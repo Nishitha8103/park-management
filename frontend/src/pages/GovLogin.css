@@ -1,0 +1,152 @@
+.gov-login-page {
+  min-height: 100vh;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  background-color: #f0f9ff;
+  padding: 2rem;
+}
+
+.gov-login-card {
+  background: white;
+  border-radius: 12px;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
+  width: 100%;
+  max-width: 450px;
+  padding: 2.5rem;
+  border-top: 6px solid #1e40af;
+}
+
+.gov-login-header {
+  text-align: center;
+  margin-bottom: 2rem;
+}
+
+.gov-login-logo {
+  display: inline-flex;
+  justify-content: center;
+  align-items: center;
+  width: 64px;
+  height: 64px;
+  background-color: #dbeafe;
+  border-radius: 50%;
+  margin-bottom: 1rem;
+}
+
+.gov-login-header h2 {
+  font-size: 1.5rem;
+  font-weight: 700;
+  color: #1e3a8a;
+  letter-spacing: 1px;
+}
+
+.gov-login-brand {
+  font-size: 0.85rem;
+  color: #64748b;
+  letter-spacing: 2px;
+}
+
+.gov-login-welcome {
+  margin-bottom: 1.5rem;
+  text-align: center;
+}
+
+.gov-login-welcome h3 {
+  font-size: 1.2rem;
+  color: #1e293b;
+  margin-bottom: 0.25rem;
+}
+
+.gov-login-welcome p {
+  font-size: 0.9rem;
+  color: #64748b;
+}
+
+.gov-form-group {
+  margin-bottom: 1.25rem;
+}
+
+.gov-input-label {
+  display: block;
+  font-size: 0.85rem;
+  font-weight: 600;
+  color: #334155;
+  margin-bottom: 0.5rem;
+}
+
+.gov-input-field {
+  width: 100%;
+  padding: 0.75rem 1rem;
+  border: 1px solid #cbd5e1;
+  border-radius: 8px;
+  font-size: 0.95rem;
+  outline: none;
+  transition: all 0.2s;
+}
+
+.gov-input-field:focus {
+  border-color: #3b82f6;
+  box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
+}
+
+.gov-password-input-wrapper {
+  position: relative;
+}
+
+.gov-password-toggle {
+  position: absolute;
+  right: 1rem;
+  top: 50%;
+  transform: translateY(-50%);
+  background: none;
+  border: none;
+  cursor: pointer;
+  color: #64748b;
+}
+
+.gov-login-options {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 1.5rem;
+  font-size: 0.85rem;
+}
+
+.gov-remember-me {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  color: #475569;
+}
+
+.gov-btn-primary {
+  width: 100%;
+  background-color: #1e40af;
+  color: white;
+  border: none;
+  padding: 0.75rem;
+  border-radius: 8px;
+  font-size: 1rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background-color 0.2s;
+}
+
+.gov-btn-primary:hover {
+  background-color: #1e3a8a;
+}
+
+.gov-login-footer {
+  margin-top: 1.5rem;
+  text-align: center;
+  font-size: 0.9rem;
+  color: #64748b;
+}
+
+.gov-text-primary {
+  color: #1e40af;
+}
+
+.gov-text-secondary {
+  color: #64748b;
+}

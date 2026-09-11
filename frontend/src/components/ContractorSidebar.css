@@ -1,0 +1,139 @@
+.contractor-sidebar {
+  position: fixed;
+  left: 0;
+  top: 0;
+  bottom: 0;
+  width: 260px;
+  transform: translateX(-100%);
+  background-color: #06402B; /* Dark green matching image */
+  color: white;
+  display: flex;
+  flex-direction: column;
+  z-index: 1000;
+  transition: transform 0.3s ease;
+}
+
+.contractor-sidebar.open {
+  transform: translateX(0);
+}
+
+.contractor-sidebar-header {
+  padding: 1.5rem;
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.contractor-sidebar-header h2 {
+  font-size: 1.1rem;
+  margin: 0;
+  font-weight: 600;
+  line-height: 1.2;
+}
+
+.contractor-sidebar-user {
+  padding: 1.5rem;
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.contractor-sidebar-avatar {
+  background-color: #64748b;
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.contractor-sidebar-user-info .name {
+  margin: 0;
+  font-weight: 600;
+  font-size: 1rem;
+}
+
+.contractor-sidebar-user-info .role {
+  margin: 0;
+  font-size: 0.8rem;
+  color: #cbd5e1;
+}
+
+.contractor-nav {
+  padding: 1rem 0;
+  flex: 1;
+  overflow-y: auto;
+}
+
+.contractor-nav-item {
+  display: flex;
+  align-items: center;
+  padding: 0.75rem 1.5rem;
+  color: white;
+  text-decoration: none;
+  gap: 1rem;
+  transition: all 0.2s;
+  position: relative;
+}
+
+.contractor-nav-item:hover {
+  background-color: rgba(255, 255, 255, 0.1);
+}
+
+.contractor-nav-item.active {
+  background-color: #10b981; /* Lighter green for active */
+  font-weight: 500;
+  border-radius: 0 25px 25px 0;
+  margin-right: 1rem;
+}
+
+.nav-badge {
+  background-color: #ef4444;
+  color: white;
+  font-size: 0.7rem;
+  padding: 0.1rem 0.4rem;
+  border-radius: 10px;
+  margin-left: auto;
+  font-weight: bold;
+}
+
+.contractor-sidebar-footer {
+  padding: 1rem;
+  border-top: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.contractor-logout-btn {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  width: 100%;
+  padding: 0.75rem;
+  background: none;
+  border: none;
+  color: white;
+  cursor: pointer;
+  border-radius: 8px;
+  transition: background-color 0.2s;
+  font-size: 1rem;
+  justify-content: flex-start;
+}
+
+.contractor-logout-btn:hover {
+  background-color: rgba(255, 255, 255, 0.1);
+}
+
+/* Sidebar overlay and mobile states */
+.contractor-sidebar-overlay {
+  display: none;
+  position: fixed;
+  inset: 0;
+  background-color: rgba(0, 0, 0, 0.5);
+  z-index: 999;
+}
+
+.contractor-sidebar-overlay.show {
+  display: block;
+}

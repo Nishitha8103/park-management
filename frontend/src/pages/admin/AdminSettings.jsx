@@ -1,0 +1,237 @@
+import { useState } from 'react';
+import { User, Lock, Bell, Shield, Mail, Phone, Save } from 'lucide-react';
+import axios from 'axios';
+
+const AdminSettings = () => {
+  const [activeTab, setActiveTab] = useState('profile');
+  const adminUser = JSON.parse(localStorage.getItem('adminUser') || '{}');
+  
+  const [profileData, setProfileData] = useState({
+    name: adminUser.name || 'System Admin',
+    email: adminUser.email || 'admin@example.com',
+    phone: adminUser.phone || '9876543210',
+  });
+
+  const [passwords, setPasswords] = useState({
+    current: '',
+    new: '',
+    confirm: ''
+  });
+
+  const [notifications, setNotifications] = useState({
+    emailAlerts: true,
+    smsAlerts: false,
+    newComplaint: true,
+    taskCompletion: true,
+  });
+
+  const [saving, setSaving] = useState(false);
+  const [message, setMessage] = useState({ type: '', text: '' });
+
+  const handleProfileSave = async (e) => {
+    e.preventDefault();
+    setSaving(true);
+    setMessage({ type: '', text: '' });
+    // Mock save delay
+    setTimeout(() => {
+      setSaving(false);
+      setMessage({ type: 'success', text: 'Profile settings updated successfully!' });
+      setTimeout(() => setMessage({ type: '', text: '' }), 3000);
+    }, 1000);
+  };
+
+  const handlePasswordSave = (e) => {
+    e.preventDefault();
+    if (passwords.new !== passwords.confirm) {
+      setMessage({ type: 'error', text: 'New passwords do not match.' });
+      return;
+    }
+    setSaving(true);
+    setTimeout(() => {
+      setSaving(false);
+      setMessage({ type: 'success', text: 'Password updated successfully!' });
+      setPasswords({ current: '', new: '', confirm: '' });
+      setTimeout(() => setMessage({ type: '', text: '' }), 3000);
+    }, 1000);
+  };
+
+  const renderTabContent = () => {
+    switch (activeTab) {
+      case 'profile':
+        return (
+          <form onSubmit={handleProfileSave} style={{ display: 'flex', flexDirection: 'column', gap: '1.5rem' }}>
+            <h4 style={{ margin: 0, color: '#334155', borderBottom: '1px solid #e2e8f0', paddingBottom: '0.5rem' }}>Personal Information</h4>
+            <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '1.5rem' }}>
+              <div>
+                <label style={{ display: 'block', fontSize: '0.85rem', fontWeight: 600, color: '#64748b', marginBottom: '8px' }}>Full Name</label>
+                <div style={{ position: 'relative' }}>
+                  <User size={18} color="#94a3b8" style={{ position: 'absolute', left: '12px', top: '50%', transform: 'translateY(-50%)' }} />
+                  <input type="text" value={profileData.name} onChange={e => setProfileData({...profileData, name: e.target.value})} style={{ width: '100%', padding: '0.75rem 1rem 0.75rem 2.5rem', borderRadius: '8px', border: '1px solid #cbd5e1', outline: 'none' }} required />
+                </div>
+              </div>
+              <div>
+                <label style={{ display: 'block', fontSize: '0.85rem', fontWeight: 600, color: '#64748b', marginBottom: '8px' }}>Email Address</label>
+                <div style={{ position: 'relative' }}>
+                  <Mail size={18} color="#94a3b8" style={{ position: 'absolute', left: '12px', top: '50%', transform: 'translateY(-50%)' }} />
+                  <input type="email" value={profileData.email} onChange={e => setProfileData({...profileData, email: e.target.value})} style={{ width: '100%', padding: '0.75rem 1rem 0.75rem 2.5rem', borderRadius: '8px', border: '1px solid #cbd5e1', outline: 'none' }} required />
+                </div>
+              </div>
+              <div>
+                <label style={{ display: 'block', fontSize: '0.85rem', fontWeight: 600, color: '#64748b', marginBottom: '8px' }}>Phone Number</label>
+                <div style={{ position: 'relative' }}>
+                  <Phone size={18} color="#94a3b8" style={{ position: 'absolute', left: '12px', top: '50%', transform: 'translateY(-50%)' }} />
+                  <input type="text" value={profileData.phone} onChange={e => setProfileData({...profileData, phone: e.target.value})} style={{ width: '100%', padding: '0.75rem 1rem 0.75rem 2.5rem', borderRadius: '8px', border: '1px solid #cbd5e1', outline: 'none' }} required />
+                </div>
+              </div>
+            </div>
+            <div style={{ display: 'flex', justifyContent: 'flex-end', marginTop: '1rem' }}>
+              <button type="submit" disabled={saving} style={{ display: 'flex', alignItems: 'center', gap: '8px', background: '#3b82f6', color: '#fff', padding: '0.75rem 2rem', border: 'none', borderRadius: '8px', fontWeight: 600, cursor: 'pointer', opacity: saving ? 0.7 : 1 }}>
+                <Save size={18} /> {saving ? 'Saving...' : 'Save Changes'}
+              </button>
+            </div>
+          </form>
+        );
+      case 'security':
+        return (
+          <form onSubmit={handlePasswordSave} style={{ display: 'flex', flexDirection: 'column', gap: '1.5rem' }}>
+            <h4 style={{ margin: 0, color: '#334155', borderBottom: '1px solid #e2e8f0', paddingBottom: '0.5rem' }}>Change Password</h4>
+            <div style={{ display: 'flex', flexDirection: 'column', gap: '1.5rem', maxWidth: '500px' }}>
+              <div>
+                <label style={{ display: 'block', fontSize: '0.85rem', fontWeight: 600, color: '#64748b', marginBottom: '8px' }}>Current Password</label>
+                <div style={{ position: 'relative' }}>
+                  <Lock size={18} color="#94a3b8" style={{ position: 'absolute', left: '12px', top: '50%', transform: 'translateY(-50%)' }} />
+                  <input type="password" value={passwords.current} onChange={e => setPasswords({...passwords, current: e.target.value})} style={{ width: '100%', padding: '0.75rem 1rem 0.75rem 2.5rem', borderRadius: '8px', border: '1px solid #cbd5e1', outline: 'none' }} required />
+                </div>
+              </div>
+              <div>
+                <label style={{ display: 'block', fontSize: '0.85rem', fontWeight: 600, color: '#64748b', marginBottom: '8px' }}>New Password</label>
+                <div style={{ position: 'relative' }}>
+                  <Lock size={18} color="#94a3b8" style={{ position: 'absolute', left: '12px', top: '50%', transform: 'translateY(-50%)' }} />
+                  <input type="password" value={passwords.new} onChange={e => setPasswords({...passwords, new: e.target.value})} style={{ width: '100%', padding: '0.75rem 1rem 0.75rem 2.5rem', borderRadius: '8px', border: '1px solid #cbd5e1', outline: 'none' }} required />
+                </div>
+              </div>
+              <div>
+                <label style={{ display: 'block', fontSize: '0.85rem', fontWeight: 600, color: '#64748b', marginBottom: '8px' }}>Confirm New Password</label>
+                <div style={{ position: 'relative' }}>
+                  <Lock size={18} color="#94a3b8" style={{ position: 'absolute', left: '12px', top: '50%', transform: 'translateY(-50%)' }} />
+                  <input type="password" value={passwords.confirm} onChange={e => setPasswords({...passwords, confirm: e.target.value})} style={{ width: '100%', padding: '0.75rem 1rem 0.75rem 2.5rem', borderRadius: '8px', border: '1px solid #cbd5e1', outline: 'none' }} required />
+                </div>
+              </div>
+            </div>
+            <div style={{ display: 'flex', justifyContent: 'flex-start', marginTop: '1rem' }}>
+              <button type="submit" disabled={saving} style={{ display: 'flex', alignItems: 'center', gap: '8px', background: '#3b82f6', color: '#fff', padding: '0.75rem 2rem', border: 'none', borderRadius: '8px', fontWeight: 600, cursor: 'pointer', opacity: saving ? 0.7 : 1 }}>
+                <Shield size={18} /> {saving ? 'Updating...' : 'Update Password'}
+              </button>
+            </div>
+          </form>
+        );
+      case 'notifications':
+        return (
+          <div style={{ display: 'flex', flexDirection: 'column', gap: '1.5rem' }}>
+            <h4 style={{ margin: 0, color: '#334155', borderBottom: '1px solid #e2e8f0', paddingBottom: '0.5rem' }}>Notification Preferences</h4>
+            <div style={{ display: 'flex', flexDirection: 'column', gap: '1rem', maxWidth: '600px' }}>
+              
+              <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', padding: '1rem', background: '#f8fafc', borderRadius: '8px', border: '1px solid #e2e8f0' }}>
+                <div>
+                  <h5 style={{ margin: '0 0 4px 0', color: '#0f172a' }}>Email Alerts</h5>
+                  <p style={{ margin: 0, fontSize: '0.85rem', color: '#64748b' }}>Receive system notifications via email.</p>
+                </div>
+                <label style={{ position: 'relative', display: 'inline-block', width: '44px', height: '24px' }}>
+                  <input type="checkbox" checked={notifications.emailAlerts} onChange={() => setNotifications({...notifications, emailAlerts: !notifications.emailAlerts})} style={{ opacity: 0, width: 0, height: 0 }} />
+                  <span style={{ position: 'absolute', cursor: 'pointer', top: 0, left: 0, right: 0, bottom: 0, backgroundColor: notifications.emailAlerts ? '#10b981' : '#cbd5e1', transition: '.4s', borderRadius: '34px' }}>
+                    <span style={{ position: 'absolute', content: '""', height: '18px', width: '18px', left: notifications.emailAlerts ? '22px' : '3px', bottom: '3px', backgroundColor: 'white', transition: '.4s', borderRadius: '50%' }}></span>
+                  </span>
+                </label>
+              </div>
+
+              <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', padding: '1rem', background: '#f8fafc', borderRadius: '8px', border: '1px solid #e2e8f0' }}>
+                <div>
+                  <h5 style={{ margin: '0 0 4px 0', color: '#0f172a' }}>SMS Alerts</h5>
+                  <p style={{ margin: 0, fontSize: '0.85rem', color: '#64748b' }}>Receive urgent alerts via SMS to your registered phone number.</p>
+                </div>
+                <label style={{ position: 'relative', display: 'inline-block', width: '44px', height: '24px' }}>
+                  <input type="checkbox" checked={notifications.smsAlerts} onChange={() => setNotifications({...notifications, smsAlerts: !notifications.smsAlerts})} style={{ opacity: 0, width: 0, height: 0 }} />
+                  <span style={{ position: 'absolute', cursor: 'pointer', top: 0, left: 0, right: 0, bottom: 0, backgroundColor: notifications.smsAlerts ? '#10b981' : '#cbd5e1', transition: '.4s', borderRadius: '34px' }}>
+                    <span style={{ position: 'absolute', content: '""', height: '18px', width: '18px', left: notifications.smsAlerts ? '22px' : '3px', bottom: '3px', backgroundColor: 'white', transition: '.4s', borderRadius: '50%' }}></span>
+                  </span>
+                </label>
+              </div>
+
+              <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', padding: '1rem', background: '#f8fafc', borderRadius: '8px', border: '1px solid #e2e8f0' }}>
+                <div>
+                  <h5 style={{ margin: '0 0 4px 0', color: '#0f172a' }}>New Complaints</h5>
+                  <p style={{ margin: 0, fontSize: '0.85rem', color: '#64748b' }}>Notify me when a new complaint is registered by a citizen.</p>
+                </div>
+                <label style={{ position: 'relative', display: 'inline-block', width: '44px', height: '24px' }}>
+                  <input type="checkbox" checked={notifications.newComplaint} onChange={() => setNotifications({...notifications, newComplaint: !notifications.newComplaint})} style={{ opacity: 0, width: 0, height: 0 }} />
+                  <span style={{ position: 'absolute', cursor: 'pointer', top: 0, left: 0, right: 0, bottom: 0, backgroundColor: notifications.newComplaint ? '#10b981' : '#cbd5e1', transition: '.4s', borderRadius: '34px' }}>
+                    <span style={{ position: 'absolute', content: '""', height: '18px', width: '18px', left: notifications.newComplaint ? '22px' : '3px', bottom: '3px', backgroundColor: 'white', transition: '.4s', borderRadius: '50%' }}></span>
+                  </span>
+                </label>
+              </div>
+            </div>
+          </div>
+        );
+      default:
+        return null;
+    }
+  };
+
+  return (
+    <div className="admin-panel" style={{ padding: '2rem', background: '#f1f5f9', minHeight: '100vh' }}>
+      <div className="admin-panel-header" style={{ marginBottom: '2rem' }}>
+        <h3 style={{ display: 'flex', alignItems: 'center', gap: '10px', fontSize: '1.5rem', margin: 0, color: '#0f172a' }}>
+          <Shield size={28} color="#8b5cf6" />
+          System Settings
+        </h3>
+        <p style={{ color: '#64748b', marginTop: '0.5rem', marginBottom: 0 }}>Manage your account settings and system preferences</p>
+      </div>
+
+      <div style={{ display: 'flex', gap: '2rem', alignItems: 'flex-start' }}>
+        
+        {/* Sidebar Tabs */}
+        <div style={{ width: '250px', background: '#fff', borderRadius: '12px', padding: '1rem', boxShadow: '0 4px 6px -1px rgba(0,0,0,0.05)' }}>
+          <button 
+            onClick={() => setActiveTab('profile')}
+            style={{ display: 'flex', alignItems: 'center', gap: '12px', width: '100%', padding: '1rem', border: 'none', background: activeTab === 'profile' ? '#eff6ff' : 'transparent', color: activeTab === 'profile' ? '#2563eb' : '#475569', fontWeight: activeTab === 'profile' ? 700 : 500, borderRadius: '8px', cursor: 'pointer', textAlign: 'left', transition: 'all 0.2s', marginBottom: '4px' }}
+          >
+            <User size={18} /> Account Profile
+          </button>
+          <button 
+            onClick={() => setActiveTab('security')}
+            style={{ display: 'flex', alignItems: 'center', gap: '12px', width: '100%', padding: '1rem', border: 'none', background: activeTab === 'security' ? '#eff6ff' : 'transparent', color: activeTab === 'security' ? '#2563eb' : '#475569', fontWeight: activeTab === 'security' ? 700 : 500, borderRadius: '8px', cursor: 'pointer', textAlign: 'left', transition: 'all 0.2s', marginBottom: '4px' }}
+          >
+            <Lock size={18} /> Security
+          </button>
+          <button 
+            onClick={() => setActiveTab('notifications')}
+            style={{ display: 'flex', alignItems: 'center', gap: '12px', width: '100%', padding: '1rem', border: 'none', background: activeTab === 'notifications' ? '#eff6ff' : 'transparent', color: activeTab === 'notifications' ? '#2563eb' : '#475569', fontWeight: activeTab === 'notifications' ? 700 : 500, borderRadius: '8px', cursor: 'pointer', textAlign: 'left', transition: 'all 0.2s' }}
+          >
+            <Bell size={18} /> Notifications
+          </button>
+        </div>
+
+        {/* Content Area */}
+        <div style={{ flex: 1, background: '#fff', borderRadius: '12px', padding: '2.5rem', boxShadow: '0 4px 6px -1px rgba(0,0,0,0.05)', minHeight: '400px' }}>
+          {message.text && (
+            <div style={{ padding: '1rem', borderRadius: '8px', marginBottom: '1.5rem', background: message.type === 'success' ? '#dcfce7' : '#fee2e2', color: message.type === 'success' ? '#166534' : '#991b1b', border: `1px solid ${message.type === 'success' ? '#bbf7d0' : '#fecaca'}`, display: 'flex', alignItems: 'center', gap: '8px' }}>
+              <CheckCircle2 size={18} /> {message.text}
+            </div>
+          )}
+          {renderTabContent()}
+        </div>
+
+      </div>
+    </div>
+  );
+};
+
+// Helper icon component for success message
+const CheckCircle2 = ({ size }) => (
+  <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+    <path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"></path>
+    <polyline points="22 4 12 14.01 9 11.01"></polyline>
+  </svg>
+);
+
+export default AdminSettings;

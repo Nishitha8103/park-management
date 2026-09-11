@@ -1,0 +1,208 @@
+.announcements-container {
+  width: 100%;
+  min-height: 80vh;
+  padding: 0.5rem 0 2.5rem 0;
+}
+
+.announcements-header {
+  background: linear-gradient(135deg, rgba(6, 78, 59, 0.92) 0%, rgba(5, 150, 105, 0.88) 100%);
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
+  border: 1px solid rgba(255, 255, 255, 0.25);
+  border-radius: 16px;
+  padding: 1.5rem 2rem;
+  color: white;
+  box-shadow: 0 12px 35px rgba(6, 78, 59, 0.18);
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 1.25rem;
+  margin-bottom: 2rem;
+}
+
+.header-title-group {
+  display: flex;
+  align-items: center;
+  gap: 1.25rem;
+}
+
+.header-icon-box {
+  width: 52px;
+  height: 52px;
+  background: #ffffff;
+  border-radius: 14px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: 0 6px 16px rgba(0, 0, 0, 0.12);
+  flex-shrink: 0;
+}
+
+.announcements-header h1 {
+  font-size: 1.85rem;
+  font-weight: 800;
+  color: #ffffff;
+  margin: 0 0 4px;
+  letter-spacing: -0.02em;
+}
+
+.announcements-header p {
+  color: #a7f3d0;
+  margin: 0;
+  font-weight: 500;
+  font-size: 0.95rem;
+}
+
+.header-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  background: rgba(255, 255, 255, 0.15);
+  border: 1px solid rgba(255, 255, 255, 0.3);
+  backdrop-filter: blur(8px);
+  padding: 6px 14px;
+  border-radius: 20px;
+  font-size: 0.85rem;
+  font-weight: 700;
+  color: #ffffff;
+}
+
+.live-pulse {
+  width: 8px;
+  height: 8px;
+  background-color: #34d399;
+  border-radius: 50%;
+  box-shadow: 0 0 0 0 rgba(52, 211, 153, 0.7);
+  animation: pulse-green 2s infinite;
+}
+
+@keyframes pulse-green {
+  0% {
+    transform: scale(0.95);
+    box-shadow: 0 0 0 0 rgba(52, 211, 153, 0.7);
+  }
+  70% {
+    transform: scale(1);
+    box-shadow: 0 0 0 8px rgba(52, 211, 153, 0);
+  }
+  100% {
+    transform: scale(0.95);
+    box-shadow: 0 0 0 0 rgba(52, 211, 153, 0);
+  }
+}
+
+.announcements-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(320px, 420px));
+  justify-content: start;
+  gap: 1.5rem;
+  width: 100%;
+  max-width: 100%;
+  margin: 0;
+}
+
+.announcement-card {
+  background: rgba(255, 255, 255, 0.96);
+  backdrop-filter: blur(12px);
+  border-radius: 16px;
+  padding: 1.5rem;
+  box-shadow: 0 8px 25px rgba(0, 0, 0, 0.05);
+  display: flex;
+  flex-direction: column;
+  transition: all 0.2s ease;
+  border: 1px solid rgba(255, 255, 255, 0.9);
+  border-left: 5px solid #cbd5e1;
+}
+
+.announcement-card:hover {
+  transform: translateY(-4px);
+  box-shadow: 0 14px 30px rgba(0, 0, 0, 0.09);
+}
+
+.announcement-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  margin-bottom: 1rem;
+}
+
+.announcement-title {
+  margin: 0;
+  color: #0f172a;
+  font-size: 1.25rem;
+  font-weight: 600;
+  line-height: 1.4;
+  flex: 1;
+}
+
+.announcement-type-badge {
+  padding: 4px 12px;
+  border-radius: 20px;
+  font-size: 0.75rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  margin-left: 1rem;
+  white-space: nowrap;
+}
+
+.announcement-type-general { background: #e2e8f0; color: #475569; }
+.announcement-type-park-closure { background: #fee2e2; color: #dc2626; border-left-color: #dc2626; }
+.announcement-type-maintenance { background: #fef3c7; color: #d97706; }
+.announcement-type-emergency { background: #fecdd3; color: #e11d48; }
+.announcement-type-event { background: #e0e7ff; color: #4f46e5; }
+.announcement-type-information { background: #dbeafe; color: #2563eb; }
+
+.announcement-priority-urgent { border-left-color: #ef4444; }
+.announcement-priority-important { border-left-color: #f59e0b; }
+
+.announcement-content {
+  color: #475569;
+  font-size: 0.95rem;
+  line-height: 1.6;
+  margin-bottom: 1.5rem;
+  flex: 1;
+  white-space: pre-wrap;
+}
+
+.announcement-footer {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+  font-size: 0.85rem;
+  color: #64748b;
+  padding-top: 1rem;
+  border-top: 1px solid #f1f5f9;
+}
+
+.announcement-footer-row {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.empty-state {
+  text-align: center;
+  padding: 4rem 2rem;
+  background: #f8fafc;
+  border-radius: 12px;
+  max-width: 600px;
+  margin: 0 auto;
+}
+
+.empty-state h3 {
+  color: #0f172a;
+  margin-bottom: 0.5rem;
+  font-size: 1.5rem;
+}
+
+.empty-state p {
+  color: #64748b;
+}
+
+.loading-state {
+  text-align: center;
+  padding: 3rem;
+  color: #64748b;
+  font-size: 1.2rem;
+}

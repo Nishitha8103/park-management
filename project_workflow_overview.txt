@@ -1,0 +1,44 @@
+Park Monitoring System - Project Workflow Overview
+
+The Park Monitoring System is a comprehensive platform designed to manage, maintain, and monitor public parks across various jurisdictions. It bridges the gap between government administration, assigned contractors, and citizens.
+
+Below is the overarching workflow and data structure of the system:
+
+1. Hierarchical Master Data Structure
+The system is built on a strict geographical hierarchy to ensure proper delegation and management:
+- District (e.g., Bangalore Urban)
+- Corporation (e.g., BBMP)
+- Zone (e.g., South Zone)
+- Ward (e.g., Jayanagar)
+- Park (e.g., Madhavan Park)
+
+2. User Roles & Capabilities
+The system supports three primary user roles:
+- Administrator (Admin): Manages the master data (adding new parks, zones, etc.), onboards new contractors, assigns jurisdictions to contractors, and oversees the entire system through a centralized dashboard.
+- Contractor: Third-party personnel or agencies assigned to specific parks or wards. They log into their portal to view assigned parks, check pending maintenance tasks/complaints, and update task statuses. They are profiled based on their "Maintenance Skills" (e.g., Plumbing, Gardening, Electrical).
+- Citizen (User): The general public who can view park details, amenities, and report issues (complaints) such as broken benches, non-functional lights, or unkempt gardens.
+
+3. The Core Workflow (Complaints & Maintenance)
+- Step A - Issue Identification: A citizen visits a park, notices an issue (e.g., a broken swing), logs into the system, and raises a 'Complaint' against that specific park.
+- Step B - Routing & Assignment: The system uses the park's geographical location (Ward/Zone) and the nature of the issue to automatically flag or route the complaint to the designated Contractor assigned to that park.
+- Step C - Resolution: The Contractor receives a notification about the pending complaint in their dashboard. They deploy their team to fix the issue.
+- Step D - Status Update: Once fixed, the Contractor updates the complaint status to "Resolved" and may upload proof (e.g., photos). 
+- Step E - Notification: The Admin and the Citizen who raised the complaint are notified of the resolution via the Announcements/Notifications module.
+
+4. Announcements & Transparency
+- The Admin can broadcast Announcements to contractors (e.g., policy changes, general directives) or citizens (e.g., park closure notices).
+- This creates a transparent, accountable loop where public infrastructure is actively monitored and maintained efficiently.
+
+5. Recent Updates & UI/UX Workflow Enhancements
+A series of significant updates have been deployed to improve both the administrative data capabilities and the citizen-facing user experience:
+
+- Enhanced Park Registration (Admin):
+  The administrative workflow for registering new parks has been expanded. Admins can now capture detailed "Visitor Safety & Accessibility" metrics (e.g., Wheelchair Accessible, CCTV Monitoring, First-Aid Facility, Pet Friendly). This data is persisted in the backend schema and rendered directly to the public.
+
+- Modernized Citizen Dashboard Workflow (Public):
+  The citizen portal has undergone a major layout refactor to act as a seamless, interactive dashboard:
+  * Global Theme: A unified global background image is now persistently visible across all sub-pages (Submit Complaint, Complaint History, Feedback, etc.) using modern glassmorphism (semi-transparent) UI cards, removing solid white blockers.
+  * One-Page Park Details: The Park Details page has been structurally compacted. All comprehensive park information (including the new Safety & Accessibility metrics and uniform Material Icons for facilities) and primary action buttons ("Report an Issue", "Give Feedback") now fit entirely on a single screen without the need for vertical scrolling.
+  * Smart Events Display: The Events page workflow has been refined to dynamically hide empty sections (e.g., hiding the "Upcoming Events" block entirely if none exist) to prevent user confusion.
+  
+These updates streamline the citizen's journey from viewing park amenities to seamlessly tracking complaints and reporting issues within a clean, single-page dashboard experience.

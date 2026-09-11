@@ -1,0 +1,113 @@
+.gov-sidebar {
+  width: 260px;
+  background-color: var(--gov-secondary); /* #0F2D52 */
+  color: white;
+  display: flex;
+  flex-direction: column;
+  height: 100vh;
+  position: fixed;
+  top: 0;
+  left: 0;
+  z-index: 20;
+  transition: transform 0.3s ease;
+  box-shadow: 4px 0 10px rgba(0, 0, 0, 0.1);
+}
+
+.gov-sidebar.closed {
+  transform: translateX(-100%);
+}
+
+.gov-sidebar-header {
+  padding: 1.5rem var(--gov-spacing);
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  background-color: rgba(0, 0, 0, 0.2);
+  border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.gov-sidebar-header .logo-icon {
+  background-color: var(--gov-primary);
+  padding: 6px;
+  border-radius: 8px;
+}
+
+.gov-sidebar-header h2 {
+  font-size: 1.1rem;
+  margin: 0;
+  font-weight: 700;
+  line-height: 1.2;
+  letter-spacing: 0.5px;
+}
+
+.gov-nav {
+  display: flex;
+  flex-direction: column;
+  padding: var(--gov-spacing) 12px;
+  gap: 6px;
+  flex: 1;
+  overflow-y: auto;
+}
+
+/* Custom Scrollbar for nav */
+.gov-nav::-webkit-scrollbar {
+  width: 6px;
+}
+.gov-nav::-webkit-scrollbar-track {
+  background: transparent;
+}
+.gov-nav::-webkit-scrollbar-thumb {
+  background: rgba(255, 255, 255, 0.2);
+  border-radius: 10px;
+}
+
+.gov-nav-item {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 12px 16px;
+  color: rgba(255, 255, 255, 0.8);
+  text-decoration: none;
+  font-weight: 500;
+  border-radius: 8px; /* Slightly less than --gov-radius for inner elements */
+  transition: all 0.2s ease;
+  position: relative;
+}
+
+.gov-nav-item:hover {
+  background-color: var(--gov-primary);
+  color: white;
+}
+
+.gov-nav-item.active {
+  background-color: var(--gov-primary);
+  color: white;
+  box-shadow: 0 4px 6px rgba(22, 163, 74, 0.3);
+}
+
+.nav-badge {
+  position: absolute;
+  right: 16px;
+  background-color: #ef4444;
+  color: white;
+  font-size: 0.75rem;
+  font-weight: bold;
+  padding: 2px 8px;
+  border-radius: 12px;
+}
+
+.nav-divider {
+  height: 1px;
+  background-color: rgba(255, 255, 255, 0.1);
+  margin: 12px 0;
+}
+
+@media (max-width: 992px) {
+  .gov-sidebar {
+    transform: translateX(-100%);
+  }
+  
+  .gov-sidebar.open {
+    transform: translateX(0);
+  }
+}

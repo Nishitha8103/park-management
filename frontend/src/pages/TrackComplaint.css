@@ -1,0 +1,144 @@
+.track-page {
+  padding: var(--spacing-xl) 0;
+}
+
+.track-card {
+  background: white;
+  border-radius: var(--radius-lg);
+  border: 1px solid var(--border);
+  box-shadow: var(--shadow-sm);
+  padding: var(--spacing-2xl);
+  width: 100%;
+}
+
+.track-header {
+  text-align: center;
+  margin-bottom: var(--spacing-xl);
+}
+
+.track-header h2 {
+  font-size: 1.75rem;
+  margin-bottom: var(--spacing-xs);
+}
+
+.track-header p {
+  color: var(--text-secondary);
+}
+
+.track-form {
+  display: flex;
+  gap: var(--spacing-md);
+  margin-bottom: var(--spacing-2xl);
+  align-items: center;
+}
+
+.track-form .form-group {
+  flex: 1;
+  margin-bottom: 0;
+}
+
+.track-submit-btn {
+  white-space: nowrap;
+}
+
+.track-result {
+  border-top: 1px solid var(--border);
+  padding-top: var(--spacing-xl);
+}
+
+.track-result h3 {
+  margin-bottom: var(--spacing-xl);
+  font-size: 1.25rem;
+}
+
+.status-timeline {
+  display: flex;
+  flex-direction: column;
+  margin-bottom: var(--spacing-2xl);
+  padding-left: var(--spacing-md);
+}
+
+.timeline-item {
+  display: flex;
+  position: relative;
+  padding-bottom: var(--spacing-xl);
+  opacity: 0.5;
+}
+
+.timeline-item:last-child {
+  padding-bottom: 0;
+}
+
+.timeline-item.active {
+  opacity: 1;
+}
+
+.timeline-dot {
+  position: absolute;
+  left: -8px;
+  top: 4px;
+  width: 16px;
+  height: 16px;
+  border-radius: 50%;
+  background-color: var(--border);
+  z-index: 2;
+}
+
+.timeline-item.active .timeline-dot {
+  background-color: var(--primary);
+}
+
+.timeline-line {
+  position: absolute;
+  left: -1px;
+  top: 20px;
+  bottom: -4px;
+  width: 2px;
+  background-color: var(--border);
+  z-index: 1;
+}
+
+.timeline-item:last-child .timeline-line {
+  display: none;
+}
+
+.timeline-item.active .timeline-line {
+  background-color: var(--primary);
+}
+.timeline-item.active:last-of-type .timeline-line {
+    background-color: var(--border);
+}
+
+.timeline-content {
+  padding-left: var(--spacing-xl);
+}
+
+.timeline-content h4 {
+  margin-bottom: 4px;
+  font-size: 1.1rem;
+}
+
+.timeline-content p {
+  color: var(--text-secondary);
+  font-size: 0.9rem;
+  margin: 0;
+}
+
+.complaint-details-box {
+  background-color: var(--background);
+  padding: var(--spacing-lg);
+  border-radius: var(--radius-md);
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-sm);
+}
+
+.complaint-details-box p {
+  margin: 0;
+  display: flex;
+  gap: var(--spacing-sm);
+}
+
+.complaint-details-box strong {
+  min-width: 120px;
+}

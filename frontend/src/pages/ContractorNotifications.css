@@ -1,0 +1,172 @@
+/* ============================================================
+   CONTRACTOR NOTIFICATIONS — Professional Park Theme
+   ============================================================ */
+
+/* ---- Page wrapper ---- */
+.contractor-notifications-page {
+  padding: 2rem 0 3.5rem;
+}
+
+/* ---- Header ---- */
+.notifications-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: 1rem;
+  margin-bottom: 1.75rem;
+  padding: 1.5rem;
+  background: linear-gradient(135deg, #0f172a 0%, #1e293b 65%, #1a2530 100%);
+  border-radius: 16px;
+  border: 1px solid rgba(148,163,184,0.15);
+  box-shadow: 0 8px 24px rgba(15,23,42,0.2);
+}
+
+.notifications-header h2 {
+  font-size: 1.35rem;
+  font-weight: 800;
+  color: #fff;
+  margin: 0;
+}
+
+.notifications-header > div {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+}
+
+.btn-mark-all {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.45rem;
+  background: rgba(22,163,74,0.15);
+  color: #4ade80;
+  border: 1px solid rgba(22,163,74,0.25);
+  padding: 0.5rem 1.1rem;
+  border-radius: 8px;
+  font-size: 0.82rem;
+  font-weight: 700;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.btn-mark-all:hover {
+  background: #16a34a;
+  color: #fff;
+  border-color: #16a34a;
+}
+
+/* ---- Notifications List ---- */
+.notifications-list {
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+}
+
+.notification-card {
+  display: flex;
+  align-items: flex-start;
+  gap: 1rem;
+  background: #fff;
+  border: 1.5px solid #e2e8f0;
+  border-radius: 14px;
+  padding: 1.1rem 1.35rem;
+  box-shadow: 0 1px 4px rgba(0,0,0,0.04);
+  transition: all 0.2s ease;
+  position: relative;
+}
+
+.notification-card:hover {
+  transform: translateX(3px);
+  box-shadow: 0 4px 16px rgba(0,0,0,0.08);
+}
+
+.notification-card.unread {
+  border-left: 4px solid #f59e0b;
+  background: linear-gradient(to right, #fffbeb, #fff 20%);
+}
+
+.notification-icon {
+  width: 42px;
+  height: 42px;
+  border-radius: 50%;
+  background: #fef3c7;
+  color: #d97706;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
+
+.notification-card.unread .notification-icon {
+  background: linear-gradient(135deg, #d97706, #f59e0b);
+  color: white;
+}
+
+.notification-content {
+  flex: 1;
+}
+
+.notification-content h4 {
+  font-size: 0.92rem;
+  font-weight: 700;
+  color: #0f172a;
+  margin: 0 0 0.3rem;
+}
+
+.notification-content p {
+  font-size: 0.85rem;
+  color: #475569;
+  margin: 0 0 0.4rem;
+  line-height: 1.5;
+}
+
+.notification-date {
+  font-size: 0.74rem;
+  color: #94a3b8;
+  font-weight: 600;
+}
+
+.btn-mark-read {
+  background: #f1f5f9;
+  color: #475569;
+  border: 1.5px solid #e2e8f0;
+  padding: 0.38rem 0.85rem;
+  border-radius: 7px;
+  font-size: 0.76rem;
+  font-weight: 700;
+  cursor: pointer;
+  white-space: nowrap;
+  flex-shrink: 0;
+  transition: all 0.2s;
+}
+
+.btn-mark-read:hover {
+  background: #16a34a;
+  color: #fff;
+  border-color: #16a34a;
+}
+
+/* ---- Empty State ---- */
+.empty-notifications {
+  text-align: center;
+  padding: 4rem 2rem;
+  color: #94a3b8;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.empty-notifications h3 {
+  font-size: 1.1rem;
+  font-weight: 700;
+  color: #475569;
+  margin: 0;
+}
+
+.empty-notifications p {
+  font-size: 0.88rem;
+  color: #94a3b8;
+  margin: 0;
+}

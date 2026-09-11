@@ -1,0 +1,34 @@
+/* Uses base styles from Sidebar.css but with admin specific tweaks */
+.admin-sidebar {
+  background-color: #111827;
+  color: #f3f4f6;
+}
+
+.admin-sidebar .nav-item {
+  color: #d1d5db;
+}
+
+.admin-sidebar .nav-item:hover, 
+.admin-sidebar .nav-item.active {
+  background-color: #3730a3;
+  color: white;
+}
+
+.admin-profile {
+  background-color: #1f2937 !important;
+  border-bottom: 1px solid #374151 !important;
+}
+
+.admin-profile .avatar {
+  background-color: #e0e7ff;
+}
+
+.nav-divider {
+  height: 1px;
+  background-color: #374151;
+  margin: 1rem 0;
+}
+
+.admin-sidebar .logout:hover {
+  background-color: #fee2e2 !important;
+}

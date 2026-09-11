@@ -1,0 +1,95 @@
+.contractor-register-page {
+  min-height: 100vh;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  background-color: #fefaf0;
+  padding: 2rem;
+  font-family: 'Inter', sans-serif;
+}
+
+.contractor-register-card {
+  background: white;
+  border-radius: 12px;
+  box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.08), 0 8px 10px -6px rgba(0, 0, 0, 0.08);
+  width: 100%;
+  max-width: 600px;
+  padding: 2.5rem;
+  border-top: 6px solid #d97706;
+}
+
+.contractor-register-header {
+  text-align: center;
+  margin-bottom: 2rem;
+}
+
+.contractor-register-logo {
+  display: inline-flex;
+  justify-content: center;
+  align-items: center;
+  width: 64px;
+  height: 64px;
+  background-color: #fef3c7;
+  border-radius: 50%;
+  margin-bottom: 1rem;
+}
+
+.contractor-register-header h2 {
+  font-size: 1.5rem;
+  font-weight: 800;
+  color: #78350f;
+  letter-spacing: 1px;
+  margin: 0;
+}
+
+.contractor-register-brand {
+  font-size: 0.85rem;
+  color: #64748b;
+  letter-spacing: 2px;
+  margin-top: 0.25rem;
+}
+
+.contractor-form-row {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 1.25rem;
+  margin-bottom: 1.25rem;
+}
+
+@media (max-width: 600px) {
+  .contractor-form-row {
+    grid-template-columns: 1fr;
+  }
+}
+
+.contractor-form-group {
+  display: flex;
+  flex-direction: column;
+}
+
+.contractor-input-with-icon {
+  position: relative;
+  display: flex;
+  align-items: center;
+}
+
+.contractor-input-icon {
+  position: absolute;
+  left: 1rem;
+  color: #64748b;
+}
+
+.contractor-input-field.has-icon {
+  padding-left: 2.75rem;
+}
+
+.contractor-register-footer {
+  margin-top: 1.5rem;
+  text-align: center;
+  font-size: 0.9rem;
+  color: #64748b;
+}
+
+.contractor-register-footer p {
+  margin: 0;
+}

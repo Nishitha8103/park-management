@@ -1,0 +1,134 @@
+.register-page {
+  min-height: 100vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background-color: transparent;
+  padding: var(--spacing-xl);
+}
+
+.register-card {
+  background: white;
+  padding: var(--spacing-2xl);
+  border-radius: var(--radius-lg);
+  box-shadow: var(--shadow-lg);
+  width: 100%;
+  max-width: 700px; /* Wider than login */
+}
+
+.register-header {
+  text-align: center;
+  margin-bottom: var(--spacing-xl);
+  padding-bottom: var(--spacing-md);
+  border-bottom: 1px solid var(--border);
+}
+
+.register-icon-wrapper {
+  display: inline-flex;
+  margin-bottom: var(--spacing-xs);
+}
+
+.register-header h2 {
+  font-size: 1.5rem;
+  font-weight: 700;
+  margin-bottom: var(--spacing-xs);
+}
+
+.register-header p {
+  color: var(--text-secondary);
+  font-size: 0.95rem;
+}
+
+.register-form {
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-lg);
+}
+
+.form-row {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: var(--spacing-lg);
+}
+
+.input-with-icon {
+  position: relative;
+  display: flex;
+  align-items: center;
+}
+
+.input-icon {
+  position: absolute;
+  left: 12px;
+  pointer-events: none;
+}
+
+.input-field.has-icon {
+  padding-left: 2.5rem;
+}
+
+.password-toggle {
+  position: absolute;
+  right: 12px;
+  background: none;
+  border: none;
+  cursor: pointer;
+  padding: 0;
+  display: flex;
+  align-items: center;
+}
+
+.privacy-alert {
+  background-color: var(--secondary);
+  border: 1px solid rgba(16, 185, 129, 0.2);
+  border-radius: var(--radius-md);
+  padding: var(--spacing-md);
+  display: flex;
+  gap: var(--spacing-md);
+  align-items: flex-start;
+  margin-top: var(--spacing-sm);
+}
+
+.privacy-icon {
+  margin-top: 2px;
+}
+
+.privacy-content h4 {
+  color: var(--primary);
+  font-size: 0.95rem;
+  font-weight: 600;
+  margin-bottom: 2px;
+}
+
+.privacy-content p {
+  color: var(--text-secondary);
+  font-size: 0.85rem;
+  line-height: 1.4;
+}
+
+.terms-checkbox {
+  display: flex;
+  align-items: flex-start;
+  gap: var(--spacing-sm);
+  font-size: 0.9rem;
+  margin: var(--spacing-sm) 0;
+  cursor: pointer;
+}
+
+.terms-checkbox input {
+  margin-top: 4px;
+}
+
+.register-btn {
+  display: flex;
+  gap: var(--spacing-sm);
+  padding: 0.875rem;
+  font-size: 1.1rem;
+}
+
+.register-footer {
+  text-align: center;
+  margin-top: var(--spacing-xl);
+  font-size: 0.95rem;
+  color: var(--text-secondary);
+}

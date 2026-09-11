@@ -1,0 +1,30 @@
+BBMP Corporation Data Migration Workflow
+
+Overview:
+This document explains the steps taken to fix the issue where multiple redundant corporations (such as "Bengaluru South City Corporation", "Bangalore Urban City Corporation", etc.) were appearing for the Bangalore Urban district. The goal was to consolidate all data into a single official corporation: BBMP.
+
+Steps Executed:
+1. Analysis of Existing Data:
+   - Found that the database contained 8 different corporations under the Bangalore Urban district.
+   - Identified that while BBMP had zones and wards mapped to it, the actual parks (over 900 of them) were scattered across the other 7 redundant corporations.
+
+2. User Alignment:
+   - Confirmed with the user that the desired outcome was to keep only BBMP as the official corporation and remove the rest.
+
+3. Database Migration Script (migrateToBBMP.js):
+   - Created a Node.js script to safely merge all data.
+   - Located the core BBMP corporation record.
+   - Found all parks assigned to the 7 extra corporations and updated their `corporation` reference to point to BBMP (Moved 934 parks).
+   - Found all wards assigned to the 7 extra corporations and updated their `corporationId` reference to BBMP (Moved 156 wards).
+   - Found all zones assigned to the 7 extra corporations and updated their `corporationId` reference to BBMP (Moved 45 zones).
+
+4. De-duplication of Zones:
+   - Since moving zones from multiple corporations into one resulted in duplicate zone names (e.g., multiple "East" or "Mahadevapura" zones), the script mapped zones with the same name.
+   - It merged the duplicates by moving all wards and parks from the duplicate zone into the primary zone, and then safely deleted the duplicate zone record.
+
+5. Cleanup:
+   - Deleted the 7 empty, redundant corporations from the database.
+   - Ensured the BBMP corporation name was cleanly set to "BBMP".
+
+Result:
+The "Corporation" dropdown on the frontend now displays a single, correct option ("BBMP") for the Bangalore Urban district. Selecting it populates the unique list of zones, and all parks and wards remain intact and correctly associated.

@@ -1,0 +1,6 @@
+.inspection-reports-container {
+  display: flex;
+  flex-direction: column;
+}
+
+/* Inherits table styles from GovMyParks.css via global/reusable classes like .custom-table */

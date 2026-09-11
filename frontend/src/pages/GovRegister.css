@@ -1,0 +1,128 @@
+.gov-register-page {
+  min-height: 100vh;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  background-color: #f0f9ff;
+  padding: 2rem;
+}
+
+.gov-register-card {
+  background: white;
+  border-radius: 12px;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
+  width: 100%;
+  max-width: 600px;
+  padding: 2.5rem;
+  border-top: 6px solid #1e40af;
+}
+
+.gov-register-header {
+  text-align: center;
+  margin-bottom: 2rem;
+}
+
+.gov-register-logo {
+  display: inline-flex;
+  justify-content: center;
+  align-items: center;
+  width: 64px;
+  height: 64px;
+  background-color: #dbeafe;
+  border-radius: 50%;
+  margin-bottom: 1rem;
+}
+
+.gov-register-header h2 {
+  font-size: 1.5rem;
+  font-weight: 700;
+  color: #1e3a8a;
+  letter-spacing: 1px;
+}
+
+.gov-register-brand {
+  font-size: 0.85rem;
+  color: #64748b;
+  letter-spacing: 2px;
+}
+
+.gov-form-row {
+  display: flex;
+  gap: 1.5rem;
+  margin-bottom: 1.25rem;
+}
+
+.gov-form-group {
+  flex: 1;
+}
+
+.gov-input-label {
+  display: block;
+  font-size: 0.85rem;
+  font-weight: 600;
+  color: #334155;
+  margin-bottom: 0.5rem;
+}
+
+.gov-input-with-icon {
+  position: relative;
+}
+
+.gov-input-icon {
+  position: absolute;
+  left: 1rem;
+  top: 50%;
+  transform: translateY(-50%);
+  color: #64748b;
+}
+
+.gov-input-field.has-icon {
+  width: 100%;
+  padding: 0.75rem 1rem 0.75rem 2.5rem;
+  border: 1px solid #cbd5e1;
+  border-radius: 8px;
+  font-size: 0.95rem;
+  outline: none;
+  transition: all 0.2s;
+}
+
+.gov-input-field.has-icon:focus {
+  border-color: #3b82f6;
+  box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
+}
+
+.gov-btn-primary {
+  width: 100%;
+  background-color: #1e40af;
+  color: white;
+  border: none;
+  padding: 0.85rem;
+  border-radius: 8px;
+  font-size: 1rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background-color 0.2s;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 0.5rem;
+  margin-top: 1rem;
+}
+
+.gov-btn-primary:hover {
+  background-color: #1e3a8a;
+}
+
+.gov-register-footer {
+  margin-top: 1.5rem;
+  text-align: center;
+  font-size: 0.9rem;
+  color: #64748b;
+}
+
+@media (max-width: 600px) {
+  .gov-form-row {
+    flex-direction: column;
+    gap: 1.25rem;
+  }
+}

@@ -1,0 +1,333 @@
+/* ============================================================
+   CONTRACTOR MY TASKS PAGE — Professional Park Theme
+   ============================================================ */
+
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap');
+
+/* Page Wrapper uses ContractorDashboard.css base classes */
+
+/* ---- Page Header Section ---- */
+.contractor-main-panel {
+  background: #fff;
+  border-radius: 16px;
+  border: 1px solid #e2e8f0;
+  box-shadow: 0 2px 12px rgba(0,0,0,0.05);
+  overflow: hidden;
+  margin-bottom: 2rem;
+}
+
+.contractor-panel-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 1rem;
+  padding: 1.5rem 1.75rem;
+  background: linear-gradient(135deg, #0f172a 0%, #1e293b 100%);
+  border-bottom: 1px solid rgba(255,255,255,0.06);
+}
+
+.contractor-panel-header h3 {
+  font-size: 1.15rem;
+  font-weight: 800;
+  color: #ffffff;
+  margin: 0;
+  letter-spacing: 0.2px;
+}
+
+/* ---- Filter Buttons ---- */
+.contractor-filters {
+  display: flex;
+  gap: 0.5rem;
+  flex-wrap: wrap;
+}
+
+.contractor-filter-btn {
+  background: rgba(255,255,255,0.07);
+  color: #94a3b8;
+  border: 1.5px solid rgba(255,255,255,0.1);
+  padding: 0.4rem 1rem;
+  border-radius: 8px;
+  font-size: 0.82rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.contractor-filter-btn:hover {
+  background: rgba(255,255,255,0.14);
+  color: #e2e8f0;
+  border-color: rgba(255,255,255,0.2);
+}
+
+.contractor-filter-btn.active {
+  background: #d97706;
+  color: #fff;
+  border-color: #d97706;
+  box-shadow: 0 3px 10px rgba(217,119,6,0.3);
+}
+
+/* ---- Table Container ---- */
+.contractor-table-container {
+  overflow-x: auto;
+}
+
+/* ---- Main Table ---- */
+.contractor-table {
+  width: 100%;
+  border-collapse: collapse;
+}
+
+.contractor-table thead tr {
+  background: #f8fafc;
+}
+
+.contractor-table thead th {
+  padding: 0.85rem 1.25rem;
+  text-align: left;
+  font-size: 0.72rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.6px;
+  color: #64748b;
+  border-bottom: 1px solid #e2e8f0;
+  white-space: nowrap;
+}
+
+.contractor-table tbody tr {
+  transition: background 0.15s ease;
+  border-bottom: 1px solid #f1f5f9;
+}
+
+.contractor-table tbody tr:last-child {
+  border-bottom: none;
+}
+
+.contractor-table tbody tr:hover {
+  background: #f0fdf4;
+}
+
+.contractor-table tbody td {
+  padding: 0.95rem 1.25rem;
+  font-size: 0.87rem;
+  color: #334155;
+  vertical-align: middle;
+}
+
+/* ---- Priority Badges ---- */
+.job-priority-badge {
+  font-size: 0.7rem;
+  font-weight: 700;
+  padding: 0.22rem 0.6rem;
+  border-radius: 6px;
+  text-transform: uppercase;
+  letter-spacing: 0.4px;
+}
+
+.job-priority-badge.high,
+.job-priority-badge.urgent {
+  background: #fee2e2;
+  color: #b91c1c;
+}
+
+.job-priority-badge.medium {
+  background: #fef3c7;
+  color: #b45309;
+}
+
+.job-priority-badge.low {
+  background: #dcfce7;
+  color: #15803d;
+}
+
+/* ---- Status Badges ---- */
+.job-status-badge {
+  font-size: 0.72rem;
+  font-weight: 700;
+  padding: 0.25rem 0.65rem;
+  border-radius: 20px;
+  display: inline-block;
+  text-transform: capitalize;
+  border: 1px solid transparent;
+}
+
+.job-status-badge.assigned,
+.job-status-badge.reassigned-to-contractor {
+  background: #dbeafe;
+  color: #1d4ed8;
+}
+
+.job-status-badge.in-progress {
+  background: #fef3c7;
+  color: #b45309;
+}
+
+.job-status-badge.completed,
+.job-status-badge.closed,
+.job-status-badge.inspection-approved {
+  background: #dcfce7;
+  color: #15803d;
+}
+
+.job-status-badge.completed-waiting-for-admin-review,
+.job-status-badge.inspection-pending {
+  background: #f0fdf4;
+  color: #15803d;
+  border-color: #bbf7d0;
+}
+
+/* ---- Action Buttons ---- */
+.btn-job-action {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.35rem;
+  padding: 0.38rem 0.75rem;
+  border-radius: 7px;
+  font-size: 0.78rem;
+  font-weight: 700;
+  border: 1.5px solid #e2e8f0;
+  background: #f8fafc;
+  color: #334155;
+  cursor: pointer;
+  transition: all 0.2s;
+  white-space: nowrap;
+}
+
+.btn-job-action:hover {
+  background: #1e293b;
+  color: #fff;
+  border-color: #1e293b;
+}
+
+.btn-job-action.complete {
+  background: #dcfce7;
+  color: #15803d;
+  border-color: #bbf7d0;
+}
+
+.btn-job-action.complete:hover {
+  background: #16a34a;
+  color: #fff;
+  border-color: #16a34a;
+}
+
+/* ---- Empty State ---- */
+.contractor-empty-state {
+  text-align: center;
+  padding: 4rem 2rem;
+  color: #94a3b8;
+}
+
+.contractor-empty-state h4 {
+  font-size: 1.05rem;
+  font-weight: 700;
+  color: #475569;
+  margin: 0.75rem 0 0.35rem;
+}
+
+.contractor-empty-state p {
+  font-size: 0.9rem;
+  color: #94a3b8;
+  margin: 0;
+}
+
+/* ---- Modal ---- */
+.contractor-modal-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(15,23,42,0.6);
+  backdrop-filter: blur(4px);
+  z-index: 999;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 1rem;
+}
+
+.contractor-modal {
+  background: #fff;
+  border-radius: 16px;
+  padding: 2rem;
+  width: 100%;
+  max-width: 500px;
+  box-shadow: 0 25px 50px rgba(0,0,0,0.25);
+  animation: modalSlideUp 0.2s ease;
+}
+
+@keyframes modalSlideUp {
+  from { opacity: 0; transform: translateY(20px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+.contractor-modal h4 {
+  font-size: 1.15rem;
+  font-weight: 800;
+  color: #0f172a;
+  margin: 0 0 1.25rem 0;
+}
+
+.contractor-modal-body {
+  margin-bottom: 1.25rem;
+}
+
+.contractor-form-group {
+  display: flex;
+  flex-direction: column;
+  gap: 0.4rem;
+}
+
+.contractor-input-label {
+  font-size: 0.82rem;
+  font-weight: 600;
+  color: #475569;
+}
+
+.contractor-input-field {
+  border: 1.5px solid #e2e8f0;
+  border-radius: 8px;
+  font-size: 0.9rem;
+  color: #1e293b;
+  transition: border-color 0.2s;
+  font-family: 'Inter', sans-serif;
+}
+
+.contractor-input-field:focus {
+  border-color: #16a34a;
+  outline: none;
+  box-shadow: 0 0 0 3px rgba(22,163,74,0.1);
+}
+
+.contractor-modal-actions {
+  display: flex;
+  gap: 0.75rem;
+  justify-content: flex-end;
+}
+
+.btn-modal-cancel {
+  background: #f1f5f9;
+  color: #475569;
+  border: 1.5px solid #e2e8f0;
+  padding: 0.55rem 1.25rem;
+  border-radius: 8px;
+  font-size: 0.88rem;
+  font-weight: 700;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.btn-modal-cancel:hover {
+  background: #e2e8f0;
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+  .contractor-panel-header {
+    padding: 1.25rem;
+    flex-direction: column;
+    align-items: flex-start;
+  }
+
+  .contractor-table tbody td {
+    padding: 0.75rem 0.85rem;
+  }
+}

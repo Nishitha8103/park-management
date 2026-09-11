@@ -1,0 +1,88 @@
+.gov-logout-page {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-height: calc(100vh - 150px);
+  padding: var(--gov-spacing);
+}
+
+.gov-logout-card {
+  background-color: var(--gov-surface);
+  border-radius: var(--gov-radius);
+  box-shadow: var(--gov-shadow-md);
+  border: 1px solid var(--gov-border);
+  padding: 40px;
+  width: 100%;
+  max-width: 450px;
+  text-align: center;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.logout-icon-container {
+  width: 80px;
+  height: 80px;
+  background-color: rgba(239, 68, 68, 0.1);
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-bottom: 24px;
+}
+
+.logout-icon {
+  color: #ef4444;
+}
+
+.logout-title {
+  font-size: 1.75rem;
+  color: var(--gov-secondary);
+  margin: 0 0 12px 0;
+  font-weight: 700;
+}
+
+.logout-message {
+  color: var(--gov-text-muted);
+  font-size: 1.05rem;
+  margin: 0 0 32px 0;
+  line-height: 1.5;
+}
+
+.logout-actions {
+  display: flex;
+  gap: 16px;
+  width: 100%;
+}
+
+.btn-cancel, .btn-confirm-logout {
+  flex: 1;
+  padding: 12px 24px;
+  border-radius: 8px;
+  font-size: 1rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s;
+  border: none;
+}
+
+.btn-cancel {
+  background-color: #f1f5f9;
+  color: var(--gov-text-main);
+  border: 1px solid var(--gov-border);
+}
+
+.btn-cancel:hover {
+  background-color: #e2e8f0;
+}
+
+.btn-confirm-logout {
+  background-color: #ef4444;
+  color: white;
+  box-shadow: 0 4px 6px -1px rgba(239, 68, 68, 0.3);
+}
+
+.btn-confirm-logout:hover {
+  background-color: #dc2626;
+  transform: translateY(-1px);
+}

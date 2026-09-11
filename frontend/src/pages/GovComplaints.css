@@ -1,0 +1,33 @@
+.complaints-monitoring-container {
+  display: flex;
+  flex-direction: column;
+}
+
+.status-inspection-pending {
+  color: #f59e0b;
+  background-color: rgba(245, 158, 11, 0.1);
+  border: none;
+}
+
+.status-rework {
+  color: #ef4444;
+  background-color: rgba(239, 68, 68, 0.1);
+  border: none;
+}
+
+.btn-view-outline {
+  background-color: transparent;
+  color: var(--primary);
+  border: 1px solid var(--primary);
+  border-radius: var(--radius-sm);
+  padding: 4px 16px;
+  font-size: 0.85rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.btn-view-outline:hover {
+  background-color: var(--primary);
+  color: white;
+}

@@ -1,0 +1,108 @@
+.gov-analytics-page {
+  display: flex;
+  flex-direction: column;
+  gap: var(--gov-spacing);
+}
+
+.flex-between {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 16px;
+}
+
+.btn-export {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  background-color: var(--gov-primary);
+  color: white;
+  border: none;
+  padding: 10px 20px;
+  border-radius: 8px;
+  font-weight: 600;
+  font-size: 0.95rem;
+  cursor: pointer;
+  transition: all 0.2s;
+  box-shadow: 0 4px 6px -1px rgba(22, 163, 74, 0.3);
+}
+
+.btn-export:hover {
+  background-color: var(--gov-primary-hover);
+  transform: translateY(-1px);
+}
+
+.analytics-toolbar {
+  background-color: var(--gov-surface);
+  border: 1px solid var(--gov-border);
+  border-radius: var(--gov-radius);
+  padding: 16px 20px;
+  display: flex;
+  align-items: center;
+}
+
+.analytics-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: var(--gov-spacing);
+}
+
+@media (max-width: 1024px) {
+  .analytics-grid {
+    grid-template-columns: 1fr;
+  }
+}
+
+.chart-container {
+  padding: 20px;
+  height: 350px;
+}
+
+/* Progress Cell in Table */
+.progress-cell {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.progress-cell span {
+  font-weight: 600;
+  min-width: 40px;
+}
+
+.small-progress-bg {
+  flex: 1;
+  height: 6px;
+  background-color: var(--gov-border);
+  border-radius: 3px;
+  overflow: hidden;
+  max-width: 150px;
+}
+
+.small-progress-fill {
+  height: 100%;
+  border-radius: 3px;
+}
+
+.bg-success { background-color: #16a34a; }
+.bg-warning { background-color: #f59e0b; }
+.bg-danger { background-color: #ef4444; }
+
+/* Rating Cell */
+.rating-cell {
+  display: flex;
+  align-items: baseline;
+  gap: 4px;
+}
+
+.rating-score {
+  font-size: 1.05rem;
+  font-weight: 700;
+  color: var(--gov-secondary);
+}
+
+.rating-max {
+  font-size: 0.8rem;
+  color: var(--gov-text-muted);
+}

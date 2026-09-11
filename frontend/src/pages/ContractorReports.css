@@ -1,0 +1,251 @@
+/* ============================================================
+   CONTRACTOR REPORTS PAGE — Professional Park Theme
+   ============================================================ */
+
+/* ---- Page Header ---- */
+.reports-header-section {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: 1rem;
+  margin-bottom: 1.75rem;
+  padding: 1.5rem;
+  background: linear-gradient(135deg, #0f172a 0%, #1e293b 65%, #1a3a2a 100%);
+  border-radius: 16px;
+  border: 1px solid rgba(22, 163, 74, 0.2);
+  box-shadow: 0 8px 24px rgba(15,23,42,0.2);
+}
+
+.reports-page-title {
+  font-size: 1.5rem;
+  font-weight: 800;
+  color: #ffffff;
+  margin: 0;
+  letter-spacing: 0.3px;
+}
+
+.reports-breadcrumb {
+  font-size: 0.82rem;
+  color: #94a3b8;
+  display: flex;
+  align-items: center;
+  gap: 0.4rem;
+}
+
+.reports-breadcrumb .chevron {
+  color: #64748b;
+  font-size: 0.75rem;
+}
+
+/* ---- Stats Grid ---- */
+.reports-stats-grid {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 1.25rem;
+  margin-bottom: 1.75rem;
+}
+
+@media (max-width: 1024px) {
+  .reports-stats-grid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+
+@media (max-width: 600px) {
+  .reports-stats-grid {
+    grid-template-columns: 1fr 1fr;
+  }
+}
+
+.reports-stat-card {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  background: #fff;
+  border-radius: 14px;
+  padding: 1.25rem 1.5rem;
+  border: 1px solid #e2e8f0;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.04);
+  transition: transform 0.2s, box-shadow 0.2s;
+}
+
+.reports-stat-card:hover {
+  transform: translateY(-3px);
+  box-shadow: 0 6px 20px rgba(0,0,0,0.09);
+}
+
+.stat-icon-wrapper {
+  width: 48px;
+  height: 48px;
+  border-radius: 12px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
+
+.total-icon { background: #f1f5f9; color: #475569; }
+.inspection-icon { background: #dcfce7; color: #16a34a; }
+.maintenance-icon { background: #fee2e2; color: #dc2626; }
+.pending-icon { background: #fef3c7; color: #d97706; }
+
+.stat-info h3 {
+  font-size: 1.75rem;
+  font-weight: 800;
+  color: #0f172a;
+  margin: 0 0 2px 0;
+  line-height: 1;
+}
+
+.stat-info p {
+  font-size: 0.8rem;
+  color: #64748b;
+  font-weight: 600;
+  margin: 0;
+  line-height: 1.3;
+}
+
+/* Border accent per type */
+.stat-total { border-top: 3px solid #94a3b8; }
+.stat-inspection { border-top: 3px solid #16a34a; }
+.stat-maintenance { border-top: 3px solid #ef4444; }
+.stat-pending { border-top: 3px solid #f59e0b; }
+
+/* ---- Table Card ---- */
+.reports-table-card {
+  background: #fff;
+  border-radius: 16px;
+  border: 1px solid #e2e8f0;
+  box-shadow: 0 2px 12px rgba(0,0,0,0.05);
+  overflow: hidden;
+}
+
+.table-title {
+  font-size: 1rem;
+  font-weight: 700;
+  color: #0f172a;
+  margin: 0;
+  padding: 1.25rem 1.5rem;
+  border-bottom: 1px solid #f1f5f9;
+  background: #f8fafc;
+}
+
+.table-responsive {
+  overflow-x: auto;
+}
+
+.reports-table {
+  width: 100%;
+  border-collapse: collapse;
+}
+
+.reports-table thead tr {
+  background: #f8fafc;
+}
+
+.reports-table thead th {
+  padding: 0.85rem 1.25rem;
+  text-align: left;
+  font-size: 0.72rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.6px;
+  color: #64748b;
+  border-bottom: 1px solid #e2e8f0;
+  white-space: nowrap;
+}
+
+.reports-table tbody tr {
+  border-bottom: 1px solid #f1f5f9;
+  transition: background 0.15s ease;
+}
+
+.reports-table tbody tr:last-child {
+  border-bottom: none;
+}
+
+.reports-table tbody tr:hover {
+  background: #f0fdf4;
+}
+
+.reports-table tbody td {
+  padding: 1rem 1.25rem;
+  font-size: 0.87rem;
+  color: #334155;
+  vertical-align: middle;
+}
+
+.col-id {
+  font-weight: 700;
+  color: #94a3b8;
+}
+
+.col-report-id {
+  font-family: monospace;
+  color: #0f172a;
+}
+
+.col-park-name {
+  font-weight: 600;
+  color: #0f172a;
+}
+
+.col-submitted-on {
+  font-size: 0.78rem;
+  color: #64748b;
+}
+
+/* ---- Status Badges ---- */
+.status-badge {
+  display: inline-flex;
+  align-items: center;
+  padding: 0.25rem 0.7rem;
+  border-radius: 20px;
+  font-size: 0.72rem;
+  font-weight: 700;
+}
+
+.badge-verified {
+  background: #dcfce7;
+  color: #16a34a;
+}
+
+.badge-pending {
+  background: #fef3c7;
+  color: #b45309;
+}
+
+.badge-rejected {
+  background: #fee2e2;
+  color: #b91c1c;
+}
+
+/* ---- Action Button ---- */
+.btn-view-report {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.35rem;
+  padding: 0.38rem 0.8rem;
+  background: #f1f5f9;
+  color: #334155;
+  border: 1.5px solid #e2e8f0;
+  border-radius: 7px;
+  font-size: 0.78rem;
+  font-weight: 700;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.btn-view-report:hover {
+  background: #16a34a;
+  color: white;
+  border-color: #16a34a;
+}
+
+/* ---- Loading ---- */
+.reports-loading-state {
+  text-align: center;
+  padding: 3rem 1rem;
+  color: #94a3b8;
+}

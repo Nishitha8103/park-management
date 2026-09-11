@@ -1,0 +1,482 @@
+.contractor-work-progress-page {
+  padding: 2rem 0 3.5rem;
+}
+
+.contractor-work-progress-container {
+  flex: 1;
+  width: 100%;
+  margin: 0 auto;
+}
+
+.work-progress-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: 1rem;
+  margin-bottom: 1.75rem;
+  padding: 1.5rem;
+  background: linear-gradient(135deg, #0f172a 0%, #1e293b 65%, #15312a 100%);
+  border-radius: 16px;
+  border: 1px solid rgba(22,163,74,0.2);
+  box-shadow: 0 8px 24px rgba(15,23,42,0.2);
+}
+
+.btn-back-details {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.5rem 1.1rem;
+  background: rgba(255,255,255,0.07);
+  border: 1.5px solid rgba(255,255,255,0.12);
+  border-radius: 8px;
+  color: #94a3b8;
+  font-size: 0.85rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s;
+  text-decoration: none;
+}
+
+.btn-back-details:hover {
+  background: rgba(255,255,255,0.14);
+  color: #fff;
+  border-color: rgba(255,255,255,0.25);
+}
+
+.progress-title-section {
+  flex: 1;
+}
+
+.progress-title-section h2 {
+  font-size: 1.2rem;
+  font-weight: 800;
+  color: #ffffff;
+  margin: 0 0 2px;
+}
+
+.progress-title-section p {
+  font-size: 0.8rem;
+  color: #94a3b8;
+  margin: 0;
+}
+
+/* Timeline specific styles */
+.progress-timeline {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  position: relative;
+  margin-bottom: 3rem;
+  padding: 0 1rem;
+}
+
+.progress-timeline::before {
+  content: '';
+  position: absolute;
+  top: 20px;
+  left: 20px;
+  right: 20px;
+  height: 2px;
+  background-color: #e2e8f0;
+  z-index: 1;
+}
+
+.progress-timeline::after {
+  content: '';
+  position: absolute;
+  top: 20px;
+  left: 20px;
+  width: 50%; /* Reflects progress */
+  height: 2px;
+  background-color: #047857;
+  z-index: 2;
+}
+
+.timeline-step {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  position: relative;
+  z-index: 3;
+  width: 120px;
+}
+
+.timeline-circle {
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: 600;
+  font-size: 1.1rem;
+  margin-bottom: 0.75rem;
+  background-color: #f1f5f9;
+  color: #94a3b8;
+}
+
+.timeline-step.completed .timeline-circle {
+  background-color: #047857;
+  color: white;
+}
+
+.timeline-step.active .timeline-circle {
+  background-color: #047857;
+  color: white;
+}
+
+.timeline-step h4 {
+  font-size: 0.95rem;
+  font-weight: 600;
+  color: #1e293b;
+  margin: 0 0 0.25rem 0;
+  text-align: center;
+}
+
+.timeline-step p {
+  font-size: 0.85rem;
+  color: #64748b;
+  margin: 0;
+  text-align: center;
+}
+
+/* Update Form Card */
+.update-progress-card {
+  background: white;
+  border-radius: 12px;
+  box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05), 0 2px 4px -1px rgba(0, 0, 0, 0.03);
+  padding: 2.5rem;
+  border: 1px solid #e2e8f0;
+}
+
+.update-progress-card h3 {
+  font-size: 1.25rem;
+  font-weight: 700;
+  color: #1e293b;
+  margin: 0 0 1.5rem 0;
+}
+
+.update-form-group {
+  margin-bottom: 1.5rem;
+}
+
+.update-form-group label {
+  display: block;
+  font-size: 0.95rem;
+  font-weight: 600;
+  color: #1e293b;
+  margin-bottom: 0.5rem;
+}
+
+.update-select {
+  width: 100%;
+  max-width: 300px;
+  padding: 0.75rem 1rem;
+  border: 1px solid #cbd5e1;
+  border-radius: 6px;
+  font-size: 1rem;
+  color: #1e293b;
+  background-color: white;
+  appearance: none;
+  background-image: url("data:image/svg+xml;charset=US-ASCII,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20width%3D%22292.4%22%20height%3D%22292.4%22%3E%3Cpath%20fill%3D%22%2364748b%22%20d%3D%22M287%2069.4a17.6%2017.6%200%200%200-13-5.4H18.4c-5%200-9.3%201.8-12.9%205.4A17.6%2017.6%200%200%200%200%2082.2c0%205%201.8%209.3%205.4%2012.9l128%20127.9c3.6%203.6%207.8%205.4%2012.8%205.4s9.2-1.8%2012.8-5.4L287%2095c3.5-3.5%205.4-7.8%205.4-12.8%200-5-1.9-9.2-5.5-12.8z%22%2F%3E%3C%2Fsvg%3E");
+  background-repeat: no-repeat;
+  background-position: right 1rem top 50%;
+  background-size: 0.65rem auto;
+}
+
+.update-textarea {
+  width: 100%;
+  padding: 1rem;
+  border: 1px solid #cbd5e1;
+  border-radius: 6px;
+  font-size: 0.95rem;
+  color: #334155;
+  resize: vertical;
+  min-height: 120px;
+  line-height: 1.5;
+}
+
+.update-photos-grid {
+  display: flex;
+  gap: 1.5rem;
+  flex-wrap: wrap;
+}
+
+.photo-thumbnail-container {
+  position: relative;
+  width: 180px;
+  height: 130px;
+}
+
+.photo-thumbnail {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  border-radius: 8px;
+  border: 1px solid #e2e8f0;
+}
+
+.btn-remove-photo {
+  position: absolute;
+  top: -8px;
+  right: -8px;
+  width: 24px;
+  height: 24px;
+  background: white;
+  border: 1px solid #e2e8f0;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+  color: #64748b;
+}
+
+.btn-remove-photo:hover {
+  color: #ef4444;
+  border-color: #ef4444;
+}
+
+.add-photo-box {
+  width: 180px;
+  height: 130px;
+  border: 2px dashed #047857;
+  border-radius: 8px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  color: #047857;
+  cursor: pointer;
+  background-color: #f0fdf4;
+  transition: all 0.2s;
+}
+
+.add-photo-box:hover {
+  background-color: #dcfce3;
+}
+
+.add-photo-box span {
+  font-weight: 600;
+  font-size: 0.95rem;
+  margin-top: 0.5rem;
+}
+
+.update-form-actions {
+  display: flex;
+  justify-content: center;
+  gap: 1.5rem;
+  margin-top: 3rem;
+}
+
+.btn-save-update {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.75rem 2.5rem;
+  background: #047857;
+  border: 1px solid #047857;
+  color: white;
+  border-radius: 6px;
+  font-weight: 600;
+  font-size: 1rem;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.btn-save-update:hover {
+  background: #065f46;
+}
+
+.btn-cancel-update {
+  display: flex;
+  align-items: center;
+  padding: 0.75rem 2.5rem;
+  background: white;
+  border: 1px solid #047857;
+  color: #047857;
+  border-radius: 6px;
+  font-weight: 600;
+  font-size: 1rem;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.btn-cancel-update:hover {
+  background: #f0fdf4;
+}
+
+@media (max-width: 768px) {
+  .progress-timeline {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 2rem;
+  }
+
+  .progress-timeline::before,
+  .progress-timeline::after {
+    display: none;
+  }
+
+  .timeline-step {
+    flex-direction: row;
+    gap: 1rem;
+    width: 100%;
+    justify-content: flex-start;
+  }
+
+  .timeline-circle {
+    margin-bottom: 0;
+  }
+
+  .timeline-step h4,
+  .timeline-step p {
+    text-align: left;
+  }
+}
+
+/* ── Before / After Photo Upload Section ─────────────────── */
+
+.upload-photos-section {
+  background: #ffffff;
+  border: 1px solid #e2e8f0;
+  border-radius: 12px;
+  padding: 1.5rem;
+  margin-top: 0.5rem;
+  margin-bottom: 1.5rem;
+}
+
+.upload-photos-title {
+  font-size: 1.05rem;
+  font-weight: 700;
+  color: #1e293b;
+  margin: 0 0 1.25rem 0;
+  padding-bottom: 0.75rem;
+  border-bottom: 1px solid #f1f5f9;
+}
+
+.upload-photos-panels {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 1.5rem;
+}
+
+@media (max-width: 640px) {
+  .upload-photos-panels {
+    grid-template-columns: 1fr;
+  }
+}
+
+.upload-panel {
+  background: #f8fafc;
+  border: 1px solid #e8eef5;
+  border-radius: 10px;
+  padding: 1rem;
+}
+
+.upload-panel-header {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  margin-bottom: 0.875rem;
+}
+
+.upload-panel-label {
+  font-size: 0.95rem;
+  font-weight: 700;
+  color: #1e293b;
+}
+
+.upload-panel-info {
+  font-size: 0.85rem;
+  color: #94a3b8;
+  cursor: help;
+  line-height: 1;
+}
+
+.upload-photo-group {
+  width: 100%;
+}
+
+.upload-photos-grid {
+  display: flex;
+  flex-direction: row;
+  align-items: flex-start;
+  flex-wrap: wrap;
+  gap: 12px;
+}
+
+.photo-thumb-wrap {
+  position: relative;
+  width: 120px;
+  height: 100px;
+  border-radius: 8px;
+  overflow: visible;
+  flex-shrink: 0;
+}
+
+.photo-thumb-img {
+  width: 120px;
+  height: 100px;
+  object-fit: cover;
+  border-radius: 8px;
+  border: 1.5px solid #e2e8f0;
+  display: block;
+}
+
+.photo-thumb-remove {
+  position: absolute;
+  top: -8px;
+  right: -8px;
+  width: 22px;
+  height: 22px;
+  background: white;
+  border: 1.5px solid #cbd5e1;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  color: #64748b;
+  box-shadow: 0 2px 6px rgba(0,0,0,0.12);
+  transition: background 0.15s, color 0.15s, border-color 0.15s, transform 0.15s;
+  z-index: 5;
+}
+
+.photo-thumb-remove:hover {
+  background: #fee2e2;
+  color: #ef4444;
+  border-color: #ef4444;
+  transform: scale(1.15);
+}
+
+.photo-add-box {
+  width: 120px;
+  height: 100px;
+  border: 2px dashed #047857;
+  border-radius: 8px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  color: #047857;
+  cursor: pointer;
+  background: #f0fdf4;
+  gap: 4px;
+  flex-shrink: 0;
+  transition: background 0.18s, border-color 0.18s;
+}
+
+.photo-add-box:hover {
+  background: #dcfce7;
+  border-color: #16a34a;
+}
+
+.photo-add-box span {
+  font-size: 0.82rem;
+  font-weight: 700;
+  color: #047857;
+}
+
