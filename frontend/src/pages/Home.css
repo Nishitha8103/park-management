@@ -57,10 +57,11 @@
   width: 96px;
   height: 96px;
   border-radius: 50%;
-  object-fit: cover;
+  object-fit: contain;
   border: 2.5px solid rgba(52, 211, 153, 0.7);
   box-shadow: 0 0 25px rgba(52, 211, 153, 0.4);
   background: #ffffff;
+  padding: 2px;
 }
 
 .landing-logo-glow {

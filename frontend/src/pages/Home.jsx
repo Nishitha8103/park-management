@@ -13,7 +13,7 @@ const Home = () => {
       <div className="landing-dark-container">
         {/* Circular Logo with tech green styling */}
         <div className="landing-logo-box">
-          <img src="/parks_logo_v2.png" alt="Parks Monitoring System Logo" className="landing-logo-img" />
+          <img src="/parks_logo_v3.png" alt="Parks Monitoring System Logo" className="landing-logo-img" />
           <div className="landing-logo-glow"></div>
         </div>
 

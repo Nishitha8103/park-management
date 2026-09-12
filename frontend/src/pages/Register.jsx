@@ -134,7 +134,7 @@ const Register = () => {
         <div className="register-glass-card">
           {/* Circular Glow Logo */}
           <div className="register-logo-container">
-            <img src="/parks_logo_v2.png" alt="Parks Monitoring System Logo" className="register-logo-img" />
+            <img src="/parks_logo_v3.png" alt="Parks Monitoring System Logo" className="register-logo-img" />
           </div>
 
           {/* Heading */}

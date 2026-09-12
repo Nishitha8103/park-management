@@ -84,10 +84,11 @@
   width: 80px;
   height: 80px;
   border-radius: 50%;
-  object-fit: cover;
+  object-fit: contain;
   border: 2px solid rgba(52, 211, 153, 0.7);
   box-shadow: 0 0 22px rgba(52, 211, 153, 0.4);
   background: #ffffff;
+  padding: 2px;
 }
 
 /* Title & Tagline */
