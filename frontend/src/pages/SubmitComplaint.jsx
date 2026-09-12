@@ -9,11 +9,12 @@ import {
   Phone, 
   Mail, 
   ShieldAlert, 
-  Sparkles,
-  FileText,
-  X,
-  Check,
-  Camera
+  Sparkles, 
+  FileText, 
+  X, 
+  Check, 
+  Camera,
+  User as UserIcon
 } from 'lucide-react';
 import { useNavigate, useLocation } from 'react-router-dom';
 import axios from 'axios';
@@ -25,10 +26,22 @@ const SubmitComplaint = () => {
   const location = useLocation();
   const parkState = location.state || {};
 
+  const getInitialCitizenName = () => {
+    try {
+      const stored = localStorage.getItem('user');
+      if (stored) {
+        const u = JSON.parse(stored);
+        return u.name || u.firstName || '';
+      }
+    } catch (e) {}
+    return '';
+  };
+
   const [formData, setFormData] = useState({
     parkName: parkState.parkName || '',
     locationInPark: '',
     category: '',
+    fullName: getInitialCitizenName(),
     mobileNumber: '',
     title: '',
     email: '',
@@ -110,6 +123,7 @@ const SubmitComplaint = () => {
     e.preventDefault();
     setErrorMsg('');
 
+    if (!formData.fullName || !formData.fullName.trim()) return setErrorMsg('Your Full Name is required');
     if (!formData.parkName.trim()) return setErrorMsg('Park Name is required');
     if (!formData.locationInPark.trim()) return setErrorMsg('Location in park is required');
     if (!formData.category) return setErrorMsg('Complaint Category is required');
@@ -127,6 +141,7 @@ const SubmitComplaint = () => {
       submitData.append('priority', formData.priority);
       submitData.append('userPhone', formData.mobileNumber);
       submitData.append('description', formData.description);
+      if (formData.title) submitData.append('title', formData.title);
       
       if (parkState.parkId) submitData.append('parkId', parkState.parkId);
       if (parkState.district) submitData.append('district', parkState.district);
@@ -134,16 +149,16 @@ const SubmitComplaint = () => {
       if (parkState.ward) submitData.append('ward', parkState.ward);
 
       const userStr = localStorage.getItem('user');
-      let userName = 'Citizen';
       let userId = null;
       if (userStr) {
         try {
           const userObj = JSON.parse(userStr);
-          userName = userObj.name || userObj.firstName || 'Citizen';
           userId = userObj._id || userObj.id || null;
         } catch(e) {}
       }
-      submitData.append('userName', userName);
+      
+      const complainantName = formData.fullName.trim();
+      submitData.append('userName', complainantName);
       if (userId) submitData.append('userId', userId);
 
       if (selectedFile) {
@@ -380,10 +395,26 @@ const SubmitComplaint = () => {
           <div className="form-section">
             <div className="section-title">
               <FileText size={18} color="#059669" />
-              <h3>3. Complaint Details & Contact</h3>
+              <h3>3. Citizen Information & Grievance Details</h3>
             </div>
 
             <div className="form-grid-2">
+              <div className="form-group">
+                <label className="input-label">Your Name / Complainant Name *</label>
+                <div className="input-with-icon">
+                  <UserIcon size={16} className="field-icon" />
+                  <input 
+                    type="text" 
+                    name="fullName" 
+                    className="input-field icon-padding" 
+                    placeholder="Enter your full name" 
+                    value={formData.fullName} 
+                    onChange={handleInputChange} 
+                    required 
+                  />
+                </div>
+              </div>
+
               <div className="form-group">
                 <label className="input-label">Mobile Number *</label>
                 <div className="input-with-icon">
@@ -399,7 +430,9 @@ const SubmitComplaint = () => {
                   />
                 </div>
               </div>
+            </div>
 
+            <div className="form-grid-2">
               <div className="form-group">
                 <label className="input-label">Email Address (Optional)</label>
                 <div className="input-with-icon">
@@ -410,6 +443,21 @@ const SubmitComplaint = () => {
                     className="input-field icon-padding" 
                     placeholder="For status updates via email" 
                     value={formData.email} 
+                    onChange={handleInputChange} 
+                  />
+                </div>
+              </div>
+
+              <div className="form-group">
+                <label className="input-label">Issue Headline / Title (Optional)</label>
+                <div className="input-with-icon">
+                  <Sparkles size={16} className="field-icon" />
+                  <input 
+                    type="text" 
+                    name="title" 
+                    className="input-field icon-padding" 
+                    placeholder="e.g., Broken bench near play area" 
+                    value={formData.title} 
                     onChange={handleInputChange} 
                   />
                 </div>
