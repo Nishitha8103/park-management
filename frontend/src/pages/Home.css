@@ -1,5 +1,5 @@
 /* ==========================================================================
-   Park Monitoring System - Landing Page Dark Green Theme (Matching Image 2)
+   Park Monitoring System - Landing Page (Exact Match to Image 2)
    ========================================================================== */
 
 .landing-dark-page {
@@ -9,9 +9,13 @@
   display: flex;
   align-items: center;
   justify-content: center;
-  background: url('/landing_bg_v2.jpg') no-repeat center center fixed;
+  background-color: #03140a;
+  background-image: url('/landing_bg_leaves.jpg');
+  background-repeat: no-repeat;
+  background-position: center center;
   background-size: cover;
-  padding: 2.5rem 1.25rem;
+  background-attachment: fixed;
+  padding: 3rem 1.25rem 2.5rem;
   overflow-y: auto;
   overflow-x: hidden;
 }
@@ -19,9 +23,8 @@
 .landing-dark-overlay {
   position: absolute;
   inset: 0;
-  background: radial-gradient(circle at top center, rgba(6, 40, 25, 0.78) 0%, rgba(2, 18, 10, 0.94) 100%),
-              linear-gradient(180deg, rgba(3, 20, 12, 0.7) 0%, rgba(2, 15, 8, 0.95) 100%);
-  backdrop-filter: blur(4px);
+  background: radial-gradient(circle at center, rgba(3, 22, 12, 0.4) 0%, rgba(2, 14, 8, 0.72) 100%);
+  pointer-events: none;
   z-index: 1;
 }
 
@@ -29,7 +32,7 @@
   position: relative;
   z-index: 2;
   width: 100%;
-  max-width: 540px;
+  max-width: 480px;
   display: flex;
   flex-direction: column;
   align-items: center;
@@ -38,30 +41,30 @@
 }
 
 @keyframes landingFadeIn {
-  from { opacity: 0; transform: translateY(14px); }
+  from { opacity: 0; transform: translateY(12px); }
   to { opacity: 1; transform: translateY(0); }
 }
 
-/* Logo */
+/* Emblem Logo */
 .landing-logo-box {
   position: relative;
-  width: 110px;
-  height: 110px;
-  margin-bottom: 1.25rem;
+  width: 130px;
+  height: 130px;
+  margin-bottom: 1.5rem;
   display: flex;
   align-items: center;
   justify-content: center;
 }
 
 .landing-logo-img {
-  width: 96px;
-  height: 96px;
+  width: 120px;
+  height: 120px;
   border-radius: 50%;
   object-fit: contain;
-  border: 2.5px solid rgba(52, 211, 153, 0.7);
-  box-shadow: 0 0 25px rgba(52, 211, 153, 0.4);
   background: #ffffff;
   padding: 2px;
+  border: 3px solid #34d399;
+  box-shadow: 0 0 35px rgba(52, 211, 153, 0.5), 0 0 15px rgba(52, 211, 153, 0.3);
 }
 
 .landing-logo-glow {
@@ -78,34 +81,36 @@
 }
 
 .landing-main-title {
-  font-size: 2.25rem;
+  font-size: 2.35rem;
   font-weight: 800;
   color: #ffffff;
   line-height: 1.15;
-  margin-bottom: 0.5rem;
+  margin-bottom: 0.65rem;
   letter-spacing: -0.5px;
-  text-shadow: 0 4px 15px rgba(0, 0, 0, 0.7);
+  text-shadow: 0 4px 18px rgba(0, 0, 0, 0.85);
 }
 
 .landing-title-accent {
-  color: #34d399;
-  text-shadow: 0 0 16px rgba(52, 211, 153, 0.45);
+  color: #4ade80;
+  text-shadow: 0 0 20px rgba(74, 222, 128, 0.5);
 }
 
 .landing-quote {
-  font-size: 1.1rem;
-  color: #e2e8f0;
-  font-weight: 500;
-  margin-bottom: 0.75rem;
+  font-size: 1.15rem;
+  font-weight: 600;
+  color: #f1f5f9;
+  margin-bottom: 0.85rem;
   letter-spacing: 0.3px;
+  text-shadow: 0 2px 8px rgba(0, 0, 0, 0.7);
 }
 
 .landing-subtitle {
   font-size: 0.95rem;
-  color: #cbd5e1;
+  color: #e2e8f0;
   line-height: 1.55;
   max-width: 440px;
   margin: 0 auto;
+  text-shadow: 0 2px 6px rgba(0, 0, 0, 0.6);
 }
 
 /* 4 Feature Cards Grid */
@@ -114,7 +119,7 @@
   grid-template-columns: repeat(2, 1fr);
   gap: 1rem;
   width: 100%;
-  margin-bottom: 2rem;
+  margin-bottom: 2.2rem;
 }
 
 @media screen and (max-width: 480px) {
@@ -125,10 +130,11 @@
 }
 
 .landing-card {
-  background: rgba(8, 40, 24, 0.65);
-  border: 1px solid rgba(52, 211, 153, 0.25);
-  backdrop-filter: blur(10px);
-  border-radius: 16px;
+  background: rgba(4, 28, 16, 0.78);
+  border: 1.5px solid rgba(52, 211, 153, 0.28);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  border-radius: 18px;
   padding: 1.15rem 1rem;
   display: flex;
   align-items: flex-start;
@@ -136,14 +142,14 @@
   text-align: left;
   text-decoration: none;
   transition: all 0.25s cubic-bezier(0.16, 1, 0.3, 1);
-  box-shadow: 0 8px 20px -6px rgba(0, 0, 0, 0.45);
+  box-shadow: 0 8px 24px -4px rgba(0, 0, 0, 0.55);
 }
 
 .landing-card:hover {
   transform: translateY(-3px);
-  border-color: rgba(52, 211, 153, 0.6);
-  background: rgba(12, 54, 33, 0.85);
-  box-shadow: 0 14px 28px -6px rgba(16, 185, 129, 0.3);
+  border-color: rgba(52, 211, 153, 0.65);
+  background: rgba(6, 42, 25, 0.9);
+  box-shadow: 0 12px 28px -4px rgba(16, 185, 129, 0.35);
 }
 
 .landing-card-icon {
@@ -154,37 +160,21 @@
   align-items: center;
   justify-content: center;
   flex-shrink: 0;
-}
-
-.icon-explore {
   background: rgba(16, 185, 129, 0.22);
-  color: #34d399;
-}
-
-.icon-report {
-  background: rgba(234, 179, 8, 0.22);
-  color: #facc15;
-}
-
-.icon-events {
-  background: rgba(56, 189, 248, 0.22);
-  color: #38bdf8;
-}
-
-.icon-stall {
-  background: rgba(168, 85, 247, 0.22);
-  color: #c084fc;
+  border: 1px solid rgba(52, 211, 153, 0.35);
+  color: #4ade80;
+  box-shadow: 0 0 12px rgba(52, 211, 153, 0.2);
 }
 
 .landing-card-text h4 {
-  color: #f8fafc;
+  color: #ffffff;
   font-size: 0.95rem;
   font-weight: 700;
   margin: 0 0 0.25rem 0;
 }
 
 .landing-card-text p {
-  color: #94a3b8;
+  color: #cbd5e1;
   font-size: 0.78rem;
   line-height: 1.35;
   margin: 0;
@@ -195,17 +185,17 @@
   display: flex;
   flex-direction: column;
   align-items: center;
-  gap: 1rem;
+  gap: 1.15rem;
   width: 100%;
 }
 
 .landing-btn-signin {
   width: 100%;
   max-width: 440px;
-  background: linear-gradient(135deg, #059669 0%, #10b981 50%, #34d399 100%);
+  background: linear-gradient(180deg, #10b981 0%, #047857 60%, #064e3b 100%);
   color: #ffffff;
-  border: none;
-  padding: 1rem 1.5rem;
+  border: 1.5px solid rgba(110, 231, 183, 0.4);
+  padding: 0.95rem 1.5rem;
   border-radius: 9999px;
   font-size: 1.15rem;
   font-weight: 700;
@@ -214,14 +204,14 @@
   justify-content: center;
   gap: 0.65rem;
   text-decoration: none;
-  box-shadow: 0 10px 25px -4px rgba(16, 185, 129, 0.5);
+  box-shadow: 0 10px 25px -4px rgba(16, 185, 129, 0.5), inset 0 1px 1px rgba(255, 255, 255, 0.3);
   transition: all 0.25s ease;
 }
 
 .landing-btn-signin:hover {
   transform: translateY(-2px);
-  box-shadow: 0 14px 30px -4px rgba(16, 185, 129, 0.7);
-  background: linear-gradient(135deg, #047857 0%, #059669 50%, #10b981 100%);
+  box-shadow: 0 14px 30px -4px rgba(16, 185, 129, 0.7), inset 0 1px 1px rgba(255, 255, 255, 0.4);
+  background: linear-gradient(180deg, #34d399 0%, #059669 60%, #064e3b 100%);
 }
 
 .btn-signin-arrow {
@@ -233,14 +223,14 @@
 }
 
 .landing-link-register {
-  color: #a7f3d0;
-  font-size: 0.95rem;
+  color: #86efac;
+  font-size: 0.98rem;
   font-weight: 600;
   text-decoration: none;
-  transition: color 0.2s;
+  transition: all 0.2s;
 }
 
 .landing-link-register:hover {
-  color: #34d399;
+  color: #bbf7d0;
   text-decoration: underline;
 }
