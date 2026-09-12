@@ -481,24 +481,25 @@ const forgotPassword = async (req, res) => {
 
     const identifierRegex = new RegExp(`^${identifier.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')}$`, 'i');
 
-    // 1. Check in User model
-    let account = await User.findOne({
+    // Find in User model
+    const userAccount = await User.findOne({
       $or: [{ email: identifierRegex }, { username: identifierRegex }]
     });
 
-    // 2. If not found in User, check Contractor model
-    if (!account) {
-      const Contractor = require('../models/Contractor');
-      account = await Contractor.findOne({
-        $or: [{ email: identifierRegex }, { username: identifierRegex }, { contractorId: identifierRegex }]
-      });
-    }
+    // Find in Contractor model
+    const Contractor = require('../models/Contractor');
+    const contractorAccount = await Contractor.findOne({
+      $or: [{ email: identifierRegex }, { username: identifierRegex }, { contractorId: identifierRegex }]
+    });
 
-    if (!account) {
+    if (!userAccount && !contractorAccount) {
       return res.status(404).json({ message: 'No registered account found with that email or username.' });
     }
 
-    if (!account.email) {
+    const targetEmail = (userAccount && userAccount.email) || (contractorAccount && contractorAccount.email);
+    const targetName = (userAccount && userAccount.name) || (contractorAccount && contractorAccount.name);
+
+    if (!targetEmail) {
       return res.status(400).json({ message: 'Account does not have an email address associated.' });
     }
 
@@ -506,23 +507,41 @@ const forgotPassword = async (req, res) => {
     const otp = Math.floor(100000 + Math.random() * 900000).toString();
     const otpExpires = new Date(Date.now() + 10 * 60 * 1000); // 10 minutes
 
-    account.resetPasswordOtp = otp;
-    account.resetPasswordOtpExpires = otpExpires;
-    await account.save();
+    // Save OTP to all matching accounts sharing this email/username
+    if (userAccount) {
+      userAccount.resetPasswordOtp = otp;
+      userAccount.resetPasswordOtpExpires = otpExpires;
+      await userAccount.save();
+    }
+    if (contractorAccount) {
+      contractorAccount.resetPasswordOtp = otp;
+      contractorAccount.resetPasswordOtpExpires = otpExpires;
+      await contractorAccount.save();
+    }
+
+    // Also update any other accounts with the same email
+    await User.updateMany(
+      { email: new RegExp(`^${targetEmail.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')}$`, 'i') },
+      { resetPasswordOtp: otp, resetPasswordOtpExpires: otpExpires }
+    );
+    await Contractor.updateMany(
+      { email: new RegExp(`^${targetEmail.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')}$`, 'i') },
+      { resetPasswordOtp: otp, resetPasswordOtpExpires: otpExpires }
+    );
 
     // Send OTP Email
     try {
-      await sendPasswordResetOtpEmail(account.email, account.name, otp);
+      await sendPasswordResetOtpEmail(targetEmail, targetName, otp);
     } catch (emailErr) {
       console.error('Failed to send OTP email:', emailErr);
       return res.status(500).json({ message: 'Failed to send OTP email. Please check your email configuration.' });
     }
 
-    const maskedEmail = account.email.replace(/(.{2})(.*)(?=@)/, (gp1, gp2, gp3) => gp2 + '*'.repeat(Math.max(0, gp3.length)));
+    const maskedEmail = targetEmail.replace(/(.{2})(.*)(?=@)/, (gp1, gp2, gp3) => gp2 + '*'.repeat(Math.max(0, gp3.length)));
 
     res.json({
       message: `A 6-digit verification code has been sent to ${maskedEmail}`,
-      email: account.email
+      email: targetEmail
     });
   } catch (error) {
     console.error('Forgot password error:', error);
@@ -530,7 +549,7 @@ const forgotPassword = async (req, res) => {
   }
 };
 
-// @desc    Reset Password - Verify OTP and update password
+// @desc    Reset Password with 6-digit OTP
 // @route   POST /api/auth/reset-password
 // @access  Public
 const resetPassword = async (req, res) => {
@@ -549,45 +568,57 @@ const resetPassword = async (req, res) => {
 
     const identifierRegex = new RegExp(`^${identifier.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')}$`, 'i');
 
-    // 1. Check in User model
-    let account = await User.findOne({
+    const userAccount = await User.findOne({
       $or: [{ email: identifierRegex }, { username: identifierRegex }]
     });
 
-    // 2. If not found in User, check Contractor model
-    if (!account) {
-      const Contractor = require('../models/Contractor');
-      account = await Contractor.findOne({
-        $or: [{ email: identifierRegex }, { username: identifierRegex }, { contractorId: identifierRegex }]
-      });
-    }
+    const Contractor = require('../models/Contractor');
+    const contractorAccount = await Contractor.findOne({
+      $or: [{ email: identifierRegex }, { username: identifierRegex }, { contractorId: identifierRegex }]
+    });
 
-    if (!account) {
+    if (!userAccount && !contractorAccount) {
       return res.status(404).json({ message: 'Account not found.' });
     }
 
-    // Verify OTP
-    if (!account.resetPasswordOtp || account.resetPasswordOtp !== enteredOtp) {
+    const activeAccount = contractorAccount || userAccount;
+
+    // Check OTP
+    const validOtp = (userAccount && userAccount.resetPasswordOtp === enteredOtp) ||
+                     (contractorAccount && contractorAccount.resetPasswordOtp === enteredOtp);
+
+    if (!validOtp) {
       return res.status(400).json({ message: 'Invalid verification code. Please check and try again.' });
     }
 
-    if (!account.resetPasswordOtpExpires || new Date() > new Date(account.resetPasswordOtpExpires)) {
+    const isExpired = (account) => !account.resetPasswordOtpExpires || new Date() > new Date(account.resetPasswordOtpExpires);
+    if ((userAccount && isExpired(userAccount)) && (contractorAccount && isExpired(contractorAccount))) {
       return res.status(400).json({ message: 'Verification code has expired. Please request a new one.' });
     }
 
-    // Set new password (pre-save hook will hash it)
-    account.password = newPassword;
-    account.resetPasswordOtp = null;
-    account.resetPasswordOtpExpires = null;
-    await account.save();
+    // Reset password on both if contractor and user share email/ID
+    if (contractorAccount) {
+      contractorAccount.password = newPassword;
+      contractorAccount.resetPasswordOtp = null;
+      contractorAccount.resetPasswordOtpExpires = null;
+      await contractorAccount.save();
+    }
 
-    const canonicalUsername = account.username || account.contractorId || account.email;
+    if (userAccount) {
+      userAccount.password = newPassword;
+      userAccount.resetPasswordOtp = null;
+      userAccount.resetPasswordOtpExpires = null;
+      await userAccount.save();
+    }
+
+    const canonicalUsername = (contractorAccount && (contractorAccount.contractorId || contractorAccount.username)) ||
+                              (userAccount && (userAccount.username || userAccount.email)) || identifier;
 
     res.json({ 
       message: 'Password has been reset successfully! You can now log in with your new password.',
       username: canonicalUsername,
-      contractorId: account.contractorId || null,
-      email: account.email
+      contractorId: (contractorAccount && contractorAccount.contractorId) || null,
+      email: (contractorAccount && contractorAccount.email) || (userAccount && userAccount.email)
     });
   } catch (error) {
     console.error('Reset password error:', error);
