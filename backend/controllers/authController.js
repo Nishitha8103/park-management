@@ -112,9 +112,11 @@ const loginUser = async (req, res) => {
       return res.status(400).json({ message: 'Please provide email/username and password' });
     }
 
+    const identifierRegex = new RegExp(`^${identifier.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')}$`, 'i');
+
     // 1. Try finding in User model (Admin, Government Official, Public User)
     const user = await User.findOne({
-      $or: [{ email: identifier }, { username: identifier }]
+      $or: [{ email: identifierRegex }, { username: identifierRegex }]
     });
 
     if (user && (await user.matchPassword(password))) {
@@ -144,10 +146,14 @@ const loginUser = async (req, res) => {
       });
     }
 
-    // 2. Try finding in Contractor model
+    // 2. Try finding in Contractor model (by email, username, or contractorId with case-insensitivity)
     const Contractor = require('../models/Contractor');
     const contractor = await Contractor.findOne({
-      $or: [{ email: identifier }, { username: identifier }]
+      $or: [
+        { email: identifierRegex },
+        { username: identifierRegex },
+        { contractorId: identifierRegex }
+      ]
     });
 
     if (contractor && (await contractor.matchPassword(password))) {
@@ -158,6 +164,7 @@ const loginUser = async (req, res) => {
         message: 'Login successful',
         user: {
           id: contractor._id,
+          _id: contractor._id,
           contractorId: contractor.contractorId,
           name: contractor.name,
           username: contractor.username,
@@ -174,7 +181,7 @@ const loginUser = async (req, res) => {
       });
     }
 
-    return res.status(401).json({ message: 'Invalid email or password' });
+    return res.status(401).json({ message: 'Invalid email/username or password' });
   } catch (error) {
     console.error('Login error:', error);
     res.status(500).json({ message: 'Server error' });
@@ -472,16 +479,18 @@ const forgotPassword = async (req, res) => {
       return res.status(400).json({ message: 'Please provide your email address or username.' });
     }
 
+    const identifierRegex = new RegExp(`^${identifier.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')}$`, 'i');
+
     // 1. Check in User model
     let account = await User.findOne({
-      $or: [{ email: identifier }, { username: identifier }]
+      $or: [{ email: identifierRegex }, { username: identifierRegex }]
     });
 
     // 2. If not found in User, check Contractor model
     if (!account) {
       const Contractor = require('../models/Contractor');
       account = await Contractor.findOne({
-        $or: [{ email: identifier }, { username: identifier }, { contractorId: identifier }]
+        $or: [{ email: identifierRegex }, { username: identifierRegex }, { contractorId: identifierRegex }]
       });
     }
 
@@ -538,16 +547,18 @@ const resetPassword = async (req, res) => {
       return res.status(400).json({ message: 'New password must be at least 6 characters.' });
     }
 
+    const identifierRegex = new RegExp(`^${identifier.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')}$`, 'i');
+
     // 1. Check in User model
     let account = await User.findOne({
-      $or: [{ email: identifier }, { username: identifier }]
+      $or: [{ email: identifierRegex }, { username: identifierRegex }]
     });
 
     // 2. If not found in User, check Contractor model
     if (!account) {
       const Contractor = require('../models/Contractor');
       account = await Contractor.findOne({
-        $or: [{ email: identifier }, { username: identifier }, { contractorId: identifier }]
+        $or: [{ email: identifierRegex }, { username: identifierRegex }, { contractorId: identifierRegex }]
       });
     }
 

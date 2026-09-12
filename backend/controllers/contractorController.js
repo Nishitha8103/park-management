@@ -221,11 +221,15 @@ const deleteContractor = async (req, res) => {
 // @access  Public
 const loginContractor = async (req, res) => {
   try {
-    const { username, password } = req.body;
-    
-    // We also support login by email just in case, but primary is username
+    const idTrimmed = (username || '').trim();
+    const identifierRegex = new RegExp(`^${idTrimmed.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')}$`, 'i');
+
     const contractor = await Contractor.findOne({ 
-      $or: [{ username }, { email: username }] 
+      $or: [
+        { username: identifierRegex },
+        { email: identifierRegex },
+        { contractorId: identifierRegex }
+      ] 
     });
 
     if (contractor && (await contractor.matchPassword(password))) {
