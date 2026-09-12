@@ -185,16 +185,22 @@ export default function ForgotPasswordModal({ isOpen, onClose, onPasswordResetSu
 
             {errorMsg && <div className="forgot-alert-error">{errorMsg}</div>}
 
-            <form onSubmit={handleResetPassword} className="forgot-form">
+            <form onSubmit={handleResetPassword} className="forgot-form" autoComplete="off">
+              {/* Hidden dummy input to catch rogue browser autofill */}
+              <input type="text" style={{ display: 'none' }} tabIndex="-1" />
+              <input type="password" style={{ display: 'none' }} tabIndex="-1" />
+
               <div className="forgot-input-group">
                 <label>6-Digit Verification Code (OTP)</label>
                 <input
                   type="text"
+                  name="reset_otp_code"
                   maxLength={6}
                   className="forgot-input forgot-otp-input"
                   placeholder="• • • • • •"
                   value={otp}
                   onChange={(e) => setOtp(e.target.value.replace(/\D/g, ''))}
+                  autoComplete="one-time-code"
                   required
                   autoFocus
                 />
@@ -206,10 +212,12 @@ export default function ForgotPasswordModal({ isOpen, onClose, onPasswordResetSu
                   <Lock size={18} className="forgot-input-icon" />
                   <input
                     type={showPassword ? 'text' : 'password'}
+                    name="new_user_password_field"
                     className="forgot-input"
                     placeholder="At least 6 characters"
                     value={newPassword}
                     onChange={(e) => setNewPassword(e.target.value)}
+                    autoComplete="new-password"
                     required
                   />
                   <button
@@ -229,10 +237,12 @@ export default function ForgotPasswordModal({ isOpen, onClose, onPasswordResetSu
                   <Lock size={18} className="forgot-input-icon" />
                   <input
                     type={showPassword ? 'text' : 'password'}
+                    name="confirm_user_password_field"
                     className="forgot-input"
                     placeholder="Re-type new password"
                     value={confirmPassword}
                     onChange={(e) => setConfirmPassword(e.target.value)}
+                    autoComplete="new-password"
                     required
                   />
                 </div>
