@@ -1,6 +1,6 @@
 import React, { useRef, useState, useEffect } from 'react';
 import { Camera, X, RefreshCw, Check, MapPin, Calendar, Clock, AlertTriangle } from 'lucide-react';
-import { stampImageWithGeoAndTimestamp } from '../utils/imageStampUtil';
+import { stampImageWithGeoAndTimestamp, reverseGeocode } from '../utils/imageStampUtil';
 import './LiveCameraCaptureModal.css';
 
 export default function LiveCameraCaptureModal({
@@ -13,6 +13,7 @@ export default function LiveCameraCaptureModal({
   const streamRef = useRef(null);
 
   const [location, setLocation] = useState(null);
+  const [placeName, setPlaceName] = useState('');
   const [locLoading, setLocLoading] = useState(true);
   const [capturedData, setCapturedData] = useState(null); // { file, preview, location, timestamp }
   const [cameraError, setCameraError] = useState('');
@@ -26,18 +27,24 @@ export default function LiveCameraCaptureModal({
     return () => clearInterval(interval);
   }, [isOpen]);
 
-  // Request high accuracy GPS
+  // Request high accuracy GPS & resolve address name
   useEffect(() => {
     if (!isOpen) return;
     setLocLoading(true);
     if (navigator.geolocation) {
       navigator.geolocation.getCurrentPosition(
-        (pos) => {
+        async (pos) => {
+          const lat = pos.coords.latitude;
+          const lon = pos.coords.longitude;
           setLocation({
-            latitude: pos.coords.latitude,
-            longitude: pos.coords.longitude
+            latitude: lat,
+            longitude: lon
           });
           setLocLoading(false);
+
+          // Resolve place name
+          const name = await reverseGeocode(lat, lon);
+          if (name) setPlaceName(name);
         },
         (err) => {
           console.warn('Live location capture warning:', err);
@@ -125,7 +132,7 @@ export default function LiveCameraCaptureModal({
 
       // Apply watermark stamp with live location and timestamp
       const stamped = await stampImageWithGeoAndTimestamp(rawFile, {
-        location,
+        location: { ...location, placeName },
         tag,
         fileName: `verified_capture_${Date.now()}.jpg`
       });
@@ -196,12 +203,18 @@ export default function LiveCameraCaptureModal({
                 <div className="hud-pill hud-tag">
                   <span className="hud-dot"></span> LIVE ON-SITE: {tag.toUpperCase()}
                 </div>
+                {placeName && (
+                  <div className="hud-pill hud-place" style={{ color: '#67e8f9', fontWeight: 600 }}>
+                    <MapPin size={12} />
+                    <span>{placeName}</span>
+                  </div>
+                )}
                 <div className="hud-pill hud-location">
                   <MapPin size={12} />
                   {locLoading ? (
                     <span>Acquiring GPS Location...</span>
                   ) : location ? (
-                    <span>{location.latitude.toFixed(4)}° N, {location.longitude.toFixed(4)}° E</span>
+                    <span>{location.latitude.toFixed(5)}° N, {location.longitude.toFixed(5)}° E</span>
                   ) : (
                     <span>GPS Acquired on Snap</span>
                   )}

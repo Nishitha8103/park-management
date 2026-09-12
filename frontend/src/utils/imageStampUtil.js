@@ -1,18 +1,65 @@
 /**
  * Utility to process a File or Blob image by stamping:
- * - Live GPS Geolocation (Latitude, Longitude) or Address
+ * - Live Human-Readable Location Address Name (e.g. "Koramangala, Bengaluru, Karnataka")
+ * - Live GPS Geolocation (Latitude, Longitude)
  * - Live Date and Time
  * - Custom Tag / Portal Stamp
  * 
  * Returns a new Promise<File> with stamped image.
  */
 
+// Cache reverse geocode lookups
+const geoNameCache = new Map();
+
+export const reverseGeocode = async (lat, lon) => {
+  if (!lat || !lon) return null;
+  const key = `${lat.toFixed(4)},${lon.toFixed(4)}`;
+  if (geoNameCache.has(key)) {
+    return geoNameCache.get(key);
+  }
+
+  try {
+    const controller = new AbortController();
+    const timeoutId = setTimeout(() => controller.abort(), 3500);
+
+    const res = await fetch(
+      `https://nominatim.openstreetmap.org/reverse?format=json&lat=${lat}&lon=${lon}&zoom=18&addressdetails=1`,
+      {
+        headers: { 'Accept-Language': 'en' },
+        signal: controller.signal
+      }
+    );
+    clearTimeout(timeoutId);
+
+    if (res.ok) {
+      const data = await res.json();
+      const addr = data.address || {};
+      
+      const suburb = addr.suburb || addr.neighbourhood || addr.residential || addr.road || '';
+      const city = addr.city || addr.town || addr.village || addr.county || addr.state_district || '';
+      const state = addr.state || '';
+
+      const parts = [suburb, city, state].filter(Boolean);
+      const placeName = parts.length > 0 ? parts.join(', ') : (data.display_name?.split(',').slice(0, 3).join(',') || '');
+      
+      if (placeName) {
+        geoNameCache.set(key, placeName);
+        return placeName;
+      }
+    }
+  } catch (err) {
+    console.warn('Reverse geocode lookup timeout/error:', err);
+  }
+
+  return null;
+};
+
 export const stampImageWithGeoAndTimestamp = async (
   imageSource, // File, Blob, or Image element
   options = {}
 ) => {
   const {
-    location = null, // { latitude, longitude }
+    location = null, // { latitude, longitude, placeName }
     tag = 'Parks Monitoring System',
     fileName = `stamped_${Date.now()}.jpg`
   } = options;
@@ -31,6 +78,12 @@ export const stampImageWithGeoAndTimestamp = async (
     } catch (e) {
       console.warn('Geolocation capture skipped:', e);
     }
+  }
+
+  // Resolve place name if we have coordinates
+  let placeName = geo?.placeName || null;
+  if (!placeName && geo?.latitude && geo?.longitude) {
+    placeName = await reverseGeocode(geo.latitude, geo.longitude);
   }
 
   // 2. Load image onto canvas
@@ -64,21 +117,23 @@ export const stampImageWithGeoAndTimestamp = async (
           hour12: true
         });
 
-        const locationText = geo
+        const locationCoordsText = geo
           ? `📍 GPS: ${geo.latitude.toFixed(5)}° N, ${geo.longitude.toFixed(5)}° E`
-          : '📍 Location: GPS Acquired On-Site';
+          : '📍 GPS: Location Acquired On-Site';
 
-        const dateTimeText = `🗓️ ${dateStr}  ⏰ ${timeStr}`;
+        const placeText = placeName ? `🏛️ ${placeName}` : null;
+        const dateTimeText = `🗓️ ${dateStr}   ⏰ ${timeStr}`;
         const tagText = `🛡️ ${tag}`;
 
         // Dynamic font sizing based on canvas dimensions
         const fontSize = Math.max(16, Math.floor(canvas.width * 0.024));
         const padding = Math.max(12, Math.floor(canvas.width * 0.02));
         const lineHeight = fontSize * 1.45;
-        const totalHeight = lineHeight * 3 + padding * 2;
+        const lineCount = placeText ? 4 : 3;
+        const totalHeight = lineHeight * lineCount + padding * 2;
 
         // Draw semi-transparent dark banner at bottom
-        ctx.fillStyle = 'rgba(15, 23, 42, 0.78)';
+        ctx.fillStyle = 'rgba(15, 23, 42, 0.82)';
         ctx.fillRect(0, canvas.height - totalHeight, canvas.width, totalHeight);
 
         // Decorative accent bar
@@ -91,25 +146,34 @@ export const stampImageWithGeoAndTimestamp = async (
         ctx.textBaseline = 'top';
 
         // Shadow for maximum contrast
-        ctx.shadowColor = 'rgba(0, 0, 0, 0.8)';
+        ctx.shadowColor = 'rgba(0, 0, 0, 0.9)';
         ctx.shadowBlur = 4;
         ctx.shadowOffsetX = 1;
         ctx.shadowOffsetY = 1;
 
-        const startY = canvas.height - totalHeight + padding;
+        let currentY = canvas.height - totalHeight + padding;
         const startX = padding + 12;
 
         // Line 1: Tag & Verified Stamp
         ctx.fillStyle = '#34d399'; // light emerald
-        ctx.fillText(`${tagText}  [VERIFIED ON-SITE]`, startX, startY);
+        ctx.fillText(`${tagText}  [VERIFIED ON-SITE]`, startX, currentY);
+        currentY += lineHeight;
 
-        // Line 2: Geolocation
+        // Line 2 (Optional Place Name): City, Area, Location Name
+        if (placeText) {
+          ctx.fillStyle = '#67e8f9'; // cyan / light sky blue
+          ctx.fillText(placeText, startX, currentY);
+          currentY += lineHeight;
+        }
+
+        // Line 3: Geolocation Coordinates
         ctx.fillStyle = '#f8fafc';
-        ctx.fillText(locationText, startX, startY + lineHeight);
+        ctx.fillText(locationCoordsText, startX, currentY);
+        currentY += lineHeight;
 
-        // Line 3: Date and Time
+        // Line 4: Date and Time
         ctx.fillStyle = '#fbbf24'; // amber yellow
-        ctx.fillText(dateTimeText, startX, startY + lineHeight * 2);
+        ctx.fillText(dateTimeText, startX, currentY);
 
         // Export to File Blob
         canvas.toBlob(
@@ -122,7 +186,7 @@ export const stampImageWithGeoAndTimestamp = async (
             resolve({
               file: stampedFile,
               preview: URL.createObjectURL(stampedFile),
-              location: geo,
+              location: { ...geo, placeName },
               timestamp: now.toISOString()
             });
           },
