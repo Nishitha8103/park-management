@@ -11,8 +11,7 @@ const Login = () => {
   const [password, setPassword] = useState('');
   const [errorMsg, setErrorMsg] = useState('');
   const [isGoogleLoading, setIsGoogleLoading] = useState(false);
-
-
+  const [isLoading, setIsLoading] = useState(false);
 
   const handleSuccessfulAuth = (userData) => {
     localStorage.setItem('user', JSON.stringify(userData));
@@ -55,6 +54,7 @@ const Login = () => {
     if (!password) return setErrorMsg('Password is required');
     if (password.length < 6) return setErrorMsg('Password must be at least 6 characters');
     
+    setIsLoading(true);
     try {
       const response = await fetch('/api/auth/login', {
         method: 'POST',
@@ -70,7 +70,9 @@ const Login = () => {
       }
     } catch (err) {
       console.error("Login error:", err);
-      setErrorMsg('Failed to connect to server.');
+      setErrorMsg('Failed to connect to server. If your Render backend was sleeping, please wait 20-30 seconds for it to wake up and try again.');
+    } finally {
+      setIsLoading(false);
     }
   };
 
@@ -176,7 +178,9 @@ const Login = () => {
 
           {errorMsg && <div style={{ color: 'red', fontSize: '0.9rem' }}>{errorMsg}</div>}
 
-          <button type="submit" className="btn btn-primary w-full login-btn">Login</button>
+          <button type="submit" className="btn btn-primary w-full login-btn" disabled={isLoading || isGoogleLoading}>
+            {isLoading ? 'Connecting to Server...' : 'Login'}
+          </button>
           
           <div className="login-divider">
             <span>OR</span>
