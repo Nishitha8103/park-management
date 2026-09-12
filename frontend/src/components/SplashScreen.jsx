@@ -23,7 +23,7 @@ export default function SplashScreen({ onFinish, duration = 3000 }) {
     <div className={`splash-screen-overlay ${fadeOut ? 'splash-fade-out' : ''}`}>
       <div className="splash-content">
         <div className="splash-logo-wrapper">
-          <img src="/parks_logo.png" alt="Parks Logo" className="splash-logo-img" />
+          <img src="/parks_logo_v2.png" alt="Parks Logo" className="splash-logo-img" />
           <div className="splash-ring"></div>
         </div>
 

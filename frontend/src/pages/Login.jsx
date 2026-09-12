@@ -124,7 +124,7 @@ const Login = () => {
         <div className="login-glass-card">
           {/* Circular Glow Logo */}
           <div className="login-logo-container">
-            <img src="/parks_logo.png" alt="Parks Monitoring System Logo" className="login-logo-img" />
+            <img src="/parks_logo_v2.png" alt="Parks Monitoring System Logo" className="login-logo-img" />
           </div>
 
           {/* Heading */}

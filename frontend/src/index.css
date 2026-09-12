@@ -63,7 +63,7 @@ html, body, #root, .app-layout {
 }
 
 body {
-  background: url('/login_bg.jpg') no-repeat center center fixed !important;
+  background: url('/login_bg_v2.jpg') no-repeat center center fixed !important;
   background-size: cover !important;
   background-color: #03140a !important;
   padding-top: var(--sat);

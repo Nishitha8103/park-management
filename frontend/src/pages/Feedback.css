@@ -6,7 +6,7 @@
   flex-direction: column;
   margin: calc(-1 * var(--spacing-xl, 2rem));
   padding: 1.5rem 2rem;
-  background: url('/login_bg.jpg') no-repeat center center fixed;
+  background: url('/login_bg_v2.jpg') no-repeat center center fixed;
   background-size: cover;
   position: relative;
   overflow: hidden;
