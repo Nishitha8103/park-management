@@ -168,10 +168,70 @@ const sendOfficialCredentialsEmail = async (toEmail, name, username, password) =
   }
 };
 
+const sendWelcomePublicEmail = async (toEmail, name) => {
+  try {
+    const { transporter, fromEmail, isTest } = await createTransporter();
+    const mailOptions = {
+      from: `"Parks Monitoring System" <${fromEmail}>`,
+      to: toEmail,
+      subject: 'Thank you for joining - Parks Monitoring System',
+      text: `Hello ${name || 'Citizen'},\n\nThank you for joining the Parks Monitoring System!\n\nWe are excited to have you on board. You can now explore nearby parks, submit and track maintenance complaints, book stalls, and register for park events.\n\nTogether, let's keep our parks green, clean, and vibrant.\n\nBest regards,\nParks Monitoring & Management Team`,
+      html: `
+        <div style="font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif; max-width: 600px; margin: 0 auto; background-color: #ffffff; border: 1px solid #e2e8f0; border-radius: 16px; overflow: hidden; box-shadow: 0 4px 12px rgba(0,0,0,0.05);">
+          <div style="background: linear-gradient(135deg, #15803d, #064e3b); padding: 32px 24px; text-align: center; color: #ffffff;">
+            <h1 style="margin: 0; font-size: 24px; font-weight: 800; letter-spacing: -0.5px;">Parks Monitoring System</h1>
+            <p style="margin: 8px 0 0 0; color: #bbf7d0; font-size: 14px; font-weight: 500;">Civic Intelligence & Urban Park Management</p>
+          </div>
+          
+          <div style="padding: 32px 24px;">
+            <h2 style="color: #0f172a; font-size: 20px; font-weight: 700; margin-top: 0; margin-bottom: 12px;">Thank you for joining!</h2>
+            <p style="color: #334155; font-size: 15px; line-height: 1.6; margin: 0 0 16px 0;">Hello <strong>${name || 'Citizen'}</strong>,</p>
+            <p style="color: #475569; font-size: 15px; line-height: 1.6; margin: 0 0 24px 0;">
+              Thank you for joining the <strong>Parks Monitoring & Management System</strong>. We are thrilled to welcome you to our community!
+            </p>
+
+            <div style="background-color: #f8fafc; border: 1px solid #e2e8f0; border-radius: 12px; padding: 20px; margin-bottom: 24px;">
+              <p style="color: #0f172a; font-weight: 700; font-size: 14px; margin: 0 0 12px 0;">✨ What you can do now:</p>
+              <ul style="margin: 0; padding-left: 20px; color: #475569; font-size: 14px; line-height: 1.8;">
+                <li><strong>Explore Parks:</strong> Discover nearby urban parks, amenities, and timings.</li>
+                <li><strong>Report Issues:</strong> Submit maintenance grievances & cleanliness reports with ease.</li>
+                <li><strong>Live Tracking:</strong> Track progress and resolution of your complaints in real time.</li>
+                <li><strong>Stalls & Events:</strong> Reserve temporary stalls and register for community park events.</li>
+              </ul>
+            </div>
+
+            <p style="color: #64748b; font-size: 14px; line-height: 1.5; margin: 0 0 8px 0;">
+              Together, let's keep our city's parks green, beautiful, and accessible for everyone.
+            </p>
+          </div>
+
+          <div style="background-color: #f8fafc; padding: 20px 24px; border-top: 1px solid #e2e8f0; text-align: center; color: #94a3b8; font-size: 12px;">
+            <p style="margin: 0 0 4px 0;">Parks Monitoring System • Official Civic Portal</p>
+            <p style="margin: 0;">This is an automated notification. Please do not reply directly to this email.</p>
+          </div>
+        </div>
+      `
+    };
+
+    const info = await transporter.sendMail(mailOptions);
+    console.log(`[Welcome Email Sent] MessageId: ${info.messageId} to ${toEmail}`);
+    if (isTest) {
+      console.log('--- [TEST EMAIL SENT] ---');
+      console.log('Recipient:', toEmail);
+      console.log('Preview URL:', nodemailer.getTestMessageUrl(info));
+      console.log('--------------------------');
+    }
+    return info;
+  } catch (error) {
+    console.error('Error sending welcome email to public user:', error.message || error);
+  }
+};
+
 module.exports = {
   sendContractorCredentialsEmail,
   sendContractorUpdateEmail,
-  sendOfficialCredentialsEmail
+  sendOfficialCredentialsEmail,
+  sendWelcomePublicEmail
 };
 
 

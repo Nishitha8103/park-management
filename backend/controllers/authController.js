@@ -1,7 +1,7 @@
 const User = require('../models/User');
 const jwt = require('jsonwebtoken');
 const crypto = require('crypto');
-const { sendOfficialCredentialsEmail, sendContractorCredentialsEmail } = require('../config/sendEmail');
+const { sendOfficialCredentialsEmail, sendContractorCredentialsEmail, sendWelcomePublicEmail } = require('../config/sendEmail');
 
 // Generate JWT
 const generateToken = (id) => {
@@ -58,7 +58,7 @@ const registerUser = async (req, res) => {
         );
       }
 
-      // Send credentials email to Government Official
+      // Send credentials email to Government Official or Contractor, or Welcome email to Public User
       if (role === 'Government Official' || role === 'government_official' || role === 'official') {
         try {
           await sendOfficialCredentialsEmail(email, name, finalUsername, password);
@@ -70,6 +70,13 @@ const registerUser = async (req, res) => {
           await sendContractorCredentialsEmail(email, name, finalUsername, password);
         } catch (emailErr) {
           console.error('Failed to send email to contractor:', emailErr);
+        }
+      } else {
+        // Public User registration welcome email
+        try {
+          await sendWelcomePublicEmail(email, name);
+        } catch (emailErr) {
+          console.error('Failed to send welcome email to public user:', emailErr);
         }
       }
 
@@ -404,6 +411,13 @@ const googleLogin = async (req, res) => {
         googleId,
         profilePic: picture || null
       });
+
+      // Send welcome email on first time Google join
+      try {
+        await sendWelcomePublicEmail(email, name);
+      } catch (emailErr) {
+        console.error('Failed to send welcome email on Google signup:', emailErr);
+      }
     } else {
       // Update profile picture and googleId if not present
       if (picture && !user.profilePic) {
