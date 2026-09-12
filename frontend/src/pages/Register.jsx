@@ -52,6 +52,7 @@ const Register = () => {
   };
 
   const googleLoginHandler = useGoogleLogin({
+    prompt: 'select_account',
     onSuccess: async (tokenResponse) => {
       setIsGoogleLoading(true);
       setErrorMsg('');
