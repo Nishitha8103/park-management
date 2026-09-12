@@ -479,7 +479,25 @@ const SubmitComplaint = () => {
 
             {/* Photo Upload Zone */}
             <div className="form-group">
-              <label className="input-label">Attach Photo Evidence with Live Location & Time</label>
+              <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '6px', flexWrap: 'wrap', gap: '6px' }}>
+                <label className="input-label" style={{ margin: 0 }}>
+                  📷 Geotagged Photo Evidence / GPS-Stamped Photo (Optional)
+                </label>
+                <span style={{ 
+                  background: '#ecfdf5', 
+                  color: '#059669', 
+                  border: '1px solid #a7f3d0', 
+                  fontSize: '0.75rem', 
+                  padding: '2px 8px', 
+                  borderRadius: '9999px', 
+                  fontWeight: 600,
+                  display: 'inline-flex',
+                  alignItems: 'center',
+                  gap: '4px'
+                }}>
+                  🛡️ Live GPS Location & Timestamp Protected
+                </span>
+              </div>
               <div className="upload-dropzone" style={{ padding: '1.25rem' }}>
                 <input 
                   type="file" 
