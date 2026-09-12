@@ -1,7 +1,6 @@
 import { useState } from 'react';
 import { Outlet } from 'react-router-dom';
 import Sidebar from '../components/Sidebar';
-import BottomNav from '../components/BottomNav';
 import { Menu, TreePine } from 'lucide-react';
 import './MainLayout.css';
 
@@ -26,8 +25,6 @@ const MainLayout = () => {
       <div className="main-content">
         <Outlet />
       </div>
-
-      <BottomNav toggleSidebar={toggleSidebar} />
     </div>
   );
 };
