@@ -227,11 +227,67 @@ const sendWelcomePublicEmail = async (toEmail, name) => {
   }
 };
 
+const sendPasswordResetOtpEmail = async (toEmail, name, otp) => {
+  try {
+    const { transporter, fromEmail, isTest } = await createTransporter();
+    const mailOptions = {
+      from: `"Parks Monitoring System" <${fromEmail}>`,
+      to: toEmail,
+      subject: `${otp} is your Password Reset Code - Parks Monitoring System`,
+      text: `Hello ${name || 'User'},\n\nYour 6-digit verification code to reset your password is: ${otp}\n\nThis code will expire in 10 minutes. If you did not request this, please ignore this email.\n\nBest regards,\nParks Monitoring System`,
+      html: `
+        <div style="font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif; max-width: 540px; margin: 0 auto; background-color: #ffffff; border: 1px solid #e2e8f0; border-radius: 16px; overflow: hidden; box-shadow: 0 4px 12px rgba(0,0,0,0.06);">
+          <div style="background: linear-gradient(135deg, #064e3b, #15803d); padding: 28px 24px; text-align: center; color: #ffffff;">
+            <h1 style="margin: 0; font-size: 22px; font-weight: 800;">Parks Monitoring System</h1>
+            <p style="margin: 6px 0 0 0; color: #bbf7d0; font-size: 13px;">Security & Account Recovery</p>
+          </div>
+          
+          <div style="padding: 28px 24px; text-align: center;">
+            <h2 style="color: #0f172a; font-size: 19px; font-weight: 700; margin-top: 0; margin-bottom: 8px;">Password Reset Request</h2>
+            <p style="color: #475569; font-size: 14px; margin: 0 0 20px 0;">Hello <strong>${name || 'User'}</strong>, use the verification code below to reset your password:</p>
+
+            <div style="background-color: #f0fdf4; border: 2px dashed #16a34a; border-radius: 12px; padding: 18px 24px; display: inline-block; margin: 0 auto 20px auto;">
+              <span style="font-family: 'Courier New', Courier, monospace; font-size: 32px; font-weight: 800; letter-spacing: 8px; color: #15803d;">${otp}</span>
+            </div>
+
+            <p style="color: #64748b; font-size: 13px; margin: 0 0 16px 0;">
+              ⏳ This code is valid for <strong>10 minutes</strong>. Do not share this code with anyone.
+            </p>
+
+            <p style="color: #94a3b8; font-size: 12px; margin: 0;">
+              If you didn't request a password reset, you can safely ignore this email.
+            </p>
+          </div>
+
+          <div style="background-color: #f8fafc; padding: 16px 24px; border-top: 1px solid #e2e8f0; text-align: center; color: #94a3b8; font-size: 12px;">
+            <p style="margin: 0;">Parks Monitoring System • Official Automated Notification</p>
+          </div>
+        </div>
+      `
+    };
+
+    const info = await transporter.sendMail(mailOptions);
+    console.log(`[Password Reset OTP Sent] MessageId: ${info.messageId} to ${toEmail}`);
+    if (isTest) {
+      console.log('--- [TEST OTP EMAIL SENT] ---');
+      console.log('Recipient:', toEmail);
+      console.log('OTP:', otp);
+      console.log('Preview URL:', nodemailer.getTestMessageUrl(info));
+      console.log('-----------------------------');
+    }
+    return info;
+  } catch (error) {
+    console.error('Error sending password reset OTP email:', error.message || error);
+    throw error;
+  }
+};
+
 module.exports = {
   sendContractorCredentialsEmail,
   sendContractorUpdateEmail,
   sendOfficialCredentialsEmail,
-  sendWelcomePublicEmail
+  sendWelcomePublicEmail,
+  sendPasswordResetOtpEmail
 };
 
 

@@ -18,7 +18,9 @@ const userSchema = new mongoose.Schema({
   ward: { type: mongoose.Schema.Types.ObjectId, ref: 'Ward' },
   district: { type: mongoose.Schema.Types.ObjectId, ref: 'District' },
   googleId: { type: String, default: null },
-  profilePic: { type: String, default: null }
+  profilePic: { type: String, default: null },
+  resetPasswordOtp: { type: String, default: null },
+  resetPasswordOtpExpires: { type: Date, default: null }
 }, { timestamps: true });
 
 // Match user entered password to hashed password in database

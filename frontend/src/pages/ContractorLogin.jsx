@@ -1,11 +1,13 @@
 import { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { HardHat, Eye, EyeOff, Wrench } from 'lucide-react';
+import ForgotPasswordModal from '../components/ForgotPasswordModal';
 import './ContractorLogin.css';
 
 const ContractorLogin = () => {
   const navigate = useNavigate();
   const [showPassword, setShowPassword] = useState(false);
+  const [showForgotModal, setShowForgotModal] = useState(false);
   const [username, setUsername] = useState('');
   const [password, setPassword] = useState('');
   const [errorMsg, setErrorMsg] = useState('');
@@ -102,7 +104,14 @@ const ContractorLogin = () => {
               <input type="checkbox" />
               <span>Remember Me</span>
             </label>
-            <a href="#" className="contractor-text-primary">Forgot Password?</a>
+            <button 
+              type="button" 
+              onClick={() => setShowForgotModal(true)} 
+              className="contractor-text-primary"
+              style={{ background: 'none', border: 'none', cursor: 'pointer', padding: 0, font: 'inherit' }}
+            >
+              Forgot Password?
+            </button>
           </div>
 
           {errorMsg && <div style={{ color: '#dc2626', fontSize: '0.9rem', marginBottom: '1rem', fontWeight: '500' }}>{errorMsg}</div>}
@@ -116,6 +125,14 @@ const ContractorLogin = () => {
           <p>Don't have a contractor account? <Link to="/contractor/register" className="contractor-text-primary" style={{ fontWeight: 'bold' }}>Register Here</Link></p>
         </div>
       </div>
+
+      <ForgotPasswordModal
+        isOpen={showForgotModal}
+        onClose={() => setShowForgotModal(false)}
+        onSuccess={() => {
+          setShowForgotModal(false);
+        }}
+      />
     </div>
   );
 };

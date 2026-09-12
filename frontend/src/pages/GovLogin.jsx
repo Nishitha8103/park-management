@@ -1,11 +1,13 @@
 import { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { Shield, Eye, EyeOff } from 'lucide-react';
+import ForgotPasswordModal from '../components/ForgotPasswordModal';
 import './GovLogin.css';
 
 const GovLogin = () => {
   const navigate = useNavigate();
   const [showPassword, setShowPassword] = useState(false);
+  const [showForgotModal, setShowForgotModal] = useState(false);
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [errorMsg, setErrorMsg] = useState('');
@@ -102,7 +104,14 @@ const GovLogin = () => {
               <input type="checkbox" />
               <span>Remember Me</span>
             </label>
-            <a href="#" className="gov-text-primary">Forgot Password?</a>
+            <button 
+              type="button" 
+              onClick={() => setShowForgotModal(true)} 
+              className="gov-text-primary" 
+              style={{ background: 'none', border: 'none', cursor: 'pointer', padding: 0, font: 'inherit' }}
+            >
+              Forgot Password?
+            </button>
           </div>
 
           {errorMsg && <div style={{ color: 'red', fontSize: '0.9rem', marginBottom: '1rem' }}>{errorMsg}</div>}
@@ -114,6 +123,14 @@ const GovLogin = () => {
           <p>Don't have an official account? <Link to="/gov/register" className="gov-text-primary" style={{ fontWeight: 'bold' }}>Register Here</Link></p>
         </div>
       </div>
+
+      <ForgotPasswordModal
+        isOpen={showForgotModal}
+        onClose={() => setShowForgotModal(false)}
+        onSuccess={() => {
+          setShowForgotModal(false);
+        }}
+      />
     </div>
   );
 };

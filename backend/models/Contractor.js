@@ -18,7 +18,9 @@ const contractorSchema = new mongoose.Schema({
   profilePhoto: { type: String },
   status: { type: String, enum: ['Active', 'Inactive'], default: 'Active' },
   role: { type: String, default: 'contractor' },
-  maintenanceSkills: [{ type: String }]
+  maintenanceSkills: [{ type: String }],
+  resetPasswordOtp: { type: String, default: null },
+  resetPasswordOtpExpires: { type: Date, default: null }
 }, { timestamps: true });
 
 // Match user entered password to hashed password in database

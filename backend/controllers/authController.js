@@ -1,7 +1,7 @@
 const User = require('../models/User');
 const jwt = require('jsonwebtoken');
 const crypto = require('crypto');
-const { sendOfficialCredentialsEmail, sendContractorCredentialsEmail, sendWelcomePublicEmail } = require('../config/sendEmail');
+const { sendOfficialCredentialsEmail, sendContractorCredentialsEmail, sendWelcomePublicEmail, sendPasswordResetOtpEmail } = require('../config/sendEmail');
 
 // Generate JWT
 const generateToken = (id) => {
@@ -460,6 +460,123 @@ const googleLogin = async (req, res) => {
   }
 };
 
+// @desc    Forgot Password - Generate and send 6-digit OTP
+// @route   POST /api/auth/forgot-password
+// @access  Public
+const forgotPassword = async (req, res) => {
+  try {
+    const { emailOrUsername } = req.body;
+    const identifier = (emailOrUsername || '').trim();
+
+    if (!identifier) {
+      return res.status(400).json({ message: 'Please provide your email address or username.' });
+    }
+
+    // 1. Check in User model
+    let account = await User.findOne({
+      $or: [{ email: identifier }, { username: identifier }]
+    });
+
+    // 2. If not found in User, check Contractor model
+    if (!account) {
+      const Contractor = require('../models/Contractor');
+      account = await Contractor.findOne({
+        $or: [{ email: identifier }, { username: identifier }, { contractorId: identifier }]
+      });
+    }
+
+    if (!account) {
+      return res.status(404).json({ message: 'No registered account found with that email or username.' });
+    }
+
+    if (!account.email) {
+      return res.status(400).json({ message: 'Account does not have an email address associated.' });
+    }
+
+    // Generate 6-digit OTP
+    const otp = Math.floor(100000 + Math.random() * 900000).toString();
+    const otpExpires = new Date(Date.now() + 10 * 60 * 1000); // 10 minutes
+
+    account.resetPasswordOtp = otp;
+    account.resetPasswordOtpExpires = otpExpires;
+    await account.save();
+
+    // Send OTP Email
+    try {
+      await sendPasswordResetOtpEmail(account.email, account.name, otp);
+    } catch (emailErr) {
+      console.error('Failed to send OTP email:', emailErr);
+      return res.status(500).json({ message: 'Failed to send OTP email. Please check your email configuration.' });
+    }
+
+    const maskedEmail = account.email.replace(/(.{2})(.*)(?=@)/, (gp1, gp2, gp3) => gp2 + '*'.repeat(Math.max(0, gp3.length)));
+
+    res.json({
+      message: `A 6-digit verification code has been sent to ${maskedEmail}`,
+      email: account.email
+    });
+  } catch (error) {
+    console.error('Forgot password error:', error);
+    res.status(500).json({ message: 'Server error', error: error.message });
+  }
+};
+
+// @desc    Reset Password - Verify OTP and update password
+// @route   POST /api/auth/reset-password
+// @access  Public
+const resetPassword = async (req, res) => {
+  try {
+    const { emailOrUsername, otp, newPassword } = req.body;
+    const identifier = (emailOrUsername || '').trim();
+    const enteredOtp = (otp || '').trim();
+
+    if (!identifier || !enteredOtp || !newPassword) {
+      return res.status(400).json({ message: 'All fields are required (identifier, OTP, and new password).' });
+    }
+
+    if (newPassword.length < 6) {
+      return res.status(400).json({ message: 'New password must be at least 6 characters.' });
+    }
+
+    // 1. Check in User model
+    let account = await User.findOne({
+      $or: [{ email: identifier }, { username: identifier }]
+    });
+
+    // 2. If not found in User, check Contractor model
+    if (!account) {
+      const Contractor = require('../models/Contractor');
+      account = await Contractor.findOne({
+        $or: [{ email: identifier }, { username: identifier }, { contractorId: identifier }]
+      });
+    }
+
+    if (!account) {
+      return res.status(404).json({ message: 'Account not found.' });
+    }
+
+    // Verify OTP
+    if (!account.resetPasswordOtp || account.resetPasswordOtp !== enteredOtp) {
+      return res.status(400).json({ message: 'Invalid verification code. Please check and try again.' });
+    }
+
+    if (!account.resetPasswordOtpExpires || new Date() > new Date(account.resetPasswordOtpExpires)) {
+      return res.status(400).json({ message: 'Verification code has expired. Please request a new one.' });
+    }
+
+    // Set new password (pre-save hook will hash it)
+    account.password = newPassword;
+    account.resetPasswordOtp = null;
+    account.resetPasswordOtpExpires = null;
+    await account.save();
+
+    res.json({ message: 'Password has been reset successfully! You can now log in with your new password.' });
+  } catch (error) {
+    console.error('Reset password error:', error);
+    res.status(500).json({ message: 'Server error', error: error.message });
+  }
+};
+
 module.exports = {
   registerUser,
   loginUser,
@@ -469,4 +586,6 @@ module.exports = {
   getUserById,
   updateUser,
   getNextOfficialId,
+  forgotPassword,
+  resetPassword
 };

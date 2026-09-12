@@ -2,11 +2,13 @@ import { useState, useEffect } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { TreePine, Eye, EyeOff } from 'lucide-react';
 import { useGoogleLogin } from '@react-oauth/google';
+import ForgotPasswordModal from '../components/ForgotPasswordModal';
 import './Login.css';
 
 const Login = () => {
   const navigate = useNavigate();
   const [showPassword, setShowPassword] = useState(false);
+  const [showForgotModal, setShowForgotModal] = useState(false);
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [errorMsg, setErrorMsg] = useState('');
@@ -173,7 +175,14 @@ const Login = () => {
               <input type="checkbox" />
               <span>Remember Me</span>
             </label>
-            <a href="#" className="forgot-password text-success">Forgot Password?</a>
+            <button
+              type="button"
+              onClick={() => setShowForgotModal(true)}
+              className="forgot-password text-success"
+              style={{ background: 'none', border: 'none', cursor: 'pointer', padding: 0 }}
+            >
+              Forgot Password?
+            </button>
           </div>
 
           {errorMsg && <div style={{ color: 'red', fontSize: '0.9rem' }}>{errorMsg}</div>}
@@ -206,6 +215,16 @@ const Login = () => {
           <p>Don't have an account? <Link to="/register" className="text-success font-semibold">Register</Link></p>
         </div>
       </div>
+
+      <ForgotPasswordModal
+        isOpen={showForgotModal}
+        onClose={() => setShowForgotModal(false)}
+        onPasswordResetSuccess={(resetIdentifier) => {
+          setEmail(resetIdentifier);
+          setShowForgotModal(false);
+          setErrorMsg('');
+        }}
+      />
     </div>
   );
 };
