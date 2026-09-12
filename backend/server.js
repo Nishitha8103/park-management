@@ -49,6 +49,20 @@ app.get('/api/health', (req, res) => {
   res.json({ status: 'ok', message: 'Backend is running!' });
 });
 
+// Serve frontend in production or whenever dist exists
+const fs = require('fs');
+const distPath = path.join(__dirname, '../frontend/dist');
+if (process.env.NODE_ENV === 'production' || (process.env.NODE_ENV !== 'development' && fs.existsSync(distPath))) {
+  app.use(express.static(distPath));
+
+  app.use((req, res, next) => {
+    if (req.method === 'GET' && !req.originalUrl.startsWith('/api') && !req.originalUrl.startsWith('/uploads')) {
+      return res.sendFile(path.join(distPath, 'index.html'));
+    }
+    next();
+  });
+}
+
 // Global error handler
 app.use((err, req, res, next) => {
   console.error('Unhandled Error:', err);

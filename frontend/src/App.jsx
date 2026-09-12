@@ -1,5 +1,6 @@
 import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom';
 import CustomPopupModal from './components/CustomPopupModal';
+import InstallPrompt from './components/InstallPrompt';
 import Home from './pages/Home';
 import Login from './pages/Login';
 import Register from './pages/Register';
@@ -179,6 +180,7 @@ function App() {
           <Route path="/notifications" element={<NotificationsPage />} />
         </Route>
       </Routes>
+      <InstallPrompt />
     </Router>
   );
 }
