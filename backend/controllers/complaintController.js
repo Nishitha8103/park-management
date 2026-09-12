@@ -3,49 +3,50 @@ const Park = require('../models/Park');
 const Notification = require('../models/Notification');
 const User = require('../models/User');
 
-// Helper to resolve government official based on Park hierarchy:
-// District -> Corporation -> Zone -> Ward -> Park -> Assigned Government Official
-const getResponsibleOfficial = async (park, parkName) => {
-  let targetPark = park;
-  if (!targetPark && parkName) {
-    targetPark = await Park.findOne({ name: new RegExp(parkName, 'i') });
-  }
-  if (!targetPark) return null;
-  
-  // 1. Direct assignment on Park
-  if (targetPark.governmentOfficial) {
-    const official = await User.findById(targetPark.governmentOfficial);
-    if (official) return official;
+// Helper to resolve government official from an in-memory list of officials
+const resolveOfficialFromList = (park, parkName, officials) => {
+  if (!park || !officials || officials.length === 0) return null;
+
+  if (park.governmentOfficial) {
+    const goId = park.governmentOfficial.toString();
+    const direct = officials.find(o => o._id.toString() === goId);
+    if (direct) return direct;
   }
 
-  // 2. Ward level match
-  if (targetPark.ward) {
-    const official = await User.findOne({
-      role: { $in: ['official', 'government_official', 'Government Official'] },
-      ward: targetPark.ward
-    });
-    if (official) return official;
+  const wardId = park.ward?._id ? park.ward._id.toString() : (park.ward ? park.ward.toString() : null);
+  if (wardId) {
+    const byWard = officials.find(o => o.ward && o.ward.toString() === wardId);
+    if (byWard) return byWard;
   }
 
-  // 3. Zone level match
-  if (targetPark.zone) {
-    const official = await User.findOne({
-      role: { $in: ['official', 'government_official', 'Government Official'] },
-      zone: targetPark.zone
-    });
-    if (official) return official;
+  const zoneId = park.zone?._id ? park.zone._id.toString() : (park.zone ? park.zone.toString() : null);
+  if (zoneId) {
+    const byZone = officials.find(o => o.zone && o.zone.toString() === zoneId);
+    if (byZone) return byZone;
   }
 
-  // 4. District level match
-  if (targetPark.district) {
-    const official = await User.findOne({
-      role: { $in: ['official', 'government_official', 'Government Official'] },
-      district: targetPark.district
-    });
-    if (official) return official;
+  const districtId = park.district?._id ? park.district._id.toString() : (park.district ? park.district.toString() : null);
+  if (districtId) {
+    const byDistrict = officials.find(o => o.district && o.district.toString() === districtId);
+    if (byDistrict) return byDistrict;
   }
 
   return null;
+};
+
+// Helper to resolve government official based on Park hierarchy:
+const getResponsibleOfficial = async (park, parkName) => {
+  let targetPark = park;
+  if (!targetPark && parkName) {
+    targetPark = await Park.findOne({ name: new RegExp(parkName, 'i') }).select('governmentOfficial ward zone district').lean();
+  }
+  if (!targetPark) return null;
+
+  const officials = await User.find({
+    role: { $in: ['official', 'government_official', 'Government Official'] }
+  }).select('name email phone department district zone ward role').lean();
+
+  return resolveOfficialFromList(targetPark, parkName, officials);
 };
 
 // @desc    Submit a new complaint
@@ -143,28 +144,25 @@ const getComplaints = async (req, res) => {
     if (userPhone) query.userPhone = userPhone;
 
     const complaints = await Complaint.find(query)
-      .populate({
-        path: 'park',
-        populate: [
-          { path: 'district' },
-          { path: 'corporation' },
-          { path: 'zone' },
-          { path: 'ward' }
-        ]
-      })
+      .populate('park', 'name district corporation zone ward latitude longitude')
       .populate('assignedContractor', 'name email phone companyName')
       .populate('assignedOfficial', 'name email phone department')
       .populate('user', 'name email phone')
-      .sort({ createdAt: -1 });
+      .sort({ createdAt: -1 })
+      .lean();
 
-    const complaintsObj = [];
-    for (let c of complaints) {
-      const cObj = c.toObject();
-      cObj.suggestedOfficial = await getResponsibleOfficial(c.park, c.parkName);
-      complaintsObj.push(cObj);
+    // Only resolve suggestedOfficial if needed (e.g., admin queries without specific contractor/user filter)
+    if (!contractorId && !userPhone && !officialId && complaints.length > 0) {
+      const officials = await User.find({
+        role: { $in: ['official', 'government_official', 'Government Official'] }
+      }).select('name email phone department district zone ward role').lean();
+
+      for (let c of complaints) {
+        c.suggestedOfficial = resolveOfficialFromList(c.park, c.parkName, officials);
+      }
     }
 
-    res.json(complaintsObj);
+    res.json(complaints);
   } catch (error) {
     console.error('Error fetching complaints:', error);
     res.status(500).json({ message: 'Server error', error: error.message });
@@ -178,48 +176,36 @@ const getComplaintById = async (req, res) => {
     const { id } = req.params;
     let complaint = null;
 
-    // Check if id is a valid MongoDB ObjectId
     const mongoose = require('mongoose');
-    if (mongoose.Types.ObjectId.isValid(id)) {
+    if (mongoose.Types.ObjectId.isValid(id) && id.length === 24) {
       complaint = await Complaint.findById(id)
-        .populate({
-          path: 'park',
-          populate: [
-            { path: 'district' },
-            { path: 'corporation' },
-            { path: 'zone' },
-            { path: 'ward' }
-          ]
-        })
-        .populate('assignedContractor')
-        .populate('assignedOfficial')
-        .populate('user', 'name email phone');
+        .populate('park', 'name district corporation zone ward latitude longitude')
+        .populate('assignedContractor', 'name email phone companyName')
+        .populate('assignedOfficial', 'name email phone department')
+        .populate('user', 'name email phone')
+        .lean();
     }
 
     if (!complaint) {
       complaint = await Complaint.findOne({ complaintNumber: id })
-        .populate({
-          path: 'park',
-          populate: [
-            { path: 'district' },
-            { path: 'corporation' },
-            { path: 'zone' },
-            { path: 'ward' }
-          ]
-        })
-        .populate('assignedContractor')
-        .populate('assignedOfficial')
-        .populate('user', 'name email phone');
+        .populate('park', 'name district corporation zone ward latitude longitude')
+        .populate('assignedContractor', 'name email phone companyName')
+        .populate('assignedOfficial', 'name email phone department')
+        .populate('user', 'name email phone')
+        .lean();
     }
 
     if (!complaint) {
       return res.status(404).json({ message: 'Complaint not found' });
     }
 
-    const complaintObj = complaint.toObject();
-    complaintObj.suggestedOfficial = await getResponsibleOfficial(complaint.park, complaint.parkName);
+    const officials = await User.find({
+      role: { $in: ['official', 'government_official', 'Government Official'] }
+    }).select('name email phone department district zone ward role').lean();
 
-    res.json(complaintObj);
+    complaint.suggestedOfficial = resolveOfficialFromList(complaint.park, complaint.parkName, officials);
+
+    res.json(complaint);
   } catch (error) {
     console.error('Error fetching complaint:', error);
     res.status(500).json({ message: 'Server error', error: error.message });
@@ -395,6 +381,18 @@ const updateComplaint = async (req, res) => {
             relatedEntityId: complaint._id
           });
         }
+      } else if (status === 'Rejected by Contractor') {
+        await Notification.create({
+          recipientUserId: 'ADMIN_ALL',
+          recipientRole: 'admin',
+          title: 'Task Rejected by Contractor',
+          message: `Contractor has rejected Complaint #${complaint.complaintNumber}. Reason: ${complaint.rejectionReason || 'No reason provided'}. Please reassign.`,
+          type: 'Task Rejected',
+          category: 'Assigned Tasks',
+          priority: 'HIGH',
+          relatedEntityType: 'COMPLAINT',
+          relatedEntityId: complaint._id
+        });
       } else if (status === 'Inspection Pending') {
         const officialId = updateData.assignedOfficial || complaint.assignedOfficial;
         if (officialId) {

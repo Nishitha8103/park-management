@@ -89,6 +89,28 @@ const AdminEvents = () => {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
+
+    if (!formData.title.trim()) {
+      alert("Event Title is required");
+      return;
+    }
+    if (!formData.description.trim()) {
+      alert("Description is required");
+      return;
+    }
+    if (!formData.eventDate) {
+      alert("Date & Time is required");
+      return;
+    }
+    if (formData.isPaid && formData.price < 0) {
+      alert("Price cannot be negative");
+      return;
+    }
+    if (formData.capacity < 0) {
+      alert("Capacity cannot be negative");
+      return;
+    }
+
     try {
       const token = JSON.parse(localStorage.getItem('adminUser'))?.token;
       const config = { headers: { Authorization: `Bearer ${token}` } };

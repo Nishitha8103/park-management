@@ -18,6 +18,7 @@ const Feedback = () => {
   const [comments, setComments] = useState('');
   const [selectedTags, setSelectedTags] = useState([]);
   const [submitted, setSubmitted] = useState(false);
+  const [errorMsg, setErrorMsg] = useState('');
 
   const QUICK_TAGS = [
     "🧹 Clean & Well Maintained",
@@ -88,6 +89,16 @@ const Feedback = () => {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
+    setErrorMsg('');
+    
+    if (!parkName.trim()) {
+      setErrorMsg('Park Name is required');
+      return;
+    }
+    if (comments.trim() && comments.trim().length < 5) {
+      setErrorMsg('If providing comments, they must be at least 5 characters');
+      return;
+    }
     
     try {
       const newFb = {
@@ -275,6 +286,8 @@ const Feedback = () => {
               <Leaf size={18} color="#10b981" />
               <span>Your feedback will be reviewed by the concerned park authorities.</span>
             </div>
+
+            {errorMsg && <div style={{ color: 'red', fontSize: '0.9rem', marginBottom: '1rem', fontWeight: 'bold', textAlign: 'center' }}>{errorMsg}</div>}
 
             <button type="submit" className="submit-btn-vibrant">
               <Send size={18} /> Submit Park Feedback ➔

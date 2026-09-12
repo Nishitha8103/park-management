@@ -12,7 +12,8 @@ const statusColor = (status) => {
     case 'Verified':           return { bg: '#f0fdf4', color: '#166534', border: '#86efac' };
     case 'Closed':             return { bg: '#f1f5f9', color: '#475569', border: '#cbd5e1' };
     case 'Inspection Pending': return { bg: '#faf5ff', color: '#7c3aed', border: '#ddd6fe' };
-    case 'Rejected':           return { bg: '#fef2f2', color: '#dc2626', border: '#fecaca' };
+    case 'Rejected':
+    case 'Rejected by Contractor': return { bg: '#fef2f2', color: '#dc2626', border: '#fecaca' };
     case 'New':                return { bg: '#fefce8', color: '#a16207', border: '#fde68a' };
     case 'Started':            return { bg: '#ecfdf5', color: '#059669', border: '#a7f3d0' };
     default:                   return { bg: '#f8fafc', color: '#475569', border: '#e2e8f0' };
@@ -200,6 +201,7 @@ const AdminAssignments = () => {
           <option value="Inspection Pending">Inspection Pending</option>
           <option value="Verified">Verified</option>
           <option value="Rejected">Rejected</option>
+          <option value="Rejected by Contractor">Rejected by Contractor</option>
           <option value="Closed">Closed</option>
         </select>
 
@@ -399,6 +401,16 @@ const AdminAssignments = () => {
                   {selectedTask.description || 'No description provided.'}
                 </p>
               </div>
+
+              {/* Rejection Reason */}
+              {selectedTask.status === 'Rejected by Contractor' && selectedTask.rejectionReason && (
+                <div style={{ background: '#fef2f2', padding: '1rem 1.25rem', borderRadius: '10px', border: '1px solid #fecaca', marginBottom: '1.5rem' }}>
+                  <div style={{ fontSize: '0.72rem', color: '#dc2626', fontWeight: 700, marginBottom: '6px', textTransform: 'uppercase', letterSpacing: '0.05em' }}>Reason for Rejection</div>
+                  <p style={{ margin: 0, color: '#991b1b', fontSize: '0.9rem', lineHeight: '1.6', fontWeight: 500 }}>
+                    {selectedTask.rejectionReason}
+                  </p>
+                </div>
+              )}
 
               {/* Reassign Section */}
               <div style={{ background: '#eff6ff', padding: '1.25rem', borderRadius: '10px', border: '1px solid #bfdbfe' }}>

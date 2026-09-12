@@ -96,8 +96,22 @@ const AdminPlantingStaff = () => {
 
   const handleCreateStaff = async (e) => {
     e.preventDefault();
-    setSubmitting(true);
     setMsg({ type: '', text: '' });
+
+    if (!staffForm.name.trim()) {
+      setMsg({ type: 'error', text: 'Name is required' });
+      return;
+    }
+    if (!/^\S+@\S+\.\S+$/.test(staffForm.email)) {
+      setMsg({ type: 'error', text: 'Invalid email format' });
+      return;
+    }
+    if (staffForm.password.length < 6) {
+      setMsg({ type: 'error', text: 'Password must be at least 6 characters long.' });
+      return;
+    }
+
+    setSubmitting(true);
 
     try {
       const token = getAuthToken();
@@ -128,8 +142,14 @@ const AdminPlantingStaff = () => {
 
   const handleAddFlora = async (e) => {
     e.preventDefault();
-    setSubmitting(true);
     setMsg({ type: '', text: '' });
+
+    if (!floraForm.species.trim()) {
+      setMsg({ type: 'error', text: 'Species is required' });
+      return;
+    }
+
+    setSubmitting(true);
 
     try {
       const token = getAuthToken();
@@ -159,8 +179,14 @@ const AdminPlantingStaff = () => {
 
   const handleCreateTask = async (e) => {
     e.preventDefault();
-    setSubmitting(true);
     setMsg({ type: '', text: '' });
+
+    if (!taskForm.park) {
+      setMsg({ type: 'error', text: 'Park is required' });
+      return;
+    }
+
+    setSubmitting(true);
 
     try {
       const token = getAuthToken();

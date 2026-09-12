@@ -12,15 +12,19 @@ const ContractorRegister = () => {
   const [specialization, setSpecialization] = useState('');
   const [password, setPassword] = useState('');
   const [confirmPassword, setConfirmPassword] = useState('');
+  const [errorMsg, setErrorMsg] = useState('');
   const [successMsg, setSuccessMsg] = useState('');
 
   const handleRegister = async (e) => {
     e.preventDefault();
+    setErrorMsg('');
     
-    if (password !== confirmPassword) {
-      alert("Passwords do not match!");
-      return;
-    }
+    if (!name.trim()) return setErrorMsg('Full Name / Company Name is required');
+    if (!/^\S+@\S+\.\S+$/.test(email)) return setErrorMsg('A valid Email Address is required');
+    if (!/^\d{10}$/.test(phone)) return setErrorMsg('Phone number must be exactly 10 digits');
+    if (!specialization) return setErrorMsg('Maintenance Specialization is required');
+    if (password.length < 6) return setErrorMsg('Password must be at least 6 characters');
+    if (password !== confirmPassword) return setErrorMsg('Passwords do not match!');
 
     try {
       const response = await fetch('/api/auth/register', {
@@ -44,11 +48,11 @@ const ContractorRegister = () => {
         setSuccessMsg("Contractor Account Created! Redirecting to login...");
         navigate('/contractor/login');
       } else {
-        alert(data.message || "Registration failed");
+        setErrorMsg(data.message || "Registration failed");
       }
     } catch (error) {
       console.error("Registration error:", error);
-      alert("Failed to connect to server. Please ensure backend is running.");
+      setErrorMsg("Failed to connect to server. Please ensure backend is running.");
     }
   };
 
@@ -174,6 +178,8 @@ const ContractorRegister = () => {
               </div>
             </div>
           </div>
+
+          {errorMsg && <div style={{ color: '#dc2626', fontSize: '0.9rem', marginBottom: '1rem', fontWeight: 'bold', textAlign: 'center' }}>{errorMsg}</div>}
 
           <button type="submit" className="contractor-btn-primary">
             <UserPlus size={18} style={{ marginRight: '8px' }} /> Register Contractor Account

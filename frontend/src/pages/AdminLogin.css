@@ -3,7 +3,8 @@
   display: flex;
   justify-content: center;
   align-items: center;
-  background-color: #f5f3ff; /* Very light purple/violet tint background */
+  background: url('/park_bg.png') no-repeat center center fixed;
+  background-size: cover;
   padding: 2rem;
   font-family: 'Inter', sans-serif;
 }

@@ -55,7 +55,7 @@ html, body, #root, .app-layout {
 }
 
 body {
-  background: url('/park_bg.jpg') no-repeat center center fixed !important;
+  background: url('/park_bg.png') no-repeat center center fixed !important;
   background-size: cover !important;
 }
 
@@ -67,8 +67,6 @@ body {
 .gov-notifications-page,
 .admin-panel,
 .main-content,
-.login-page,
-.register-page,
 .gov-login-page,
 .gov-register-page,
 .contractor-login-page,

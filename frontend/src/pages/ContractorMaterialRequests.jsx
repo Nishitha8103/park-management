@@ -78,8 +78,16 @@ const ContractorMaterialRequests = () => {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    if (!form.materialName || !form.quantity || !form.reason) {
-      showMsg('error', 'Please fill all required fields.');
+    if (!form.materialName.trim()) {
+      showMsg('error', 'Material Name is required.');
+      return;
+    }
+    if (!form.quantity || isNaN(form.quantity) || Number(form.quantity) <= 0) {
+      showMsg('error', 'Quantity must be a valid positive number.');
+      return;
+    }
+    if (!form.reason.trim()) {
+      showMsg('error', 'Reason is required.');
       return;
     }
     setSubmitting(true);

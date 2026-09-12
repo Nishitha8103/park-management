@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { TreePine, Eye, EyeOff } from 'lucide-react';
 import { useGoogleLogin } from '@react-oauth/google';
@@ -11,6 +11,8 @@ const Login = () => {
   const [password, setPassword] = useState('');
   const [errorMsg, setErrorMsg] = useState('');
   const [isGoogleLoading, setIsGoogleLoading] = useState(false);
+
+
 
   const handleSuccessfulAuth = (userData) => {
     localStorage.setItem('user', JSON.stringify(userData));
@@ -48,6 +50,10 @@ const Login = () => {
   const handleLogin = async (e) => {
     e.preventDefault();
     setErrorMsg('');
+    
+    if (!email.trim()) return setErrorMsg('Email or Username is required');
+    if (!password) return setErrorMsg('Password is required');
+    if (password.length < 6) return setErrorMsg('Password must be at least 6 characters');
     
     try {
       const response = await fetch('/api/auth/login', {

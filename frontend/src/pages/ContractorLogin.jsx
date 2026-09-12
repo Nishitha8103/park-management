@@ -14,6 +14,10 @@ const ContractorLogin = () => {
     e.preventDefault();
     setErrorMsg('');
     
+    if (!username.trim()) return setErrorMsg('Username is required');
+    if (!password) return setErrorMsg('Password is required');
+    if (password.length < 6) return setErrorMsg('Password must be at least 6 characters');
+
     try {
       const response = await fetch('/api/contractors/login', {
         method: 'POST',

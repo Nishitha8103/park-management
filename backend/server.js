@@ -19,10 +19,13 @@ initAnnouncementCron();
 const { initStallPaymentCron } = require('./cron/stallPaymentCron');
 initStallPaymentCron();
 
+const compression = require('compression');
+
 const app = express();
 const port = process.env.PORT || 5000;
 
 app.use(cors());
+app.use(compression());
 app.use(express.json());
 
 // Serve static files from uploads folder

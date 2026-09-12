@@ -15,4 +15,7 @@ const notificationSchema = new mongoose.Schema({
   actionRoute: { type: String }
 }, { timestamps: true });
 
+notificationSchema.index({ recipientUserId: 1, isRead: 1 });
+notificationSchema.index({ createdAt: -1 });
+
 module.exports = mongoose.model('Notification', notificationSchema);

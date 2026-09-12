@@ -194,8 +194,10 @@ const AdminOfficialsEdit = () => {
   };
 
   const validateForm = () => {
-    if (formData.phone && (formData.phone.length < 10 || isNaN(formData.phone.replace(/[^0-9]/g, '')))) {
-      return "Phone number must be valid.";
+    if (!formData.name.trim()) return "Name is required.";
+    if (!/^\S+@\S+\.\S+$/.test(formData.email)) return "Invalid email format.";
+    if (formData.phone && (formData.phone.length !== 10 || isNaN(formData.phone))) {
+      return "Phone number must be exactly 10 digits.";
     }
     if (formData.password && formData.password.length < 6) {
       return "Password must be at least 6 characters long.";

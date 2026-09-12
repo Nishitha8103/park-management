@@ -109,6 +109,28 @@ const AdminStallBookings = () => {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
+
+    if (!formData.parkId) {
+      alert("Please select a park.");
+      return;
+    }
+    if (!formData.userId) {
+      alert("Please select a user.");
+      return;
+    }
+    if (!formData.stallName.trim()) {
+      alert("Stall Name is required.");
+      return;
+    }
+    if (!formData.productsType.trim()) {
+      alert("Products Type is required.");
+      return;
+    }
+    if (formData.amountPaid < 0) {
+      alert("Amount Paid cannot be negative.");
+      return;
+    }
+
     setSubmitting(true);
     try {
       const token = JSON.parse(localStorage.getItem('adminUser'))?.token;

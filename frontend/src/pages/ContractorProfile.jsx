@@ -115,6 +115,22 @@ const ContractorProfile = () => {
   const handleSaveProfile = async (e) => {
     e.preventDefault();
     
+    if (!formData.name.trim()) {
+      setMessage({ type: 'error', text: 'Name is required' });
+      setTimeout(() => setMessage({ type: '', text: '' }), 4000);
+      return;
+    }
+    if (!/^\S+@\S+\.\S+$/.test(formData.email)) {
+      setMessage({ type: 'error', text: 'Invalid email format' });
+      setTimeout(() => setMessage({ type: '', text: '' }), 4000);
+      return;
+    }
+    if (!/^\d{10}$/.test(formData.phone)) {
+      setMessage({ type: 'error', text: 'Phone number must be exactly 10 digits' });
+      setTimeout(() => setMessage({ type: '', text: '' }), 4000);
+      return;
+    }
+    
     try {
       const token = contractor?.token;
       const submitData = new FormData();
@@ -156,6 +172,11 @@ const ContractorProfile = () => {
     e.preventDefault();
     if (!passwordData.newPassword || !passwordData.confirmPassword) {
       setMessage({ type: 'error', text: 'Please fill all password fields.' });
+      setTimeout(() => setMessage({ type: '', text: '' }), 3000);
+      return;
+    }
+    if (passwordData.newPassword.length < 6) {
+      setMessage({ type: 'error', text: 'New password must be at least 6 characters.' });
       setTimeout(() => setMessage({ type: '', text: '' }), 3000);
       return;
     }

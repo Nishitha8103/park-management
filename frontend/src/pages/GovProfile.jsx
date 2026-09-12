@@ -99,6 +99,20 @@ const GovProfile = () => {
   const handleSaveProfile = async (e) => {
     e.preventDefault();
     if (!user) return;
+
+    if (!profileData.name.trim()) {
+      showAlert('error', 'Name is required');
+      return;
+    }
+    if (!/^\S+@\S+\.\S+$/.test(profileData.email)) {
+      showAlert('error', 'Invalid email format');
+      return;
+    }
+    if (profileData.phone && !/^\d{10}$/.test(profileData.phone)) {
+      showAlert('error', 'Phone number must be exactly 10 digits');
+      return;
+    }
+
     setSavingProfile(true);
     
     try {

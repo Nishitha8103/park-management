@@ -40,6 +40,7 @@ const SubmitComplaint = () => {
   const [complaintId, setComplaintId] = useState('');
   const [loading, setLoading] = useState(false);
   const [copied, setCopied] = useState(false);
+  const [errorMsg, setErrorMsg] = useState('');
   const navigate = useNavigate();
 
   useEffect(() => {
@@ -77,6 +78,16 @@ const SubmitComplaint = () => {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
+    setErrorMsg('');
+
+    if (!formData.parkName.trim()) return setErrorMsg('Park Name is required');
+    if (!formData.locationInPark.trim()) return setErrorMsg('Location in park is required');
+    if (!formData.category) return setErrorMsg('Complaint Category is required');
+    if (!formData.priority) return setErrorMsg('Priority Level is required');
+    if (!/^\d{10}$/.test(formData.mobileNumber)) return setErrorMsg('Mobile number must be exactly 10 digits');
+    if (formData.email && !/^\S+@\S+\.\S+$/.test(formData.email)) return setErrorMsg('Please enter a valid email format');
+    if (!formData.description.trim() || formData.description.trim().length < 10) return setErrorMsg('Please provide a detailed description (minimum 10 characters)');
+
     setLoading(true);
     try {
       const submitData = new FormData();
@@ -425,6 +436,8 @@ const SubmitComplaint = () => {
             </div>
 
           </div>
+
+          {errorMsg && <div style={{ color: 'red', fontSize: '0.9rem', marginBottom: '1rem', fontWeight: 'bold', textAlign: 'center' }}>{errorMsg}</div>}
 
           {/* Form Submit Row */}
           <div className="form-submit-row">

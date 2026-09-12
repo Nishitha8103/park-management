@@ -1063,6 +1063,24 @@
   background: #15803d;
 }
 
+.btn-job-action.reject {
+  background: #fef2f2;
+  color: #dc2626;
+  border-color: #fca5a5;
+}
+
+.btn-job-action.reject:hover {
+  background: #dc2626;
+  color: white;
+  border-color: #dc2626;
+}
+
+.job-status-badge.rejected-by-contractor {
+  background: #fee2e2;
+  color: #dc2626;
+  border: 1px solid #fca5a5;
+}
+
 .contractor-empty-state {
   display: flex;
   flex-direction: column;

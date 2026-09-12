@@ -137,7 +137,9 @@ const AdminOfficialsAdd = () => {
   };
 
   const validateForm = () => {
-    if (formData.phone && (formData.phone.length !== 10 || isNaN(formData.phone))) {
+    if (!formData.name.trim()) return "Full Name is required.";
+    if (!/^\S+@\S+\.\S+$/.test(formData.email)) return "Invalid email format.";
+    if (formData.phone && !/^\d{10}$/.test(formData.phone)) {
       return "Phone number must contain exactly 10 digits.";
     }
     if (formData.password.length < 6) {

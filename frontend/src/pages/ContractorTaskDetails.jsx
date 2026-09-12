@@ -14,6 +14,8 @@ const ContractorTaskDetails = () => {
   const [task, setTask] = useState(null);
   const [loading, setLoading] = useState(true);
   const [showImageModal, setShowImageModal] = useState(false);
+  const [showRejectModal, setShowRejectModal] = useState(false);
+  const [rejectionReason, setRejectionReason] = useState('');
 
   useEffect(() => {
     const storedUser = localStorage.getItem('contractorUser');
@@ -53,6 +55,7 @@ const ContractorTaskDetails = () => {
               assignedBy: 'Admin',
               description: c.description,
               status: c.status,
+              rejectionReason: c.rejectionReason || '',
               progress: (() => {
                 if (['Completed', 'Completed - Waiting for Admin Review', 'Inspection Pending', 'Inspection Approved', 'Verified', 'Closed'].includes(c.status)) return 100;
                 if (['Returned by Admin', 'Rework Required'].includes(c.status)) return 60;
@@ -116,6 +119,38 @@ const ContractorTaskDetails = () => {
     } catch (error) {
       console.error(error);
       alert('Error accepting task.');
+    }
+  };
+
+  const rejectTask = async () => {
+    if (!task) return;
+    if (!rejectionReason.trim()) {
+      alert("Please provide a reason for declining the task.");
+      return;
+    }
+    
+    try {
+      const payload = { 
+        status: 'Rejected by Contractor',
+        rejectionReason: rejectionReason
+      };
+
+      const res = await fetch(`/api/complaints/${task._id}`, {
+        method: 'PUT',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(payload)
+      });
+      
+      if (res.ok) {
+        alert('Task declined successfully.');
+        setShowRejectModal(false);
+        window.location.reload();
+      } else {
+        alert('Failed to decline task.');
+      }
+    } catch (error) {
+      console.error(error);
+      alert('Error declining task.');
     }
   };
 
@@ -277,9 +312,13 @@ const ContractorTaskDetails = () => {
                 
                 {/* Header Pills Row */}
                 <div className="task-pills-row">
-                  <div className={`task-status-pill status-${task.status.toLowerCase().replace(/\s+/g, '-')}`}>
+                  <div className={`task-status-pill status-${task.status?.toLowerCase().replace(/\s+/g, '-')}`}>
                     <Hourglass size={14} /> 
-                    {['Returned by Admin', 'Rework Required'].includes(task.status) ? 'Rework Required' : task.status}
+                    {['Returned by Admin', 'Rework Required'].includes(task.status) 
+                      ? 'Rework Required' 
+                      : task.status === 'Rejected by Contractor' 
+                      ? 'Declined by You' 
+                      : task.status}
                   </div>
 
                   <div className={`task-priority-pill priority-${task.priority.toLowerCase()}`}>
@@ -356,14 +395,31 @@ const ContractorTaskDetails = () => {
                   </div>
                   
                   <div className="action-buttons-row">
-                    {['Assigned', 'Reassigned to Contractor'].includes(task.status) ? (
-                      <button className="btn-action-primary accept" onClick={acceptTask}>
-                        <Play size={18} /> Accept Task & Commence Work
-                      </button>
+                    {['Assigned', 'Reassigned to Contractor', 'assigned', 'reassigned to contractor'].includes(task.status) ? (
+                      <div style={{ display: 'flex', gap: '10px', width: '100%' }}>
+                        <button className="btn-action-primary accept" onClick={acceptTask} style={{ flex: 1 }}>
+                          <Play size={18} /> Accept Task
+                        </button>
+                        <button className="btn-action-secondary reject" onClick={() => setShowRejectModal(true)} style={{ flex: 1, backgroundColor: '#fef2f2', color: '#dc2626', border: '1px solid #fecaca', cursor: 'pointer', borderRadius: '8px', padding: '12px', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '8px', fontWeight: 'bold' }}>
+                          <X size={18} /> Decline Task
+                        </button>
+                      </div>
                     ) : ['In Progress', 'Returned by Admin', 'Rework Required'].includes(task.status) ? (
                       <Link to={`/contractor/progress/${task.id}`} className="btn-action-primary progress-btn">
                         <Edit size={18} /> Start & Update Work Progress
                       </Link>
+                    ) : task.status === 'Rejected by Contractor' ? (
+                      <div style={{ width: '100%' }}>
+                        <div className="completion-badge-full" style={{ backgroundColor: '#fef2f2', color: '#dc2626', border: '1px solid #fecaca' }}>
+                          <X size={20} />
+                          <span>Task Declined by You</span>
+                        </div>
+                        {task.rejectionReason && (
+                          <div style={{ marginTop: '0.75rem', padding: '0.75rem 1rem', background: '#fff5f5', borderRadius: '8px', border: '1px solid #fed7d7', color: '#991b1b', fontSize: '0.88rem' }}>
+                            <strong>Reason for Declining:</strong> {task.rejectionReason}
+                          </div>
+                        )}
+                      </div>
                     ) : task.status === 'Closed' ? (
                       <div className="completion-action-group">
                         <div className="completion-badge-full">
@@ -402,6 +458,40 @@ const ContractorTaskDetails = () => {
             <div className="modal-caption">
               <span>{task.id} - {task.issueTitle}</span>
               <p>{task.location}, {task.parkName}</p>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Reject Modal */}
+      {showRejectModal && (
+        <div className="contractor-image-modal-overlay" style={{ alignItems: 'center', justifyContent: 'center', display: 'flex' }}>
+          <div style={{ backgroundColor: 'white', padding: '2rem', borderRadius: '12px', width: '90%', maxWidth: '500px', boxShadow: '0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04)' }}>
+            <h3 style={{ marginTop: 0, color: '#0f172a', display: 'flex', alignItems: 'center', gap: '8px' }}>
+              <AlertTriangle color="#dc2626" size={24} /> Decline Task
+            </h3>
+            <p style={{ color: '#475569', fontSize: '0.95rem', marginBottom: '1.5rem' }}>
+              Are you sure you want to decline this task? Please provide a reason so the admin can reassign it appropriately.
+            </p>
+            <textarea
+              placeholder="Reason for declining..."
+              value={rejectionReason}
+              onChange={(e) => setRejectionReason(e.target.value)}
+              style={{ width: '100%', minHeight: '100px', padding: '12px', border: '1px solid #cbd5e1', borderRadius: '8px', marginBottom: '1.5rem', fontFamily: 'inherit', resize: 'vertical' }}
+            />
+            <div style={{ display: 'flex', justifyContent: 'flex-end', gap: '10px' }}>
+              <button 
+                onClick={() => setShowRejectModal(false)}
+                style={{ padding: '10px 16px', background: 'transparent', border: '1px solid #cbd5e1', color: '#475569', borderRadius: '6px', cursor: 'pointer', fontWeight: 'bold' }}
+              >
+                Cancel
+              </button>
+              <button 
+                onClick={rejectTask}
+                style={{ padding: '10px 16px', background: '#dc2626', border: 'none', color: 'white', borderRadius: '6px', cursor: 'pointer', fontWeight: 'bold' }}
+              >
+                Submit Rejection
+              </button>
             </div>
           </div>
         </div>

@@ -26,11 +26,24 @@ const getParkById = async (req, res) => {
   }
 };
 
+const parksCache = new Map();
+const CACHE_TTL = 120 * 1000; // 2 minutes
+
+const clearParksCache = () => {
+  parksCache.clear();
+};
+
 // @desc    Get all parks
 // @route   GET /api/parks
 // @access  Private
 const getParks = async (req, res) => {
   try {
+    const cacheKey = JSON.stringify(req.query || {});
+    const cached = parksCache.get(cacheKey);
+    if (cached && (Date.now() - cached.timestamp < CACHE_TTL)) {
+      return res.json(cached.data);
+    }
+
     const { districtId, corporationId, zoneId, wardId, district, corporation, zone, ward, contractorId } = req.query;
     let filter = {};
     if (districtId || district) filter.district = districtId || district;
@@ -42,7 +55,7 @@ const getParks = async (req, res) => {
       try {
         const Contractor = require('../models/Contractor');
         const Complaint = require('../models/Complaint');
-        const contractor = await Contractor.findById(contractorId);
+        const contractor = await Contractor.findById(contractorId).lean();
         if (contractor) {
           const parkIds = [];
           if (contractor.park) parkIds.push(contractor.park.toString());
@@ -52,7 +65,7 @@ const getParks = async (req, res) => {
             });
           }
           // Also check parks referenced in complaints assigned to this contractor
-          const contractorComplaints = await Complaint.find({ contractor: contractorId }).select('park').lean();
+          const contractorComplaints = await Complaint.find({ assignedContractor: contractorId }).select('park').lean();
           contractorComplaints.forEach(c => {
             if (c.park && !parkIds.includes(c.park.toString())) {
               parkIds.push(c.park.toString());
@@ -73,6 +86,8 @@ const getParks = async (req, res) => {
       .populate('ward', 'name')
       .sort({ createdAt: -1 })
       .lean();
+
+    parksCache.set(cacheKey, { timestamp: Date.now(), data: parks });
     res.json(parks);
   } catch (error) {
     console.error('Error fetching parks:', error);
@@ -196,6 +211,7 @@ const createPark = async (req, res) => {
     });
 
     const createdPark = await park.save();
+    clearParksCache();
     res.status(201).json(createdPark);
   } catch (error) {
     console.error('Error creating park:', error);
@@ -445,6 +461,7 @@ const bulkUploadParks = async (req, res) => {
       }
     }
 
+    clearParksCache();
     console.log("Finished processing, sending response:", results);
     res.status(200).json(results);
   } catch (error) {
@@ -545,6 +562,7 @@ const updatePark = async (req, res) => {
     }
 
     const updatedPark = await Park.findByIdAndUpdate(id, updateFields, { new: true });
+    clearParksCache();
     res.json(updatedPark);
   } catch (error) {
     console.error('Error updating park:', error);
@@ -562,6 +580,7 @@ const deletePark = async (req, res) => {
       return res.status(404).json({ message: 'Park not found' });
     }
     await Park.findByIdAndDelete(id);
+    clearParksCache();
     res.json({ message: 'Park removed successfully' });
   } catch (error) {
     console.error('Error deleting park:', error);
@@ -579,6 +598,7 @@ const bulkDeleteParks = async (req, res) => {
       return res.status(400).json({ message: 'No park IDs provided' });
     }
     await Park.deleteMany({ _id: { $in: parkIds } });
+    clearParksCache();
     res.json({ message: 'Parks removed successfully' });
   } catch (error) {
     console.error('Error in bulk delete:', error);

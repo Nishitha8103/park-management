@@ -14,6 +14,10 @@ const GovLogin = () => {
     e.preventDefault();
     setErrorMsg('');
     
+    if (!email.trim() || !/^\S+@\S+\.\S+$/.test(email)) return setErrorMsg('A valid Official Email Address is required');
+    if (!password) return setErrorMsg('Password is required');
+    if (password.length < 6) return setErrorMsg('Password must be at least 6 characters');
+
     try {
       const response = await fetch('/api/auth/login', {
         method: 'POST',

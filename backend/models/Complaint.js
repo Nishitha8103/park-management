@@ -32,6 +32,7 @@ const complaintSchema = new mongoose.Schema({
       'Inspection Approved',
       'Rework Required',
       'Reassigned to Contractor',
+      'Rejected by Contractor',
       'Closed'
     ],
     default: 'New'
@@ -75,5 +76,12 @@ const complaintSchema = new mongoose.Schema({
   
   rejectionReason: { type: String }
 }, { timestamps: true });
+
+complaintSchema.index({ assignedContractor: 1 });
+complaintSchema.index({ assignedOfficial: 1 });
+complaintSchema.index({ status: 1 });
+complaintSchema.index({ user: 1 });
+complaintSchema.index({ park: 1 });
+complaintSchema.index({ createdAt: -1 });
 
 module.exports = mongoose.model('Complaint', complaintSchema);

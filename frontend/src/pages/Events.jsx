@@ -101,6 +101,18 @@ const Events = () => {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
+    setSubmitError('');
+
+    if (!formData.name.trim()) return setSubmitError('Full Name is required');
+    if (!/^\d+$/.test(formData.age) || formData.age < 1 || formData.age > 120) return setSubmitError('Please enter a valid age');
+    if (!formData.gender) return setSubmitError('Gender is required');
+    if (!/^\d{10}$/.test(formData.phone)) return setSubmitError('Mobile number must be exactly 10 digits');
+    if (!/^\S+@\S+\.\S+$/.test(formData.email)) return setSubmitError('A valid Email Address is required');
+    
+    if (formData.emergencyContactPhone && !/^\d{10}$/.test(formData.emergencyContactPhone)) {
+      return setSubmitError('Emergency Contact Number must be exactly 10 digits');
+    }
+
     if (selectedEvent.isPaid) {
       await processRazorpayPayment();
     } else {

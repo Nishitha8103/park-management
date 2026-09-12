@@ -20,9 +20,16 @@ const TrackComplaint = () => {
 
   const handleTrack = (e) => {
     e.preventDefault();
-    if (complaintId.trim()) {
-      trackComplaint(complaintId);
+    setError('');
+    if (!complaintId.trim()) {
+      setError('Complaint ID is required');
+      return;
     }
+    if (complaintId.trim().length < 5) {
+      setError('Invalid Complaint ID format');
+      return;
+    }
+    trackComplaint(complaintId.trim());
   };
 
   const trackComplaint = async (id) => {

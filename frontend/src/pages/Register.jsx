@@ -10,7 +10,10 @@ const Register = () => {
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
   const [name, setName] = useState('');
   const [email, setEmail] = useState('');
+  const [phone, setPhone] = useState('');
   const [password, setPassword] = useState('');
+  const [confirmPassword, setConfirmPassword] = useState('');
+  const [errorMsg, setErrorMsg] = useState('');
   const [successMsg, setSuccessMsg] = useState('');
   const [isGoogleLoading, setIsGoogleLoading] = useState(false);
 
@@ -86,8 +89,14 @@ const Register = () => {
 
   const handleRegister = async (e) => {
     e.preventDefault();
+    setErrorMsg('');
     
     // Basic validation
+    if (!name.trim()) return setErrorMsg('Name is required');
+    if (!/^\S+@\S+\.\S+$/.test(email)) return setErrorMsg('Invalid email format');
+    if (!/^\d{10}$/.test(phone)) return setErrorMsg('Phone number must be exactly 10 digits');
+    if (password.length < 6) return setErrorMsg('Password must be at least 6 characters');
+    if (password !== confirmPassword) return setErrorMsg('Passwords do not match');
 
     try {
       const response = await fetch('/api/auth/register', {
@@ -95,7 +104,7 @@ const Register = () => {
         headers: {
           'Content-Type': 'application/json',
         },
-        body: JSON.stringify({ name, email, password, role: 'public_user' }),
+        body: JSON.stringify({ name, email, phone, password, role: 'public_user' }),
       });
 
       const data = await response.json();
@@ -162,7 +171,14 @@ const Register = () => {
               <label className="input-label">Phone Number</label>
               <div className="input-with-icon">
                 <Phone size={18} className="input-icon text-secondary" />
-                <input type="tel" className="input-field has-icon" placeholder="Enter your phone number" required />
+                <input 
+                  type="tel" 
+                  className="input-field has-icon" 
+                  placeholder="Enter your phone number" 
+                  value={phone}
+                  onChange={(e) => setPhone(e.target.value)}
+                  required 
+                />
               </div>
             </div>
             
@@ -198,6 +214,8 @@ const Register = () => {
                 type={showConfirmPassword ? "text" : "password"} 
                 className="input-field has-icon" 
                 placeholder="Confirm your password" 
+                value={confirmPassword}
+                onChange={(e) => setConfirmPassword(e.target.value)}
                 required
               />
               <button 
@@ -223,6 +241,8 @@ const Register = () => {
             <input type="checkbox" required />
             <span>I agree to the <a href="#" className="text-success font-semibold">Terms & Conditions</a> and <a href="#" className="text-success font-semibold">Privacy Policy</a></span>
           </label>
+
+          {errorMsg && <div style={{ color: 'red', textAlign: 'center', marginBottom: '1rem' }}>{errorMsg}</div>}
 
           <button type="submit" className="btn btn-primary w-full register-btn">
             <UserPlus size={18} /> Register

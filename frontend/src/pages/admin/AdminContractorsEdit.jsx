@@ -215,6 +215,8 @@ const AdminContractorsEdit = () => {
   };
 
   const validateForm = () => {
+    if (!formData.name.trim()) return "Name is required.";
+    if (!/^\S+@\S+\.\S+$/.test(formData.email)) return "Invalid email format.";
     if (formData.phone.length !== 10 || isNaN(formData.phone)) {
       return "Phone number must contain exactly 10 digits.";
     }

@@ -62,6 +62,12 @@ const parkSchema = new mongoose.Schema({
   }
 }, { timestamps: true });
 
+parkSchema.index({ district: 1 });
+parkSchema.index({ zone: 1 });
+parkSchema.index({ ward: 1 });
+parkSchema.index({ status: 1 });
+parkSchema.index({ createdAt: -1 });
+
 const Park = mongoose.model('Park', parkSchema);
 
 module.exports = Park;
