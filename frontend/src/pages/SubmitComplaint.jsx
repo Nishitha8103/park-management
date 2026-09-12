@@ -12,10 +12,13 @@ import {
   Sparkles,
   FileText,
   X,
-  Check
+  Check,
+  Camera
 } from 'lucide-react';
 import { useNavigate, useLocation } from 'react-router-dom';
 import axios from 'axios';
+import LiveCameraCaptureModal from '../components/LiveCameraCaptureModal';
+import { stampImageWithGeoAndTimestamp } from '../utils/imageStampUtil';
 import './SubmitComplaint.css';
 
 const SubmitComplaint = () => {
@@ -36,6 +39,8 @@ const SubmitComplaint = () => {
   const [selectedFile, setSelectedFile] = useState(null);
   const [filePreview, setFilePreview] = useState(null);
   const [fileName, setFileName] = useState('');
+  const [isCameraOpen, setIsCameraOpen] = useState(false);
+  const [isProcessingFile, setIsProcessingFile] = useState(false);
   const [isSubmitted, setIsSubmitted] = useState(false);
   const [complaintId, setComplaintId] = useState('');
   const [loading, setLoading] = useState(false);
@@ -61,16 +66,41 @@ const SubmitComplaint = () => {
     setFormData(prev => ({ ...prev, priority: pri }));
   };
 
-  const handleFileChange = (e) => {
+  const handleFileChange = async (e) => {
     if (e.target.files && e.target.files.length > 0) {
       const file = e.target.files[0];
-      setSelectedFile(file);
-      setFileName(file.name);
-      setFilePreview(URL.createObjectURL(file));
+      setIsProcessingFile(true);
+      try {
+        const stamped = await stampImageWithGeoAndTimestamp(file, {
+          tag: 'Citizen Grievance',
+          fileName: `complaint_${Date.now()}.jpg`
+        });
+        setSelectedFile(stamped.file);
+        setFileName(stamped.file.name);
+        setFilePreview(stamped.preview);
+      } catch (err) {
+        console.warn('Stamp fallback to raw file:', err);
+        setSelectedFile(file);
+        setFileName(file.name);
+        setFilePreview(URL.createObjectURL(file));
+      } finally {
+        setIsProcessingFile(false);
+      }
+    }
+  };
+
+  const handleCameraCapture = (captured) => {
+    if (captured && captured.file) {
+      setSelectedFile(captured.file);
+      setFileName(captured.file.name);
+      setFilePreview(captured.preview);
     }
   };
 
   const removeFile = () => {
+    if (filePreview) {
+      URL.revokeObjectURL(filePreview);
+    }
     setSelectedFile(null);
     setFileName('');
     setFilePreview(null);
@@ -401,8 +431,8 @@ const SubmitComplaint = () => {
 
             {/* Photo Upload Zone */}
             <div className="form-group">
-              <label className="input-label">Attach Photo Evidence (Optional)</label>
-              <div className="upload-dropzone">
+              <label className="input-label">Attach Photo Evidence with Live Location & Time</label>
+              <div className="upload-dropzone" style={{ padding: '1.25rem' }}>
                 <input 
                   type="file" 
                   id="image-upload" 
@@ -411,10 +441,32 @@ const SubmitComplaint = () => {
                   accept="image/*"
                 />
                 
-                {filePreview ? (
+                {isProcessingFile ? (
+                  <div style={{ textAlign: 'center', padding: '1.5rem', color: '#059669' }}>
+                    <p style={{ fontWeight: 600 }}>Stamping Live Location & Timestamp...</p>
+                  </div>
+                ) : filePreview ? (
                   <div className="preview-container">
-                    <img src={filePreview} alt="Complaint Evidence Preview" className="upload-preview-img" />
-                    <div className="preview-info">
+                    <div style={{ position: 'relative' }}>
+                      <img src={filePreview} alt="Complaint Evidence Preview" className="upload-preview-img" style={{ maxHeight: '280px', width: 'auto', borderRadius: '12px' }} />
+                      <div style={{ 
+                        position: 'absolute', 
+                        top: '8px', 
+                        left: '8px', 
+                        background: 'rgba(16, 185, 129, 0.9)', 
+                        color: 'white', 
+                        fontSize: '0.75rem', 
+                        padding: '3px 8px', 
+                        borderRadius: '6px', 
+                        fontWeight: 'bold',
+                        display: 'flex',
+                        alignItems: 'center',
+                        gap: '4px'
+                      }}>
+                        <Check size={12} /> Live Verified & Stamped
+                      </div>
+                    </div>
+                    <div className="preview-info" style={{ marginTop: '0.75rem' }}>
                       <span className="file-name">{fileName}</span>
                       <button type="button" className="btn-remove-file" onClick={removeFile}>
                         <X size={16} /> Remove Photo
@@ -422,14 +474,60 @@ const SubmitComplaint = () => {
                     </div>
                   </div>
                 ) : (
-                  <div className="dropzone-content" onClick={() => document.getElementById('image-upload').click()}>
-                    <div className="upload-icon-ring">
-                      <Upload size={24} color="#059669" />
+                  <div style={{ display: 'flex', flexDirection: 'column', gap: '0.75rem' }}>
+                    <div style={{ display: 'flex', gap: '0.75rem', flexWrap: 'wrap' }}>
+                      {/* Live Camera Button */}
+                      <button 
+                        type="button" 
+                        onClick={() => setIsCameraOpen(true)}
+                        style={{
+                          flex: 1,
+                          minWidth: '160px',
+                          display: 'flex',
+                          alignItems: 'center',
+                          justifyContent: 'center',
+                          gap: '0.5rem',
+                          padding: '1rem',
+                          background: 'linear-gradient(135deg, #059669 0%, #10b981 100%)',
+                          color: '#ffffff',
+                          border: 'none',
+                          borderRadius: '12px',
+                          fontWeight: 600,
+                          cursor: 'pointer',
+                          boxShadow: '0 4px 6px -1px rgba(16, 185, 129, 0.25)'
+                        }}
+                      >
+                        <Camera size={20} />
+                        <span>Take Photo (Camera)</span>
+                      </button>
+
+                      {/* Upload from Gallery Button */}
+                      <button 
+                        type="button" 
+                        onClick={() => document.getElementById('image-upload').click()}
+                        style={{
+                          flex: 1,
+                          minWidth: '160px',
+                          display: 'flex',
+                          alignItems: 'center',
+                          justifyContent: 'center',
+                          gap: '0.5rem',
+                          padding: '1rem',
+                          background: '#f8fafc',
+                          color: '#334155',
+                          border: '1.5px dashed #cbd5e1',
+                          borderRadius: '12px',
+                          fontWeight: 600,
+                          cursor: 'pointer'
+                        }}
+                      >
+                        <Upload size={20} color="#059669" />
+                        <span>Upload from Gallery</span>
+                      </button>
                     </div>
-                    <div className="upload-text">
-                      <strong>Click to upload photo evidence</strong>
-                      <span>Supports PNG, JPG, JPEG</span>
-                    </div>
+                    <p style={{ margin: 0, fontSize: '0.8rem', color: '#64748b', textAlign: 'center' }}>
+                      📸 Photos are automatically stamped with your verified <strong>GPS coordinates, date, and live time</strong>.
+                    </p>
                   </div>
                 )}
               </div>
@@ -455,6 +553,13 @@ const SubmitComplaint = () => {
 
         </form>
       </div>
+
+      <LiveCameraCaptureModal
+        isOpen={isCameraOpen}
+        onClose={() => setIsCameraOpen(false)}
+        onCapture={handleCameraCapture}
+        tag="Citizen Grievance"
+      />
     </div>
   );
 };

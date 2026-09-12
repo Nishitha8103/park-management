@@ -1,6 +1,8 @@
 import { useEffect, useState } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
-import { ArrowLeft, Star, Plus, X } from 'lucide-react';
+import { ArrowLeft, Star, Plus, X, Camera, Upload, Check } from 'lucide-react';
+import LiveCameraCaptureModal from '../components/LiveCameraCaptureModal';
+import { stampImageWithGeoAndTimestamp } from '../utils/imageStampUtil';
 import './GovInspectionForm.css';
 
 const API_BASE = '/api';
@@ -13,6 +15,8 @@ const GovInspectionForm = () => {
   const navigate = useNavigate();
   const [complaint, setComplaint] = useState(null);
   const [loading, setLoading] = useState(true);
+  const [isCameraOpen, setIsCameraOpen] = useState(false);
+  const [isProcessingPhotos, setIsProcessingPhotos] = useState(false);
 
   const checklistItems = [
     { key: 'workCompleted', text: 'Work completed as per requirement' },
@@ -62,11 +66,32 @@ const GovInspectionForm = () => {
     setChecklist(prev => ({ ...prev, [key]: value }));
   };
 
-  const handleAddPhoto = (e) => {
+  const handleAddPhoto = async (e) => {
     const files = Array.from(e.target.files);
-    const newPhotos = files.map(file => ({ file, preview: URL.createObjectURL(file) }));
-    setPhotos(prev => [...prev, ...newPhotos]);
+    if (files.length === 0) return;
+    
+    setIsProcessingPhotos(true);
     e.target.value = '';
+
+    for (const file of files) {
+      try {
+        const stamped = await stampImageWithGeoAndTimestamp(file, {
+          tag: 'Official Field Inspection',
+          fileName: `gov_inspection_${Date.now()}.jpg`
+        });
+        setPhotos(prev => [...prev, { file: stamped.file, preview: stamped.preview }]);
+      } catch (err) {
+        console.warn('Failed to stamp image:', err);
+        setPhotos(prev => [...prev, { file, preview: URL.createObjectURL(file) }]);
+      }
+    }
+    setIsProcessingPhotos(false);
+  };
+
+  const handleCameraCapture = (captured) => {
+    if (captured && captured.file) {
+      setPhotos(prev => [...prev, { file: captured.file, preview: captured.preview }]);
+    }
   };
 
   const handleRemovePhoto = (index) => {
@@ -188,7 +213,7 @@ const GovInspectionForm = () => {
 
           <div className="card p-xl">
             <h3 className="card-header-title" style={{ border: 'none', paddingBottom: '0' }}>
-              Inspection Photos <span style={{ fontWeight: 'normal', fontSize: '0.9rem', color: '#64748b' }}>(On Site)</span>
+              Inspection Photos <span style={{ fontWeight: 'normal', fontSize: '0.9rem', color: '#64748b' }}>(On Site with Live GPS & Date-Time)</span>
             </h3>
 
             <input
@@ -200,6 +225,12 @@ const GovInspectionForm = () => {
               onChange={handleAddPhoto}
             />
 
+            {isProcessingPhotos && (
+              <div style={{ color: '#06402b', fontSize: '0.85rem', fontWeight: 600, marginTop: '0.5rem' }}>
+                Stamping Live GPS & Timestamp onto inspection photos...
+              </div>
+            )}
+
             <div className="photos-upload-grid mt-md">
               {photos.map((p, i) => (
                 <div className="photo-item-wrap" key={i} style={{ position: 'relative' }}>
@@ -209,10 +240,24 @@ const GovInspectionForm = () => {
                   </button>
                 </div>
               ))}
+              
+              {/* Camera Trigger */}
+              <div 
+                className="upload-placeholder" 
+                style={{ background: 'linear-gradient(135deg, #06402b 0%, #059669 100%)', color: '#ffffff', border: 'none', cursor: 'pointer' }}
+                onClick={() => setIsCameraOpen(true)}
+              >
+                <div className="upload-content" style={{ color: '#ffffff' }}>
+                  <Camera size={24} />
+                  <span>Live Camera</span>
+                </div>
+              </div>
+
+              {/* Gallery Trigger */}
               <div className="upload-placeholder" onClick={() => document.getElementById('inspection-photo-input').click()}>
                 <div className="upload-content text-primary">
-                  <Plus size={24} />
-                  <span>Upload Photo</span>
+                  <Upload size={24} />
+                  <span>Upload File</span>
                 </div>
               </div>
             </div>
@@ -260,6 +305,13 @@ const GovInspectionForm = () => {
 
         </div>
       </div>
+
+      <LiveCameraCaptureModal
+        isOpen={isCameraOpen}
+        onClose={() => setIsCameraOpen(false)}
+        onCapture={handleCameraCapture}
+        tag="Official Field Inspection"
+      />
     </div>
   );
 };

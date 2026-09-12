@@ -1,9 +1,10 @@
 import { useEffect, useState } from 'react';
 import { useParams, Link, useNavigate } from 'react-router-dom';
-import { Menu, LogOut, ArrowLeft, HardHat, Check, X, Plus, Save, Bell } from 'lucide-react';
+import { Menu, LogOut, ArrowLeft, HardHat, Check, X, Plus, Save, Bell, Camera, Upload } from 'lucide-react';
 import './ContractorWorkProgress.css';
 import ContractorSidebar from '../components/ContractorSidebar';
-
+import LiveCameraCaptureModal from '../components/LiveCameraCaptureModal';
+import { stampImageWithGeoAndTimestamp } from '../utils/imageStampUtil';
 
 const ContractorWorkProgress = () => {
   const { id } = useParams();
@@ -15,6 +16,8 @@ const ContractorWorkProgress = () => {
   const [beforePhotos, setBeforePhotos] = useState([]);
   const [afterPhotos, setAfterPhotos] = useState([]);
   const [location, setLocation] = useState(null);
+  const [isCameraOpen, setIsCameraOpen] = useState(false);
+  const [isProcessingPhotos, setIsProcessingPhotos] = useState(false);
   const [completionReportFile, setCompletionReportFile] = useState(null);
   const [completionReportName, setCompletionReportName] = useState('');
 
@@ -130,24 +133,33 @@ const ContractorWorkProgress = () => {
     });
   };
 
-  const handleAddAfterPhoto = (e) => {
+  const handleAddAfterPhoto = async (e) => {
     const files = Array.from(e.target.files);
-    const newPhotos = files.map(file => ({ file, preview: URL.createObjectURL(file) }));
-    setAfterPhotos(prev => [...prev, ...newPhotos]);
+    if (files.length === 0) return;
+    
+    setIsProcessingPhotos(true);
     e.target.value = '';
 
-    if (!location && navigator.geolocation) {
-      navigator.geolocation.getCurrentPosition(
-        (position) => {
-          setLocation({
-            latitude: position.coords.latitude,
-            longitude: position.coords.longitude
-          });
-        },
-        (error) => {
-          console.warn("Location access denied or unavailable. Photos will upload without location.", error);
-        }
-      );
+    for (const file of files) {
+      try {
+        const stamped = await stampImageWithGeoAndTimestamp(file, {
+          tag: 'Contractor Work Progress',
+          fileName: `work_progress_${Date.now()}.jpg`
+        });
+        setAfterPhotos(prev => [...prev, { file: stamped.file, preview: stamped.preview }]);
+        if (stamped.location) setLocation(stamped.location);
+      } catch (err) {
+        console.warn('Failed to stamp image:', err);
+        setAfterPhotos(prev => [...prev, { file, preview: URL.createObjectURL(file) }]);
+      }
+    }
+    setIsProcessingPhotos(false);
+  };
+
+  const handleCameraCapture = (captured) => {
+    if (captured && captured.file) {
+      setAfterPhotos(prev => [...prev, { file: captured.file, preview: captured.preview }]);
+      if (captured.location) setLocation(captured.location);
     }
   };
 
@@ -313,6 +325,13 @@ const ContractorWorkProgress = () => {
                   style={{ display: 'none' }}
                   onChange={handleAddAfterPhoto}
                 />
+                
+                {isProcessingPhotos && (
+                  <div style={{ color: '#10b981', fontSize: '0.85rem', fontWeight: 600, marginBottom: '0.75rem' }}>
+                    Stamping Live GPS & Timestamp onto photos...
+                  </div>
+                )}
+
                 <div className="upload-photos-grid">
                   {afterPhotos.map((p, i) => (
                     <div className="photo-thumb-wrap" key={i}>
@@ -322,20 +341,33 @@ const ContractorWorkProgress = () => {
                       </button>
                     </div>
                   ))}
+                  
+                  {/* Camera Button */}
+                  <div
+                    className="photo-add-box"
+                    style={{ background: 'linear-gradient(135deg, #059669 0%, #10b981 100%)', color: '#fff', border: 'none', cursor: 'pointer' }}
+                    onClick={() => setIsCameraOpen(true)}
+                  >
+                    <Camera size={22} />
+                    <span>Live Camera</span>
+                  </div>
+
+                  {/* Gallery Upload Button */}
                   <div
                     className="photo-add-box"
                     onClick={() => document.getElementById('after-photo-input').click()}
                   >
-                    <Plus size={22} />
-                    <span>Add Photo</span>
+                    <Upload size={20} />
+                    <span>Upload File</span>
                   </div>
                 </div>
+
                 {/* Location Status Indicator */}
                 <div style={{ marginTop: '0.75rem', fontSize: '0.9rem', display: 'flex', alignItems: 'center', gap: '0.5rem', color: location ? '#10b981' : '#64748b' }}>
                   <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"></path><circle cx="12" cy="10" r="3"></circle></svg>
                   {location ? 
                     `Location Attached: ${location.latitude.toFixed(4)}, ${location.longitude.toFixed(4)}` : 
-                    "Location will be captured automatically when you add a photo."
+                    "Photos will be automatically stamped with live GPS coordinates, date, and time."
                   }
                 </div>
               </div>
@@ -354,8 +386,14 @@ const ContractorWorkProgress = () => {
           </div>
         </div>
 
-        
       </div>
+
+      <LiveCameraCaptureModal
+        isOpen={isCameraOpen}
+        onClose={() => setIsCameraOpen(false)}
+        onCapture={handleCameraCapture}
+        tag="Contractor Work Evidence"
+      />
     </div>
   );
 };
