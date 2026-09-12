@@ -84,3 +84,30 @@
   color: rgba(255, 255, 255, 0.6);
   font-size: 0.875rem;
 }
+
+@media screen and (max-width: 900px) {
+  .footer-content {
+    grid-template-columns: 1fr 1fr;
+    gap: 2rem;
+  }
+}
+
+@media screen and (max-width: 600px) {
+  .footer {
+    padding-top: 2rem;
+  }
+
+  .footer-content {
+    grid-template-columns: 1fr;
+    gap: 1.75rem;
+    margin-bottom: 2rem;
+  }
+
+  .footer-desc {
+    font-size: 0.9rem;
+  }
+
+  .footer-bottom {
+    padding: 1.25rem 1rem 5rem 1rem; /* Extra padding for mobile bottom bar */
+  }
+}

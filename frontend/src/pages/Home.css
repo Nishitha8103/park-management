@@ -787,21 +787,108 @@
   }
 }
 
-@media (max-width: 640px) {
+@media (max-width: 768px) {
   .hero-section {
-    padding: 3.5rem 0 4.5rem 0;
+    padding: 6rem 0 3.5rem 0;
   }
+
   .hero-main-title {
-    font-size: 2rem;
+    font-size: 1.85rem !important;
+    line-height: 1.2;
   }
+
   .hero-description {
-    font-size: 1rem;
+    font-size: 0.95rem;
+    margin-bottom: 1.75rem;
   }
+
+  .hero-badge {
+    font-size: 0.78rem;
+    padding: 6px 14px;
+    max-width: 90vw;
+  }
+
+  .hero-cta-group {
+    flex-direction: column;
+    width: 100%;
+    gap: 0.75rem;
+    margin-bottom: 2rem;
+  }
+
+  .hero-btn {
+    width: 100%;
+    justify-content: center;
+    padding: 0.8rem 1rem;
+    font-size: 0.95rem;
+  }
+
+  .hero-feature-pills {
+    flex-direction: column;
+    width: 100%;
+    gap: 0.5rem;
+  }
+
+  .feature-pill {
+    width: 100%;
+    justify-content: center;
+    font-size: 0.82rem;
+  }
+
+  .announcements-section {
+    padding: 1.5rem 0.5rem;
+  }
+
+  .announcements-container {
+    padding: 1.25rem 1rem;
+    border-radius: 16px;
+  }
+
+  .announcements-header {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 0.75rem;
+  }
+
+  .announcements-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .section-header {
+    margin-bottom: 2rem;
+  }
+
+  .section-main-title {
+    font-size: 1.65rem !important;
+  }
+
+  .section-main-subtitle {
+    font-size: 0.92rem;
+  }
+
+  .services-section {
+    padding: 2.5rem 0;
+  }
+
   .services-grid {
     grid-template-columns: 1fr;
+    gap: 1.25rem;
   }
+
   .stats-grid {
     grid-template-columns: 1fr;
+    gap: 1rem;
+  }
+
+  .stat-card {
+    padding: 1rem;
+  }
+
+  .features-banner-card {
+    padding: 1.25rem 1rem;
+  }
+
+  .banner-features-side {
+    padding: 1.25rem 1rem;
   }
 }
 
