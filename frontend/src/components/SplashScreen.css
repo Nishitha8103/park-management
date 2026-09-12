@@ -6,7 +6,7 @@
   align-items: center;
   justify-content: center;
   background: radial-gradient(circle at center, rgba(6, 40, 25, 0.92) 0%, rgba(2, 18, 10, 0.98) 100%),
-              url('/park_dark_bg.jpg') no-repeat center center fixed;
+              url('/login_bg.jpg') no-repeat center center fixed;
   background-size: cover;
   backdrop-filter: blur(12px);
   animation: splashFadeIn 0.4s ease-out forwards;
