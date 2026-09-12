@@ -1,159 +1,405 @@
-.register-page {
+/* ==========================================================================
+   Park Monitoring System - Register Page Dark Green Glassmorphic Theme (Matching Image 1)
+   ========================================================================== */
+
+.register-dark-page {
   min-height: 100vh;
+  width: 100%;
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: url('/park_dark_bg.jpg') no-repeat center center fixed;
+  background-size: cover;
+  padding: 2.5rem 1.25rem;
+  overflow-y: auto;
+  overflow-x: hidden;
+}
+
+.register-dark-overlay {
+  position: absolute;
+  inset: 0;
+  background: radial-gradient(circle at center, rgba(6, 36, 22, 0.72) 0%, rgba(2, 18, 10, 0.92) 100%),
+              linear-gradient(180deg, rgba(3, 20, 12, 0.6) 0%, rgba(2, 14, 8, 0.92) 100%);
+  backdrop-filter: blur(5px);
+  -webkit-backdrop-filter: blur(5px);
+  z-index: 1;
+}
+
+.register-main-wrapper {
+  position: relative;
+  z-index: 2;
+  width: 100%;
+  max-width: 480px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  animation: registerFadeIn 0.5s ease-out;
+}
+
+@keyframes registerFadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(16px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* Glassmorphic Card */
+.register-glass-card {
+  width: 100%;
+  background: linear-gradient(180deg, rgba(8, 36, 23, 0.88) 0%, rgba(4, 22, 14, 0.94) 100%);
+  border: 1.5px solid rgba(52, 211, 153, 0.38);
+  border-radius: 28px;
+  padding: 2.25rem 2rem 1.75rem;
+  backdrop-filter: blur(18px);
+  -webkit-backdrop-filter: blur(18px);
+  box-shadow: 0 0 40px rgba(16, 185, 129, 0.16), 0 25px 50px -10px rgba(0, 0, 0, 0.75);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+@media screen and (max-width: 480px) {
+  .register-glass-card {
+    padding: 1.75rem 1.25rem 1.5rem;
+    border-radius: 22px;
+  }
+}
+
+/* Logo */
+.register-logo-container {
+  width: 86px;
+  height: 86px;
+  margin-bottom: 0.85rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.register-logo-img {
+  width: 80px;
+  height: 80px;
+  border-radius: 50%;
+  object-fit: cover;
+  border: 2px solid rgba(52, 211, 153, 0.7);
+  box-shadow: 0 0 22px rgba(52, 211, 153, 0.4);
+  background: #ffffff;
+}
+
+/* Title & Tagline */
+.register-header-group {
+  text-align: center;
+  margin-bottom: 1.25rem;
+  width: 100%;
+}
+
+.register-brand-title {
+  font-size: 1.55rem;
+  font-weight: 800;
+  color: #ffffff;
+  letter-spacing: -0.3px;
+  margin-bottom: 0.35rem;
+}
+
+.register-title-accent {
+  color: #34d399;
+  text-shadow: 0 0 14px rgba(52, 211, 153, 0.45);
+}
+
+.register-tagline-row {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.6rem;
+}
+
+.register-tagline-line {
+  height: 1px;
+  width: 28px;
+  background: rgba(52, 211, 153, 0.4);
+}
+
+.register-tagline-text {
+  color: #d1fae5;
+  font-size: 0.82rem;
+  font-weight: 500;
+  letter-spacing: 0.5px;
+}
+
+/* Welcome / Header Pill Banner */
+.register-welcome-pill {
+  width: 100%;
+  background: linear-gradient(90deg, rgba(16, 185, 129, 0.22) 0%, rgba(6, 78, 59, 0.38) 100%);
+  border: 1px solid rgba(52, 211, 153, 0.3);
+  border-radius: 40px;
+  padding: 0.6rem 1rem;
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  margin-bottom: 1.35rem;
+}
+
+.welcome-pill-leaf-left {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: #34d399;
+}
+
+.welcome-sprout-icon {
+  filter: drop-shadow(0 0 6px rgba(52, 211, 153, 0.6));
+}
+
+.welcome-pill-content {
+  flex: 1;
+  text-align: left;
+}
+
+.welcome-pill-title {
+  font-size: 0.95rem;
+  font-weight: 700;
+  color: #ffffff;
+  margin: 0;
+  line-height: 1.2;
+}
+
+.welcome-pill-sub {
+  font-size: 0.75rem;
+  color: #cbd5e1;
+  margin: 0;
+}
+
+.welcome-pill-leaf-right {
+  font-size: 1.15rem;
+  opacity: 0.85;
+}
+
+/* Form Styles */
+.register-card-form {
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  gap: 0.95rem;
+}
+
+.register-field-group {
+  display: flex;
+  flex-direction: column;
+  gap: 0.35rem;
+  text-align: left;
+}
+
+.register-field-label {
+  font-size: 0.8rem;
+  font-weight: 600;
+  color: #e2e8f0;
+  letter-spacing: 0.2px;
+}
+
+.register-input-container {
+  position: relative;
+  display: flex;
+  align-items: center;
+  background: rgba(4, 26, 16, 0.65);
+  border: 1.2px solid rgba(52, 211, 153, 0.25);
+  border-radius: 12px;
+  transition: all 0.2s ease;
+}
+
+.register-input-container:focus-within {
+  border-color: #34d399;
+  box-shadow: 0 0 14px rgba(52, 211, 153, 0.3);
+  background: rgba(6, 32, 20, 0.8);
+}
+
+.register-input-icon {
+  position: absolute;
+  left: 12px;
+  color: #34d399;
+  pointer-events: none;
+}
+
+.register-text-input {
+  width: 100%;
+  background: transparent;
+  border: none;
+  outline: none;
+  color: #ffffff;
+  font-size: 0.88rem;
+  padding: 0.75rem 0.85rem 0.75rem 2.4rem;
+  font-family: inherit;
+}
+
+.register-text-input::placeholder {
+  color: #64748b;
+  font-size: 0.84rem;
+}
+
+.register-password-toggle {
+  position: absolute;
+  right: 12px;
+  background: transparent;
+  border: none;
+  color: #94a3b8;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 4px;
+  transition: color 0.15s ease;
+}
+
+.register-password-toggle:hover {
+  color: #34d399;
+}
+
+/* Terms Checkbox */
+.register-terms-label {
+  display: flex;
+  align-items: flex-start;
+  gap: 0.55rem;
+  color: #cbd5e1;
+  font-size: 0.78rem;
+  line-height: 1.4;
+  cursor: pointer;
+  margin-top: 0.2rem;
+  text-align: left;
+}
+
+.register-custom-checkbox {
+  accent-color: #10b981;
+  cursor: pointer;
+  width: 15px;
+  height: 15px;
+  border-radius: 4px;
+  margin-top: 2px;
+  flex-shrink: 0;
+}
+
+.terms-highlight {
+  color: #34d399;
+  font-weight: 600;
+}
+
+/* Alerts */
+.register-error-alert {
+  background: rgba(239, 68, 68, 0.18);
+  border: 1px solid rgba(239, 68, 68, 0.45);
+  color: #fca5a5;
+  font-size: 0.82rem;
+  padding: 0.6rem 0.85rem;
+  border-radius: 10px;
+  text-align: center;
+  line-height: 1.4;
+}
+
+.register-success-alert {
+  background: rgba(16, 185, 129, 0.2);
+  border: 1px solid rgba(52, 211, 153, 0.45);
+  color: #6ee7b7;
+  font-size: 0.85rem;
+  padding: 0.65rem 0.85rem;
+  border-radius: 10px;
+  text-align: center;
+  line-height: 1.4;
+  font-weight: 600;
+}
+
+/* Submit Button */
+.register-submit-button {
   width: 100%;
   display: flex;
   align-items: center;
   justify-content: center;
-  background: url('/park_bg.png') no-repeat center center fixed;
-  background-size: cover;
-  padding: var(--spacing-xl);
-  position: fixed;
-  top: 0;
-  left: 0;
-  right: 0;
-  bottom: 0;
-  z-index: 9999;
-  overflow-y: auto;
-}
-
-.register-card {
-  background: white;
-  padding: var(--spacing-2xl);
-  border-radius: var(--radius-lg);
-  box-shadow: var(--shadow-lg);
-  width: 100%;
-  max-width: 700px; /* Wider than login */
-}
-
-.register-header {
-  text-align: center;
-  margin-bottom: var(--spacing-xl);
-  padding-bottom: var(--spacing-md);
-  border-bottom: 1px solid var(--border);
-}
-
-.register-icon-wrapper {
-  display: inline-flex;
-  margin-bottom: var(--spacing-xs);
-}
-
-.register-header h2 {
-  font-size: 1.5rem;
-  font-weight: 700;
-  margin-bottom: var(--spacing-xs);
-}
-
-.register-header p {
-  color: var(--text-secondary);
-  font-size: 0.95rem;
-}
-
-.register-form {
-  display: flex;
-  flex-direction: column;
-  gap: var(--spacing-lg);
-}
-
-.form-row {
-  display: grid;
-  grid-template-columns: 1fr 1fr;
-  gap: var(--spacing-lg);
-}
-
-@media screen and (max-width: 640px) {
-  .register-page {
-    padding: 0.75rem;
-  }
-
-  .register-card {
-    padding: 1.5rem 1.15rem;
-    border-radius: var(--radius-md);
-  }
-
-  .form-row {
-    grid-template-columns: 1fr;
-    gap: var(--spacing-md);
-  }
-}
-
-.input-with-icon {
-  position: relative;
-  display: flex;
-  align-items: center;
-}
-
-.input-icon {
-  position: absolute;
-  left: 12px;
-  pointer-events: none;
-}
-
-.input-field.has-icon {
-  padding-left: 2.5rem;
-}
-
-.password-toggle {
-  position: absolute;
-  right: 12px;
-  background: none;
+  gap: 0.6rem;
+  background: linear-gradient(90deg, #10b981 0%, #059669 100%);
+  color: #ffffff;
   border: none;
+  border-radius: 14px;
+  padding: 0.8rem 1.5rem;
+  font-size: 0.95rem;
+  font-weight: 700;
   cursor: pointer;
-  padding: 0;
+  box-shadow: 0 4px 18px rgba(16, 185, 129, 0.4);
+  transition: all 0.2s ease;
+  margin-top: 0.35rem;
+}
+
+.register-submit-button:hover:not(:disabled) {
+  transform: translateY(-2px);
+  box-shadow: 0 6px 24px rgba(16, 185, 129, 0.55);
+  background: linear-gradient(90deg, #34d399 0%, #10b981 100%);
+}
+
+.register-submit-button:disabled {
+  opacity: 0.65;
+  cursor: not-allowed;
+}
+
+/* OR Divider */
+.register-divider-container {
   display: flex;
   align-items: center;
+  gap: 0.75rem;
+  margin: 0.2rem 0;
 }
 
-.privacy-alert {
-  background-color: var(--secondary);
-  border: 1px solid rgba(16, 185, 129, 0.2);
-  border-radius: var(--radius-md);
-  padding: var(--spacing-md);
+/* Google Button */
+.register-google-button {
+  width: 100%;
   display: flex;
-  gap: var(--spacing-md);
-  align-items: flex-start;
-  margin-top: var(--spacing-sm);
-}
-
-.privacy-icon {
-  margin-top: 2px;
-}
-
-.privacy-content h4 {
-  color: var(--primary);
-  font-size: 0.95rem;
+  align-items: center;
+  justify-content: center;
+  gap: 0.65rem;
+  background: rgba(6, 30, 19, 0.65);
+  border: 1.2px solid rgba(255, 255, 255, 0.18);
+  border-radius: 14px;
+  padding: 0.75rem 1.25rem;
+  color: #ffffff;
+  font-size: 0.88rem;
   font-weight: 600;
-  margin-bottom: 2px;
-}
-
-.privacy-content p {
-  color: var(--text-secondary);
-  font-size: 0.85rem;
-  line-height: 1.4;
-}
-
-.terms-checkbox {
-  display: flex;
-  align-items: flex-start;
-  gap: var(--spacing-sm);
-  font-size: 0.9rem;
-  margin: var(--spacing-sm) 0;
   cursor: pointer;
+  transition: all 0.2s ease;
 }
 
-.terms-checkbox input {
-  margin-top: 4px;
+.register-google-button:hover:not(:disabled) {
+  background: rgba(12, 48, 30, 0.85);
+  border-color: rgba(52, 211, 153, 0.5);
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.4);
 }
 
-.register-btn {
-  display: flex;
-  gap: var(--spacing-sm);
-  padding: 0.875rem;
-  font-size: 1.1rem;
+.register-google-button:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
 }
 
-.register-footer {
+/* Bottom Card Footer */
+.register-card-bottom {
+  margin-top: 1.25rem;
   text-align: center;
-  margin-top: var(--spacing-xl);
-  font-size: 0.95rem;
-  color: var(--text-secondary);
+  font-size: 0.85rem;
+  color: #cbd5e1;
+}
+
+.register-login-action {
+  color: #34d399;
+  font-weight: 700;
+  text-decoration: none;
+  margin-left: 0.25rem;
+  transition: color 0.15s ease;
+}
+
+.register-login-action:hover {
+  color: #6ee7b7;
+  text-decoration: underline;
+}
+
+/* Skyline Footer */
+.register-bottom-skyline {
+  margin-top: 1.75rem;
+  text-align: center;
 }

@@ -63,8 +63,9 @@ html, body, #root, .app-layout {
 }
 
 body {
-  background: url('/park_bg.png') no-repeat center center fixed !important;
+  background: url('/park_dark_bg.jpg') no-repeat center center fixed !important;
   background-size: cover !important;
+  background-color: #03140a !important;
   padding-top: var(--sat);
   padding-bottom: var(--sab);
 }

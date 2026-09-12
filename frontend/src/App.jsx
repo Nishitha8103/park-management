@@ -77,16 +77,21 @@ import ContractorReports from './pages/ContractorReports';
 import ContractorReportDetails from './pages/ContractorReportDetails';
 import ContractorNotifications from './pages/ContractorNotifications';
 import ContractorProfile from './pages/ContractorProfile';
+import { useState } from 'react';
 import ContractorMapView from './pages/ContractorMapView';
 import ContractorSchedule from './pages/ContractorSchedule';
 import ContractorMaterialRequests from './pages/ContractorMaterialRequests';
 import AdminMaterialRequests from './pages/admin/AdminMaterialRequests';
 import MainLayout from './layouts/MainLayout';
 import GovLayout from './layouts/GovLayout';
+import SplashScreen from './components/SplashScreen';
 
 function App() {
+  const [showSplash, setShowSplash] = useState(true);
+
   return (
     <Router>
+      {showSplash && <SplashScreen onFinish={() => setShowSplash(false)} duration={3000} />}
       <CustomPopupModal />
       <Routes>
         <Route path="/" element={<Home />} />
