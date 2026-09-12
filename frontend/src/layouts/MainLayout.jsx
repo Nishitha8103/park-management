@@ -1,6 +1,7 @@
 import { useState } from 'react';
 import { Outlet } from 'react-router-dom';
 import Sidebar from '../components/Sidebar';
+import BottomNav from '../components/BottomNav';
 import { Menu, TreePine } from 'lucide-react';
 import './MainLayout.css';
 
@@ -11,12 +12,12 @@ const MainLayout = () => {
   return (
     <div className="app-layout">
       <header className="main-topbar">
-        <button className="menu-toggle" onClick={toggleSidebar}>
-          <Menu size={28} color="white" />
+        <button className="menu-toggle" onClick={toggleSidebar} aria-label="Toggle navigation menu">
+          <Menu size={26} color="white" />
         </button>
         <div className="topbar-logo">
-          <TreePine size={28} color="white" />
-          <span className="logo-text">Parks Monitoring System</span>
+          <TreePine size={24} color="white" />
+          <span className="logo-text">Parks Monitoring</span>
         </div>
       </header>
       
@@ -25,6 +26,8 @@ const MainLayout = () => {
       <div className="main-content">
         <Outlet />
       </div>
+
+      <BottomNav toggleSidebar={toggleSidebar} />
     </div>
   );
 };

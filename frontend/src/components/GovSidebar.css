@@ -1,5 +1,6 @@
 .gov-sidebar {
-  width: 260px;
+  width: 280px;
+  max-width: 85vw;
   background-color: var(--gov-secondary); /* #0F2D52 */
   color: white;
   display: flex;
@@ -8,9 +9,11 @@
   position: fixed;
   top: 0;
   left: 0;
-  z-index: 20;
-  transition: transform 0.3s ease;
-  box-shadow: 4px 0 10px rgba(0, 0, 0, 0.1);
+  z-index: 1000;
+  transition: transform 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+  box-shadow: 4px 0 24px rgba(0, 0, 0, 0.25);
+  overflow-y: auto;
+  -webkit-overflow-scrolling: touch;
 }
 
 .gov-sidebar.closed {

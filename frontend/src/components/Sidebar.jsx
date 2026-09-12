@@ -112,51 +112,51 @@ const Sidebar = ({ isOpen = false, toggleSidebar = () => {} }) => {
       </div>
 
       <nav className="sidebar-nav">
-        <NavLink to="/" className={({isActive}) => isActive ? 'nav-item active' : 'nav-item'}>
+        <NavLink to="/" onClick={toggleSidebar} className={({isActive}) => isActive ? 'nav-item active' : 'nav-item'}>
           <Home size={20} />
           <span>Home</span>
         </NavLink>
-        <NavLink to="/parks" className={({isActive}) => isActive ? 'nav-item active' : 'nav-item'}>
+        <NavLink to="/parks" onClick={toggleSidebar} className={({isActive}) => isActive ? 'nav-item active' : 'nav-item'}>
           <TreePine size={20} />
           <span>Parks</span>
         </NavLink>
-        <NavLink to="/events" className={({isActive}) => isActive ? 'nav-item active' : 'nav-item'}>
+        <NavLink to="/events" onClick={toggleSidebar} className={({isActive}) => isActive ? 'nav-item active' : 'nav-item'}>
           <Calendar size={20} />
           <span>Events</span>
         </NavLink>
-        <NavLink to="/complaint-history" className={({isActive}) => isActive ? 'nav-item active' : 'nav-item'}>
+        <NavLink to="/complaint-history" onClick={toggleSidebar} className={({isActive}) => isActive ? 'nav-item active' : 'nav-item'}>
           <FileText size={20} />
           <span>Complaints</span>
         </NavLink>
-        <NavLink to="/track-complaint" className={({isActive}) => isActive ? 'nav-item active' : 'nav-item'}>
+        <NavLink to="/track-complaint" onClick={toggleSidebar} className={({isActive}) => isActive ? 'nav-item active' : 'nav-item'}>
           <History size={20} />
           <span>Track Complaint</span>
         </NavLink>
-        <NavLink to="/feedback-history" className={({isActive}) => isActive ? 'nav-item active' : 'nav-item'}>
+        <NavLink to="/feedback-history" onClick={toggleSidebar} className={({isActive}) => isActive ? 'nav-item active' : 'nav-item'}>
           <Star size={20} />
           <span>Feedback Notification</span>
         </NavLink>
-        <NavLink to="/stall-bookings" className={({isActive}) => isActive ? 'nav-item active' : 'nav-item'}>
+        <NavLink to="/stall-bookings" onClick={toggleSidebar} className={({isActive}) => isActive ? 'nav-item active' : 'nav-item'}>
           <FileText size={20} />
           <span>Stall Bookings</span>
         </NavLink>
-        <NavLink to="/my-registrations" className={({isActive}) => isActive ? 'nav-item active' : 'nav-item'}>
+        <NavLink to="/my-registrations" onClick={toggleSidebar} className={({isActive}) => isActive ? 'nav-item active' : 'nav-item'}>
           <FileText size={20} />
           <span>My Registrations</span>
         </NavLink>
-        <NavLink to="/announcements" className={({isActive}) => isActive ? 'nav-item active' : 'nav-item'}>
+        <NavLink to="/announcements" onClick={toggleSidebar} className={({isActive}) => isActive ? 'nav-item active' : 'nav-item'}>
           <Megaphone size={20} />
           <span>Announcements</span>
         </NavLink>
-        <NavLink to="/notifications" className={({isActive}) => isActive ? 'nav-item active' : 'nav-item'}>
+        <NavLink to="/notifications" onClick={toggleSidebar} className={({isActive}) => isActive ? 'nav-item active' : 'nav-item'}>
           <Bell size={20} />
           <span>Notifications</span>
         </NavLink>
-        <NavLink to="/scan" className={({isActive}) => isActive ? 'nav-item active' : 'nav-item'}>
+        <NavLink to="/scan" onClick={toggleSidebar} className={({isActive}) => isActive ? 'nav-item active' : 'nav-item'}>
           <ScanLine size={20} />
           <span>QR Scanner</span>
         </NavLink>
-        <NavLink to="/profile" className={({isActive}) => isActive ? 'nav-item active' : 'nav-item'}>
+        <NavLink to="/profile" onClick={toggleSidebar} className={({isActive}) => isActive ? 'nav-item active' : 'nav-item'}>
           <User size={20} />
           <span>Profile</span>
         </NavLink>

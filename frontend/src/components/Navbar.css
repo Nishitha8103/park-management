@@ -60,3 +60,41 @@
   transform: translateY(0);
 }
 
+@media screen and (max-width: 768px) {
+  .navbar {
+    top: 0.75rem;
+    width: calc(100% - 1.5rem);
+    padding: 0.6rem 1rem;
+    border-radius: 12px;
+  }
+
+  .navbar-logo {
+    font-size: 1rem;
+  }
+
+  .navbar-logo span {
+    font-size: 0.95rem;
+  }
+
+  .navbar-links {
+    gap: 0.5rem;
+  }
+
+  .navbar-links .btn {
+    padding: 0.45rem 0.85rem !important;
+    font-size: 0.85rem !important;
+  }
+}
+
+@media screen and (max-width: 480px) {
+  .navbar {
+    top: 0.5rem;
+    width: calc(100% - 1rem);
+    padding: 0.5rem 0.75rem;
+  }
+
+  .navbar-logo span {
+    font-size: 0.85rem !important;
+    max-width: 140px;
+  }
+}
