@@ -127,8 +127,10 @@ const GovLogin = () => {
       <ForgotPasswordModal
         isOpen={showForgotModal}
         onClose={() => setShowForgotModal(false)}
-        onSuccess={() => {
+        onPasswordResetSuccess={(resetId) => {
+          if (resetId) setEmail(resetId);
           setShowForgotModal(false);
+          setErrorMsg('');
         }}
       />
     </div>

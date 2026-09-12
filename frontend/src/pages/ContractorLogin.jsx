@@ -129,8 +129,10 @@ const ContractorLogin = () => {
       <ForgotPasswordModal
         isOpen={showForgotModal}
         onClose={() => setShowForgotModal(false)}
-        onSuccess={() => {
+        onPasswordResetSuccess={(resetUsername) => {
+          if (resetUsername) setUsername(resetUsername);
           setShowForgotModal(false);
+          setErrorMsg('');
         }}
       />
     </div>

@@ -581,7 +581,14 @@ const resetPassword = async (req, res) => {
     account.resetPasswordOtpExpires = null;
     await account.save();
 
-    res.json({ message: 'Password has been reset successfully! You can now log in with your new password.' });
+    const canonicalUsername = account.username || account.contractorId || account.email;
+
+    res.json({ 
+      message: 'Password has been reset successfully! You can now log in with your new password.',
+      username: canonicalUsername,
+      contractorId: account.contractorId || null,
+      email: account.email
+    });
   } catch (error) {
     console.error('Reset password error:', error);
     res.status(500).json({ message: 'Server error', error: error.message });

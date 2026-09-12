@@ -105,7 +105,7 @@ export default function ForgotPasswordModal({ isOpen, onClose, onPasswordResetSu
       if (response.ok) {
         setStep(3);
         if (onPasswordResetSuccess) {
-          onPasswordResetSuccess(emailOrUsername);
+          onPasswordResetSuccess(data.username || data.contractorId || emailOrUsername);
         }
       } else {
         setErrorMsg(data.message || 'Failed to reset password. Please verify the code.');
