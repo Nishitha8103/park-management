@@ -13,6 +13,7 @@ const userSchema = new mongoose.Schema({
   },
   assignedParks: [{ type: mongoose.Schema.Types.ObjectId, ref: 'Park' }],
   phone: { type: String },
+  address: { type: String, default: '' },
   department: { type: String },
   zone: { type: mongoose.Schema.Types.ObjectId, ref: 'Zone' },
   ward: { type: mongoose.Schema.Types.ObjectId, ref: 'Ward' },

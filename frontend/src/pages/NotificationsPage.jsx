@@ -20,8 +20,21 @@ import {
 import './NotificationsPage.css';
 
 const NotificationsPage = () => {
-  const [notifications, setNotifications] = useState([]);
-  const [loading, setLoading] = useState(true);
+  const [notifications, setNotifications] = useState(() => {
+    try {
+      const cached = sessionStorage.getItem('cached_notifications_list');
+      if (cached) return JSON.parse(cached);
+    } catch (e) {}
+    return [];
+  });
+  const [loading, setLoading] = useState(() => {
+    try {
+      const cached = sessionStorage.getItem('cached_notifications_list');
+      return !cached;
+    } catch {
+      return true;
+    }
+  });
   const [filter, setFilter] = useState('All'); // All, Unread
   const [toastMessage, setToastMessage] = useState('');
   const navigate = useNavigate();
@@ -53,7 +66,17 @@ const NotificationsPage = () => {
       const phoneParam = (user.role === 'citizen' && phone) ? `&phone=${encodeURIComponent(phone)}` : '';
       const res = await axios.get(`/api/notifications?userId=${userId}&role=${user.role}${phoneParam}`);
       if (res.data) {
-        setNotifications(res.data.notifications || []);
+        const allNotifs = res.data.notifications || [];
+        const filteredNotifs = allNotifs.filter(n => {
+          const title = (n.title || '').toLowerCase();
+          const cat = (n.category || '').toLowerCase();
+          const type = (n.type || n.relatedEntityType || '').toLowerCase();
+          return !title.includes('sos') && !cat.includes('sos') && !type.includes('sos') && !title.includes('emergency');
+        });
+        setNotifications(filteredNotifs);
+        try {
+          sessionStorage.setItem('cached_notifications_list', JSON.stringify(filteredNotifs));
+        } catch (e) {}
       }
     } catch (err) {
       console.error('Failed to fetch notifications', err);

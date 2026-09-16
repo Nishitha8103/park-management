@@ -45,10 +45,13 @@ const TrackComplaint = () => {
           stateText = 'Resolved';
         } else if (['In Progress', 'Assigned', 'Pending', 'Completed - Waiting for Admin Review', 'Returned by Admin', 'Inspection Pending', 'Rework Required', 'Reassigned to Contractor'].includes(c.status)) {
           stateText = 'Under Review';
+        } else if (['Rejected', 'Rejected by Contractor', 'Rejected by Admin'].includes(c.status)) {
+          stateText = 'Rejected';
         }
 
         setStatus({
           id: c.complaintNumber,
+          rawStatus: c.status,
           date: new Date(c.createdAt).toLocaleDateString(),
           park: c.parkName || (c.park ? c.park.name : 'Unknown Park'),
           category: c.category || 'General',
@@ -56,7 +59,7 @@ const TrackComplaint = () => {
           slaData: getSlaStatusAndRemaining(c),
           afterImages: c.afterImages || [],
           inspectionImages: c.inspectionImages || [],
-          contractorRemarks: c.contractorRemarks || c.inspectionRemarks || ''
+          contractorRemarks: c.contractorRemarks || c.inspectionRemarks || c.rejectionReason || ''
         });
       } else {
         setStatus(null);
@@ -109,31 +112,53 @@ const TrackComplaint = () => {
                   <p>{status.date}</p>
                 </div>
               </div>
-              <div className={`timeline-item ${status.state === 'Under Review' || status.state === 'Resolved' ? 'active' : ''}`}>
-                <div className="timeline-dot"></div>
-                <div className="timeline-line"></div>
-                <div className="timeline-content">
-                  <h4>Under Review</h4>
-                  <p>{status.state === 'Under Review' || status.state === 'Resolved' ? 'Your complaint is being reviewed by the authorities.' : 'Pending review'}</p>
+              {status.state === 'Rejected' ? (
+                <div className="timeline-item active">
+                  <div className="timeline-dot" style={{ backgroundColor: '#ef4444', borderColor: '#fee2e2' }}></div>
+                  <div className="timeline-content">
+                    <h4 style={{ color: '#ef4444' }}>Rejected ❌</h4>
+                    <p style={{ color: '#b91c1c' }}>{status.rawStatus || 'Rejected by authorities'}</p>
+                  </div>
                 </div>
-              </div>
-              <div className={`timeline-item ${status.state === 'Resolved' ? 'active' : ''}`}>
-                <div className="timeline-dot"></div>
-                <div className="timeline-content">
-                  <h4>{status.state === 'Resolved' ? 'Complaint Resolved ✅' : 'Resolved'}</h4>
-                  <p>{status.state === 'Resolved' ? `Your reported ${status.category.toLowerCase()} issue has been fixed.` : 'Pending'}</p>
-                </div>
-              </div>
+              ) : (
+                <>
+                  <div className={`timeline-item ${status.state === 'Under Review' || status.state === 'Resolved' ? 'active' : ''}`}>
+                    <div className="timeline-dot"></div>
+                    <div className="timeline-line"></div>
+                    <div className="timeline-content">
+                      <h4>Under Review</h4>
+                      <p>{status.state === 'Under Review' || status.state === 'Resolved' ? 'Your complaint is being reviewed by the authorities.' : 'Pending review'}</p>
+                    </div>
+                  </div>
+                  <div className={`timeline-item ${status.state === 'Resolved' ? 'active' : ''}`}>
+                    <div className="timeline-dot"></div>
+                    <div className="timeline-content">
+                      <h4>{status.state === 'Resolved' ? 'Complaint Resolved ✅' : 'Resolved'}</h4>
+                      <p>{status.state === 'Resolved' ? `Your reported ${status.category.toLowerCase()} issue has been fixed.` : 'Pending'}</p>
+                    </div>
+                  </div>
+                </>
+              )}
             </div>
             
             <div className="complaint-details-box">
               <p><strong>Complaint ID:</strong> {status.id}</p>
               <p><strong>Park:</strong> {status.park}</p>
               <p><strong>Category:</strong> {status.category}</p>
-              {status.slaData && status.slaData.status !== 'Not Applicable' && (
+              <p><strong>Current Status:</strong> <span style={{ fontWeight: 700, color: status.state === 'Rejected' ? '#ef4444' : (status.state === 'Resolved' ? '#10b981' : '#3b82f6') }}>{status.rawStatus || status.state}</span></p>
+              {status.slaData && status.slaData.status !== 'Not Applicable' && status.state !== 'Rejected' && (
                 <p><strong>Expected Resolution:</strong> <span style={{ color: status.slaData.colorCode, fontWeight: 600 }}>{status.slaData.text}</span></p>
               )}
             </div>
+
+            {status.state === 'Rejected' && status.contractorRemarks && (
+              <div style={{ marginTop: '1.5rem', padding: '1.25rem', backgroundColor: '#fef2f2', borderRadius: '12px', border: '1px solid #fecaca' }}>
+                <h4 style={{ margin: '0 0 0.5rem 0', color: '#991b1b', display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
+                  ❌ Rejection Reason / Remarks
+                </h4>
+                <p style={{ margin: 0, color: '#b91c1c', fontSize: '0.95rem' }}>{status.contractorRemarks}</p>
+              </div>
+            )}
 
             {status.state === 'Resolved' && (status.afterImages.length > 0 || status.inspectionImages.length > 0 || status.contractorRemarks) && (
               <div className="resolution-details-box" style={{ marginTop: '1.5rem', padding: '1.5rem', backgroundColor: '#f0fdf4', borderRadius: '12px', border: '1px solid #bbf7d0' }}>

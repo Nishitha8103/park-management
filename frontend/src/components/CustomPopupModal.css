@@ -112,6 +112,12 @@
   color: #047857;
 }
 
+.badge-confirm {
+  background: #eff6ff;
+  border: 2px solid #bfdbfe;
+  color: #2563eb;
+}
+
 .custom-popup-body {
   margin-bottom: 1.5rem;
   width: 100%;
@@ -127,6 +133,12 @@
 }
 
 .custom-popup-actions {
+  width: 100%;
+}
+
+.custom-popup-btn-group {
+  display: flex;
+  gap: 12px;
   width: 100%;
 }
 
@@ -171,5 +183,30 @@
 }
 .btn-info:hover {
   background: linear-gradient(135deg, #047857 0%, #064e3b 100%);
+  transform: translateY(-1px);
+}
+
+.btn-confirm {
+  background: linear-gradient(135deg, #059669 0%, #047857 100%);
+  color: #ffffff;
+  box-shadow: 0 4px 15px rgba(5, 150, 105, 0.35);
+  flex: 1;
+}
+.btn-confirm:hover {
+  background: linear-gradient(135deg, #047857 0%, #064e3b 100%);
+  transform: translateY(-1px);
+  box-shadow: 0 6px 18px rgba(5, 150, 105, 0.45);
+}
+
+.btn-cancel {
+  background: #f1f5f9;
+  color: #475569;
+  border: 1px solid #cbd5e1;
+  box-shadow: none;
+  flex: 1;
+}
+.btn-cancel:hover {
+  background: #e2e8f0;
+  color: #0f172a;
   transform: translateY(-1px);
 }

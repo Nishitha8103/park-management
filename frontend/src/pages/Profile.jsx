@@ -96,7 +96,27 @@ const Profile = () => {
       }
     };
 
+    const fetchLiveProfile = async () => {
+      const stored = getStoredUser();
+      const token = stored?.token || localStorage.getItem('token');
+      if (token) {
+        try {
+          const res = await axios.get('/api/auth/profile', {
+            headers: { Authorization: `Bearer ${token}` }
+          });
+          if (res.data) {
+            const freshUser = { ...stored, ...res.data };
+            localStorage.setItem('user', JSON.stringify(freshUser));
+            syncFromStorage();
+          }
+        } catch (err) {
+          console.error('Error fetching live profile:', err);
+        }
+      }
+    };
+
     syncFromStorage();
+    fetchLiveProfile();
     window.addEventListener('user-updated', syncFromStorage);
     window.addEventListener('storage', syncFromStorage);
     return () => {
@@ -107,26 +127,35 @@ const Profile = () => {
 
   const handleEditClick = async () => {
     if (isEditing) {
-      const updatedUser = {
+      const updatedFields = {
         name: editForm.name.trim() || userData.name,
         email: editForm.email.trim() || userData.email,
         phone: editForm.phone.trim(),
         address: editForm.address.trim()
       };
 
-      setUserData(prev => ({ ...prev, ...updatedUser }));
-      setIsEditing(false);
-
       const stored = getStoredUser() || {};
-      const newStored = { ...stored, ...updatedUser };
+      const newStored = { ...stored, ...updatedFields };
+      
+      // Update local storage and UI immediately
       localStorage.setItem('user', JSON.stringify(newStored));
+      setUserData(prev => ({ ...prev, ...updatedFields }));
+      setIsEditing(false);
       window.dispatchEvent(new Event('user-updated'));
 
-      // If user id exists, persist to backend DB
+      // If user id exists, persist to backend DB and update with response
       const userId = stored._id || stored.id;
       if (userId) {
         try {
-          await axios.put(`/api/auth/users/${userId}`, updatedUser);
+          const res = await axios.put(`/api/auth/users/${userId}`, updatedFields);
+          if (res.data && res.data.user) {
+            const syncedUser = { ...newStored, ...res.data.user };
+            localStorage.setItem('user', JSON.stringify(syncedUser));
+            if (syncedUser.role === 'Contractor') localStorage.setItem('contractorUser', JSON.stringify(syncedUser));
+            if (syncedUser.role === 'Admin') localStorage.setItem('adminUser', JSON.stringify(syncedUser));
+            if (syncedUser.role === 'Government Official') localStorage.setItem('govUser', JSON.stringify(syncedUser));
+            window.dispatchEvent(new Event('user-updated'));
+          }
         } catch (err) {
           console.error('Failed to sync profile update to backend:', err);
         }
@@ -216,7 +245,9 @@ const Profile = () => {
         <div className="profile-hero-info">
           <div className="user-name-row">
             <h2>{isEditing ? editForm.name : userData.name}</h2>
-            <span className="user-role-badge">🟢 {userData.role || 'Public User'}</span>
+            <span className="user-role-badge">
+              🟢 {userData.role === 'public_user' ? 'Public User' : userData.role || 'Public User'}
+            </span>
           </div>
           <div className="profile-meta-grid">
             <div className="profile-meta-item">

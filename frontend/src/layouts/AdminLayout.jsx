@@ -35,10 +35,6 @@ const AdminLayout = () => {
             <span className="logo-text">Parks Monitoring</span>
             <span className="adm-badge-portal">Admin</span>
           </div>
-          <div className="adm-topbar-search">
-            <Search size={16} color="#666E85" />
-            <input type="text" placeholder="Search parks, complaints, staff..." />
-          </div>
           <div className="adm-topbar-actions">
             {adminUser && <NotificationDropdown userId={adminUser.id || adminUser._id} role="admin" />}
             <button className="adm-topbar-icon-btn" onClick={() => navigate('/admin-dashboard/settings')} title="Settings">

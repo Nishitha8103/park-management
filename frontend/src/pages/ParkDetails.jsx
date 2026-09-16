@@ -6,9 +6,31 @@ import './ParkDetails.css';
 
 const ParkDetails = () => {
   const { id } = useParams();
-  const [parkData, setParkData] = useState(null);
-  const [loading, setLoading] = useState(true);
-  const [announcements, setAnnouncements] = useState([]);
+  const [parkData, setParkData] = useState(() => {
+    if (!id) return null;
+    try {
+      const cached = sessionStorage.getItem(`cached_park_${id}`);
+      if (cached) return JSON.parse(cached);
+    } catch (e) {}
+    return null;
+  });
+  const [loading, setLoading] = useState(() => {
+    if (!id) return false;
+    try {
+      const cached = sessionStorage.getItem(`cached_park_${id}`);
+      return !cached;
+    } catch {
+      return true;
+    }
+  });
+  const [announcements, setAnnouncements] = useState(() => {
+    if (!id) return [];
+    try {
+      const cached = sessionStorage.getItem(`cached_announcements_${id}`);
+      if (cached) return JSON.parse(cached);
+    } catch (e) {}
+    return [];
+  });
 
   const defaultImages = [
     '/parks/park7.jpg',
@@ -73,7 +95,6 @@ const ParkDetails = () => {
         return;
       }
       try {
-        setLoading(true);
         const res = await axios.get(`/api/parks/${id}`);
         const found = res.data;
         if (found) {
@@ -86,7 +107,7 @@ const ParkDetails = () => {
           const rawImg = (found.images && found.images.length > 0) ? found.images[0] : (found.image || null);
           const imgUrl = resolveParkImage(rawImg, found.name || '');
 
-          setParkData({
+          const formatted = {
             id: found._id,
             name: found.name || defaultPark.name,
             location: locationStr || defaultPark.location,
@@ -113,13 +134,20 @@ const ParkDetails = () => {
             address: found.address || '',
             latitude: found.latitude || '',
             longitude: found.longitude || ''
-          });
-        } else {
+          };
+
+          setParkData(formatted);
+          try {
+            sessionStorage.setItem(`cached_park_${id}`, JSON.stringify(formatted));
+          } catch (e) {}
+        } else if (!parkData) {
           setParkData(defaultPark);
         }
       } catch (err) {
         console.error("Error fetching park details:", err);
-        setParkData(defaultPark);
+        if (!parkData) {
+          setParkData(defaultPark);
+        }
       } finally {
         setLoading(false);
       }
@@ -129,7 +157,12 @@ const ParkDetails = () => {
       if (!id) return;
       try {
         const res = await axios.get(`/api/announcements/park/${id}`);
-        setAnnouncements(res.data);
+        if (res.data) {
+          setAnnouncements(res.data);
+          try {
+            sessionStorage.setItem(`cached_announcements_${id}`, JSON.stringify(res.data));
+          } catch (e) {}
+        }
       } catch (err) {
         console.error("Error fetching park announcements:", err);
       }

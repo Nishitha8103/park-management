@@ -80,13 +80,6 @@ const ComplaintHistory = () => {
             </h2>
             <p>View all complaints submitted by you and track their status</p>
           </div>
-          <button 
-            className="btn btn-primary"
-            onClick={() => navigate('/complaint')}
-            style={{ display: 'flex', alignItems: 'center', gap: '0.4rem', padding: '0.6rem 1.2rem', borderRadius: '8px', fontWeight: 600 }}
-          >
-            <Plus size={18} /> Submit New Complaint
-          </button>
         </div>
         
         <div className="history-list">

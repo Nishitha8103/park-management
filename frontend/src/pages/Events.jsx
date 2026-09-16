@@ -5,9 +5,28 @@ import { useNavigate } from 'react-router-dom';
 import './Events.css';
 
 const Events = () => {
-  const [events, setEvents] = useState([]);
-  const [filteredEvents, setFilteredEvents] = useState([]);
-  const [loading, setLoading] = useState(true);
+  const [events, setEvents] = useState(() => {
+    try {
+      const cached = sessionStorage.getItem('cached_events_list');
+      if (cached) return JSON.parse(cached);
+    } catch (e) {}
+    return [];
+  });
+  const [filteredEvents, setFilteredEvents] = useState(() => {
+    try {
+      const cached = sessionStorage.getItem('cached_events_list');
+      if (cached) return JSON.parse(cached);
+    } catch (e) {}
+    return [];
+  });
+  const [loading, setLoading] = useState(() => {
+    try {
+      const cached = sessionStorage.getItem('cached_events_list');
+      return !cached;
+    } catch {
+      return true;
+    }
+  });
   const [searchTerm, setSearchTerm] = useState('');
   const navigate = useNavigate();
 
@@ -34,10 +53,15 @@ const Events = () => {
   useEffect(() => {
     const fetchEvents = async () => {
       try {
-        setLoading(true);
         const response = await axios.get('/api/events');
-        setEvents(response.data);
-        setFilteredEvents(response.data);
+        const data = Array.isArray(response.data) ? response.data : [];
+        setEvents(data);
+        if (!searchTerm) {
+          setFilteredEvents(data);
+        }
+        try {
+          sessionStorage.setItem('cached_events_list', JSON.stringify(data));
+        } catch (e) {}
       } catch (err) {
         console.error('Failed to fetch events:', err);
       } finally {

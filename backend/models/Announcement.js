@@ -38,6 +38,11 @@ const announcementSchema = new mongoose.Schema({
     enum: ['Normal', 'Important', 'Urgent'],
     default: 'Normal'
   },
+  duration: {
+    type: String,
+    enum: ['Full Day', 'Half Day – Morning', 'Half Day – Afternoon'],
+    default: 'Full Day'
+  },
   startDate: {
     type: Date,
     default: Date.now

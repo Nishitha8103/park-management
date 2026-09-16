@@ -33,6 +33,13 @@ exports.dispatchNotifications = async (announcement) => {
       notifications.push({ ...baseNotification, recipientUserId: 'CITIZEN_ALL', recipientRole: 'citizen' });
     } else if (announcement.targetType === 'ALL_CONTRACTORS') {
       notifications.push({ ...baseNotification, recipientUserId: 'CONTRACTOR_ALL', recipientRole: 'contractor' });
+    } else if (announcement.targetType === 'ALL_GOVERNMENT') {
+      notifications.push({ ...baseNotification, recipientUserId: 'GOVERNMENT_ALL', recipientRole: 'government_official' });
+    } else if (announcement.targetType === 'CORPORATION') {
+      const users = await User.find({ corporation: announcement.targetId });
+      users.forEach(u => notifications.push({ ...baseNotification, recipientUserId: u._id.toString(), recipientRole: 'citizen' }));
+      const contractors = await Contractor.find({ corporation: announcement.targetId });
+      contractors.forEach(c => notifications.push({ ...baseNotification, recipientUserId: c._id.toString(), recipientRole: 'contractor' }));
     } else if (announcement.targetType === 'ZONE') {
       // Users in zone
       const users = await User.find({ zone: announcement.targetId });
@@ -129,7 +136,7 @@ exports.getParkAnnouncements = async (req, res) => {
 // Create new announcement
 exports.createAnnouncement = async (req, res) => {
   try {
-    const { title, content, type, targetType, targetId, onModel, priority, startDate, endDate, status, isActive } = req.body;
+    const { title, content, type, targetType, targetId, onModel, priority, duration, startDate, endDate, status, isActive } = req.body;
     
     let initialStatus = status || 'Active';
     
@@ -142,6 +149,7 @@ exports.createAnnouncement = async (req, res) => {
       targetId: targetId || null,
       onModel: onModel || 'Park',
       priority: priority || 'Normal',
+      duration: duration || 'Full Day',
       startDate: startDate || Date.now(),
       endDate: endDate || null,
       status: initialStatus,
@@ -172,7 +180,7 @@ exports.createAnnouncement = async (req, res) => {
 exports.updateAnnouncement = async (req, res) => {
   try {
     const { id } = req.params;
-    const { title, content, type, targetType, targetId, priority, startDate, endDate, status, isActive } = req.body;
+    const { title, content, type, targetType, targetId, onModel, priority, duration, startDate, endDate, status, isActive } = req.body;
     
     const oldAnnouncement = await Announcement.findById(id);
     if (!oldAnnouncement) {
@@ -181,7 +189,7 @@ exports.updateAnnouncement = async (req, res) => {
 
     const updated = await Announcement.findByIdAndUpdate(
       id,
-      { title, content, type, targetType, targetId, priority, startDate, endDate, status, isActive },
+      { title, content, type, targetType, targetId, onModel, priority, duration, startDate, endDate, status, isActive },
       { new: true }
     );
     

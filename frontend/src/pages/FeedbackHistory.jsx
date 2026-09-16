@@ -44,13 +44,6 @@ const FeedbackHistory = () => {
             </h2>
             <p>View all feedback submitted by you</p>
           </div>
-          <button 
-            className="btn btn-primary"
-            onClick={() => navigate('/feedback')}
-            style={{ display: 'flex', alignItems: 'center', gap: '0.4rem', padding: '0.6rem 1.2rem', borderRadius: '8px', fontWeight: 600 }}
-          >
-            <Plus size={18} /> Submit New Feedback
-          </button>
         </div>
         
         <div className="history-list">

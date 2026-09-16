@@ -138,9 +138,11 @@ const loginUser = async (req, res) => {
           email: user.email,
           username: user.username || user.email.split('@')[0],
           role: normalizedRole,
-          phone: user.phone,
+          phone: user.phone || '',
+          address: user.address || '',
           department: user.department,
           profilePic: user.profilePic || null,
+          createdAt: user.createdAt,
           token: generateToken(user._id),
         }
       });
@@ -169,13 +171,16 @@ const loginUser = async (req, res) => {
           name: contractor.name,
           username: contractor.username,
           email: contractor.email,
-          phone: contractor.phone,
+          phone: contractor.phone || '',
+          address: contractor.address || '',
           role: 'Contractor',
           corporation: contractor.corporation,
           zone: contractor.zone,
           ward: contractor.ward,
           profilePhoto: contractor.profilePhoto,
+          profilePic: contractor.profilePhoto,
           maintenanceSkills: contractor.maintenanceSkills || [],
+          createdAt: contractor.createdAt,
           token: generateToken(contractor._id),
         }
       });
@@ -200,8 +205,11 @@ const getUserProfile = async (req, res) => {
       name: user.name,
       email: user.email,
       role: user.role,
-      phone: user.phone,
+      phone: user.phone || '',
+      address: user.address || '',
       department: user.department,
+      profilePic: user.profilePic || null,
+      createdAt: user.createdAt
     });
   } else {
     res.status(404).json({ message: 'User not found' });
@@ -236,64 +244,104 @@ const getUsers = async (req, res) => {
   }
 };
 
-// @desc    Update user (name, email, phone, department, password)
+// @desc    Update user (name, email, phone, department, password, address)
 // @route   PUT /api/auth/users/:id
 // @access  Admin
 const updateUser = async (req, res) => {
   try {
-    const { name, email, username, phone, department, password, district, zone, ward, parks, profilePic } = req.body;
-    const user = await User.findById(req.params.id);
-
-    if (!user) {
-      return res.status(404).json({ message: 'User not found' });
-    }
-
-    if (name !== undefined)       user.name = name;
-    if (email !== undefined)      user.email = email;
-    if (username !== undefined)   user.username = username;
-    if (phone !== undefined)      user.phone = phone;
-    if (department !== undefined) user.department = department;
-    if (district !== undefined)   user.district = district || undefined;
-    if (zone !== undefined)       user.zone = zone || undefined;
-    if (ward !== undefined)       user.ward = ward || undefined;
-    if (profilePic !== undefined) user.profilePic = profilePic;
+    const { name, email, username, phone, address, department, password, district, zone, ward, parks, profilePic } = req.body;
     
-    if (password && password.trim() !== '') {
-      user.password = password; // pre-save hook will hash it
-    }
+    // Check in User model first
+    let user = await User.findById(req.params.id);
 
-    const updatedUser = await user.save();
-
-    // Assign official to multiple parks if provided
-    if (parks && Array.isArray(parks)) {
-      const Park = require('../models/Park');
-      // First remove this official from any parks they were previously assigned to
-      await Park.updateMany(
-        { governmentOfficial: user._id },
-        { $unset: { governmentOfficial: "" } }
-      );
+    if (user) {
+      if (name !== undefined)       user.name = name;
+      if (email !== undefined)      user.email = email;
+      if (username !== undefined)   user.username = username;
+      if (phone !== undefined)      user.phone = phone;
+      if (address !== undefined)    user.address = address;
+      if (department !== undefined) user.department = department;
+      if (district !== undefined)   user.district = district || undefined;
+      if (zone !== undefined)       user.zone = zone || undefined;
+      if (ward !== undefined)       user.ward = ward || undefined;
+      if (profilePic !== undefined) user.profilePic = profilePic;
       
-      if (parks.length > 0) {
-        // Then assign them to the new parks
-        await Park.updateMany(
-          { _id: { $in: parks } },
-          { governmentOfficial: user._id }
-        );
+      if (password && password.trim() !== '') {
+        user.password = password; // pre-save hook will hash it
       }
+
+      const updatedUser = await user.save();
+
+      // Assign official to multiple parks if provided
+      if (parks && Array.isArray(parks)) {
+        const Park = require('../models/Park');
+        await Park.updateMany(
+          { governmentOfficial: user._id },
+          { $unset: { governmentOfficial: "" } }
+        );
+        
+        if (parks.length > 0) {
+          await Park.updateMany(
+            { _id: { $in: parks } },
+            { governmentOfficial: user._id }
+          );
+        }
+      }
+
+      return res.json({
+        message: 'User updated successfully',
+        user: {
+          id: updatedUser._id,
+          _id: updatedUser._id,
+          name: updatedUser.name,
+          email: updatedUser.email,
+          username: updatedUser.username,
+          role: updatedUser.role,
+          phone: updatedUser.phone || '',
+          address: updatedUser.address || '',
+          department: updatedUser.department,
+          profilePic: updatedUser.profilePic,
+          createdAt: updatedUser.createdAt
+        }
+      });
     }
 
-    res.json({
-      message: 'User updated successfully',
-      user: {
-        id: updatedUser._id,
-        name: updatedUser.name,
-        email: updatedUser.email,
-        role: updatedUser.role,
-        phone: updatedUser.phone,
-        department: updatedUser.department,
-        profilePic: updatedUser.profilePic,
+    // If not in User, check Contractor model
+    const Contractor = require('../models/Contractor');
+    const contractor = await Contractor.findById(req.params.id);
+    if (contractor) {
+      if (name !== undefined)       contractor.name = name;
+      if (email !== undefined)      contractor.email = email;
+      if (username !== undefined)   contractor.username = username;
+      if (phone !== undefined)      contractor.phone = phone;
+      if (address !== undefined)    contractor.address = address;
+      if (profilePic !== undefined) {
+        contractor.profilePhoto = profilePic;
       }
-    });
+      if (password && password.trim() !== '') {
+        contractor.password = password;
+      }
+
+      const updatedContractor = await contractor.save();
+      return res.json({
+        message: 'Contractor profile updated successfully',
+        user: {
+          id: updatedContractor._id,
+          _id: updatedContractor._id,
+          name: updatedContractor.name,
+          email: updatedContractor.email,
+          username: updatedContractor.username,
+          role: 'Contractor',
+          phone: updatedContractor.phone || '',
+          address: updatedContractor.address || '',
+          profilePhoto: updatedContractor.profilePhoto,
+          profilePic: updatedContractor.profilePhoto,
+          createdAt: updatedContractor.createdAt
+        }
+      });
+    }
+
+    return res.status(404).json({ message: 'User not found' });
   } catch (error) {
     console.error('Update user error:', error);
     res.status(500).json({ message: 'Server error', error: error.message });
@@ -454,9 +502,11 @@ const googleLogin = async (req, res) => {
         email: user.email,
         username: user.username || user.email.split('@')[0],
         role: normalizedRole,
-        phone: user.phone,
+        phone: user.phone || '',
+        address: user.address || '',
         department: user.department,
         profilePic: user.profilePic || picture || null,
+        createdAt: user.createdAt,
         token: generateToken(user._id),
       }
     });

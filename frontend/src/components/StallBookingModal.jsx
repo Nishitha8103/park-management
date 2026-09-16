@@ -47,22 +47,8 @@ const StallBookingModal = ({ parkId, parkName, slot, onClose, onBookingSuccess }
   const [error, setError] = useState('');
   const [paymentSuccess, setPaymentSuccess] = useState(false);
 
-  useEffect(() => {
-    // Autofill user details if available
-    const userStr = localStorage.getItem('user') || localStorage.getItem('public_user') || localStorage.getItem('govUser');
-    if (userStr) {
-      try {
-        const parsed = JSON.parse(userStr);
-        if (parsed.name && !formData.applicantName) {
-          setFormData(prev => ({
-            ...prev,
-            applicantName: parsed.name || '',
-            applicantPhone: parsed.phone || ''
-          }));
-        }
-      } catch (_) {}
-    }
-  }, []);
+  // Do not auto-populate user data from localStorage to prevent showing wrong/stale info
+  // Inputs remain clean and allow the user to type their correct name and phone number.
 
   const handleInputChange = (e) => {
     const { name, value } = e.target;
@@ -215,8 +201,8 @@ const StallBookingModal = ({ parkId, parkName, slot, onClose, onBookingSuccess }
           }
         },
         prefill: {
-          name: formData.applicantName,
-          contact: formData.applicantPhone
+          name: formData.applicantName || '',
+          contact: formData.applicantPhone || ''
         },
         theme: { color: '#059669' },
         modal: {
@@ -262,12 +248,8 @@ const StallBookingModal = ({ parkId, parkName, slot, onClose, onBookingSuccess }
               <span style={{ fontWeight: 700, color: '#1e293b' }}>{parkName}</span>
             </div>
             <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '8px' }}>
-              <span style={{ color: '#64748b' }}>Aadhaar Address:</span>
+              <span style={{ color: '#64748b' }}>Address:</span>
               <span style={{ fontWeight: 600, color: '#334155' }}>{formData.nativeAddress || 'N/A'}</span>
-            </div>
-            <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '8px' }}>
-              <span style={{ color: '#64748b' }}>Current Address:</span>
-              <span style={{ fontWeight: 600, color: '#334155' }}>{formData.currentAddress || 'N/A'}</span>
             </div>
             <div style={{ display: 'flex', justifyContent: 'space-between', borderTop: '1px solid #dcfce7', paddingTop: '8px' }}>
               <span style={{ color: '#64748b' }}>Amount Paid:</span>
@@ -330,6 +312,7 @@ const StallBookingModal = ({ parkId, parkName, slot, onClose, onBookingSuccess }
                 value={formData.applicantName} 
                 onChange={handleInputChange} 
                 required 
+                autoComplete="off"
                 placeholder="Full Legal Name"
                 style={{ width: '100%', padding: '0.65rem 0.8rem', border: '1px solid #cbd5e1', borderRadius: '8px', fontSize: '0.9rem', boxSizing: 'border-box' }} 
               />
@@ -344,6 +327,7 @@ const StallBookingModal = ({ parkId, parkName, slot, onClose, onBookingSuccess }
                 value={formData.applicantPhone} 
                 onChange={handleInputChange} 
                 required 
+                autoComplete="off"
                 placeholder="10-digit mobile number"
                 style={{ width: '100%', padding: '0.65rem 0.8rem', border: '1px solid #cbd5e1', borderRadius: '8px', fontSize: '0.9rem', boxSizing: 'border-box' }} 
               />
@@ -416,18 +400,18 @@ const StallBookingModal = ({ parkId, parkName, slot, onClose, onBookingSuccess }
             <Home size={16} color="#059669" /> 3. Address Details
           </h4>
 
-          {/* Aadhaar Address */}
+          {/* Current Residential Address */}
           <div style={{ marginBottom: '1rem' }}>
             <label style={{ display: 'block', marginBottom: '0.35rem', fontWeight: '600', color: '#374151', fontSize: '0.84rem' }}>
-              Aadhaar Address *
+              Current Residential Address *
             </label>
             <textarea 
-              name="nativeAddress" 
-              value={formData.nativeAddress} 
+              name="currentAddress" 
+              value={formData.currentAddress} 
               onChange={handleInputChange} 
               required 
               rows="2"
-              placeholder="Enter address"
+              placeholder="Enter the address where you currently live"
               style={{ width: '100%', padding: '0.65rem 0.8rem', border: '1px solid #cbd5e1', borderRadius: '8px', fontSize: '0.9rem', boxSizing: 'border-box' }} 
             />
           </div>
@@ -447,22 +431,6 @@ const StallBookingModal = ({ parkId, parkName, slot, onClose, onBookingSuccess }
             <p style={{ margin: '3px 0 0', fontSize: '0.75rem', color: '#64748b' }}>
               Upload your official Aadhaar card copy (PDF or Image).
             </p>
-          </div>
-
-          {/* Current Residential Address */}
-          <div style={{ marginBottom: '1rem' }}>
-            <label style={{ display: 'block', marginBottom: '0.35rem', fontWeight: '600', color: '#374151', fontSize: '0.84rem' }}>
-              Current Residential Address *
-            </label>
-            <textarea 
-              name="currentAddress" 
-              value={formData.currentAddress} 
-              onChange={handleInputChange} 
-              required 
-              rows="2"
-              placeholder="Enter current address"
-              style={{ width: '100%', padding: '0.65rem 0.8rem', border: '1px solid #cbd5e1', borderRadius: '8px', fontSize: '0.9rem', boxSizing: 'border-box' }} 
-            />
           </div>
 
           {/* Is your current address the same as Aadhaar? */}
@@ -497,7 +465,7 @@ const StallBookingModal = ({ parkId, parkName, slot, onClose, onBookingSuccess }
             {/* Conditional Display for YES */}
             {formData.isAddressSameAsAadhaar === 'yes' ? (
               <div style={{ padding: '8px 12px', background: '#ecfdf5', color: '#065f46', borderRadius: '6px', fontSize: '0.82rem', fontWeight: 600, display: 'flex', alignItems: 'center', gap: '6px', border: '1px solid #a7f3d0' }}>
-                <CheckCircle2 size={14} /> Current address matches Aadhaar address.
+                <CheckCircle2 size={14} /> ✓ Current address matches Aadhaar address.
               </div>
             ) : (
               /* Conditional Display for NO */
@@ -517,7 +485,7 @@ const StallBookingModal = ({ parkId, parkName, slot, onClose, onBookingSuccess }
                     <option value="Studying in another city">Studying in another city</option>
                     <option value="Working in another city">Working in another city</option>
                     <option value="Rented accommodation">Rented accommodation</option>
-                    <option value="Currently staying in another city">Currently staying in another city</option>
+                    <option value="Staying with relatives/friends">Staying with relatives/friends</option>
                     <option value="Other">Other</option>
                   </select>
                 </div>
@@ -546,7 +514,7 @@ const StallBookingModal = ({ parkId, parkName, slot, onClose, onBookingSuccess }
                   <input 
                     type="file" 
                     onChange={(e) => setCurrentAddressProofFile(e.target.files[0])} 
-                    required 
+                    required={formData.isAddressSameAsAadhaar === 'no' && !currentAddressProofFile}
                     accept=".pdf,.jpg,.jpeg,.png"
                     style={{ width: '100%', padding: '0.45rem', border: '1px solid #f59e0b', borderRadius: '6px', fontSize: '0.82rem', backgroundColor: 'white' }} 
                   />
@@ -558,6 +526,7 @@ const StallBookingModal = ({ parkId, parkName, slot, onClose, onBookingSuccess }
             )}
           </div>
         </div>
+
 
         {/* Summary & Fee */}
         <div style={{ backgroundColor: '#f8fafc', padding: '1rem', borderRadius: '12px', border: '1px solid #e2e8f0' }}>

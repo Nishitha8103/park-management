@@ -157,6 +157,15 @@ const createBooking = async (req, res) => {
 
     await booking.save();
 
+    // Decrement slot availability immediately upon booking reservation request
+    if (slot.availableSlots !== undefined) {
+      slot.availableSlots = Math.max(0, slot.availableSlots - 1);
+      slot.isAvailable = slot.availableSlots > 0;
+    } else {
+      slot.isAvailable = false;
+    }
+    await slot.save();
+
     res.status(201).json(booking);
   } catch (error) {
     console.error('Error creating stall booking:', error);
@@ -384,6 +393,20 @@ const rejectBooking = async (req, res) => {
     }
     await booking.save();
 
+    // Restore slot availability
+    if (booking.slot) {
+      const slot = await StallSlot.findById(booking.slot);
+      if (slot) {
+        if (slot.availableSlots !== undefined) {
+          slot.availableSlots = Math.min(slot.totalSlots || 1, slot.availableSlots + 1);
+        } else {
+          slot.availableSlots = 1;
+        }
+        slot.isAvailable = true;
+        await slot.save();
+      }
+    }
+
     // Notify citizen
     const reasonText = reason ? ` Reason: ${reason}` : ' Please review your documents and try again.';
     const notification = new Notification({
@@ -416,17 +439,6 @@ const createRazorpayOrder = async (req, res) => {
 
     if (booking.status !== 'Pending Payment') {
       return res.status(400).json({ message: `Cannot create order for booking in status: ${booking.status}` });
-    }
-
-    if (booking.slot) {
-      const slot = await StallSlot.findById(booking.slot);
-      if (slot) {
-        if (slot.availableSlots !== undefined && slot.availableSlots <= 0) {
-           return res.status(400).json({ message: 'Sorry, this slot has already been fully booked by others who paid first.' });
-        } else if (slot.availableSlots === undefined && !slot.isAvailable) {
-           return res.status(400).json({ message: 'Sorry, this slot has already been fully booked by others who paid first.' });
-        }
-      }
     }
 
     const amount = booking.amountPaid * 100; // paise
@@ -487,22 +499,6 @@ const payBooking = async (req, res) => {
       }
     }
 
-    // Check availability and decrement slot
-    if (booking.slot) {
-      const slot = await StallSlot.findById(booking.slot);
-      if (slot) {
-        if (slot.availableSlots !== undefined) {
-          if (slot.availableSlots > 0) {
-            slot.availableSlots -= 1;
-            slot.isAvailable = slot.availableSlots > 0;
-          }
-        } else {
-          slot.isAvailable = false;
-        }
-        await slot.save();
-      }
-    }
-
     booking.status = 'Confirmed';
     await booking.save();
 
@@ -524,6 +520,49 @@ const payBooking = async (req, res) => {
   }
 };
 
+// @desc    Delete single booking
+// @route   DELETE /api/stall-bookings/:id
+const deleteBooking = async (req, res) => {
+  try {
+    const booking = await StallBooking.findById(req.params.id);
+    if (!booking) {
+      return res.status(404).json({ message: 'Booking not found' });
+    }
+
+    // If active reservation, release the slot
+    if (['Pending Approval', 'Pending Payment', 'Confirmed'].includes(booking.status) && booking.slot) {
+      const slot = await StallSlot.findById(booking.slot);
+      if (slot) {
+        if (slot.availableSlots !== undefined) {
+          slot.availableSlots = Math.min(slot.totalSlots || 1, slot.availableSlots + 1);
+        } else {
+          slot.availableSlots = 1;
+        }
+        slot.isAvailable = true;
+        await slot.save();
+      }
+    }
+
+    await StallBooking.findByIdAndDelete(req.params.id);
+    res.json({ success: true, message: 'Stall booking removed successfully' });
+  } catch (error) {
+    console.error('Error deleting booking:', error);
+    res.status(500).json({ message: 'Server error', error: error.message });
+  }
+};
+
+// @desc    Clear all bookings
+// @route   DELETE /api/stall-bookings
+const clearAllBookings = async (req, res) => {
+  try {
+    const result = await StallBooking.deleteMany({});
+    res.json({ success: true, message: 'All stall bookings cleared', count: result.deletedCount });
+  } catch (error) {
+    console.error('Error clearing stall bookings:', error);
+    res.status(500).json({ message: 'Server error', error: error.message });
+  }
+};
+
 module.exports = {
   getProofTypesConfig,
   updateProofTypesConfig,
@@ -536,5 +575,8 @@ module.exports = {
   approveBooking,
   rejectBooking,
   createRazorpayOrder,
-  payBooking
+  payBooking,
+  deleteBooking,
+  clearAllBookings
 };
+

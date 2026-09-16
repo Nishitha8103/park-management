@@ -3,6 +3,27 @@ const StallBooking = require('../models/StallBooking');
 const StallSlot = require('../models/StallSlot');
 const Notification = require('../models/Notification');
 
+const syncAllSlotAvailability = async () => {
+  try {
+    const slots = await StallSlot.find();
+    for (const slot of slots) {
+      const activeBookingsCount = await StallBooking.countDocuments({
+        slot: slot._id,
+        status: { $in: ['Pending Approval', 'Pending Payment', 'Confirmed', 'Approved'] }
+      });
+      const total = slot.totalSlots || 1;
+      const remaining = Math.max(0, total - activeBookingsCount);
+      if (slot.availableSlots !== remaining || slot.isAvailable !== (remaining > 0)) {
+        slot.availableSlots = remaining;
+        slot.isAvailable = remaining > 0;
+        await slot.save();
+      }
+    }
+  } catch (err) {
+    console.error('Error syncing slot availability:', err);
+  }
+};
+
 const checkStallPaymentStatus = async () => {
   try {
     const now = new Date();
@@ -31,6 +52,11 @@ const checkStallPaymentStatus = async () => {
         if (booking.slot) {
           const slot = await StallSlot.findById(booking.slot);
           if (slot) {
+            if (slot.availableSlots !== undefined) {
+              slot.availableSlots = Math.min(slot.totalSlots || 1, slot.availableSlots + 1);
+            } else {
+              slot.availableSlots = 1;
+            }
             slot.isAvailable = true;
             await slot.save();
           }
@@ -48,19 +74,23 @@ const checkStallPaymentStatus = async () => {
         console.log(`[Cron] Marked booking ${booking._id} as Expired due to payment deadline timeout.`);
       }
     }
+
+    // Periodically re-sync all slot availability to ensure consistency
+    await syncAllSlotAvailability();
   } catch (err) {
     console.error('Error running Stall Payment check cron job:', err);
   }
 };
 
 const initStallPaymentCron = () => {
+  // Sync slots and check expiry on startup
+  syncAllSlotAvailability();
+
   // Check every 1 minute
   setInterval(checkStallPaymentStatus, 60 * 1000);
-  
-  // Run it once immediately on startup
   setTimeout(checkStallPaymentStatus, 5000);
   
   console.log('Stall Payment Expiry Cron Job Initialized');
 };
 
-module.exports = { initStallPaymentCron };
+module.exports = { initStallPaymentCron, syncAllSlotAvailability };

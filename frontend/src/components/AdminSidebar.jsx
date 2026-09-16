@@ -74,22 +74,6 @@ const AdminSidebar = ({ isOpen = false, toggleSidebar = () => {}, closeSidebar =
             <TreePine size={18} />
             <span>Parks</span>
           </NavLink>
-          <NavLink to="/admin-dashboard/districts" className={({isActive}) => isActive ? 'nav-item active' : 'nav-item'} onClick={closeSidebar}>
-            <MapPin size={18} />
-            <span>Districts</span>
-          </NavLink>
-          <NavLink to="/admin-dashboard/corporations" className={({isActive}) => isActive ? 'nav-item active' : 'nav-item'} onClick={closeSidebar}>
-            <Building2 size={18} />
-            <span>Corporations</span>
-          </NavLink>
-          <NavLink to="/admin-dashboard/zones" className={({isActive}) => isActive ? 'nav-item active' : 'nav-item'} onClick={closeSidebar}>
-            <Grid3x3 size={18} />
-            <span>Zones</span>
-          </NavLink>
-          <NavLink to="/admin-dashboard/wards" className={({isActive}) => isActive ? 'nav-item active' : 'nav-item'} onClick={closeSidebar}>
-            <MapPin size={18} />
-            <span>Wards</span>
-          </NavLink>
 
           <div className="adm-nav-group-label">Operations</div>
 
@@ -97,17 +81,9 @@ const AdminSidebar = ({ isOpen = false, toggleSidebar = () => {}, closeSidebar =
             <AlertTriangle size={18} />
             <span>Complaints</span>
           </NavLink>
-          <NavLink to="/admin-dashboard/assignments" className={({isActive}) => isActive ? 'nav-item active' : 'nav-item'} onClick={closeSidebar}>
-            <ClipboardCheck size={18} />
-            <span>Assignments</span>
-          </NavLink>
           <NavLink to="/admin-dashboard/reassignments" className={({isActive}) => isActive ? 'nav-item active' : 'nav-item'} onClick={closeSidebar}>
             <RotateCcw size={18} />
             <span>Task Reassignments</span>
-          </NavLink>
-          <NavLink to="/admin-dashboard/inspections" className={({isActive}) => isActive ? 'nav-item active' : 'nav-item'} onClick={closeSidebar}>
-            <CheckCircle size={18} />
-            <span>Inspections</span>
           </NavLink>
           <NavLink to="/admin-dashboard/contractors" className={({isActive}) => isActive ? 'nav-item active' : 'nav-item'} onClick={closeSidebar}>
             <Briefcase size={18} />
@@ -120,10 +96,6 @@ const AdminSidebar = ({ isOpen = false, toggleSidebar = () => {}, closeSidebar =
           <NavLink to="/admin-dashboard/leaves" className={({isActive}) => isActive ? 'nav-item active' : 'nav-item'} onClick={closeSidebar}>
             <CalendarDays size={18} />
             <span>Leave Management</span>
-          </NavLink>
-          <NavLink to="/admin-dashboard/kyc-review" className={({isActive}) => isActive ? 'nav-item active' : 'nav-item'} onClick={closeSidebar}>
-            <ShieldCheck size={18} />
-            <span>KYC Verification</span>
           </NavLink>
 
           <div className="adm-nav-group-label">Communication</div>

@@ -15,8 +15,11 @@ const {
   approveBooking,
   rejectBooking,
   createRazorpayOrder,
-  payBooking
+  payBooking,
+  deleteBooking,
+  clearAllBookings
 } = require('../controllers/stallBookingController');
+
 
 // Configuration
 router.get('/config/proof-types', getProofTypesConfig);
@@ -36,6 +39,8 @@ router.post(
 
 router.get('/', protect, authorize('Admin', 'SuperAdmin'), getBookings);
 router.get('/user/:userId', getUserBookings);
+router.delete('/', protect, authorize('Admin', 'SuperAdmin'), clearAllBookings);
+router.delete('/:id', protect, authorize('Admin', 'SuperAdmin'), deleteBooking);
 
 // Admin Multi-tier Verification Actions
 router.put('/:id/verify-identity', protect, authorize('Admin', 'SuperAdmin'), verifyIdentity);
@@ -49,3 +54,4 @@ router.post('/:id/create-order', protect, createRazorpayOrder);
 router.post('/:id/pay', protect, payBooking);
 
 module.exports = router;
+

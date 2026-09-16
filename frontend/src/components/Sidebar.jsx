@@ -152,10 +152,6 @@ const Sidebar = ({ isOpen = false, toggleSidebar = () => {} }) => {
           <FileText size={20} />
           <span>Complaints</span>
         </NavLink>
-        <NavLink to="/track-complaint" onClick={toggleSidebar} className={({isActive}) => isActive ? 'nav-item active' : 'nav-item'}>
-          <History size={20} />
-          <span>Track Complaint</span>
-        </NavLink>
         <NavLink to="/feedback-history" onClick={toggleSidebar} className={({isActive}) => isActive ? 'nav-item active' : 'nav-item'}>
           <Star size={20} />
           <span>Feedback Notification</span>

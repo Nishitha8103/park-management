@@ -213,7 +213,8 @@ const AdminParks = () => {
   };
 
   const handleDeleteStallSlot = async (slotId) => {
-    if (!window.confirm("Are you sure you want to delete this slot?")) return;
+    const ok = await (window.customConfirm ? window.customConfirm("Are you sure you want to delete this slot?") : Promise.resolve(window.confirm("Are you sure you want to delete this slot?")));
+    if (!ok) return;
     try {
       const token = JSON.parse(localStorage.getItem('adminUser'))?.token;
       await axios.delete(`/api/stall-slots/${slotId}`, {
@@ -374,7 +375,8 @@ const AdminParks = () => {
   };
 
   const handleDeleteClick = async (parkId) => {
-    if (!window.confirm("Are you sure you want to delete this park?")) return;
+    const ok = await (window.customConfirm ? window.customConfirm("Are you sure you want to delete this park?") : Promise.resolve(window.confirm("Are you sure you want to delete this park?")));
+    if (!ok) return;
     try {
       const token = JSON.parse(localStorage.getItem('adminUser'))?.token;
       await axios.delete(`/api/parks/${parkId}`, {
@@ -405,7 +407,8 @@ const AdminParks = () => {
 
   const handleBulkDelete = async () => {
     if (selectedParks.length === 0) return;
-    if (!window.confirm(`Are you sure you want to delete ${selectedParks.length} parks?`)) return;
+    const ok = await (window.customConfirm ? window.customConfirm(`Are you sure you want to delete ${selectedParks.length} parks?`) : Promise.resolve(window.confirm(`Are you sure you want to delete ${selectedParks.length} parks?`)));
+    if (!ok) return;
     try {
       setLoading(true);
       const token = JSON.parse(localStorage.getItem('adminUser'))?.token;

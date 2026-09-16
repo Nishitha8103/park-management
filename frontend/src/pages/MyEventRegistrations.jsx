@@ -354,21 +354,6 @@ const MyEventRegistrations = () => {
           <h1>My Registrations & Bookings</h1>
           <p>View your registered park events and stall slot bookings in one place</p>
         </div>
-        <div style={{ display: 'flex', gap: '8px', flexWrap: 'wrap' }}>
-          <button 
-            className="btn-browse-events" 
-            onClick={() => navigate('/events')}
-          >
-            <Calendar size={16} /> Browse Events
-          </button>
-          <button 
-            className="btn-browse-events" 
-            style={{ background: '#ecfdf5', border: '1px solid #a7f3d0' }}
-            onClick={() => navigate('/stall-bookings')}
-          >
-            <Store size={16} /> Book New Stall
-          </button>
-        </div>
       </div>
 
       {/* Navigation Tabs */}

@@ -170,11 +170,13 @@ const Login = () => {
                 <Mail size={18} className="login-input-icon" />
                 <input 
                   type="text" 
+                  name="username"
+                  id="login-username"
                   className="login-text-input" 
                   placeholder="Enter your email or username" 
                   value={email}
                   onChange={(e) => setEmail(e.target.value)}
-                  autoComplete="off"
+                  autoComplete="username"
                   required
                 />
               </div>
@@ -187,11 +189,13 @@ const Login = () => {
                 <Lock size={18} className="login-input-icon" />
                 <input 
                   type={showPassword ? "text" : "password"} 
+                  name="password"
+                  id="login-password"
                   className="login-text-input" 
                   placeholder="Enter your password" 
                   value={password}
                   onChange={(e) => setPassword(e.target.value)}
-                  autoComplete="new-password"
+                  autoComplete="current-password"
                   required
                 />
                 <button 

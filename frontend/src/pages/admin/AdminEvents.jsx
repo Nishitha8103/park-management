@@ -293,113 +293,113 @@ const AdminEvents = () => {
 
       {/* Modal Overlay */}
       {isModalOpen && (
-        <div style={{ position: 'fixed', top: 0, left: 0, right: 0, bottom: 0, background: 'rgba(0,0,0,0.5)', display: 'flex', alignItems: 'center', justifyContent: 'center', zIndex: 1000 }}>
-          <div style={{ background: '#fff', padding: '2rem', borderRadius: '12px', width: '100%', maxWidth: '500px', maxHeight: '90vh', overflowY: 'auto' }}>
-            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '1.5rem' }}>
-              <h2 style={{ margin: 0 }}>{isEditing ? 'Edit Event' : 'Create New Event'}</h2>
-              <button onClick={() => setIsModalOpen(false)} style={{ background: 'none', border: 'none', cursor: 'pointer', color: '#64748b' }}>
-                <X size={24} />
+        <div style={{ position: 'fixed', top: 0, left: 0, right: 0, bottom: 0, background: 'rgba(0,0,0,0.7)', backdropFilter: 'blur(3px)', display: 'flex', alignItems: 'center', justifyContent: 'center', zIndex: 1000, padding: '1rem' }}>
+          <div style={{ background: '#ffffff', color: '#0f172a', padding: '2rem', borderRadius: '14px', width: '100%', maxWidth: '520px', maxHeight: '90vh', overflowY: 'auto', boxShadow: '0 20px 40px rgba(0,0,0,0.3)', border: '1px solid #e2e8f0' }}>
+            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '1.5rem', borderBottom: '1px solid #e2e8f0', paddingBottom: '0.75rem' }}>
+              <h2 style={{ margin: 0, color: '#0f172a', fontSize: '1.4rem', fontWeight: 800 }}>{isEditing ? 'Edit Event' : 'Create New Event'}</h2>
+              <button onClick={() => setIsModalOpen(false)} style={{ background: '#f1f5f9', border: 'none', borderRadius: '50%', width: '32px', height: '32px', display: 'flex', alignItems: 'center', justifyContent: 'center', cursor: 'pointer', color: '#475569' }}>
+                <X size={20} />
               </button>
             </div>
             
-            <form onSubmit={handleSubmit} style={{ display: 'flex', flexDirection: 'column', gap: '1rem' }}>
+            <form onSubmit={handleSubmit} style={{ display: 'flex', flexDirection: 'column', gap: '1.1rem' }}>
               <div>
-                <label style={{ display: 'block', marginBottom: '4px', fontWeight: 600, fontSize: '0.9rem' }}>Event Title *</label>
+                <label style={{ display: 'block', marginBottom: '6px', fontWeight: 700, fontSize: '0.88rem', color: '#1e293b' }}>Event Title *</label>
                 <input 
                   type="text" name="title" required
                   value={formData.title} onChange={handleInputChange}
-                  style={{ width: '100%', padding: '10px', borderRadius: '6px', border: '1px solid #cbd5e1' }}
+                  style={{ width: '100%', padding: '10px 12px', borderRadius: '8px', border: '1px solid #cbd5e1', background: '#f8fafc', color: '#0f172a', fontSize: '0.92rem', boxSizing: 'border-box' }}
                 />
               </div>
               
               <div>
-                <label style={{ display: 'block', marginBottom: '4px', fontWeight: 600, fontSize: '0.9rem' }}>Description *</label>
+                <label style={{ display: 'block', marginBottom: '6px', fontWeight: 700, fontSize: '0.88rem', color: '#1e293b' }}>Description *</label>
                 <textarea 
                   name="description" required rows="4"
                   value={formData.description} onChange={handleInputChange}
-                  style={{ width: '100%', padding: '10px', borderRadius: '6px', border: '1px solid #cbd5e1', resize: 'vertical' }}
+                  style={{ width: '100%', padding: '10px 12px', borderRadius: '8px', border: '1px solid #cbd5e1', background: '#f8fafc', color: '#0f172a', fontSize: '0.92rem', resize: 'vertical', boxSizing: 'border-box' }}
                 />
               </div>
               
               <div>
-                <label style={{ display: 'block', marginBottom: '4px', fontWeight: 600, fontSize: '0.9rem' }}>Date & Time *</label>
+                <label style={{ display: 'block', marginBottom: '6px', fontWeight: 700, fontSize: '0.88rem', color: '#1e293b' }}>Date & Time *</label>
                 <input 
                   type="datetime-local" name="eventDate" required
                   value={formData.eventDate} onChange={handleInputChange}
-                  style={{ width: '100%', padding: '10px', borderRadius: '6px', border: '1px solid #cbd5e1' }}
+                  style={{ width: '100%', padding: '10px 12px', borderRadius: '8px', border: '1px solid #cbd5e1', background: '#f8fafc', color: '#0f172a', fontSize: '0.92rem', boxSizing: 'border-box' }}
                 />
               </div>
               
               <div>
-                <label style={{ display: 'block', marginBottom: '4px', fontWeight: 600, fontSize: '0.9rem' }}>Park Name</label>
+                <label style={{ display: 'block', marginBottom: '6px', fontWeight: 700, fontSize: '0.88rem', color: '#1e293b' }}>Park Name</label>
                 <input 
                   type="text" name="parkName" placeholder="e.g., Cubbon Park"
                   value={formData.parkName} onChange={handleInputChange}
-                  style={{ width: '100%', padding: '10px', borderRadius: '6px', border: '1px solid #cbd5e1' }}
+                  style={{ width: '100%', padding: '10px 12px', borderRadius: '8px', border: '1px solid #cbd5e1', background: '#f8fafc', color: '#0f172a', fontSize: '0.92rem', boxSizing: 'border-box' }}
                 />
               </div>
               
               <div>
-                <label style={{ display: 'block', marginBottom: '4px', fontWeight: 600, fontSize: '0.9rem' }}>Location / Venue</label>
+                <label style={{ display: 'block', marginBottom: '6px', fontWeight: 700, fontSize: '0.88rem', color: '#1e293b' }}>Location / Venue</label>
                 <input 
                   type="text" name="location" placeholder="e.g., Central Park Pavilion"
                   value={formData.location} onChange={handleInputChange}
-                  style={{ width: '100%', padding: '10px', borderRadius: '6px', border: '1px solid #cbd5e1' }}
+                  style={{ width: '100%', padding: '10px 12px', borderRadius: '8px', border: '1px solid #cbd5e1', background: '#f8fafc', color: '#0f172a', fontSize: '0.92rem', boxSizing: 'border-box' }}
                 />
               </div>
               
               <div>
-                <label style={{ display: 'block', marginBottom: '4px', fontWeight: 600, fontSize: '0.9rem' }}>Image URL</label>
+                <label style={{ display: 'block', marginBottom: '6px', fontWeight: 700, fontSize: '0.88rem', color: '#1e293b' }}>Image URL</label>
                 <input 
                   type="url" name="image" placeholder="https://example.com/image.jpg"
                   value={formData.image} onChange={handleInputChange}
-                  style={{ width: '100%', padding: '10px', borderRadius: '6px', border: '1px solid #cbd5e1' }}
+                  style={{ width: '100%', padding: '10px 12px', borderRadius: '8px', border: '1px solid #cbd5e1', background: '#f8fafc', color: '#0f172a', fontSize: '0.92rem', boxSizing: 'border-box' }}
                 />
               </div>
 
               <div>
-                <label style={{ display: 'block', marginBottom: '4px', fontWeight: 600, fontSize: '0.9rem' }}>Maximum Capacity (0 for unlimited)</label>
+                <label style={{ display: 'block', marginBottom: '6px', fontWeight: 700, fontSize: '0.88rem', color: '#1e293b' }}>Maximum Capacity (0 for unlimited)</label>
                 <input 
                   type="number" name="capacity" min="0"
                   value={formData.capacity} onChange={handleInputChange}
-                  style={{ width: '100%', padding: '10px', borderRadius: '6px', border: '1px solid #cbd5e1' }}
+                  style={{ width: '100%', padding: '10px 12px', borderRadius: '8px', border: '1px solid #cbd5e1', background: '#f8fafc', color: '#0f172a', fontSize: '0.92rem', boxSizing: 'border-box' }}
                 />
               </div>
               
-              <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginTop: '0.5rem' }}>
+              <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginTop: '0.25rem' }}>
                 <input 
                   type="checkbox" name="isPaid" id="isPaid"
                   checked={formData.isPaid} onChange={handleInputChange}
-                  style={{ width: '18px', height: '18px' }}
+                  style={{ width: '18px', height: '18px', cursor: 'pointer' }}
                 />
-                <label htmlFor="isPaid" style={{ fontWeight: 600 }}>This is a paid event</label>
+                <label htmlFor="isPaid" style={{ fontWeight: 700, color: '#1e293b', cursor: 'pointer', fontSize: '0.9rem' }}>This is a paid event</label>
               </div>
 
               {formData.isPaid && (
                 <div>
-                  <label style={{ display: 'block', marginBottom: '4px', fontWeight: 600, fontSize: '0.9rem' }}>Ticket Price (₹) *</label>
+                  <label style={{ display: 'block', marginBottom: '6px', fontWeight: 700, fontSize: '0.88rem', color: '#1e293b' }}>Ticket Price (₹) *</label>
                   <input 
                     type="number" name="price" min="0" required
                     value={formData.price} onChange={handleInputChange}
-                    style={{ width: '100%', padding: '10px', borderRadius: '6px', border: '1px solid #cbd5e1' }}
+                    style={{ width: '100%', padding: '10px 12px', borderRadius: '8px', border: '1px solid #cbd5e1', background: '#f8fafc', color: '#0f172a', fontSize: '0.92rem', boxSizing: 'border-box' }}
                   />
                 </div>
               )}
 
-              <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginTop: '0.5rem' }}>
+              <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginTop: '0.25rem' }}>
                 <input 
                   type="checkbox" name="isActive" id="isActive"
                   checked={formData.isActive} onChange={handleInputChange}
-                  style={{ width: '18px', height: '18px' }}
+                  style={{ width: '18px', height: '18px', cursor: 'pointer' }}
                 />
-                <label htmlFor="isActive" style={{ fontWeight: 600 }}>Publish this event immediately</label>
+                <label htmlFor="isActive" style={{ fontWeight: 700, color: '#1e293b', cursor: 'pointer', fontSize: '0.9rem' }}>Publish this event immediately</label>
               </div>
               
-              <div style={{ display: 'flex', gap: '1rem', marginTop: '1.5rem' }}>
-                <button type="button" onClick={() => setIsModalOpen(false)} style={{ flex: 1, padding: '12px', background: '#f1f5f9', border: 'none', borderRadius: '6px', fontWeight: 'bold', color: '#475569', cursor: 'pointer' }}>
+              <div style={{ display: 'flex', gap: '1rem', marginTop: '1.25rem' }}>
+                <button type="button" onClick={() => setIsModalOpen(false)} style={{ flex: 1, padding: '12px', background: '#f1f5f9', border: '1px solid #cbd5e1', borderRadius: '8px', fontWeight: 700, color: '#475569', cursor: 'pointer' }}>
                   Cancel
                 </button>
-                <button type="submit" style={{ flex: 1, padding: '12px', background: '#2563eb', border: 'none', borderRadius: '6px', fontWeight: 'bold', color: 'white', cursor: 'pointer' }}>
+                <button type="submit" style={{ flex: 1, padding: '12px', background: '#2563eb', border: 'none', borderRadius: '8px', fontWeight: 800, color: '#ffffff', cursor: 'pointer' }}>
                   {isEditing ? 'Update Event' : 'Create Event'}
                 </button>
               </div>

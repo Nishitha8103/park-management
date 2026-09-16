@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import axios from 'axios';
 import { Link } from 'react-router-dom';
 import { Plus, CheckCircle2, XCircle, Clock, CreditCard, ExternalLink } from 'lucide-react';
+import Swal from 'sweetalert2';
 import StallBookingModal from '../components/StallBookingModal';
 
 const BookingTimer = ({ expiresAt }) => {
@@ -108,7 +109,11 @@ const MyStallBookings = () => {
 
       const res = await loadRazorpayScript();
       if (!res) {
-        alert('Razorpay SDK failed to load. Are you online?');
+        Swal.fire({
+          title: 'Offline Error',
+          text: 'Razorpay SDK failed to load. Are you online?',
+          icon: 'error'
+        });
         return;
       }
 
@@ -133,11 +138,21 @@ const MyStallBookings = () => {
             }, {
               headers: { Authorization: `Bearer ${token}` }
             });
-            alert('Payment successful! Your stall is now confirmed.');
+            Swal.fire({
+              title: 'Payment Successful!',
+              text: 'Your stall booking is now confirmed.',
+              icon: 'success',
+              timer: 2200,
+              showConfirmButton: false
+            });
             fetchBookings();
             fetchAvailableSlots();
           } catch (err) {
-            alert(err.response?.data?.message || 'Payment verification failed');
+            Swal.fire({
+              title: 'Verification Failed',
+              text: err.response?.data?.message || 'Payment verification failed',
+              icon: 'error'
+            });
           }
         },
         prefill: {
@@ -154,12 +169,20 @@ const MyStallBookings = () => {
       paymentObject.open();
       
       paymentObject.on('payment.failed', function (response) {
-        alert(response.error.description);
+        Swal.fire({
+          title: 'Payment Failed',
+          text: response.error?.description || 'Transaction could not be completed.',
+          icon: 'error'
+        });
       });
       
     } catch (error) {
       console.error('Error initiating payment:', error);
-      alert(error.response?.data?.message || 'Failed to initiate payment.');
+      Swal.fire({
+        title: 'Payment Error',
+        text: error.response?.data?.message || 'Failed to initiate payment.',
+        icon: 'error'
+      });
     } finally {
       setLoading(false);
     }
@@ -259,6 +282,12 @@ const MyStallBookings = () => {
             const avail = slot.availableSlots !== undefined ? slot.availableSlots : (slot.isAvailable ? 1 : 0);
             const total = slot.totalSlots || 1;
             const isSoldOut = avail === 0;
+
+            // Check if current user already has an active booking for this slot
+            const userExistingBooking = bookings.find(b => 
+              (b.slot?._id === slot._id || b.slot === slot._id) && 
+              ['Pending Approval', 'Pending Payment', 'Confirmed', 'Approved'].includes(b.status)
+            );
             
             return (
             <div key={slot._id} style={{ border: '1px solid #e2e8f0', borderRadius: '8px', padding: '1.5rem', display: 'flex', flexDirection: 'column', justifyContent: 'space-between', backgroundColor: '#f8fafc' }}>
@@ -275,25 +304,42 @@ const MyStallBookings = () => {
                   <p style={{ margin: '0 0 0.25rem 0', color: '#475569' }}>
                     🎟️ Available Slots: {avail} / {total}
                   </p>
-                  <p style={{ margin: '0 0 1.25rem 0', color: isSoldOut ? '#dc2626' : '#16a34a', fontWeight: 'bold' }}>
-                    {isSoldOut ? '🔴 Status: Sold Out' : '🟢 Status: Registration Open'}
+                  <p style={{ margin: '0 0 1.25rem 0', color: userExistingBooking ? '#d97706' : isSoldOut ? '#dc2626' : '#16a34a', fontWeight: 'bold' }}>
+                    {userExistingBooking ? `⏳ Status: ${userExistingBooking.status} (You Applied)` : isSoldOut ? '🔴 Status: Sold Out' : '🟢 Status: Registration Open'}
                   </p>
                </div>
-               <button 
-                  onClick={() => { setSelectedPark(slot.park); setSelectedSlot(slot); setShowBookingModal(true); }}
-                  disabled={isSoldOut}
-                  style={{ 
-                    width: '100%', 
-                    padding: '0.75rem', 
-                    backgroundColor: isSoldOut ? '#9ca3af' : '#10b981', 
-                    color: 'white', 
-                    border: 'none', 
-                    borderRadius: '4px', 
-                    cursor: isSoldOut ? 'not-allowed' : 'pointer', 
-                    fontWeight: 'bold' 
-                  }}>
-                 {isSoldOut ? 'Sold Out' : 'Book This Slot'}
-               </button>
+               {userExistingBooking ? (
+                 <button 
+                    disabled
+                    style={{ 
+                      width: '100%', 
+                      padding: '0.75rem', 
+                      backgroundColor: '#fde68a', 
+                      color: '#92400e', 
+                      border: '1px solid #f59e0b', 
+                      borderRadius: '4px', 
+                      cursor: 'not-allowed', 
+                      fontWeight: 'bold' 
+                    }}>
+                   Already Booked ({userExistingBooking.status})
+                 </button>
+               ) : (
+                 <button 
+                    onClick={() => { setSelectedPark(slot.park); setSelectedSlot(slot); setShowBookingModal(true); }}
+                    disabled={isSoldOut}
+                    style={{ 
+                      width: '100%', 
+                      padding: '0.75rem', 
+                      backgroundColor: isSoldOut ? '#9ca3af' : '#10b981', 
+                      color: 'white', 
+                      border: 'none', 
+                      borderRadius: '4px', 
+                      cursor: isSoldOut ? 'not-allowed' : 'pointer', 
+                      fontWeight: 'bold' 
+                    }}>
+                   {isSoldOut ? 'Sold Out' : 'Book This Slot'}
+                 </button>
+               )}
             </div>
             );
           })}
@@ -315,7 +361,13 @@ const MyStallBookings = () => {
             setShowBookingModal(false);
             fetchAvailableSlots();
             fetchBookings();
-            alert("Booking request submitted successfully!");
+            Swal.fire({
+              title: 'Request Submitted!',
+              text: 'Your stall booking application has been sent for admin review.',
+              icon: 'success',
+              timer: 2500,
+              showConfirmButton: false
+            });
           }}
         />
       )}
