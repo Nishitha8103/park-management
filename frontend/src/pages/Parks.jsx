@@ -1,12 +1,26 @@
 import { useState, useEffect, useMemo } from 'react';
 import { Link } from 'react-router-dom';
-import { Search, MapPin } from 'lucide-react';
+import { Search, MapPin, Loader2, RefreshCw, AlertCircle } from 'lucide-react';
 import axios from 'axios';
 import './Parks.css';
 
 const Parks = () => {
-  const [parks, setParks] = useState([]);
-  const [loading, setLoading] = useState(true);
+  const [parks, setParks] = useState(() => {
+    try {
+      const cached = sessionStorage.getItem('cached_parks_list');
+      if (cached) return JSON.parse(cached);
+    } catch (e) {}
+    return [];
+  });
+  const [loading, setLoading] = useState(() => {
+    try {
+      const cached = sessionStorage.getItem('cached_parks_list');
+      return !cached;
+    } catch {
+      return true;
+    }
+  });
+  const [fetchError, setFetchError] = useState(null);
   const [searchTerm, setSearchTerm] = useState('');
 
   // Selected Filter States
@@ -15,20 +29,26 @@ const Parks = () => {
   const [selectedZone, setSelectedZone] = useState('');
   const [selectedWard, setSelectedWard] = useState('');
 
-  const fetchParks = async () => {
+  const fetchParks = async (showLoadingState = true) => {
     try {
-      setLoading(true);
+      if (showLoadingState) setLoading(true);
+      setFetchError(null);
       const res = await axios.get('/api/parks');
-      setParks(res.data);
+      const data = Array.isArray(res.data) ? res.data : (res.data?.parks || []);
+      setParks(data);
+      try {
+        sessionStorage.setItem('cached_parks_list', JSON.stringify(data));
+      } catch (e) {}
     } catch (error) {
       console.error("Error fetching parks:", error);
+      setFetchError(error.response?.data?.message || error.message || 'Failed to load parks.');
     } finally {
       setLoading(false);
     }
   };
 
   useEffect(() => {
-    fetchParks();
+    fetchParks(parks.length === 0);
   }, []);
 
   // Dynamically derive filter options from actual parks
@@ -36,7 +56,9 @@ const Parks = () => {
     const map = new Map();
     parks.forEach(p => {
       const d = p.district;
-      if (d && !map.has(d._id)) map.set(d._id, d);
+      if (d && typeof d === 'object' && d._id && !map.has(d._id)) {
+        map.set(d._id, d);
+      }
     });
     return Array.from(map.values());
   }, [parks]);
@@ -46,7 +68,10 @@ const Parks = () => {
     parks.forEach(p => {
       const d = p.district;
       const c = p.corporation;
-      if (c && (!selectedDistrict || (d && d._id === selectedDistrict)) && !map.has(c._id)) map.set(c._id, c);
+      const distId = (d?._id || d || '').toString();
+      if (c && typeof c === 'object' && c._id && (!selectedDistrict || distId === selectedDistrict) && !map.has(c._id)) {
+        map.set(c._id, c);
+      }
     });
     return Array.from(map.values());
   }, [parks, selectedDistrict]);
@@ -56,7 +81,10 @@ const Parks = () => {
     parks.forEach(p => {
       const c = p.corporation;
       const z = p.zone;
-      if (z && (!selectedCorporation || (c && c._id === selectedCorporation)) && !map.has(z._id)) map.set(z._id, z);
+      const corpId = (c?._id || c || '').toString();
+      if (z && typeof z === 'object' && z._id && (!selectedCorporation || corpId === selectedCorporation) && !map.has(z._id)) {
+        map.set(z._id, z);
+      }
     });
     return Array.from(map.values());
   }, [parks, selectedCorporation]);
@@ -66,7 +94,10 @@ const Parks = () => {
     parks.forEach(p => {
       const z = p.zone;
       const w = p.ward;
-      if (w && (!selectedZone || (z && z._id === selectedZone)) && !map.has(w._id)) map.set(w._id, w);
+      const zoneId = (z?._id || z || '').toString();
+      if (w && typeof w === 'object' && w._id && (!selectedZone || zoneId === selectedZone) && !map.has(w._id)) {
+        map.set(w._id, w);
+      }
     });
     return Array.from(map.values());
   }, [parks, selectedZone]);
@@ -112,19 +143,28 @@ const Parks = () => {
   ];
 
   const getImageUrl = (imagePath, index = 0) => {
+    if (imagePath && typeof imagePath === 'string' && (imagePath.startsWith('/') || imagePath.startsWith('http'))) {
+      return imagePath;
+    }
     return defaultImages[index % defaultImages.length];
   };
 
   const filteredParks = useMemo(() => parks.filter(p => {
-    const matchesSearch = p.name.toLowerCase().includes(searchTerm.toLowerCase());
-    const parkDist = p.district?._id || p.district;
-    const parkCorp = p.corporation?._id || p.corporation;
-    const parkZone = p.zone?._id || p.zone;
-    const parkWard = p.ward?._id || p.ward;
+    const pName = (p.name || '').toLowerCase();
+    const pCode = (p.parkCode || '').toLowerCase();
+    const q = searchTerm.toLowerCase().trim();
+    const matchesSearch = !q || pName.includes(q) || pCode.includes(q);
+
+    const parkDist = (p.district?._id || p.district || '').toString();
+    const parkCorp = (p.corporation?._id || p.corporation || '').toString();
+    const parkZone = (p.zone?._id || p.zone || '').toString();
+    const parkWard = (p.ward?._id || p.ward || '').toString();
+
     const matchesDist = !selectedDistrict || parkDist === selectedDistrict;
     const matchesCorp = !selectedCorporation || parkCorp === selectedCorporation;
     const matchesZone = !selectedZone || parkZone === selectedZone;
     const matchesWard = !selectedWard || parkWard === selectedWard;
+
     return matchesSearch && matchesDist && matchesCorp && matchesZone && matchesWard;
   }), [parks, searchTerm, selectedDistrict, selectedCorporation, selectedZone, selectedWard]);
 
@@ -159,7 +199,7 @@ const Parks = () => {
           <Search size={20} className="text-secondary" />
           <input
             type="text"
-            placeholder="Search Park Name"
+            placeholder="Search Park Name or Code..."
             className="search-input"
             value={searchTerm}
             onChange={handleSearchChange}
@@ -177,14 +217,41 @@ const Parks = () => {
         )}
       </div>
 
-      {loading ? (
-        <div style={{ textAlign: 'center', padding: '3rem', color: '#64748b' }}>Loading parks...</div>
+      {loading && parks.length === 0 ? (
+        <div style={{ textAlign: 'center', padding: '4rem 1.5rem', display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '12px' }}>
+          <Loader2 size={32} className="spin-icon" color="#16a34a" />
+          <span style={{ color: '#475569', fontWeight: 600, fontSize: '1rem' }}>Loading parks catalog...</span>
+        </div>
+      ) : fetchError && parks.length === 0 ? (
+        <div style={{ textAlign: 'center', padding: '3rem 1.5rem', background: '#fef2f2', borderRadius: '12px', border: '1px solid #fecaca', margin: '2rem 0' }}>
+          <AlertCircle size={36} color="#dc2626" style={{ marginBottom: '8px' }} />
+          <h3 style={{ color: '#991b1b', margin: '0 0 8px 0' }}>Unable to load parks</h3>
+          <p style={{ color: '#b91c1c', margin: '0 0 1rem 0', fontSize: '0.9rem' }}>{fetchError}</p>
+          <button 
+            onClick={() => fetchParks(true)}
+            style={{ display: 'inline-flex', alignItems: 'center', gap: '8px', background: '#dc2626', color: 'white', border: 'none', padding: '0.6rem 1.2rem', borderRadius: '8px', fontWeight: 700, cursor: 'pointer' }}
+          >
+            <RefreshCw size={16} /> Retry
+          </button>
+        </div>
       ) : filteredParks.length === 0 ? (
-        <div style={{ textAlign: 'center', padding: '3rem', color: '#64748b' }}>No parks found.</div>
+        <div style={{ textAlign: 'center', padding: '3.5rem', color: '#64748b', background: '#f8fafc', borderRadius: '12px', margin: '2rem 0' }}>
+          <p style={{ fontSize: '1.1rem', fontWeight: 600, color: '#334155', margin: '0 0 0.5rem 0' }}>No parks match your selected filters.</p>
+          <p style={{ fontSize: '0.9rem', color: '#64748b', margin: 0 }}>Try selecting a different district, zone, ward or clearing search filters.</p>
+          {hasActiveFilters && (
+            <button
+              onClick={handleClearFilters}
+              style={{ marginTop: '1rem', padding: '0.5rem 1.2rem', background: '#16a34a', color: 'white', border: 'none', borderRadius: '6px', cursor: 'pointer', fontWeight: 600 }}
+            >
+              Reset Filters
+            </button>
+          )}
+        </div>
       ) : (
         <>
-          <div style={{ margin: '1.5rem 0 0.5rem 0', color: '#64748b', fontSize: '0.9rem' }}>
-            Showing <strong>{filteredParks.length}</strong> parks
+          <div style={{ margin: '1.5rem 0 0.5rem 0', color: '#64748b', fontSize: '0.9rem', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+            <span>Showing <strong>{filteredParks.length}</strong> parks</span>
+            {loading && <span style={{ fontSize: '0.8rem', color: '#16a34a', display: 'inline-flex', alignItems: 'center', gap: '4px' }}><Loader2 size={13} className="spin-icon" /> Syncing updates...</span>}
           </div>
 
           <div className="parks-grid" style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(300px, 1fr))', gap: '1.5rem', marginTop: '0.5rem' }}>
@@ -239,3 +306,4 @@ const Parks = () => {
 };
 
 export default Parks;
+

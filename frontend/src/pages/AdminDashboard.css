@@ -1,14 +1,22 @@
+/* ====================================================
+   ADMIN DASHBOARD — Dark Professional Theme
+   ==================================================== */
+
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap');
+
 .admin-dashboard-page {
-  background-color: #f8fafc;
+  background-color: #151A2B;
   min-height: 100vh;
   font-family: 'Inter', sans-serif;
+  color: #F0F4FF;
 }
 
 .admin-header {
-  background-color: #1e1b4b; /* Deep indigo/violet header */
-  color: white;
+  background-color: #151A2B;
+  color: #F0F4FF;
   padding: 1.5rem 0;
-  box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+  box-shadow: 0 2px 12px rgba(0, 0, 0, 0.3);
+  border-bottom: 1px solid rgba(255,255,255,0.06);
 }
 
 .admin-header-content {
@@ -28,14 +36,16 @@
   font-weight: 800;
   margin: 0;
   letter-spacing: 0.5px;
+  color: #F0F4FF;
 }
 
 .admin-brand span {
   font-size: 0.85rem;
-  background-color: #6366f1;
+  background-color: #4F6FF5;
   padding: 0.2rem 0.6rem;
   border-radius: 4px;
   font-weight: 600;
+  color: #fff;
 }
 
 .admin-user-info {
@@ -46,8 +56,8 @@
 
 .btn-admin-logout {
   background-color: transparent;
-  color: #c7d2fe;
-  border: 1px solid #4338ca;
+  color: #A8B0C8;
+  border: 1px solid rgba(255,255,255,0.12);
   padding: 0.4rem 0.8rem;
   border-radius: 6px;
   font-size: 0.85rem;
@@ -60,21 +70,21 @@
 }
 
 .btn-admin-logout:hover {
-  color: white;
-  border-color: white;
-  background-color: rgba(255, 255, 255, 0.05);
+  color: #F0F4FF;
+  border-color: #4F6FF5;
+  background-color: rgba(79,111,245,0.1);
 }
 
 .admin-dashboard-container {
   padding: 2.5rem 0;
 }
 
-/* Tabs styles */
+/* Tabs */
 .admin-tabs {
   display: flex;
   gap: 1rem;
   margin-bottom: 2rem;
-  border-bottom: 2px solid #e2e8f0;
+  border-bottom: 1px solid rgba(255,255,255,0.07);
   padding-bottom: 0.5rem;
 }
 
@@ -84,18 +94,18 @@
   padding: 0.75rem 1.5rem;
   font-size: 1rem;
   font-weight: 600;
-  color: #64748b;
+  color: #666E85;
   cursor: pointer;
   position: relative;
   transition: all 0.2s;
 }
 
 .admin-tab-btn:hover {
-  color: #6366f1;
+  color: #A8B0C8;
 }
 
 .admin-tab-btn.active {
-  color: #6366f1;
+  color: #4F6FF5;
 }
 
 .admin-tab-btn.active::after {
@@ -105,56 +115,64 @@
   left: 0;
   right: 0;
   height: 3px;
-  background-color: #6366f1;
+  background-color: #4F6FF5;
   border-radius: 3px 3px 0 0;
 }
 
-/* Panel management */
+/* ====================================================
+   ADMIN PANELS (Cards)
+   ==================================================== */
 .admin-panel {
-  background-color: white;
-  border-radius: 12px;
-  border: 1px solid #e2e8f0;
-  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
+  background-color: #1E2438;
+  border-radius: 14px;
+  border: 1px solid rgba(255,255,255,0.06);
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.18);
   overflow: hidden;
-  margin-bottom: 2.5rem;
+  margin-bottom: 2rem;
+  color: #F0F4FF;
 }
 
 .admin-panel-header {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  padding: 1.5rem;
-  border-bottom: 1px solid #e2e8f0;
-  background-color: #fafafa;
+  padding: 1.25rem 1.5rem;
+  border-bottom: 1px solid rgba(255,255,255,0.06);
+  background-color: rgba(255,255,255,0.02);
 }
 
+.admin-panel-header h2,
 .admin-panel-header h3 {
   font-size: 1.1rem;
   font-weight: 700;
-  color: #1e293b;
+  color: #F0F4FF;
   margin: 0;
 }
 
 .btn-admin-add {
-  background-color: #6366f1;
+  background: linear-gradient(135deg, #4F6FF5, #6C7CFF);
   color: white;
   border: none;
-  padding: 0.5rem 1rem;
-  border-radius: 6px;
+  padding: 0.5rem 1.1rem;
+  border-radius: 8px;
   font-size: 0.85rem;
   font-weight: 600;
   cursor: pointer;
   display: inline-flex;
   align-items: center;
   gap: 0.5rem;
-  transition: background-color 0.2s;
+  transition: all 0.2s;
+  box-shadow: 0 4px 14px rgba(79,111,245,0.25);
 }
 
 .btn-admin-add:hover {
-  background-color: #4f46e5;
+  transform: translateY(-1px);
+  box-shadow: 0 6px 18px rgba(79,111,245,0.35);
 }
 
-/* Table styles */
+/* ====================================================
+   ADMIN TABLES
+   ==================================================== */
 .admin-table-container {
   overflow-x: auto;
 }
@@ -166,27 +184,27 @@
 }
 
 .admin-table th {
-  background-color: #f8fafc;
-  color: #334155;
+  background-color: rgba(255,255,255,0.03);
+  color: #666E85;
   font-weight: 700;
-  font-size: 0.8rem;
+  font-size: 0.78rem;
   text-transform: uppercase;
-  letter-spacing: 0.5px;
-  padding: 1rem 1.5rem;
+  letter-spacing: 0.06em;
+  padding: 0.9rem 1.25rem;
   text-align: left;
-  border-bottom: 1px solid #e2e8f0;
+  border-bottom: 1px solid rgba(255,255,255,0.06);
 }
 
 .admin-table td {
-  padding: 1.25rem 1.5rem;
-  font-size: 0.95rem;
-  color: #334155;
-  border-bottom: 1px solid #f1f5f9;
+  padding: 1rem 1.25rem;
+  font-size: 0.9rem;
+  color: #A8B0C8;
+  border-bottom: 1px solid rgba(255,255,255,0.04);
   vertical-align: middle;
 }
 
 .admin-table tr:hover td {
-  background-color: #fafafa;
+  background-color: rgba(79,111,245,0.04);
 }
 
 .admin-table tr:last-child td {
@@ -197,7 +215,7 @@
   background: none;
   border: none;
   padding: 0.35rem 0.65rem;
-  border-radius: 4px;
+  border-radius: 6px;
   font-size: 0.8rem;
   font-weight: 600;
   cursor: pointer;
@@ -205,32 +223,35 @@
 }
 
 .btn-table-action.edit {
-  color: #4f46e5;
-  background-color: #e0e7ff;
+  color: #4F6FF5;
+  background-color: rgba(79,111,245,0.12);
 }
 
 .btn-table-action.edit:hover {
-  background-color: #c7d2fe;
+  background-color: rgba(79,111,245,0.22);
 }
 
 .btn-table-action.delete {
-  color: #dc2626;
-  background-color: #fee2e2;
+  color: #FF5C67;
+  background-color: rgba(255,92,103,0.12);
   margin-left: 0.5rem;
 }
 
 .btn-table-action.delete:hover {
-  background-color: #fca5a5;
+  background-color: rgba(255,92,103,0.22);
 }
 
-/* Modal styling */
+/* ====================================================
+   ADMIN MODALS
+   ==================================================== */
 .admin-modal-overlay {
   position: fixed;
   top: 0;
   left: 0;
   right: 0;
   bottom: 0;
-  background-color: rgba(0, 0, 0, 0.5);
+  background-color: rgba(10, 12, 20, 0.7);
+  backdrop-filter: blur(4px);
   display: flex;
   justify-content: center;
   align-items: center;
@@ -238,20 +259,22 @@
 }
 
 .admin-modal {
-  background: white;
-  border-radius: 12px;
+  background: #1E2438;
+  border-radius: 14px;
   width: 90%;
   max-width: 500px;
   padding: 2rem;
-  box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
+  box-shadow: 0 20px 40px rgba(0, 0, 0, 0.4);
+  border: 1px solid rgba(255,255,255,0.08);
+  color: #F0F4FF;
 }
 
 .admin-modal h4 {
   margin: 0 0 1.25rem 0;
   font-size: 1.25rem;
   font-weight: 700;
-  color: #1e293b;
-  border-bottom: 1px solid #e2e8f0;
+  color: #F0F4FF;
+  border-bottom: 1px solid rgba(255,255,255,0.07);
   padding-bottom: 0.75rem;
 }
 
@@ -269,35 +292,41 @@
 }
 
 .btn-modal-cancel {
-  background-color: white;
-  border: 1px solid #cbd5e1;
-  color: #475569;
+  background-color: transparent;
+  border: 1px solid rgba(255,255,255,0.12);
+  color: #A8B0C8;
   padding: 0.5rem 1rem;
-  border-radius: 6px;
+  border-radius: 8px;
   font-size: 0.85rem;
   font-weight: 600;
   cursor: pointer;
+  transition: all 0.2s;
 }
 
 .btn-modal-cancel:hover {
-  background-color: #f1f5f9;
+  background-color: rgba(255,255,255,0.05);
+  color: #F0F4FF;
 }
 
 .btn-modal-submit {
-  background-color: #6366f1;
+  background: linear-gradient(135deg, #4F6FF5, #6C7CFF);
   color: white;
   border: none;
   padding: 0.5rem 1.25rem;
-  border-radius: 6px;
+  border-radius: 8px;
   font-size: 0.85rem;
   font-weight: 600;
   cursor: pointer;
+  transition: all 0.2s;
 }
 
 .btn-modal-submit:hover {
-  background-color: #4f46e5;
+  box-shadow: 0 4px 14px rgba(79,111,245,0.35);
 }
 
+/* ====================================================
+   ADMIN FORM INPUTS
+   ==================================================== */
 .admin-form-group {
   display: flex;
   flex-direction: column;
@@ -307,41 +336,131 @@
 .admin-input-label {
   font-size: 0.85rem;
   font-weight: 600;
-  color: #475569;
+  color: #A8B0C8;
 }
 
 .admin-input-field {
   padding: 0.7rem 0.9rem;
-  border: 1px solid #cbd5e1;
-  border-radius: 6px;
+  border: 1px solid rgba(255,255,255,0.1);
+  border-radius: 8px;
   font-size: 0.95rem;
   outline: none;
-  background-color: white;
+  background-color: #151A2B;
+  color: #F0F4FF;
+  transition: border-color 0.2s;
 }
 
 .admin-input-field:focus {
-  border-color: #6366f1;
+  border-color: #4F6FF5;
 }
 
+.admin-input-field::placeholder {
+  color: #555D75;
+}
+
+/* ====================================================
+   ADMIN BADGES
+   ==================================================== */
 .admin-badge {
-  padding: 0.25rem 0.5rem;
-  border-radius: 4px;
+  padding: 0.25rem 0.6rem;
+  border-radius: 6px;
   font-size: 0.75rem;
   font-weight: 700;
   display: inline-block;
 }
 
 .admin-badge.user-role {
-  background-color: #e0e7ff;
-  color: #4f46e5;
+  background-color: rgba(79,111,245,0.15);
+  color: #6C7CFF;
 }
 
 .admin-badge.contractor-role {
-  background-color: #fef3c7;
-  color: #d97706;
+  background-color: rgba(245,185,66,0.15);
+  color: #F5B942;
 }
 
 .admin-badge.public-role {
-  background-color: #f1f5f9;
-  color: #475569;
+  background-color: rgba(255,255,255,0.06);
+  color: #A8B0C8;
 }
+
+/* ====================================================
+   ADMIN MODAL STYLING & HIGH CONTRAST TYPOGRAPHY
+   ==================================================== */
+.admin-modal-overlay {
+  position: fixed;
+  inset: 0;
+  background-color: rgba(15, 23, 42, 0.75);
+  backdrop-filter: blur(4px);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 1000;
+  padding: 1rem;
+}
+
+.admin-modal {
+  background-color: #ffffff !important;
+  color: #0f172a !important;
+  border-radius: 12px;
+  box-shadow: 0 20px 50px rgba(0, 0, 0, 0.4);
+  border: 1px solid #cbd5e1;
+}
+
+.admin-modal h1,
+.admin-modal h2,
+.admin-modal h3,
+.admin-modal h4,
+.admin-modal h5,
+.admin-modal h6 {
+  color: #0f172a !important;
+  font-weight: 700;
+}
+
+.admin-modal label {
+  color: #1e293b !important;
+  font-weight: 600;
+}
+
+.admin-modal p,
+.admin-modal span,
+.admin-modal li {
+  color: #334155;
+}
+
+.admin-modal input,
+.admin-modal select,
+.admin-modal textarea {
+  color: #0f172a !important;
+  background-color: #ffffff !important;
+  border: 1px solid #cbd5e1 !important;
+}
+
+.admin-modal input::placeholder,
+.admin-modal textarea::placeholder {
+  color: #94a3b8 !important;
+}
+
+.admin-modal input:focus,
+.admin-modal select:focus,
+.admin-modal textarea:focus {
+  border-color: #059669 !important;
+  outline: none;
+  box-shadow: 0 0 0 3px rgba(5, 150, 105, 0.15) !important;
+}
+
+.admin-modal table {
+  color: #1e293b !important;
+}
+
+.admin-modal th {
+  background-color: #f1f5f9 !important;
+  color: #1e293b !important;
+  font-weight: 700 !important;
+}
+
+.admin-modal td {
+  color: #1e293b !important;
+  border-bottom: 1px solid #e2e8f0 !important;
+}
+

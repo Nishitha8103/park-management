@@ -1,5 +1,5 @@
 import { useState, useEffect, useRef } from 'react';
-import { Bell, CheckCircle2, Clock, Info, FileText, Wrench, Megaphone, Star } from 'lucide-react';
+import { Bell, CheckCircle2, Clock, Info, FileText, Wrench, Megaphone, Star, AlertOctagon } from 'lucide-react';
 import axios from 'axios';
 import { useNavigate } from 'react-router-dom';
 import './NotificationDropdown.css';
@@ -11,13 +11,15 @@ const NotificationDropdown = ({ userId, role, onNotificationClick }) => {
   const [loading, setLoading] = useState(true);
   const dropdownRef = useRef(null);
   const navigate = useNavigate();
+  const lastAlertTimeRef = useRef(0);
 
   const fetchNotifications = async () => {
     try {
       if (!userId || !role) return;
       const res = await axios.get(`/api/notifications?userId=${userId}&role=${role}`);
       if (res.data) {
-        setNotifications(res.data.notifications || []);
+        const notifList = res.data.notifications || [];
+        setNotifications(notifList);
         setUnreadCount(res.data.unreadCount || 0);
       }
     } catch (err) {
@@ -74,7 +76,14 @@ const NotificationDropdown = ({ userId, role, onNotificationClick }) => {
     setIsOpen(false);
     
     if (onNotificationClick) {
-        onNotificationClick(notif);
+      onNotificationClick(notif);
+    } else if (notif.actionRoute) {
+      navigate(notif.actionRoute);
+    } else {
+      if (role === 'citizen') navigate('/track-complaint');
+      else if (role === 'contractor') navigate('/contractor/tasks');
+      else if (role === 'official') navigate('/gov-dashboard/complaints');
+      else if (role === 'admin') navigate('/admin-dashboard/complaints');
     }
   };
 
@@ -86,28 +95,30 @@ const NotificationDropdown = ({ userId, role, onNotificationClick }) => {
     else if (role === 'official') navigate('/official/notifications');
   };
 
-  const getIconForCategory = (category) => {
-    switch(category) {
-      case 'Complaints':
-      case 'My Complaints': return <FileText size={18} />;
-      case 'Maintenance':
-      case 'Assigned Tasks': return <Wrench size={18} />;
-      case 'SLA': return <Clock size={18} />;
-      case 'Announcements': return <Megaphone size={18} />;
-      case 'Feedback': return <Star size={18} />;
-      case 'Verification': return <CheckCircle2 size={18} />;
-      default: return <Info size={18} />;
-    }
+  const getIconForCategory = (category, type = '') => {
+    const cat = (category || '').toLowerCase();
+    const t = (type || '').toLowerCase();
+
+    if (t.includes('resolved') || cat.includes('resolved')) return <CheckCircle2 size={18} />;
+    if (t.includes('maintenance') || cat.includes('maintenance') || t.includes('repair')) return <Wrench size={18} />;
+    if (t.includes('inspection') || cat.includes('inspection')) return <FileText size={18} />;
+    if (t.includes('overdue') || t.includes('due') || cat.includes('sla')) return <Clock size={18} />;
+    if (cat.includes('complaint')) return <FileText size={18} />;
+    if (cat.includes('feedback')) return <Star size={18} />;
+    if (cat.includes('announcement')) return <Megaphone size={18} />;
+    if (cat.includes('verification')) return <CheckCircle2 size={18} />;
+    
+    return <Info size={18} />;
   };
 
-  const getPriorityColor = (priority) => {
-    switch(priority) {
-      case 'URGENT': return '#ef4444';
-      case 'HIGH': return '#f59e0b';
-      case 'NORMAL': return '#3b82f6';
-      case 'LOW': return '#6b7280';
-      default: return '#3b82f6';
-    }
+  const getPriorityColor = (priority, type = '') => {
+    const p = (priority || '').toUpperCase();
+    const t = (type || '').toLowerCase();
+    if (t.includes('overdue') || p === 'URGENT') return '#ef4444';
+    if (t.includes('due') || p === 'HIGH') return '#f59e0b';
+    if (t.includes('resolved')) return '#10b981';
+    if (p === 'LOW') return '#6b7280';
+    return '#3b82f6';
   };
 
   return (

@@ -505,7 +505,7 @@ const AdminParks = () => {
       <div className="admin-table-container" style={{ padding: '1rem' }}>
         <table className="admin-table" style={{ width: '100%', borderCollapse: 'collapse' }}>
           <thead>
-            <tr style={{ backgroundColor: '#f1f5f9', textAlign: 'left' }}>
+            <tr>
               <th style={{ padding: '0.75rem', width: '40px' }}>
                 <input 
                   type="checkbox" 
@@ -526,11 +526,11 @@ const AdminParks = () => {
           </thead>
           <tbody>
             {parks.length === 0 ? (
-              <tr><td colSpan="9" style={{ textAlign: 'center', padding: '1rem' }}>No parks added yet.</td></tr>
+              <tr><td colSpan="9" style={{ textAlign: 'center', padding: '1.5rem', color: '#8F9CAE' }}>No parks added yet.</td></tr>
             ) : (
               <>
                 {parks.map(p => (
-                  <tr key={p._id} style={{ borderBottom: '1px solid #e2e8f0' }}>
+                  <tr key={p._id}>
                   <td style={{ padding: '0.75rem' }}>
                     <input 
                       type="checkbox" 
@@ -542,32 +542,32 @@ const AdminParks = () => {
                   <td style={{ padding: '0.75rem' }}>
                     {p.images && p.images.length > 0 ? (
                       <div style={{ display: 'flex', alignItems: 'center', gap: '4px' }}>
-                        <img src={getImageUrl(p.images[0])} alt="Park" style={{ width: '40px', height: '40px', borderRadius: '4px', objectFit: 'cover' }} />
-                        {p.images.length > 1 && <span style={{ fontSize: '0.7rem', color: '#6b7280' }}>+{p.images.length - 1}</span>}
+                        <img src={getImageUrl(p.images[0])} alt="Park" style={{ width: '40px', height: '40px', borderRadius: '6px', objectFit: 'cover' }} />
+                        {p.images.length > 1 && <span style={{ fontSize: '0.75rem', color: '#8F9CAE' }}>+{p.images.length - 1}</span>}
                       </div>
                     ) : (
-                      <div style={{ width: '40px', height: '40px', borderRadius: '4px', backgroundColor: '#e2e8f0', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-                        <ImageIcon size={16} color="#94a3b8" />
+                      <div style={{ width: '40px', height: '40px', borderRadius: '6px', backgroundColor: 'rgba(255,255,255,0.06)', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                        <ImageIcon size={18} color="#8F9CAE" />
                       </div>
                     )}
                   </td>
-                  <td style={{ padding: '0.75rem', fontWeight: 'bold' }}>{p.name}</td>
-                  <td style={{ padding: '0.75rem' }}>{p.parkCode || 'N/A'}</td>
-                  <td style={{ padding: '0.75rem' }}>{p.corporation?.name || 'N/A'}</td>
-                  <td style={{ padding: '0.75rem' }}>{p.zone?.name || 'N/A'}</td>
-                  <td style={{ padding: '0.75rem' }}>{p.ward?.name || 'N/A'}</td>
+                  <td style={{ padding: '0.75rem', fontWeight: '600', color: '#F8FAFC', fontSize: '0.95rem' }}>{p.name}</td>
+                  <td style={{ padding: '0.75rem', color: '#94A3B8' }}>{p.parkCode || 'N/A'}</td>
+                  <td style={{ padding: '0.75rem', color: '#CBD5E1' }}>{p.corporation?.name || 'N/A'}</td>
+                  <td style={{ padding: '0.75rem', color: '#94A3B8' }}>{p.zone?.name || 'N/A'}</td>
+                  <td style={{ padding: '0.75rem', color: '#94A3B8' }}>{p.ward?.name || 'N/A'}</td>
                   <td style={{ padding: '0.75rem' }}>
                     <span style={{ 
-                      fontSize: '0.8rem', fontWeight: 'bold', padding: '0.2rem 0.5rem', borderRadius: '4px',
-                      color: p.status === 'Active' ? '#16a34a' : '#f97316', 
-                      backgroundColor: p.status === 'Active' ? '#dcfce7' : '#ffedd5',
+                      fontSize: '0.78rem', fontWeight: '700', padding: '0.25rem 0.6rem', borderRadius: '4px',
+                      color: p.status === 'Active' ? '#22c55e' : '#f97316', 
+                      backgroundColor: p.status === 'Active' ? 'rgba(34,197,94,0.15)' : 'rgba(249,115,22,0.15)',
                     }}>{p.status}</span>
                   </td>
                   <td style={{ padding: '0.75rem' }}>
                     <div className="action-buttons" style={{ display: 'flex', gap: '8px' }}>
                       <button className="btn-icon" onClick={() => openStallSlotsModal(p)} title="Manage Stall Slots"><Store size={16} /></button>
-                      <button className="btn-icon" onClick={() => handleEditClick(p)}><Edit2 size={16} /></button>
-                      <button className="btn-icon delete" onClick={() => handleDeleteClick(p._id)}><Trash2 size={16} /></button>
+                      <button className="btn-icon" onClick={() => handleEditClick(p)} title="Edit Park"><Edit2 size={16} /></button>
+                      <button className="btn-icon delete" onClick={() => handleDeleteClick(p._id)} title="Delete Park"><Trash2 size={16} /></button>
                     </div>
                   </td>
                 </tr>
@@ -580,42 +580,42 @@ const AdminParks = () => {
 
       {/* Bulk Upload Modal */}
       {showBulkModal && (
-        <div className="admin-modal-overlay" style={{ position: 'fixed', top: 0, left: 0, right: 0, bottom: 0, backgroundColor: 'rgba(0,0,0,0.5)', display: 'flex', justifyContent: 'center', alignItems: 'center', zIndex: 1000 }}>
-          <div className="admin-modal" style={{ backgroundColor: 'white', borderRadius: '8px', width: '600px', maxHeight: '90vh', overflowY: 'auto' }}>
-            <div style={{ padding: '1rem', borderBottom: '1px solid #e2e8f0', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-              <h4 style={{ margin: 0 }}>Bulk Upload Parks (Excel / CSV)</h4>
-              <button type="button" onClick={() => setShowBulkModal(false)} style={{ background: 'none', border: 'none', cursor: 'pointer' }}><X size={20} /></button>
+        <div className="admin-modal-overlay" style={{ position: 'fixed', top: 0, left: 0, right: 0, bottom: 0, backgroundColor: 'rgba(15, 23, 42, 0.75)', backdropFilter: 'blur(4px)', display: 'flex', justifyContent: 'center', alignItems: 'center', zIndex: 1000, padding: '1rem' }}>
+          <div className="admin-modal" style={{ backgroundColor: '#ffffff', color: '#0f172a', borderRadius: '12px', width: '620px', maxWidth: '95vw', maxHeight: '90vh', overflowY: 'auto', boxShadow: '0 20px 50px rgba(0,0,0,0.3)', border: '1px solid #cbd5e1' }}>
+            <div style={{ padding: '1.25rem 1.5rem', borderBottom: '1px solid #e2e8f0', display: 'flex', justifyContent: 'space-between', alignItems: 'center', backgroundColor: '#f8fafc', borderTopLeftRadius: '12px', borderTopRightRadius: '12px' }}>
+              <h4 style={{ margin: 0, color: '#0f172a', fontWeight: 800, fontSize: '1.15rem' }}>Bulk Upload Parks (Excel / CSV)</h4>
+              <button type="button" onClick={() => setShowBulkModal(false)} style={{ background: 'none', border: 'none', cursor: 'pointer', color: '#64748b' }}><X size={20} /></button>
             </div>
             
-            <div className="admin-modal-body" style={{ padding: '1.5rem', display: 'flex', flexDirection: 'column', gap: '1.5rem' }}>
+            <div className="admin-modal-body" style={{ padding: '1.5rem', display: 'flex', flexDirection: 'column', gap: '1.5rem', color: '#0f172a' }}>
               
-              <div style={{ backgroundColor: '#f8fafc', border: '1px dashed #cbd5e1', borderRadius: '6px', padding: '1rem', textAlign: 'center' }}>
+              <div style={{ backgroundColor: '#f8fafc', border: '1px dashed #cbd5e1', borderRadius: '8px', padding: '1rem', textAlign: 'center' }}>
                 <a href="/parks_template.csv" download className="btn-link" style={{ display: 'inline-flex', alignItems: 'center', gap: '6px', color: '#4f46e5', textDecoration: 'none', fontWeight: 'bold', fontSize: '0.95rem' }}>
                   <Download size={16} /> Download Sample CSV Template
                 </a>
-                <p style={{ margin: '8px 0 0', fontSize: '0.8rem', color: '#64748b' }}>Use this template to properly format your data columns before uploading.</p>
+                <p style={{ margin: '8px 0 0', fontSize: '0.85rem', color: '#64748b' }}>Use this template to properly format your data columns before uploading.</p>
               </div>
 
               <form onSubmit={handleBulkSubmit} style={{ display: 'flex', flexDirection: 'column', gap: '1rem' }}>
                 <div>
-                  <label style={{ display: 'block', marginBottom: '0.5rem', fontWeight: 'bold', fontSize: '0.9rem' }}>Select Excel/CSV File</label>
+                  <label style={{ display: 'block', marginBottom: '0.4rem', fontWeight: 700, fontSize: '0.9rem', color: '#1e293b' }}>Select Excel/CSV File</label>
                   <input 
                     type="file" 
                     accept=".xlsx, .xls, .csv" 
                     onChange={(e) => setBulkFile(e.target.files[0])}
                     required 
-                    style={{ width: '100%', padding: '0.5rem', border: '1px solid #cbd5e1', borderRadius: '4px' }}
+                    style={{ width: '100%', padding: '0.55rem', border: '1px solid #cbd5e1', borderRadius: '6px', color: '#0f172a', backgroundColor: '#ffffff' }}
                   />
                 </div>
-                <button type="submit" disabled={bulkLoading} style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '8px', padding: '0.75rem', backgroundColor: '#4f46e5', color: 'white', border: 'none', borderRadius: '4px', cursor: 'pointer', fontWeight: 'bold', width: '100%' }}>
+                <button type="submit" disabled={bulkLoading} style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '8px', padding: '0.75rem', backgroundColor: '#4f46e5', color: 'white', border: 'none', borderRadius: '6px', cursor: 'pointer', fontWeight: 700, width: '100%', fontSize: '0.95rem' }}>
                   {bulkLoading ? 'Processing file...' : 'Upload & Parse Parks'}
                 </button>
               </form>
 
               {/* Bulk Results Summary */}
               {bulkResult && (
-                <div style={{ border: '1px solid #cbd5e1', borderRadius: '6px', padding: '1rem', background: '#f8fafc' }}>
-                  <h5 style={{ margin: '0 0 10px 0', borderBottom: '1px solid #e2e8f0', paddingBottom: '5px' }}>Upload Summary</h5>
+                <div style={{ border: '1px solid #cbd5e1', borderRadius: '8px', padding: '1rem', background: '#f8fafc' }}>
+                  <h5 style={{ margin: '0 0 10px 0', borderBottom: '1px solid #e2e8f0', paddingBottom: '5px', color: '#0f172a', fontWeight: 700 }}>Upload Summary</h5>
                   <div style={{ display: 'flex', gap: '15px', marginBottom: '10px' }}>
                     <span style={{ color: '#16a34a', fontWeight: 'bold', display: 'flex', alignItems: 'center', gap: '4px' }}>
                       <CheckCircle2 size={16} /> Success: {bulkResult.successCount}
@@ -641,8 +641,8 @@ const AdminParks = () => {
               )}
 
               <div style={{ borderTop: '1px solid #e2e8f0', paddingTop: '1rem' }}>
-                <h6 style={{ margin: '0 0 5px 0', fontSize: '0.85rem', color: '#475569' }}>Column Format Reference:</h6>
-                <ul style={{ margin: 0, paddingLeft: '20px', fontSize: '0.8rem', color: '#64748b', display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '2px' }}>
+                <h6 style={{ margin: '0 0 5px 0', fontSize: '0.85rem', color: '#334155', fontWeight: 700 }}>Column Format Reference:</h6>
+                <ul style={{ margin: 0, paddingLeft: '20px', fontSize: '0.82rem', color: '#475569', display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '4px' }}>
                   <li><strong>District</strong> (e.g. Bangalore Urban)</li>
                   <li><strong>Corporation</strong> (e.g. BBMP)</li>
                   <li><strong>Zone</strong> (e.g. South Zone)</li>
@@ -655,8 +655,8 @@ const AdminParks = () => {
               </div>
             </div>
             
-            <div style={{ padding: '1rem', borderTop: '1px solid #e2e8f0', display: 'flex', justifyContent: 'flex-end' }}>
-              <button type="button" onClick={() => setShowBulkModal(false)} style={{ padding: '0.5rem 1rem', backgroundColor: '#f1f5f9', border: '1px solid #cbd5e1', borderRadius: '4px', cursor: 'pointer' }}>Close Dialog</button>
+            <div style={{ padding: '1rem 1.5rem', borderTop: '1px solid #e2e8f0', display: 'flex', justifyContent: 'flex-end', backgroundColor: '#f8fafc' }}>
+              <button type="button" onClick={() => setShowBulkModal(false)} style={{ padding: '0.5rem 1.25rem', backgroundColor: '#e2e8f0', border: '1px solid #cbd5e1', borderRadius: '6px', cursor: 'pointer', fontWeight: 600, color: '#334155' }}>Close Dialog</button>
             </div>
           </div>
         </div>
@@ -664,14 +664,14 @@ const AdminParks = () => {
 
       {/* Modern Add Park Modal */}
       {showModal && (
-        <div className="admin-modal-overlay" style={{ position: 'fixed', top: 0, left: 0, right: 0, bottom: 0, backgroundColor: 'rgba(0,0,0,0.5)', display: 'flex', justifyContent: 'center', alignItems: 'center', zIndex: 1000 }}>
-          <form className="admin-modal" onSubmit={handleSubmit} style={{ backgroundColor: 'white', borderRadius: '8px', width: '800px', maxHeight: '90vh', overflowY: 'auto' }}>
-            <div style={{ padding: '1rem', borderBottom: '1px solid #e2e8f0', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-              <h4 style={{ margin: 0 }}>{editingPark ? 'Edit Park Details' : 'Register New Park'}</h4>
-              <button type="button" onClick={() => {setShowModal(false); setFormData(initialForm); setEditingPark(null);}} style={{ background: 'none', border: 'none', cursor: 'pointer' }}><X size={20} /></button>
+        <div className="admin-modal-overlay" style={{ position: 'fixed', top: 0, left: 0, right: 0, bottom: 0, backgroundColor: 'rgba(15, 23, 42, 0.75)', backdropFilter: 'blur(4px)', display: 'flex', justifyContent: 'center', alignItems: 'center', zIndex: 1000, padding: '1rem' }}>
+          <form className="admin-modal" onSubmit={handleSubmit} style={{ backgroundColor: '#ffffff', color: '#0f172a', borderRadius: '12px', width: '820px', maxWidth: '95vw', maxHeight: '90vh', overflowY: 'auto', boxShadow: '0 20px 50px rgba(0,0,0,0.3)', border: '1px solid #cbd5e1' }}>
+            <div style={{ padding: '1.25rem 1.5rem', borderBottom: '1px solid #e2e8f0', display: 'flex', justifyContent: 'space-between', alignItems: 'center', backgroundColor: '#f8fafc', borderTopLeftRadius: '12px', borderTopRightRadius: '12px' }}>
+              <h4 style={{ margin: 0, color: '#0f172a', fontWeight: 800, fontSize: '1.15rem' }}>{editingPark ? 'Edit Park Details' : 'Register New Park'}</h4>
+              <button type="button" onClick={() => {setShowModal(false); setFormData(initialForm); setEditingPark(null);}} style={{ background: 'none', border: 'none', cursor: 'pointer', color: '#64748b' }}><X size={20} /></button>
             </div>
             
-            <div className="admin-modal-body" style={{ padding: '1.5rem', display: 'flex', flexDirection: 'column', gap: '1rem' }}>
+            <div className="admin-modal-body" style={{ padding: '1.5rem', display: 'flex', flexDirection: 'column', gap: '1rem', color: '#0f172a' }}>
               
               {/* Location Hierarchy */}
               <h5 style={{ borderBottom: '1px solid #e5e7eb', paddingBottom: '0.5rem', marginBottom: '0.5rem', color: '#374151' }}>Location Hierarchy</h5>
@@ -871,57 +871,57 @@ const AdminParks = () => {
 
       {/* Stall Slots Management Modal */}
       {showStallSlotsModal && selectedParkForSlots && (
-        <div className="admin-modal-overlay" style={{ position: 'fixed', top: 0, left: 0, right: 0, bottom: 0, backgroundColor: 'rgba(0,0,0,0.5)', display: 'flex', justifyContent: 'center', alignItems: 'center', zIndex: 1000 }}>
-          <div className="admin-modal" style={{ backgroundColor: 'white', borderRadius: '8px', width: '800px', maxHeight: '90vh', display: 'flex', flexDirection: 'column' }}>
-            <div style={{ padding: '1rem', borderBottom: '1px solid #e2e8f0', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-              <h4 style={{ margin: 0 }}>Manage Stall Slots - {selectedParkForSlots.name}</h4>
-              <button type="button" onClick={() => setShowStallSlotsModal(false)} style={{ background: 'none', border: 'none', cursor: 'pointer' }}><X size={20} /></button>
+        <div className="admin-modal-overlay" style={{ position: 'fixed', top: 0, left: 0, right: 0, bottom: 0, backgroundColor: 'rgba(15, 23, 42, 0.75)', backdropFilter: 'blur(4px)', display: 'flex', justifyContent: 'center', alignItems: 'center', zIndex: 1000, padding: '1rem' }}>
+          <div className="admin-modal" style={{ backgroundColor: '#ffffff', color: '#0f172a', borderRadius: '12px', width: '820px', maxWidth: '95vw', maxHeight: '90vh', display: 'flex', flexDirection: 'column', boxShadow: '0 20px 50px rgba(0,0,0,0.3)', border: '1px solid #cbd5e1' }}>
+            <div style={{ padding: '1.25rem 1.5rem', borderBottom: '1px solid #e2e8f0', display: 'flex', justifyContent: 'space-between', alignItems: 'center', backgroundColor: '#f8fafc', borderTopLeftRadius: '12px', borderTopRightRadius: '12px' }}>
+              <h4 style={{ margin: 0, color: '#0f172a', fontWeight: 800, fontSize: '1.15rem' }}>Manage Stall Slots - {selectedParkForSlots.name}</h4>
+              <button type="button" onClick={() => setShowStallSlotsModal(false)} style={{ background: 'none', border: 'none', cursor: 'pointer', color: '#64748b', display: 'flex', alignItems: 'center', padding: '4px', borderRadius: '4px' }}><X size={20} /></button>
             </div>
             
-            <div className="admin-modal-body" style={{ padding: '1.5rem', overflowY: 'auto', flex: 1 }}>
+            <div className="admin-modal-body" style={{ padding: '1.5rem', overflowY: 'auto', flex: 1, color: '#0f172a' }}>
               
               {/* Add New Slot Form */}
-              <div style={{ backgroundColor: '#f8fafc', padding: '1rem', borderRadius: '6px', border: '1px solid #cbd5e1', marginBottom: '1.5rem' }}>
-                <h5 style={{ margin: '0 0 1rem 0' }}>Add New Slot</h5>
+              <div style={{ backgroundColor: '#f8fafc', padding: '1.25rem', borderRadius: '8px', border: '1px solid #e2e8f0', marginBottom: '1.5rem' }}>
+                <h5 style={{ margin: '0 0 1rem 0', color: '#0f172a', fontWeight: 700, fontSize: '1rem' }}>Add New Slot</h5>
                 <form onSubmit={handleSlotSubmit} style={{ display: 'flex', flexWrap: 'wrap', gap: '1rem', alignItems: 'flex-end' }}>
                   <div style={{ flex: '1 1 150px' }}>
-                    <label style={{ display: 'block', fontSize: '0.8rem', fontWeight: 'bold', marginBottom: '0.2rem' }}>Date *</label>
-                    <input type="date" name="date" required value={slotFormData.date} onChange={handleSlotInputChange} style={{ width: '100%', padding: '0.4rem', border: '1px solid #cbd5e1', borderRadius: '4px' }} />
-                  </div>
-                  <div style={{ flex: '1 1 100px' }}>
-                    <label style={{ display: 'block', fontSize: '0.8rem', fontWeight: 'bold', marginBottom: '0.2rem' }}>Start Time *</label>
-                    <input type="time" name="startTime" required value={slotFormData.startTime} onChange={handleSlotInputChange} style={{ width: '100%', padding: '0.4rem', border: '1px solid #cbd5e1', borderRadius: '4px' }} />
-                  </div>
-                  <div style={{ flex: '1 1 100px' }}>
-                    <label style={{ display: 'block', fontSize: '0.8rem', fontWeight: 'bold', marginBottom: '0.2rem' }}>End Time *</label>
-                    <input type="time" name="endTime" required value={slotFormData.endTime} onChange={handleSlotInputChange} style={{ width: '100%', padding: '0.4rem', border: '1px solid #cbd5e1', borderRadius: '4px' }} />
-                  </div>
-                  <div style={{ flex: '1 1 150px' }}>
-                    <label style={{ display: 'block', fontSize: '0.8rem', fontWeight: 'bold', marginBottom: '0.2rem' }}>Location *</label>
-                    <input type="text" name="location" required placeholder="e.g. North Gate" value={slotFormData.location} onChange={handleSlotInputChange} style={{ width: '100%', padding: '0.4rem', border: '1px solid #cbd5e1', borderRadius: '4px' }} />
-                  </div>
-                  <div style={{ flex: '1 1 100px' }}>
-                    <label style={{ display: 'block', fontSize: '0.8rem', fontWeight: 'bold', marginBottom: '0.2rem' }}>Price (₹) *</label>
-                    <input type="number" name="price" required value={slotFormData.price} onChange={handleSlotInputChange} style={{ width: '100%', padding: '0.4rem', border: '1px solid #cbd5e1', borderRadius: '4px' }} />
-                  </div>
-                  <div style={{ flex: '1 1 100px' }}>
-                    <label style={{ display: 'block', fontSize: '0.8rem', fontWeight: 'bold', marginBottom: '0.2rem' }}>Total Slots *</label>
-                    <input type="number" name="totalSlots" min="1" required value={slotFormData.totalSlots} onChange={handleSlotInputChange} style={{ width: '100%', padding: '0.4rem', border: '1px solid #cbd5e1', borderRadius: '4px' }} />
-                  </div>
-                  <div style={{ flex: '1 1 140px' }}>
-                    <label style={{ display: 'block', fontSize: '0.8rem', fontWeight: 'bold', marginBottom: '0.2rem', color: '#047857' }}>Payment Deadline Date</label>
-                    <input type="date" name="paymentDeadlineDate" value={slotFormData.paymentDeadlineDate} onChange={handleSlotInputChange} style={{ width: '100%', padding: '0.4rem', border: '1px solid #a7f3d0', borderRadius: '4px', backgroundColor: '#ecfdf5' }} />
+                    <label style={{ display: 'block', fontSize: '0.82rem', fontWeight: 700, marginBottom: '0.3rem', color: '#1e293b' }}>Date *</label>
+                    <input type="date" name="date" required value={slotFormData.date} onChange={handleSlotInputChange} style={{ width: '100%', padding: '0.5rem', border: '1px solid #cbd5e1', borderRadius: '6px', color: '#0f172a', backgroundColor: '#ffffff', fontSize: '0.9rem' }} />
                   </div>
                   <div style={{ flex: '1 1 110px' }}>
-                    <label style={{ display: 'block', fontSize: '0.8rem', fontWeight: 'bold', marginBottom: '0.2rem', color: '#047857' }}>Deadline Time</label>
-                    <input type="time" name="paymentDeadlineTime" value={slotFormData.paymentDeadlineTime} onChange={handleSlotInputChange} style={{ width: '100%', padding: '0.4rem', border: '1px solid #a7f3d0', borderRadius: '4px', backgroundColor: '#ecfdf5' }} />
+                    <label style={{ display: 'block', fontSize: '0.82rem', fontWeight: 700, marginBottom: '0.3rem', color: '#1e293b' }}>Start Time *</label>
+                    <input type="time" name="startTime" required value={slotFormData.startTime} onChange={handleSlotInputChange} style={{ width: '100%', padding: '0.5rem', border: '1px solid #cbd5e1', borderRadius: '6px', color: '#0f172a', backgroundColor: '#ffffff', fontSize: '0.9rem' }} />
                   </div>
-                  <div style={{ flex: '1 1 140px' }}>
-                    <label style={{ display: 'block', fontSize: '0.8rem', fontWeight: 'bold', marginBottom: '0.2rem', color: '#047857' }}>Payment Window (Hrs)</label>
-                    <input type="number" name="paymentWindowHours" min="1" value={slotFormData.paymentWindowHours} onChange={handleSlotInputChange} style={{ width: '100%', padding: '0.4rem', border: '1px solid #a7f3d0', borderRadius: '4px', backgroundColor: '#ecfdf5' }} placeholder="e.g. 24" />
+                  <div style={{ flex: '1 1 110px' }}>
+                    <label style={{ display: 'block', fontSize: '0.82rem', fontWeight: 700, marginBottom: '0.3rem', color: '#1e293b' }}>End Time *</label>
+                    <input type="time" name="endTime" required value={slotFormData.endTime} onChange={handleSlotInputChange} style={{ width: '100%', padding: '0.5rem', border: '1px solid #cbd5e1', borderRadius: '6px', color: '#0f172a', backgroundColor: '#ffffff', fontSize: '0.9rem' }} />
                   </div>
-                  <div style={{ flex: '1 1 100%' }}>
-                    <button type="submit" style={{ width: '100%', padding: '0.5rem', backgroundColor: '#059669', color: 'white', border: 'none', borderRadius: '4px', cursor: 'pointer', fontWeight: 'bold' }}>
+                  <div style={{ flex: '1 1 150px' }}>
+                    <label style={{ display: 'block', fontSize: '0.82rem', fontWeight: 700, marginBottom: '0.3rem', color: '#1e293b' }}>Location *</label>
+                    <input type="text" name="location" required placeholder="e.g. North Gate" value={slotFormData.location} onChange={handleSlotInputChange} style={{ width: '100%', padding: '0.5rem', border: '1px solid #cbd5e1', borderRadius: '6px', color: '#0f172a', backgroundColor: '#ffffff', fontSize: '0.9rem' }} />
+                  </div>
+                  <div style={{ flex: '1 1 110px' }}>
+                    <label style={{ display: 'block', fontSize: '0.82rem', fontWeight: 700, marginBottom: '0.3rem', color: '#1e293b' }}>Price (₹) *</label>
+                    <input type="number" name="price" required value={slotFormData.price} onChange={handleSlotInputChange} style={{ width: '100%', padding: '0.5rem', border: '1px solid #cbd5e1', borderRadius: '6px', color: '#0f172a', backgroundColor: '#ffffff', fontSize: '0.9rem' }} />
+                  </div>
+                  <div style={{ flex: '1 1 110px' }}>
+                    <label style={{ display: 'block', fontSize: '0.82rem', fontWeight: 700, marginBottom: '0.3rem', color: '#1e293b' }}>Total Slots *</label>
+                    <input type="number" name="totalSlots" min="1" required value={slotFormData.totalSlots} onChange={handleSlotInputChange} style={{ width: '100%', padding: '0.5rem', border: '1px solid #cbd5e1', borderRadius: '6px', color: '#0f172a', backgroundColor: '#ffffff', fontSize: '0.9rem' }} />
+                  </div>
+                  <div style={{ flex: '1 1 150px' }}>
+                    <label style={{ display: 'block', fontSize: '0.82rem', fontWeight: 700, marginBottom: '0.3rem', color: '#047857' }}>Payment Deadline Date</label>
+                    <input type="date" name="paymentDeadlineDate" value={slotFormData.paymentDeadlineDate} onChange={handleSlotInputChange} style={{ width: '100%', padding: '0.5rem', border: '1px solid #a7f3d0', borderRadius: '6px', backgroundColor: '#ecfdf5', color: '#064e3b', fontSize: '0.9rem' }} />
+                  </div>
+                  <div style={{ flex: '1 1 120px' }}>
+                    <label style={{ display: 'block', fontSize: '0.82rem', fontWeight: 700, marginBottom: '0.3rem', color: '#047857' }}>Deadline Time</label>
+                    <input type="time" name="paymentDeadlineTime" value={slotFormData.paymentDeadlineTime} onChange={handleSlotInputChange} style={{ width: '100%', padding: '0.5rem', border: '1px solid #a7f3d0', borderRadius: '6px', backgroundColor: '#ecfdf5', color: '#064e3b', fontSize: '0.9rem' }} />
+                  </div>
+                  <div style={{ flex: '1 1 150px' }}>
+                    <label style={{ display: 'block', fontSize: '0.82rem', fontWeight: 700, marginBottom: '0.3rem', color: '#047857' }}>Payment Window (Hrs)</label>
+                    <input type="number" name="paymentWindowHours" min="1" value={slotFormData.paymentWindowHours} onChange={handleSlotInputChange} style={{ width: '100%', padding: '0.5rem', border: '1px solid #a7f3d0', borderRadius: '6px', backgroundColor: '#ecfdf5', color: '#064e3b', fontSize: '0.9rem' }} placeholder="e.g. 24" />
+                  </div>
+                  <div style={{ flex: '1 1 100%', marginTop: '0.5rem' }}>
+                    <button type="submit" style={{ width: '100%', padding: '0.65rem', backgroundColor: '#059669', color: 'white', border: 'none', borderRadius: '6px', cursor: 'pointer', fontWeight: 700, fontSize: '0.95rem', boxShadow: '0 2px 6px rgba(5, 150, 105, 0.3)' }}>
                       Add Slot
                     </button>
                   </div>
@@ -929,49 +929,49 @@ const AdminParks = () => {
               </div>
 
               {/* Existing Slots List */}
-              <h5>Existing Slots</h5>
+              <h5 style={{ color: '#0f172a', fontWeight: 700, fontSize: '1rem', margin: '1rem 0 0.75rem 0' }}>Existing Slots</h5>
               {parkSlots.length === 0 ? (
-                <p style={{ color: '#64748b', fontSize: '0.9rem' }}>No slots available for this park.</p>
+                <p style={{ color: '#64748b', fontSize: '0.92rem', margin: '0.5rem 0' }}>No slots available for this park.</p>
               ) : (
-                <div className="table-responsive">
-                  <table className="admin-table">
-                    <thead>
+                <div className="table-responsive" style={{ border: '1px solid #e2e8f0', borderRadius: '8px', overflow: 'hidden' }}>
+                  <table className="admin-table" style={{ width: '100%', borderCollapse: 'collapse', color: '#0f172a' }}>
+                    <thead style={{ backgroundColor: '#f1f5f9' }}>
                       <tr>
-                        <th>Date</th>
-                        <th>Time</th>
-                        <th>Location</th>
-                        <th>Price</th>
-                        <th>Payment Cutoff</th>
-                        <th>Status</th>
-                        <th>Action</th>
+                        <th style={{ padding: '0.75rem 1rem', color: '#334155', fontWeight: 700, textAlign: 'left', borderBottom: '1px solid #e2e8f0' }}>Date</th>
+                        <th style={{ padding: '0.75rem 1rem', color: '#334155', fontWeight: 700, textAlign: 'left', borderBottom: '1px solid #e2e8f0' }}>Time</th>
+                        <th style={{ padding: '0.75rem 1rem', color: '#334155', fontWeight: 700, textAlign: 'left', borderBottom: '1px solid #e2e8f0' }}>Location</th>
+                        <th style={{ padding: '0.75rem 1rem', color: '#334155', fontWeight: 700, textAlign: 'left', borderBottom: '1px solid #e2e8f0' }}>Price</th>
+                        <th style={{ padding: '0.75rem 1rem', color: '#334155', fontWeight: 700, textAlign: 'left', borderBottom: '1px solid #e2e8f0' }}>Payment Cutoff</th>
+                        <th style={{ padding: '0.75rem 1rem', color: '#334155', fontWeight: 700, textAlign: 'left', borderBottom: '1px solid #e2e8f0' }}>Status</th>
+                        <th style={{ padding: '0.75rem 1rem', color: '#334155', fontWeight: 700, textAlign: 'left', borderBottom: '1px solid #e2e8f0' }}>Action</th>
                       </tr>
                     </thead>
                     <tbody>
                       {parkSlots.map(slot => (
-                        <tr key={slot._id}>
-                          <td>{new Date(slot.date).toLocaleDateString()}</td>
-                          <td>{slot.startTime} - {slot.endTime}</td>
-                          <td>{slot.location}</td>
-                          <td>₹{slot.price}</td>
-                          <td>
+                        <tr key={slot._id} style={{ borderBottom: '1px solid #f1f5f9' }}>
+                          <td style={{ padding: '0.75rem 1rem', color: '#1e293b', fontWeight: 600 }}>{new Date(slot.date).toLocaleDateString()}</td>
+                          <td style={{ padding: '0.75rem 1rem', color: '#334155' }}>{slot.startTime} - {slot.endTime}</td>
+                          <td style={{ padding: '0.75rem 1rem', color: '#334155' }}>{slot.location}</td>
+                          <td style={{ padding: '0.75rem 1rem', color: '#059669', fontWeight: 700 }}>₹{slot.price}</td>
+                          <td style={{ padding: '0.75rem 1rem' }}>
                             <div style={{ fontSize: '0.8rem', color: '#047857', fontWeight: 600 }}>
                               {slot.paymentDeadlineDate 
                                 ? `${new Date(slot.paymentDeadlineDate).toLocaleDateString()} ${slot.paymentDeadlineTime || ''}` 
                                 : `Within ${slot.paymentWindowHours || 24}h of approval`}
                             </div>
                           </td>
-                          <td>
-                            <span style={{ padding: '2px 6px', borderRadius: '4px', fontSize: '0.8rem', backgroundColor: slot.isAvailable ? '#dcfce7' : '#f1f5f9', color: slot.isAvailable ? '#16a34a' : '#64748b', fontWeight: 'bold' }}>
+                          <td style={{ padding: '0.75rem 1rem' }}>
+                            <span style={{ padding: '4px 8px', borderRadius: '4px', fontSize: '0.78rem', backgroundColor: slot.isAvailable ? '#dcfce7' : '#f1f5f9', color: slot.isAvailable ? '#16a34a' : '#64748b', fontWeight: 700 }}>
                               {slot.totalSlots !== undefined 
                                 ? `${slot.availableSlots} / ${slot.totalSlots} Available` 
                                 : (slot.isAvailable ? 'Available' : 'Booked')}
                             </span>
                           </td>
-                          <td>
+                          <td style={{ padding: '0.75rem 1rem' }}>
                             <button 
                               onClick={() => handleDeleteStallSlot(slot._id)}
                               disabled={!slot.isAvailable}
-                              style={{ background: 'none', border: 'none', color: slot.isAvailable ? '#ef4444' : '#cbd5e1', cursor: slot.isAvailable ? 'pointer' : 'not-allowed' }}
+                              style={{ background: 'none', border: 'none', color: slot.isAvailable ? '#ef4444' : '#cbd5e1', cursor: slot.isAvailable ? 'pointer' : 'not-allowed', padding: '4px' }}
                             >
                               <Trash2 size={16} />
                             </button>

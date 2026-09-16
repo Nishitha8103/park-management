@@ -9,7 +9,7 @@ const userSchema = new mongoose.Schema({
   role: { 
     type: String, 
     required: true,
-    enum: ['Admin', 'Contractor', 'Government Official', 'Public', 'public_user', 'official', 'government_official', 'Planting Staff']
+    enum: ['Admin', 'Contractor', 'Government Official', 'Public', 'public_user', 'official', 'government_official', 'Planting Staff', 'Park Staff', 'Security', 'Park Security']
   },
   assignedParks: [{ type: mongoose.Schema.Types.ObjectId, ref: 'Park' }],
   phone: { type: String },
@@ -19,8 +19,24 @@ const userSchema = new mongoose.Schema({
   district: { type: mongoose.Schema.Types.ObjectId, ref: 'District' },
   googleId: { type: String, default: null },
   profilePic: { type: String, default: null },
+  availabilityStatus: { 
+    type: String, 
+    enum: ['Available', 'On Leave', 'Unavailable'], 
+    default: 'Available' 
+  },
   resetPasswordOtp: { type: String, default: null },
-  resetPasswordOtpExpires: { type: Date, default: null }
+  resetPasswordOtpExpires: { type: Date, default: null },
+  // KYC fields (document upload based)
+  aadhaarNumber: { type: String, default: null },        // 12-digit Aadhaar (stored masked)
+  aadhaarKycStatus: {
+    type: String,
+    enum: ['not_started', 'pending', 'verified', 'rejected'],
+    default: 'not_started'
+  },
+  aadhaarFrontImage: { type: String, default: null },    // path to Aadhaar front photo
+  aadhaarBackImage:  { type: String, default: null },    // path to Aadhaar back photo
+  aadhaarKycRejectionReason: { type: String, default: null }, // admin rejection note
+  aadhaarKycReviewedAt: { type: Date, default: null }    // when admin acted
 }, { timestamps: true });
 
 // Match user entered password to hashed password in database

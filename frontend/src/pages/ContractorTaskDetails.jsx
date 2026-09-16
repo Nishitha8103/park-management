@@ -1,8 +1,10 @@
 import { useEffect, useState } from 'react';
 import { useParams, Link, useNavigate } from 'react-router-dom';
-import { Menu, LogOut, ArrowLeft, User, Calendar, MapPin, Paperclip, Hourglass, Edit, Play, HardHat, FileText, Bell, Phone, Clock, AlertTriangle, CheckCircle, Tag, ExternalLink, Eye, ShieldAlert, Wrench, X } from 'lucide-react';
+import { Menu, LogOut, ArrowLeft, User, Calendar, MapPin, Paperclip, Hourglass, Edit, Play, HardHat, FileText, Bell, Phone, Clock, AlertTriangle, CheckCircle, Tag, ExternalLink, Eye, ShieldAlert, Wrench, X, RotateCcw } from 'lucide-react';
 import './ContractorTaskDetails.css';
 import ContractorSidebar from '../components/ContractorSidebar';
+import RequestReassignmentModal from '../components/RequestReassignmentModal';
+import AssignmentHistoryTimeline from '../components/AssignmentHistoryTimeline';
 import { getSlaStatusAndRemaining } from '../utils/slaUtils';
 
 const ContractorTaskDetails = () => {
@@ -15,20 +17,25 @@ const ContractorTaskDetails = () => {
   const [loading, setLoading] = useState(true);
   const [showImageModal, setShowImageModal] = useState(false);
   const [showRejectModal, setShowRejectModal] = useState(false);
+  const [showReassignModal, setShowReassignModal] = useState(false);
   const [rejectionReason, setRejectionReason] = useState('');
 
   useEffect(() => {
     const storedUser = localStorage.getItem('contractorUser');
     if (!storedUser) {
-      navigate('/contractor/login');
-    } else {
-      setContractor(JSON.parse(storedUser));
+      navigate('/login');
+      return;
     }
-  }, [navigate]);
+    try {
+      const user = JSON.parse(storedUser);
+      setContractor(user);
+    } catch (e) {
+      console.error(e);
+      navigate('/login');
+      return;
+    }
 
-  useEffect(() => {
-    const contractorId = contractor?.id || contractor?._id;
-    if (contractorId && id) {
+    if (id) {
       const fetchTask = async () => {
         try {
           const res = await fetch(`/api/complaints/${id}`);
@@ -55,6 +62,12 @@ const ContractorTaskDetails = () => {
               assignedBy: 'Admin',
               description: c.description,
               status: c.status,
+              reassignmentStatus: c.reassignmentStatus || 'None',
+              reassignmentReason: c.reassignmentReason || '',
+              reassignmentExplanation: c.reassignmentExplanation || '',
+              reassignmentAttachment: c.reassignmentAttachment || '',
+              assignmentHistory: c.assignmentHistory || [],
+              rawComplaint: c,
               rejectionReason: c.rejectionReason || '',
               progress: (() => {
                 if (['Completed', 'Completed - Waiting for Admin Review', 'Inspection Pending', 'Inspection Approved', 'Verified', 'Closed'].includes(c.status)) return 100;
@@ -80,14 +93,18 @@ const ContractorTaskDetails = () => {
         }
       };
       fetchTask();
+    } else {
+      setLoading(false);
     }
-  }, [contractor, id]);
+  }, [id, navigate]);
 
   const toggleSidebar = () => setIsSidebarOpen(!isSidebarOpen);
 
   const handleLogout = () => {
     localStorage.removeItem('contractorUser');
-    navigate('/contractor/login');
+    localStorage.removeItem('user');
+    localStorage.removeItem('token');
+    navigate('/login');
   };
 
   const acceptTask = async () => {
@@ -381,6 +398,24 @@ const ContractorTaskDetails = () => {
                   <p className="desc-card-body">{task.description || "No detailed description was provided by the reporter."}</p>
                 </div>
 
+                {/* Reassignment Pending Banner */}
+                {(task.status === 'Reassignment Requested' || task.reassignmentStatus === 'Reassignment Requested') && (
+                  <div style={{ background: '#fffbeb', border: '1px solid #fde68a', borderRadius: '10px', padding: '1rem 1.25rem', marginBottom: '1.25rem', display: 'flex', alignItems: 'flex-start', gap: '12px' }}>
+                    <RotateCcw size={24} color="#d97706" style={{ marginTop: '2px', flexShrink: 0 }} />
+                    <div style={{ flex: 1 }}>
+                      <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '4px' }}>
+                        <span style={{ fontWeight: 'bold', color: '#92400e', fontSize: '0.95rem' }}>Reassignment Request Pending Review</span>
+                        <span style={{ backgroundColor: '#d97706', color: 'white', fontSize: '0.7rem', padding: '2px 6px', borderRadius: '10px', fontWeight: 'bold' }}>PENDING ADMIN</span>
+                      </div>
+                      <p style={{ margin: 0, fontSize: '0.85rem', color: '#78350f' }}>
+                        You submitted a request to reassign this task. <strong>Reason:</strong> {task.reassignmentReason || 'On Leave / Unavailable'}.
+                        {task.reassignmentExplanation && ` Note: "${task.reassignmentExplanation}"`}. 
+                        Administrator review is in progress.
+                      </p>
+                    </div>
+                  </div>
+                )}
+
                 {/* Progress & Action Container */}
                 <div className="task-action-card">
                   <div className="action-card-header">
@@ -396,18 +431,44 @@ const ContractorTaskDetails = () => {
                   
                   <div className="action-buttons-row">
                     {['Assigned', 'Reassigned to Contractor', 'assigned', 'reassigned to contractor'].includes(task.status) ? (
-                      <div style={{ display: 'flex', gap: '10px', width: '100%' }}>
-                        <button className="btn-action-primary accept" onClick={acceptTask} style={{ flex: 1 }}>
-                          <Play size={18} /> Accept Task
-                        </button>
-                        <button className="btn-action-secondary reject" onClick={() => setShowRejectModal(true)} style={{ flex: 1, backgroundColor: '#fef2f2', color: '#dc2626', border: '1px solid #fecaca', cursor: 'pointer', borderRadius: '8px', padding: '12px', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '8px', fontWeight: 'bold' }}>
-                          <X size={18} /> Decline Task
-                        </button>
+                      <div style={{ display: 'flex', flexDirection: 'column', gap: '10px', width: '100%' }}>
+                        <div style={{ display: 'flex', gap: '10px', width: '100%' }}>
+                          <button className="btn-action-primary accept" onClick={acceptTask} style={{ flex: 1 }}>
+                            <Play size={18} /> Accept Task
+                          </button>
+                          <button 
+                            type="button"
+                            className="btn-action-secondary"
+                            onClick={() => setShowReassignModal(true)}
+                            style={{ flex: 1, backgroundColor: '#fffbeb', color: '#b45309', border: '1px solid #fde68a', cursor: 'pointer', borderRadius: '8px', padding: '12px', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '8px', fontWeight: 'bold' }}
+                          >
+                            <RotateCcw size={18} /> Cannot Complete Task
+                          </button>
+                        </div>
                       </div>
                     ) : ['In Progress', 'Returned by Admin', 'Rework Required'].includes(task.status) ? (
-                      <Link to={`/contractor/progress/${task.id}`} className="btn-action-primary progress-btn">
-                        <Edit size={18} /> Start & Update Work Progress
-                      </Link>
+                      <div style={{ display: 'flex', flexDirection: 'column', gap: '10px', width: '100%' }}>
+                        <div style={{ display: 'flex', gap: '10px', width: '100%' }}>
+                          <Link to={`/contractor/progress/${task.id}`} className="btn-action-primary progress-btn" style={{ flex: 2 }}>
+                            <Edit size={18} /> Update Work Progress
+                          </Link>
+                          <button 
+                            type="button"
+                            className="btn-action-secondary"
+                            onClick={() => setShowReassignModal(true)}
+                            style={{ flex: 1, backgroundColor: '#fffbeb', color: '#b45309', border: '1px solid #fde68a', cursor: 'pointer', borderRadius: '8px', padding: '12px', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '8px', fontWeight: 'bold' }}
+                          >
+                            <RotateCcw size={18} /> Cannot Complete
+                          </button>
+                        </div>
+                      </div>
+                    ) : task.status === 'Reassignment Requested' ? (
+                      <div style={{ width: '100%' }}>
+                        <div className="completion-badge-full" style={{ backgroundColor: '#fffbeb', color: '#b45309', border: '1px solid #fde68a' }}>
+                          <RotateCcw size={20} />
+                          <span>Reassignment Requested — Awaiting Admin</span>
+                        </div>
+                      </div>
                     ) : task.status === 'Rejected by Contractor' ? (
                       <div style={{ width: '100%' }}>
                         <div className="completion-badge-full" style={{ backgroundColor: '#fef2f2', color: '#dc2626', border: '1px solid #fecaca' }}>
@@ -443,9 +504,30 @@ const ContractorTaskDetails = () => {
 
             </div>
 
+            {/* Assignment & Reassignment Audit Trail Timeline */}
+            <AssignmentHistoryTimeline 
+              history={task.assignmentHistory} 
+              currentAssignee={contractor?.name} 
+              currentRole="contractor" 
+              initialAssignedDate={task.assignedOn} 
+            />
+
           </div>
         </div>
       </div>
+
+      {/* Request Reassignment Modal */}
+      <RequestReassignmentModal
+        isOpen={showReassignModal}
+        onClose={() => setShowReassignModal(false)}
+        task={task.rawComplaint || { _id: task._id, complaintNumber: task.id, category: task.issueTitle, parkName: task.parkName }}
+        user={contractor}
+        userRole="contractor"
+        onSuccess={() => {
+          alert('Reassignment request submitted successfully to Administrator.');
+          window.location.reload();
+        }}
+      />
 
       {/* Image Modal Lightbox */}
       {showImageModal && (
@@ -501,3 +583,4 @@ const ContractorTaskDetails = () => {
 };
 
 export default ContractorTaskDetails;
+

@@ -1,34 +1,115 @@
-/* Uses base styles from Sidebar.css but with admin specific tweaks */
+/* ====================================================
+   ADMIN SIDEBAR — Dark Professional Theme
+   ==================================================== */
+
+/* Override base sidebar colors for admin */
 .admin-sidebar {
-  background-color: #111827;
-  color: #f3f4f6;
+  background: #111628 !important;
+  color: #A8B0C8;
+  border-right: 1px solid rgba(255,255,255,0.05);
+  box-shadow: 4px 0 20px rgba(0,0,0,0.3);
 }
 
-.admin-sidebar .nav-item {
-  color: #d1d5db;
-}
-
-.admin-sidebar .nav-item:hover, 
-.admin-sidebar .nav-item.active {
-  background-color: #3730a3;
-  color: white;
-}
-
+/* Admin Profile Section */
 .admin-profile {
-  background-color: #1f2937 !important;
-  border-bottom: 1px solid #374151 !important;
+  background: rgba(79,111,245,0.06) !important;
+  border-bottom: 1px solid rgba(255,255,255,0.06) !important;
+  padding: 1.25rem 1.1rem !important;
+  margin-bottom: 0.5rem !important;
 }
 
 .admin-profile .avatar {
-  background-color: #e0e7ff;
+  background: linear-gradient(135deg, #4F6FF5, #6C7CFF) !important;
+  color: #fff;
 }
 
+.admin-profile .user-name {
+  color: #F0F4FF !important;
+  font-weight: 600;
+  font-size: 0.92rem;
+}
+
+.admin-profile .user-role {
+  color: #4F6FF5 !important;
+  opacity: 1 !important;
+  font-size: 0.78rem;
+  font-weight: 600;
+}
+
+/* Section Group Labels */
+.admin-sidebar .adm-nav-group-label {
+  font-size: 0.68rem;
+  font-weight: 700;
+  color: #555D75;
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+  padding: 1rem 1.15rem 0.35rem;
+  margin: 0;
+  user-select: none;
+}
+
+/* Navigation Items */
+.admin-sidebar .nav-item {
+  color: #A8B0C8;
+  padding: 0.6rem 1rem;
+  border-radius: 8px;
+  font-size: 0.875rem;
+  font-weight: 500;
+  margin: 1px 0;
+  transition: all 0.18s ease;
+  position: relative;
+}
+
+.admin-sidebar .nav-item:hover {
+  background: rgba(79,111,245,0.1);
+  color: #C8D0F0;
+}
+
+.admin-sidebar .nav-item.active {
+  background: rgba(79,111,245,0.18) !important;
+  color: #fff !important;
+  font-weight: 600;
+  box-shadow: inset 3px 0 0 #4F6FF5;
+}
+
+.admin-sidebar .nav-item.active svg {
+  color: #4F6FF5;
+}
+
+/* Divider */
 .nav-divider {
   height: 1px;
-  background-color: #374151;
-  margin: 1rem 0;
+  background: rgba(255,255,255,0.05);
+  margin: 0.75rem 0.75rem;
 }
 
-.admin-sidebar .logout:hover {
-  background-color: #fee2e2 !important;
+/* Logout item */
+.admin-sidebar .nav-item.logout {
+  margin-top: 0.5rem;
+}
+
+.admin-sidebar .nav-item.logout:hover {
+  background: rgba(255,92,103,0.12) !important;
+}
+
+.admin-sidebar .nav-item.logout span {
+  color: #FF5C67 !important;
+}
+
+/* Scrollbar styling for sidebar */
+.admin-sidebar::-webkit-scrollbar {
+  width: 4px;
+}
+
+.admin-sidebar::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+.admin-sidebar::-webkit-scrollbar-thumb {
+  background: rgba(255,255,255,0.08);
+  border-radius: 4px;
+}
+
+.admin-sidebar::-webkit-scrollbar-thumb:hover {
+  background: rgba(255,255,255,0.14);
 }

@@ -110,18 +110,73 @@ const createComplaint = async (req, res) => {
 
     await complaint.save();
 
-    // Create Notification for Admin
+    // 1. Create Notification for Citizen if registered user
+    const citizenUserId = (req.user ? req.user._id : undefined) || (userId ? userId : undefined);
+    if (citizenUserId) {
+      await Notification.create({
+        recipientUserId: citizenUserId.toString(),
+        recipientRole: 'citizen',
+        title: '🔔 Complaint Submitted',
+        message: `Your complaint for ${(category || 'maintenance').toLowerCase()} at ${parkName || 'the park'} has been submitted. Ticket #${complaintNumber}.`,
+        type: 'Complaint Submitted',
+        category: 'Complaint',
+        priority: 'NORMAL',
+        relatedEntityType: 'COMPLAINT',
+        relatedEntityId: complaint._id.toString(),
+        actionRoute: '/track-complaint'
+      });
+    }
+
+    // 2. Create Notification for Admin
     await Notification.create({
       recipientUserId: 'ADMIN_ALL',
       recipientRole: 'admin',
-      title: 'New Complaint Submitted',
+      title: '🔔 New Complaint Submitted',
       message: `A new complaint (${complaintNumber}) has been submitted for ${parkName || 'Park'}.`,
       type: 'Complaint Submitted',
-      category: 'Complaints',
+      category: 'Complaint',
       priority: 'NORMAL',
       relatedEntityType: 'COMPLAINT',
-      relatedEntityId: complaint._id
+      relatedEntityId: complaint._id.toString(),
+      actionRoute: '/admin-dashboard/complaints'
     });
+
+    // 3. Trigger Maintenance Alert for responsible Contractor if park has assigned contractor
+    if (targetParkId) {
+      const parkDoc = await Park.findById(targetParkId).populate('contractor').populate('governmentOfficial');
+      if (parkDoc) {
+        if (parkDoc.contractor) {
+          const contractorId = parkDoc.contractor._id ? parkDoc.contractor._id.toString() : parkDoc.contractor.toString();
+          await Notification.create({
+            recipientUserId: contractorId,
+            recipientRole: 'contractor',
+            title: '🔔 Maintenance Alert',
+            message: `${category || 'Asset'} at ${parkName || parkDoc.name || 'Park'} requires repair. Ticket #${complaintNumber}.`,
+            type: 'Maintenance Alert',
+            category: 'Maintenance',
+            priority: finalPriority === 'Urgent' || finalPriority === 'High' ? 'URGENT' : 'HIGH',
+            relatedEntityType: 'TASK',
+            relatedEntityId: complaint._id.toString(),
+            actionRoute: '/contractor/tasks'
+          });
+        }
+        if (parkDoc.governmentOfficial) {
+          const officialId = parkDoc.governmentOfficial._id ? parkDoc.governmentOfficial._id.toString() : parkDoc.governmentOfficial.toString();
+          await Notification.create({
+            recipientUserId: officialId,
+            recipientRole: 'official',
+            title: '🔔 New Complaint Submitted',
+            message: `New complaint (${complaintNumber}) submitted for ${parkName || parkDoc.name || 'Park'} (${category}).`,
+            type: 'Complaint Submitted',
+            category: 'Complaint',
+            priority: 'NORMAL',
+            relatedEntityType: 'COMPLAINT',
+            relatedEntityId: complaint._id.toString(),
+            actionRoute: '/gov-dashboard/complaints'
+          });
+        }
+      }
+    }
 
     res.status(201).json(complaint);
   } catch (error) {
@@ -247,6 +302,27 @@ const updateComplaint = async (req, res) => {
       return res.status(404).json({ message: 'Complaint not found' });
     }
 
+    // Prevent assignment if the Contractor is On Leave / Unavailable
+    if (updateData.assignedContractor && String(updateData.assignedContractor) !== String(existingComplaint.assignedContractor || '')) {
+      const Contractor = require('../models/Contractor');
+      const targetContractor = await Contractor.findById(updateData.assignedContractor).lean();
+      if (targetContractor && (targetContractor.availabilityStatus === 'On Leave' || targetContractor.availabilityStatus === 'Unavailable')) {
+        return res.status(400).json({
+          message: `Cannot assign task to ${targetContractor.name}. Contractor is currently On Leave or Unavailable.`
+        });
+      }
+    }
+
+    // Prevent assignment if Government Official is On Leave / Unavailable
+    if (updateData.assignedOfficial && String(updateData.assignedOfficial) !== String(existingComplaint.assignedOfficial || '')) {
+      const targetOfficial = await User.findById(updateData.assignedOfficial).lean();
+      if (targetOfficial && (targetOfficial.availabilityStatus === 'On Leave' || targetOfficial.availabilityStatus === 'Unavailable')) {
+        return res.status(400).json({
+          message: `Cannot assign task to ${targetOfficial.name}. Government Official is currently On Leave or Unavailable.`
+        });
+      }
+    }
+
     if (updateData.status === 'Assigned' && !existingComplaint.assignedAt) {
       updateData.assignedAt = new Date();
     }
@@ -264,52 +340,178 @@ const updateComplaint = async (req, res) => {
 
     const complaint = await Complaint.findByIdAndUpdate(id, updateData, { new: true });
 
-    // Auto trigger notification on status transition
+    // 1. Handle Contractor Assignment & Reassignment
+    if (updateData.assignedContractor && String(updateData.assignedContractor) !== String(existingComplaint.assignedContractor || '')) {
+      const newContractorId = updateData.assignedContractor.toString();
+      const oldContractorId = existingComplaint.assignedContractor ? existingComplaint.assignedContractor.toString() : null;
+
+      // If reassigning from an existing contractor
+      if (oldContractorId && oldContractorId !== newContractorId) {
+        await Notification.create({
+          recipientUserId: oldContractorId,
+          recipientRole: 'contractor',
+          title: '🔄 Task Reassigned',
+          message: `Complaint #${complaint.complaintNumber} (${complaint.parkName || 'Park'}) has been reassigned by Admin to another contractor.`,
+          type: 'Task Reassigned',
+          category: 'Assigned Tasks',
+          priority: 'NORMAL',
+          relatedEntityType: 'TASK',
+          relatedEntityId: complaint._id.toString(),
+          actionRoute: '/contractor/tasks'
+        });
+
+        await Notification.create({
+          recipientUserId: newContractorId,
+          recipientRole: 'contractor',
+          title: '🔄 Task Reassigned to You',
+          message: `Reassigned maintenance task: ${complaint.category || 'Maintenance'} at ${complaint.parkName || 'Park'}. Ticket #${complaint.complaintNumber}.`,
+          type: 'New Task Assigned',
+          category: 'Assigned Tasks',
+          priority: 'HIGH',
+          relatedEntityType: 'TASK',
+          relatedEntityId: complaint._id.toString(),
+          actionRoute: '/contractor/tasks'
+        });
+      } else {
+        // First-time assignment
+        await Notification.create({
+          recipientUserId: newContractorId,
+          recipientRole: 'contractor',
+          title: '🔔 New Task Assigned',
+          message: `New maintenance task assigned to you: ${complaint.category || 'Maintenance'} at ${complaint.parkName || 'Park'} (Ticket #${complaint.complaintNumber}).`,
+          type: 'New Task Assigned',
+          category: 'Assigned Tasks',
+          priority: 'HIGH',
+          relatedEntityType: 'TASK',
+          relatedEntityId: complaint._id.toString(),
+          actionRoute: '/contractor/tasks'
+        });
+      }
+
+      // Also deliver Maintenance Alert
+      await Notification.create({
+        recipientUserId: newContractorId,
+        recipientRole: 'contractor',
+        title: '🔔 Maintenance Alert',
+        message: `${complaint.category || 'Asset'} at ${complaint.parkName || 'Park'} requires repair. Ticket #${complaint.complaintNumber}.`,
+        type: 'Maintenance Alert',
+        category: 'Maintenance',
+        priority: 'HIGH',
+        relatedEntityType: 'TASK',
+        relatedEntityId: complaint._id.toString(),
+        actionRoute: '/contractor/tasks'
+      });
+
+      // Notify citizen that complaint is assigned
+      if (complaint.user) {
+        await Notification.create({
+          recipientUserId: complaint.user.toString(),
+          recipientRole: 'citizen',
+          title: '🔔 Complaint Status Updated',
+          message: `Your complaint #${complaint.complaintNumber} has been assigned to a maintenance contractor.`,
+          type: 'Complaint Status Updated',
+          category: 'Complaint',
+          priority: 'NORMAL',
+          relatedEntityType: 'COMPLAINT',
+          relatedEntityId: complaint._id.toString(),
+          actionRoute: '/track-complaint'
+        });
+      }
+    }
+
+    // 2. Auto trigger notifications on status transitions
     if (updateData.status && updateData.status !== existingComplaint.status) {
       const { status } = updateData;
 
-      if (status === 'Assigned') {
-        if (updateData.assignedContractor || existingComplaint.assignedContractor) {
-          const cid = updateData.assignedContractor || existingComplaint.assignedContractor;
+      // Status -> In Progress (Contractor starts work)
+      if (status === 'In Progress' || status === 'in-progress') {
+        let citizenUserId = complaint.user;
+        if (!citizenUserId && (complaint.userPhone || complaint.userName)) {
+          const citizenUser = await User.findOne({
+            role: { $in: ['Public', 'Public User', 'public_user', 'citizen'] },
+            $or: [
+              ...(complaint.userPhone ? [{ phone: complaint.userPhone }] : []),
+              ...(complaint.userName ? [{ name: new RegExp(`^${complaint.userName.trim()}$`, 'i') }] : [])
+            ]
+          });
+          if (citizenUser) citizenUserId = citizenUser._id;
+        }
+
+        if (citizenUserId) {
           await Notification.create({
-            recipientUserId: cid.toString(),
-            recipientRole: 'contractor',
-            title: 'New Maintenance Task',
-            message: `New maintenance task assigned to you for Complaint #${complaint.complaintNumber}.`,
-            type: 'Task Assigned',
-            category: 'Assigned Tasks',
-            priority: 'HIGH',
-            relatedEntityType: 'TASK',
-            relatedEntityId: complaint._id
+            recipientUserId: citizenUserId.toString(),
+            recipientRole: 'citizen',
+            title: '🔔 Complaint Status Updated',
+            message: 'Your complaint has been marked “In Progress.”',
+            type: 'Complaint Status Updated',
+            category: 'Complaint',
+            priority: 'NORMAL',
+            relatedEntityType: 'COMPLAINT',
+            relatedEntityId: complaint._id.toString(),
+            actionRoute: '/track-complaint'
           });
         }
+
+        await Notification.create({
+          recipientUserId: 'ADMIN_ALL',
+          recipientRole: 'admin',
+          title: '🔔 Work In Progress',
+          message: `Contractor started work on Complaint #${complaint.complaintNumber} at ${complaint.parkName || 'Park'}.`,
+          type: 'Work In Progress',
+          category: 'Complaint',
+          priority: 'NORMAL',
+          relatedEntityType: 'COMPLAINT',
+          relatedEntityId: complaint._id.toString(),
+          actionRoute: '/admin-dashboard/complaints'
+        });
+      }
+      // Status -> Completed - Waiting for Admin Review
+      else if (status === 'Completed - Waiting for Admin Review') {
         if (complaint.user) {
           await Notification.create({
             recipientUserId: complaint.user.toString(),
             recipientRole: 'citizen',
-            title: 'Complaint Assigned',
-            message: `Your complaint #${complaint.complaintNumber} has been assigned to a maintenance contractor.`,
-            type: 'Complaint Assigned',
-            category: 'My Complaints',
+            title: '🔔 Complaint Status Updated',
+            message: `Work on your complaint #${complaint.complaintNumber} has been completed and is under verification.`,
+            type: 'Complaint Status Updated',
+            category: 'Complaint',
             priority: 'NORMAL',
             relatedEntityType: 'COMPLAINT',
-            relatedEntityId: complaint._id
+            relatedEntityId: complaint._id.toString(),
+            actionRoute: '/track-complaint'
           });
         }
-      } else if (status === 'Completed - Waiting for Admin Review') {
+
         await Notification.create({
           recipientUserId: 'ADMIN_ALL',
           recipientRole: 'admin',
-          title: 'Verification Required',
+          title: '🔔 Verification Required',
           message: `Maintenance work for Complaint #${complaint.complaintNumber} is waiting for verification.`,
           type: 'Work Completed',
           category: 'Verification',
           priority: 'NORMAL',
           relatedEntityType: 'COMPLAINT',
-          relatedEntityId: complaint._id
+          relatedEntityId: complaint._id.toString(),
+          actionRoute: '/admin-dashboard/inspections'
         });
-      } else if (['Inspection Approved', 'Verified', 'Closed', 'Resolved'].includes(status)) {
-        // Resolve the citizen user ID - look up by phone/name if complaint.user is missing
+
+        if (complaint.assignedOfficial) {
+          await Notification.create({
+            recipientUserId: complaint.assignedOfficial.toString(),
+            recipientRole: 'official',
+            title: '🔔 Verification Required',
+            message: `Contractor completed work for Complaint #${complaint.complaintNumber} at ${complaint.parkName || 'Park'}. Inspection verification required.`,
+            type: 'Work Completed',
+            category: 'Verification',
+            priority: 'HIGH',
+            relatedEntityType: 'COMPLAINT',
+            relatedEntityId: complaint._id.toString(),
+            actionRoute: `/gov-dashboard/verify-work/${complaint._id}`
+          });
+        }
+      }
+      // Status -> Resolved / Closed / Inspection Approved / Verified
+      else if (['Inspection Approved', 'Verified', 'Closed', 'Resolved'].includes(status)) {
         let citizenUserId = complaint.user;
         if (!citizenUserId && (complaint.userPhone || complaint.userName)) {
           const lookupQuery = [];
@@ -322,7 +524,6 @@ const updateComplaint = async (req, res) => {
             });
             if (citizenUser) {
               citizenUserId = citizenUser._id;
-              // Also fix the complaint record for the future
               await Complaint.findByIdAndUpdate(complaint._id, { user: citizenUser._id });
             }
           }
@@ -332,80 +533,107 @@ const updateComplaint = async (req, res) => {
           await Notification.create({
             recipientUserId: citizenUserId.toString(),
             recipientRole: 'citizen',
-            title: 'Complaint Resolved ✅',
-            message: `Your reported ${complaint.category.toLowerCase()} issue has been fixed.`,
+            title: '✅ Complaint Resolved',
+            message: 'Your complaint has been successfully resolved.',
             type: 'Complaint Resolved',
-            category: 'My Complaints',
+            category: 'Complaint',
             priority: 'NORMAL',
             relatedEntityType: 'COMPLAINT',
-            relatedEntityId: complaint._id
+            relatedEntityId: complaint._id.toString(),
+            actionRoute: '/track-complaint'
           });
           
           // Feedback reminder
           await Notification.create({
             recipientUserId: citizenUserId.toString(),
             recipientRole: 'citizen',
-            title: 'Feedback Requested',
-            message: `Your reported ${complaint.category.toLowerCase()} issue was resolved. Please share your feedback!`,
+            title: '⭐ Feedback Requested',
+            message: `Your reported ${(complaint.category || 'maintenance').toLowerCase()} issue was resolved. Please share your feedback!`,
             type: 'Feedback Reminder',
             category: 'Feedback',
             priority: 'LOW',
             relatedEntityType: 'COMPLAINT',
-            relatedEntityId: complaint._id
+            relatedEntityId: complaint._id.toString(),
+            actionRoute: '/feedback'
           });
         }
-        if (complaint.assignedContractor && ['Verified', 'Inspection Approved'].includes(status)) {
+
+        if (complaint.assignedContractor && ['Verified', 'Inspection Approved', 'Resolved'].includes(status)) {
           await Notification.create({
             recipientUserId: complaint.assignedContractor.toString(),
             recipientRole: 'contractor',
-            title: 'Work Verified',
-            message: `Your completed maintenance work for #${complaint.complaintNumber} has been verified by Admin.`,
+            title: '🔔 Work Verified',
+            message: `Your completed maintenance work for #${complaint.complaintNumber} has been verified and approved.`,
             type: 'Work Verified',
             category: 'Verification',
             priority: 'NORMAL',
             relatedEntityType: 'TASK',
-            relatedEntityId: complaint._id
+            relatedEntityId: complaint._id.toString(),
+            actionRoute: '/contractor/tasks'
           });
         }
-      } else if (['Returned by Admin', 'Rework Required'].includes(status)) {
+      }
+      // Status -> Rework Required / Returned by Admin
+      else if (['Returned by Admin', 'Rework Required'].includes(status)) {
         if (complaint.assignedContractor) {
           await Notification.create({
             recipientUserId: complaint.assignedContractor.toString(),
             recipientRole: 'contractor',
-            title: 'Work Rejected - Rework Required',
-            message: `Your submitted maintenance work for #${complaint.complaintNumber} requires rework. Please review admin remarks.`,
+            title: '🚨 Work Rejected - Rework Required',
+            message: `Your submitted maintenance work for #${complaint.complaintNumber} requires rework. Reason: ${complaint.rejectionReason || 'Please check remarks.'}`,
             type: 'Rework Required',
             category: 'Verification',
             priority: 'HIGH',
             relatedEntityType: 'TASK',
-            relatedEntityId: complaint._id
+            relatedEntityId: complaint._id.toString(),
+            actionRoute: '/contractor/tasks'
           });
         }
-      } else if (status === 'Rejected by Contractor') {
+        if (complaint.user) {
+          await Notification.create({
+            recipientUserId: complaint.user.toString(),
+            recipientRole: 'citizen',
+            title: '🔔 Complaint Status Updated',
+            message: `Your complaint #${complaint.complaintNumber} is undergoing further maintenance rework.`,
+            type: 'Complaint Status Updated',
+            category: 'Complaint',
+            priority: 'NORMAL',
+            relatedEntityType: 'COMPLAINT',
+            relatedEntityId: complaint._id.toString(),
+            actionRoute: '/track-complaint'
+          });
+        }
+      }
+      // Status -> Rejected by Contractor
+      else if (status === 'Rejected by Contractor') {
         await Notification.create({
           recipientUserId: 'ADMIN_ALL',
           recipientRole: 'admin',
-          title: 'Task Rejected by Contractor',
-          message: `Contractor has rejected Complaint #${complaint.complaintNumber}. Reason: ${complaint.rejectionReason || 'No reason provided'}. Please reassign.`,
+          title: '🚨 Task Rejected by Contractor',
+          message: `Contractor has rejected Complaint #${complaint.complaintNumber}. Reason: ${complaint.rejectionReason || 'No reason provided'}. Please reassign to another contractor.`,
           type: 'Task Rejected',
           category: 'Assigned Tasks',
           priority: 'HIGH',
           relatedEntityType: 'COMPLAINT',
-          relatedEntityId: complaint._id
+          relatedEntityId: complaint._id.toString(),
+          actionRoute: '/admin-dashboard/complaints'
         });
-      } else if (status === 'Inspection Pending') {
+      }
+      // Status -> Inspection Pending
+      else if (status === 'Inspection Pending') {
         const officialId = updateData.assignedOfficial || complaint.assignedOfficial;
         if (officialId) {
           await Notification.create({
             recipientUserId: officialId.toString(),
             recipientRole: 'official',
-            title: 'New Inspection Assigned',
-            message: `New inspection assigned for ${complaint.parkName || 'Park'} (${complaint.complaintNumber}).`,
-            type: 'Inspection Assigned',
-            category: 'Verification',
+            title: '🔔 Inspection Reminder',
+            message: `Inspection for ${complaint.parkName || 'Park'} (${complaint.complaintNumber}) is due.`,
+            type: 'Inspection Reminder',
+            category: 'Inspection',
             priority: 'HIGH',
             relatedEntityType: 'COMPLAINT',
-            relatedEntityId: complaint._id
+            relatedEntityId: complaint._id.toString(),
+            actionRoute: `/gov-dashboard/verify-work/${complaint._id}`
           });
         }
       }

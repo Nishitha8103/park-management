@@ -6,7 +6,9 @@ const AdminLogout = () => {
 
   useEffect(() => {
     localStorage.removeItem('adminUser');
-    navigate('/admin/login');
+    localStorage.removeItem('user');
+    localStorage.removeItem('token');
+    navigate('/login');
   }, [navigate]);
 
   return <div style={{ padding: '2rem' }}>Logging out...</div>;

@@ -44,6 +44,11 @@ import AdminAnnouncements from './pages/admin/AdminAnnouncements';
 import AdminStallBookings from './pages/admin/AdminStallBookings';
 import AdminStallPayments from './pages/admin/AdminStallPayments';
 import AdminEventPayments from './pages/admin/AdminEventPayments';
+import AdminReassignmentRequests from './pages/admin/AdminReassignmentRequests';
+import AdminLeaveManagement from './pages/admin/AdminLeaveManagement';
+import AdminKycReview from './pages/admin/AdminKycReview';
+import ContractorLeaves from './pages/ContractorLeaves';
+import GovLeaves from './pages/GovLeaves';
 
 // AdminDashboard component is being replaced by modular components in /pages/admin/
 // import AdminDashboard from './pages/AdminDashboard';
@@ -129,6 +134,9 @@ function App() {
           <Route path="stall-payments" element={<AdminStallPayments />} />
           <Route path="event-registrations" element={<AdminEventPayments />} />
           <Route path="material-requests" element={<AdminMaterialRequests />} />
+          <Route path="reassignments" element={<AdminReassignmentRequests />} />
+          <Route path="leaves" element={<AdminLeaveManagement />} />
+          <Route path="kyc-review" element={<AdminKycReview />} />
 
           <Route path="settings" element={<AdminSettings />} />
           <Route path="logout" element={<AdminLogout />} />
@@ -145,6 +153,7 @@ function App() {
         <Route path="/contractor/map" element={<Navigate to="/contractor-dashboard" replace />} />
         <Route path="/contractor/schedule" element={<ContractorSchedule />} />
         <Route path="/contractor/materials" element={<ContractorMaterialRequests />} />
+        <Route path="/contractor/leaves" element={<ContractorLeaves />} />
         
         {/* Government Portal Routes */}
         <Route path="/gov-dashboard" element={<GovLayout />}>
@@ -164,9 +173,10 @@ function App() {
           <Route path="notifications" element={<GovNotifications />} />
           <Route path="analytics" element={<GovAnalytics />} />
           <Route path="profile" element={<GovProfile />} />
+          <Route path="leaves" element={<GovLeaves />} />
           <Route path="logout" element={<GovLogout />} />
         </Route>
-        
+
         {/* Routes with Sidebar Layout */}
         <Route element={<MainLayout />}>
           <Route path="/parks" element={<Parks />} />

@@ -1,7 +1,8 @@
 import { useEffect, useState, useRef } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { Menu, LogOut, HardHat, User, Mail, Phone, Wrench, Save, Camera, Lock, Shield, Eye, EyeOff } from 'lucide-react';
+import { Menu, LogOut, HardHat, User, Mail, Phone, Wrench, Save, Camera, Lock, Shield, Eye, EyeOff, ShieldCheck, ShieldX, Fingerprint } from 'lucide-react';
 import './ContractorProfile.css';
+import AadhaarKycModal from '../components/AadhaarKycModal';
 import ContractorSidebar from '../components/ContractorSidebar';
 
 
@@ -23,6 +24,11 @@ const ContractorProfile = () => {
   const [rawFile, setRawFile] = useState(null);
   const [message, setMessage] = useState({ type: '', text: '' });
 
+  // Aadhaar KYC state
+  const [kycModalOpen, setKycModalOpen] = useState(false);
+  const [kycStatus, setKycStatus] = useState('not_started'); // from backend
+  const [kycData, setKycData] = useState(null);
+
   // Password fields
   const [passwordData, setPasswordData] = useState({
     currentPassword: '',
@@ -38,7 +44,7 @@ const ContractorProfile = () => {
   useEffect(() => {
     const storedUser = localStorage.getItem('contractorUser');
     if (!storedUser) {
-      navigate('/contractor/login');
+      navigate('/login');
     } else {
       const user = JSON.parse(storedUser);
       setContractor(user);
@@ -49,6 +55,19 @@ const ContractorProfile = () => {
         department: user.department || ''
       });
       if (user.profilePic || user.profilePhoto) setProfilePic(user.profilePic || user.profilePhoto);
+
+      // Fetch KYC status from backend
+      fetch('/api/kyc/status', {
+        headers: { Authorization: `Bearer ${user.token}` }
+      })
+        .then(res => res.ok ? res.json() : null)
+        .then(data => {
+          if (data && data.success) {
+            setKycStatus(data.kycStatus || 'not_started');
+            setKycData(data.kycData || null);
+          }
+        })
+        .catch(() => {});
 
       // If maintenanceSkills is missing (old session), fetch fresh data from backend
       if (!user.maintenanceSkills || user.maintenanceSkills.length === 0) {
@@ -68,11 +87,17 @@ const ContractorProfile = () => {
     }
   }, [navigate]);
 
+  const handleKycVerified = () => {
+    setKycStatus('pending');
+  };
+
   const toggleSidebar = () => setIsSidebarOpen(!isSidebarOpen);
 
   const handleLogout = () => {
     localStorage.removeItem('contractorUser');
-    navigate('/contractor/login');
+    localStorage.removeItem('user');
+    localStorage.removeItem('token');
+    navigate('/login');
   };
 
   const handleChange = (e) => {
@@ -417,6 +442,66 @@ const ContractorProfile = () => {
 
               <div className="section-divider"></div>
 
+              {/* Aadhaar KYC Section */}
+              <div className="form-section-block">
+                <h3 className="section-title" style={{ color: '#1a237e' }}>
+                  <Fingerprint size={18} /> Aadhaar KYC Verification
+                </h3>
+                <p className="section-desc">Upload your Aadhaar card for identity verification. Admin will review and approve within 1–2 business days.</p>
+
+                {kycStatus === 'verified' && (
+                  <div style={{ background: 'linear-gradient(135deg,#e8f5e9,#f1f8e9)', border: '1.5px solid #a5d6a7', borderRadius: '12px', padding: '16px 20px', display: 'flex', alignItems: 'center', gap: '12px' }}>
+                    <ShieldCheck size={24} style={{ color: '#2e7d32', flexShrink: 0 }} />
+                    <div>
+                      <p style={{ margin: 0, fontWeight: 700, color: '#1b5e20', fontSize: '15px' }}>KYC Verified ✓</p>
+                      <p style={{ margin: '2px 0 0', fontSize: '12.5px', color: '#388e3c' }}>Your identity has been verified by the administrator.</p>
+                    </div>
+                    <span style={{ marginLeft: 'auto', background: '#2e7d32', color: '#fff', fontSize: '11px', fontWeight: 700, padding: '3px 12px', borderRadius: '20px' }}>VERIFIED</span>
+                  </div>
+                )}
+
+                {kycStatus === 'pending' && (
+                  <div style={{ background: '#fffde7', border: '1.5px solid #ffe082', borderRadius: '12px', padding: '16px 20px', display: 'flex', alignItems: 'center', gap: '12px' }}>
+                    <ShieldCheck size={24} style={{ color: '#f57f17', flexShrink: 0 }} />
+                    <div>
+                      <p style={{ margin: 0, fontWeight: 700, color: '#e65100', fontSize: '15px' }}>Under Review</p>
+                      <p style={{ margin: '2px 0 0', fontSize: '12.5px', color: '#795548' }}>Your documents have been submitted. Admin will verify them soon.</p>
+                    </div>
+                    <span style={{ marginLeft: 'auto', background: '#ff8f00', color: '#fff', fontSize: '11px', fontWeight: 700, padding: '3px 12px', borderRadius: '20px' }}>PENDING</span>
+                  </div>
+                )}
+
+                {kycStatus === 'rejected' && (
+                  <div style={{ background: '#fff8f8', border: '1.5px solid #ef9a9a', borderRadius: '12px', padding: '16px 20px', display: 'flex', flexDirection: 'column', gap: '10px' }}>
+                    <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
+                      <ShieldX size={22} style={{ color: '#c62828' }} />
+                      <span style={{ fontWeight: 700, color: '#c62828', fontSize: '15px' }}>KYC Rejected</span>
+                    </div>
+                    {kycRejectReason && <p style={{ margin: 0, fontSize: '13px', color: '#546e7a', background: '#f5f5f5', padding: '8px 12px', borderRadius: '8px' }}><strong>Reason:</strong> {kycRejectReason}</p>}
+                    <button id="kyc-retry-btn" onClick={() => setKycModalOpen(true)} style={{ alignSelf: 'flex-start', display: 'flex', alignItems: 'center', gap: '6px', padding: '9px 18px', background: 'linear-gradient(135deg,#1a237e,#1565c0)', color: '#fff', border: 'none', borderRadius: '8px', fontWeight: 600, fontSize: '13px', cursor: 'pointer' }}>
+                      <Fingerprint size={14} /> Resubmit Documents
+                    </button>
+                  </div>
+                )}
+
+                {kycStatus === 'not_started' && (
+                  <div style={{ background: '#f8f9ff', border: '1.5px solid #c5cae9', borderRadius: '12px', padding: '16px 20px', display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: '16px', flexWrap: 'wrap' }}>
+                    <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
+                      <ShieldCheck size={22} style={{ color: '#90a4ae' }} />
+                      <div>
+                        <p style={{ margin: 0, fontWeight: 600, color: '#546e7a', fontSize: '14px' }}>Not Verified</p>
+                        <p style={{ margin: '2px 0 0', fontSize: '12px', color: '#90a4ae' }}>Upload your Aadhaar card to get verified.</p>
+                      </div>
+                    </div>
+                    <button id="kyc-open-modal-btn" onClick={() => setKycModalOpen(true)} style={{ display: 'flex', alignItems: 'center', gap: '8px', padding: '10px 20px', background: 'linear-gradient(135deg,#1a237e,#1565c0)', color: '#fff', border: 'none', borderRadius: '8px', fontWeight: 600, fontSize: '14px', cursor: 'pointer', boxShadow: '0 4px 14px rgba(26,35,126,0.28)' }}>
+                      <Fingerprint size={16} /> Verify Aadhaar
+                    </button>
+                  </div>
+                )}
+              </div>
+
+              <div className="section-divider"></div>
+
               {/* Change Password Form */}
               <div className="form-section-block">
                 <h3 className="section-title security">
@@ -496,8 +581,17 @@ const ContractorProfile = () => {
         </div>
         
       </div>
+
+      {/* Aadhaar KYC Modal */}
+      <AadhaarKycModal
+        isOpen={kycModalOpen}
+        onClose={() => setKycModalOpen(false)}
+        onSubmitted={handleKycVerified}
+        currentStatus={kycStatus}
+      />
     </div>
   );
 };
 
 export default ContractorProfile;
+

@@ -30,7 +30,7 @@ const ContractorWorkProgress = () => {
   useEffect(() => {
     const storedUser = localStorage.getItem('contractorUser');
     if (!storedUser) {
-      navigate('/contractor/login');
+      navigate('/login');
     } else {
       setContractor(JSON.parse(storedUser));
     }
@@ -65,11 +65,12 @@ const ContractorWorkProgress = () => {
   const handleSaveUpdate = async () => {
     if (!taskDetails?._id) return;
 
+    if (afterPhotos.length === 0) {
+      alert("Live Camera photo capture is mandatory (*). Please capture at least one on-site photo.");
+      return;
+    }
+
     if (status === 'Completed') {
-      if (afterPhotos.length === 0) {
-        alert("Completed Works Images are mandatory for completion.");
-        return;
-      }
       if (!description.trim()) {
         alert("Completion Remarks are mandatory for completion.");
         return;
@@ -184,7 +185,9 @@ const ContractorWorkProgress = () => {
 
   const handleLogout = () => {
     localStorage.removeItem('contractorUser');
-    navigate('/contractor/login');
+    localStorage.removeItem('token');
+    localStorage.removeItem('user');
+    navigate('/login');
   };
 
   if (!contractor) return null;
@@ -315,7 +318,9 @@ const ContractorWorkProgress = () => {
               {/* Works Images Upload */}
               <div className="upload-photos-section" style={{ marginBottom: '1.5rem' }}>
                 <h3 className="upload-photos-title">
-                  {status === 'Completed' ? 'Upload Completed Works Image' : 'Upload Progress Image'}
+                  {status === 'Completed' ? 'Completed Works Photo ' : 'Progress Photo '}
+                  <span style={{ color: '#ef4444' }}>*</span>
+                  <span style={{ fontSize: '0.85rem', color: '#dc2626', fontWeight: 600, marginLeft: '6px' }}>(Mandatory Live Camera Capture)</span>
                 </h3>
                 <input
                   type="file"
@@ -345,20 +350,11 @@ const ContractorWorkProgress = () => {
                   {/* Camera Button */}
                   <div
                     className="photo-add-box"
-                    style={{ background: 'linear-gradient(135deg, #059669 0%, #10b981 100%)', color: '#fff', border: 'none', cursor: 'pointer' }}
+                    style={{ background: 'linear-gradient(135deg, #059669 0%, #10b981 100%)', color: '#fff', border: 'none', cursor: 'pointer', padding: '1rem 1.5rem', minWidth: '160px' }}
                     onClick={() => setIsCameraOpen(true)}
                   >
-                    <Camera size={22} />
-                    <span>Live Camera</span>
-                  </div>
-
-                  {/* Gallery Upload Button */}
-                  <div
-                    className="photo-add-box"
-                    onClick={() => document.getElementById('after-photo-input').click()}
-                  >
-                    <Upload size={20} />
-                    <span>Upload File</span>
+                    <Camera size={24} />
+                    <span style={{ fontWeight: 600 }}>Live Camera Capture</span>
                   </div>
                 </div>
 
@@ -393,9 +389,14 @@ const ContractorWorkProgress = () => {
         onClose={() => setIsCameraOpen(false)}
         onCapture={handleCameraCapture}
         tag="Contractor Work Evidence"
+        defaultLocation={taskDetails ? {
+          name: taskDetails.parkId?.name || taskDetails.parkName || 'Work Site Park',
+          address: taskDetails.parkId?.address || taskDetails.address || taskDetails.parkName || 'Work Site Location'
+        } : null}
       />
     </div>
   );
 };
 
 export default ContractorWorkProgress;
+

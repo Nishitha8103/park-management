@@ -8,7 +8,9 @@ const GovLogout = () => {
 
   const handleLogout = () => {
     localStorage.removeItem('govUser');
-    navigate('/gov/login');
+    localStorage.removeItem('user');
+    localStorage.removeItem('token');
+    navigate('/login');
   };
 
   const handleCancel = () => {
@@ -38,3 +40,4 @@ const GovLogout = () => {
 };
 
 export default GovLogout;
+

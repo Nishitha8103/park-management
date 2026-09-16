@@ -1,7 +1,13 @@
+const mongoose = require('mongoose');
 const Notification = require('../models/Notification');
 const Complaint = require('../models/Complaint');
 const User = require('../models/User');
+const Contractor = require('../models/Contractor');
+const Park = require('../models/Park');
+const Event = require('../models/Event');
 const EventRegistration = require('../models/EventRegistration');
+const StallBooking = require('../models/StallBooking');
+const Announcement = require('../models/Announcement');
 
 // Get notifications for a user based on their ID and Role
 const getNotifications = async (req, res) => {
@@ -14,30 +20,71 @@ const getNotifications = async (req, res) => {
 
     const isOfficial = ['official', 'government_official', 'Government Official'].includes(role);
 
+    let citizenDoc = null;
+    let citizenIds = [userId];
+    if (role === 'citizen') {
+      if (mongoose.Types.ObjectId.isValid(userId) && userId.length === 24) {
+        citizenDoc = await User.findById(userId).lean();
+      }
+      if (!citizenDoc && phone) {
+        citizenDoc = await User.findOne({ phone }).lean();
+      }
+      if (citizenDoc) {
+        citizenIds.push(citizenDoc._id.toString());
+        if (citizenDoc.phone) citizenIds.push(citizenDoc.phone);
+        if (citizenDoc.email) citizenIds.push(citizenDoc.email);
+      }
+    }
+
+    let contractorDoc = null;
+    let contractorIds = [userId];
+
+    if (role === 'contractor') {
+      contractorDoc = await Contractor.findOne({
+        $or: [
+          ...(mongoose.Types.ObjectId.isValid(userId) && userId.length === 24 ? [{ _id: userId }] : []),
+          { contractorId: userId },
+          { email: userId },
+          { username: userId }
+        ]
+      });
+
+      if (contractorDoc) {
+        contractorIds.push(contractorDoc._id.toString());
+        if (contractorDoc.contractorId) contractorIds.push(contractorDoc.contractorId);
+        if (contractorDoc.email) contractorIds.push(contractorDoc.email);
+        if (contractorDoc.username) contractorIds.push(contractorDoc.username);
+      }
+    }
+
     // Match any notification explicitly sent to this user ID, plus role-based broadcasts
     const query = {
-      $or: [
-        { recipientUserId: userId },
-      ]
+      $or: []
     };
 
     if (role === 'citizen') {
+      query.$or.push({ recipientUserId: { $in: [...new Set(citizenIds)] } });
       query.$or.push({ recipientUserId: 'CITIZEN_ALL' });
-    }
-
-    if (isOfficial) {
-      query.$or.push({ recipientUserId: userId, recipientRole: 'official' });
-      query.$or.push({ recipientUserId: userId, recipientRole: 'Government Official' });
-      query.$or.push({ recipientUserId: userId, recipientRole: 'government_official' });
-    }
-
-    if (role === 'admin') {
-      query.$or.push({ recipientUserId: 'ADMIN_ALL', recipientRole: 'admin' });
+      query.$or.push({ recipientUserId: 'all' });
+      query.$or.push({ recipientRole: 'citizen' });
+      query.$or.push({ recipientRole: 'all' });
+    } else if (role === 'contractor') {
+      query.$or.push({ recipientUserId: { $in: [...new Set(contractorIds)] } });
+      query.$or.push({ recipientUserId: 'CONTRACTOR_ALL' });
+      query.$or.push({ recipientUserId: 'all' });
+      query.$or.push({ recipientRole: 'contractor' });
+    } else if (isOfficial) {
+      query.$or.push({ recipientUserId: userId });
+      query.$or.push({ recipientRole: 'official' });
+      query.$or.push({ recipientRole: 'Government Official' });
+      query.$or.push({ recipientRole: 'government_official' });
+    } else if (role === 'admin') {
+      query.$or.push({ recipientUserId: 'ADMIN_ALL' });
       query.$or.push({ recipientUserId: 'CITIZEN_ALL' });
-    }
-
-    if (role === 'contractor') {
-      query.$or.push({ recipientUserId: 'CONTRACTOR_ALL', recipientRole: 'contractor' });
+      query.$or.push({ recipientRole: 'admin' });
+      query.$or.push({ recipientUserId: userId });
+    } else {
+      query.$or.push({ recipientUserId: userId });
     }
 
     // ── 1. For government officials: auto-create notifications for assigned inspections & default role notifications ──
@@ -57,8 +104,8 @@ const getNotifications = async (req, res) => {
           await Notification.create({
             recipientUserId: userId,
             recipientRole: 'official',
-            title: `New inspection assigned for ${complaint.parkName || 'Park'} (${complaint.complaintNumber || 'Ticket'}).`,
-            message: `You have been assigned to inspect ${complaint.category || 'maintenance'} work at ${complaint.parkName || 'the park'}. Ticket #${complaint.complaintNumber || 'N/A'}.`,
+            title: `🔔 New Task Assigned`,
+            message: `New inspection assigned for ${complaint.parkName || 'Park'} (${complaint.complaintNumber || 'Ticket'}).`,
             type: 'Inspection Assigned',
             category: 'Inspection',
             priority: complaint.priority === 'Urgent' || complaint.priority === 'High' ? 'URGENT' : 'NORMAL',
@@ -71,36 +118,30 @@ const getNotifications = async (req, res) => {
       }
 
       // Check count of notifications for official
-      const officialNotifCount = await Notification.countDocuments({
-        $or: [
-          { recipientUserId: userId },
-          { recipientUserId: userId, recipientRole: 'official' },
-          { recipientUserId: userId, recipientRole: 'Government Official' }
-        ]
-      });
+      const officialNotifCount = await Notification.countDocuments(query);
 
       if (officialNotifCount === 0) {
         const sampleNotifs = [
           {
             recipientUserId: userId,
             recipientRole: 'official',
-            title: 'SLA Breached',
-            message: 'Complaint CMP-2026-0012 has exceeded its SLA deadline and requires immediate attention.',
-            category: 'SLA',
-            type: 'SLA Breached',
-            priority: 'Urgent',
+            title: '🔔 Inspection Reminder',
+            message: 'Daily inspection for J.P. Nagar 5th Stage Park is due today.',
+            category: 'Inspection',
+            type: 'Inspection Reminder',
+            priority: 'NORMAL',
             isRead: false,
-            actionRoute: '/gov-dashboard/complaints',
+            actionRoute: '/gov-dashboard/my-inspections',
             createdAt: new Date(Date.now() - 30 * 60 * 1000)
           },
           {
             recipientUserId: userId,
             recipientRole: 'official',
-            title: 'Work Completed – Verification Required',
+            title: '🔔 Verification Required',
             message: 'The contractor has submitted completion proof for the assigned maintenance task at J.P. Nagar 5th Stage Park.',
-            category: 'Contractor Work',
-            type: 'Contractor Work',
-            priority: 'Important',
+            category: 'Verification',
+            type: 'Work Completed',
+            priority: 'HIGH',
             isRead: false,
             actionRoute: '/gov-dashboard/verify-work',
             createdAt: new Date(Date.now() - 2 * 3600 * 1000)
@@ -108,98 +149,14 @@ const getNotifications = async (req, res) => {
           {
             recipientUserId: userId,
             recipientRole: 'official',
-            title: 'Maruthi Layout Park Temporary Closure',
-            message: 'Maruthi Layout Park will remain closed temporarily due to scheduled maintenance work.',
-            category: 'Park Announcement',
-            type: 'Park Announcement',
-            priority: 'Important',
-            isRead: false,
-            actionRoute: '/announcements',
-            createdAt: new Date(Date.now() - 5 * 3600 * 1000)
-          },
-          {
-            recipientUserId: userId,
-            recipientRole: 'official',
-            title: 'Complaint Requires Review',
-            message: 'A citizen complaint regarding damaged playground equipment requires your review.',
-            category: 'Complaint',
-            type: 'Complaint',
-            priority: 'Important',
-            isRead: false,
-            actionRoute: '/gov-dashboard/complaints',
-            createdAt: new Date(Date.now() - 12 * 3600 * 1000)
-          },
-          {
-            recipientUserId: userId,
-            recipientRole: 'official',
-            title: 'Park Inspection Due',
-            message: 'The scheduled inspection for J.P. Nagar 5th Stage Park is due today.',
-            category: 'Park Monitoring',
-            type: 'Park Monitoring',
-            priority: 'Normal',
-            isRead: true,
-            actionRoute: '/gov-dashboard/parks',
-            createdAt: new Date(Date.now() - 24 * 3600 * 1000)
-          },
-          {
-            recipientUserId: userId,
-            recipientRole: 'official',
-            title: 'Inspection Assigned',
-            message: 'A new park inspection has been assigned to you for J.P. Nagar 5th Stage Park.',
-            category: 'Inspection',
-            type: 'Inspection',
-            priority: 'Normal',
-            isRead: true,
-            actionRoute: '/gov-dashboard/my-inspections',
-            createdAt: new Date(Date.now() - 36 * 3600 * 1000)
-          },
-          {
-            recipientUserId: userId,
-            recipientRole: 'official',
-            title: 'Rework Request Submitted',
-            message: 'A maintenance task requires rework verification after the contractor resubmitted the completion report.',
-            category: 'Contractor Work',
-            type: 'Contractor Work',
-            priority: 'Important',
-            isRead: true,
-            actionRoute: '/gov-dashboard/verify-work',
-            createdAt: new Date(Date.now() - 48 * 3600 * 1000)
-          },
-          {
-            recipientUserId: userId,
-            recipientRole: 'official',
-            title: 'SLA Deadline Approaching',
-            message: 'The SLA deadline for complaint CMP-2026-0012 is approaching. Please review the complaint status.',
+            title: '⏰ Task Due Soon',
+            message: 'Maintenance task at Maruthi Layout Park is approaching SLA deadline in 24 hours.',
             category: 'SLA',
-            type: 'SLA',
-            priority: 'Important',
-            isRead: true,
+            type: 'Task Due Soon',
+            priority: 'HIGH',
+            isRead: false,
             actionRoute: '/gov-dashboard/complaints',
-            createdAt: new Date(Date.now() - 60 * 3600 * 1000)
-          },
-          {
-            recipientUserId: userId,
-            recipientRole: 'official',
-            title: 'Inspection Report Submitted',
-            message: 'A new inspection report has been submitted and is ready for verification.',
-            category: 'Report',
-            type: 'Report',
-            priority: 'Normal',
-            isRead: true,
-            actionRoute: '/gov-dashboard/analytics',
-            createdAt: new Date(Date.now() - 72 * 3600 * 1000)
-          },
-          {
-            recipientUserId: userId,
-            recipientRole: 'official',
-            title: 'New Event Scheduled',
-            message: 'A new public event has been scheduled at an assigned park.',
-            category: 'Event',
-            type: 'Event',
-            priority: 'Normal',
-            isRead: true,
-            actionRoute: '/events',
-            createdAt: new Date(Date.now() - 84 * 3600 * 1000)
+            createdAt: new Date(Date.now() - 5 * 3600 * 1000)
           }
         ];
 
@@ -207,64 +164,245 @@ const getNotifications = async (req, res) => {
       }
     }
 
-    // ── 2. For citizens: auto-sync complaints & event registrations with distinct IDs ──
+    // ── 2. For contractors: auto-sync assigned tasks, maintenance alerts, due dates, & inspection reminders ──
+    if (role === 'contractor') {
+      const contractorSearchIds = [...new Set(contractorIds)];
+      const assignedTasks = await Complaint.find({
+        $or: [
+          { assignedContractor: { $in: contractorSearchIds.filter(id => mongoose.Types.ObjectId.isValid(id) && id.length === 24) } }
+        ]
+      }).sort({ createdAt: -1 });
+
+      for (const task of assignedTasks) {
+        const taskIdStr = task._id.toString();
+
+        // Check if Maintenance Alert exists
+        const existsMaintenanceAlert = await Notification.findOne({
+          recipientUserId: { $in: contractorSearchIds },
+          type: 'Maintenance Alert',
+          relatedEntityId: taskIdStr
+        });
+
+        if (!existsMaintenanceAlert) {
+          await Notification.create({
+            recipientUserId: userId,
+            recipientRole: 'contractor',
+            title: '🔔 Maintenance Alert',
+            message: `${task.category || 'Asset'} at ${task.parkName || 'Park'} requires repair. Ticket #${task.complaintNumber}.`,
+            type: 'Maintenance Alert',
+            category: 'Maintenance',
+            priority: task.priority === 'Urgent' || task.priority === 'High' ? 'URGENT' : 'HIGH',
+            relatedEntityType: 'TASK',
+            relatedEntityId: taskIdStr,
+            actionRoute: '/contractor/tasks',
+            createdAt: task.createdAt || new Date()
+          });
+        }
+
+        // Check if New Task Assigned exists
+        const existsTaskAssigned = await Notification.findOne({
+          recipientUserId: { $in: contractorSearchIds },
+          type: { $in: ['Task Assigned', 'New Task Assigned'] },
+          relatedEntityId: taskIdStr
+        });
+
+        if (!existsTaskAssigned) {
+          await Notification.create({
+            recipientUserId: userId,
+            recipientRole: 'contractor',
+            title: '🔔 New Task Assigned',
+            message: `New maintenance task assigned to you: ${task.category || 'Maintenance'} at ${task.parkName || 'Park'} (Ticket #${task.complaintNumber}).`,
+            type: 'New Task Assigned',
+            category: 'Assigned Tasks',
+            priority: 'HIGH',
+            relatedEntityType: 'TASK',
+            relatedEntityId: taskIdStr,
+            actionRoute: '/contractor/tasks',
+            createdAt: task.assignedAt || task.createdAt || new Date()
+          });
+        }
+      }
+
+      // Check daily inspection reminder for assigned parks
+      if (contractorDoc && contractorDoc.assignedParks && contractorDoc.assignedParks.length > 0) {
+        const assignedParksList = await Park.find({ _id: { $in: contractorDoc.assignedParks } }).select('name').lean();
+        const startOfDay = new Date();
+        startOfDay.setHours(0, 0, 0, 0);
+
+        for (const park of assignedParksList) {
+          const existsInsp = await Notification.findOne({
+            recipientUserId: { $in: contractorSearchIds },
+            type: 'Inspection Reminder',
+            relatedEntityId: park._id.toString(),
+            createdAt: { $gte: startOfDay }
+          });
+
+          if (!existsInsp) {
+            await Notification.create({
+              recipientUserId: userId,
+              recipientRole: 'contractor',
+              title: '🔔 Inspection Reminder',
+              message: `Daily inspection for ${park.name} is due today.`,
+              type: 'Inspection Reminder',
+              category: 'Inspection',
+              priority: 'NORMAL',
+              relatedEntityType: 'PARK',
+              relatedEntityId: park._id.toString(),
+              actionRoute: '/contractor/tasks'
+            });
+          }
+        }
+      }
+
+      // If contractor still has 0 notifications, add sample maintenance alerts & inspection reminders
+      const contractorNotifCount = await Notification.countDocuments(query);
+      if (contractorNotifCount === 0) {
+        const contractorSamples = [
+          {
+            recipientUserId: userId,
+            recipientRole: 'contractor',
+            title: '🔔 Maintenance Alert',
+            message: 'Playground equipment at JP Park requires repair.',
+            category: 'Maintenance',
+            type: 'Maintenance Alert',
+            priority: 'HIGH',
+            isRead: false,
+            actionRoute: '/contractor/tasks',
+            createdAt: new Date(Date.now() - 20 * 60 * 1000)
+          },
+          {
+            recipientUserId: userId,
+            recipientRole: 'contractor',
+            title: '🔔 Inspection Reminder',
+            message: 'Daily inspection for JP Park is due today.',
+            category: 'Inspection',
+            type: 'Inspection Reminder',
+            priority: 'NORMAL',
+            isRead: false,
+            actionRoute: '/contractor/tasks',
+            createdAt: new Date(Date.now() - 2 * 3600 * 1000)
+          },
+          {
+            recipientUserId: userId,
+            recipientRole: 'contractor',
+            title: '🔔 New Task Assigned',
+            message: 'Admin assigned a new pathway lighting repair task to you.',
+            category: 'Assigned Tasks',
+            type: 'New Task Assigned',
+            priority: 'HIGH',
+            isRead: false,
+            actionRoute: '/contractor/tasks',
+            createdAt: new Date(Date.now() - 5 * 3600 * 1000)
+          }
+        ];
+        await Notification.insertMany(contractorSamples);
+      }
+    }
+
+    // ── 3. For citizens: auto-sync complaints & status updates (In Progress, Resolved, Assigned) ──
     if (role === 'citizen') {
-      const citizenUser = await User.findById(userId).lean();
+      const isObjectId = mongoose.Types.ObjectId.isValid(userId) && userId.length === 24;
+      const citizenUser = citizenDoc || (isObjectId ? await User.findById(userId).lean() : null);
       const citizenPhone = (phone && phone !== 'undefined') ? phone : (citizenUser && citizenUser.phone);
       const citizenName = citizenUser ? citizenUser.name : '';
       const citizenEmail = citizenUser ? citizenUser.email : '';
 
-      // A. Complaints auto-sync
+      // Complaints auto-sync
       const resolvedStatuses = ['Closed', 'Verified', 'Inspection Approved', 'Resolved'];
       const complaintQuery = { $or: [] };
       if (citizenPhone) complaintQuery.$or.push({ userPhone: citizenPhone });
       if (citizenName) complaintQuery.$or.push({ userName: new RegExp(`^${citizenName.trim()}$`, 'i') });
-      complaintQuery.$or.push({ user: userId });
+      if (isObjectId) complaintQuery.$or.push({ user: userId });
 
       if (complaintQuery.$or.length > 0) {
         const userComplaints = await Complaint.find(complaintQuery).sort({ createdAt: -1 });
 
         for (const complaint of userComplaints) {
+          const complaintIdStr = complaint._id.toString();
           const isResolved = resolvedStatuses.includes(complaint.status);
-          const notifType = isResolved ? 'Complaint Resolved' : 'Complaint Submitted';
-          const notifTitle = isResolved ? 'Complaint Resolved ✅' : 'Complaint Submitted 📝';
+          const isInProgress = complaint.status === 'In Progress' || complaint.status === 'in-progress';
+          const isAssigned = complaint.status === 'Assigned';
 
-          const exists = await Notification.findOne({
-            recipientUserId: userId,
-            type: notifType,
-            relatedEntityId: complaint._id.toString()
+          // A. Initial Submission
+          const existsSubmit = await Notification.findOne({
+            recipientUserId: { $in: [...new Set(citizenIds)] },
+            type: 'Complaint Submitted',
+            relatedEntityId: complaintIdStr
           });
 
-          if (!exists) {
+          if (!existsSubmit) {
             await Notification.create({
               recipientUserId: userId,
               recipientRole: 'citizen',
-              title: notifTitle,
-              message: isResolved
-                ? `Your reported ${(complaint.category || 'maintenance').toLowerCase()} issue at ${complaint.parkName || 'the park'} has been fixed. Ticket #${complaint.complaintNumber || 'N/A'}.`
-                : `Your complaint for ${(complaint.category || 'park maintenance').toLowerCase()} at ${complaint.parkName || 'the park'} was submitted. Ticket #${complaint.complaintNumber || 'N/A'}.`,
-              type: notifType,
+              title: '🔔 Complaint Submitted',
+              message: `Your complaint for ${(complaint.category || 'park maintenance').toLowerCase()} at ${complaint.parkName || 'the park'} was submitted. Ticket #${complaint.complaintNumber || 'N/A'}.`,
+              type: 'Complaint Submitted',
               category: 'Complaint',
               priority: 'NORMAL',
               relatedEntityType: 'COMPLAINT',
-              relatedEntityId: complaint._id.toString(),
+              relatedEntityId: complaintIdStr,
               actionRoute: '/track-complaint',
-              createdAt: complaint.updatedAt || complaint.createdAt || new Date()
+              createdAt: complaint.createdAt || new Date()
             });
-          } else if (isResolved && exists.message && !exists.message.includes('#')) {
-            // Upgrade existing notification message to include unique ticket number & park name
-            exists.message = `Your reported ${(complaint.category || 'maintenance').toLowerCase()} issue at ${complaint.parkName || 'the park'} has been fixed. Ticket #${complaint.complaintNumber || 'N/A'}.`;
-            exists.category = 'Complaint';
-            exists.actionRoute = '/track-complaint';
-            await exists.save();
+          }
+
+          // B. In Progress Status Update
+          if (isInProgress || isResolved) {
+            const existsInProgress = await Notification.findOne({
+              recipientUserId: { $in: [...new Set(citizenIds)] },
+              message: /In Progress/i,
+              relatedEntityId: complaintIdStr
+            });
+
+            if (!existsInProgress) {
+              await Notification.create({
+                recipientUserId: userId,
+                recipientRole: 'citizen',
+                title: '🔔 Complaint Status Updated',
+                message: 'Your complaint has been marked “In Progress.”',
+                type: 'Complaint Status Updated',
+                category: 'Complaint',
+                priority: 'NORMAL',
+                relatedEntityType: 'COMPLAINT',
+                relatedEntityId: complaintIdStr,
+                actionRoute: '/track-complaint',
+                createdAt: complaint.updatedAt || new Date()
+              });
+            }
+          }
+
+          // C. Resolved Status Update
+          if (isResolved) {
+            const existsResolved = await Notification.findOne({
+              recipientUserId: { $in: [...new Set(citizenIds)] },
+              type: 'Complaint Resolved',
+              relatedEntityId: complaintIdStr
+            });
+
+            if (!existsResolved) {
+              await Notification.create({
+                recipientUserId: userId,
+                recipientRole: 'citizen',
+                title: '✅ Complaint Resolved',
+                message: 'Your complaint has been successfully resolved.',
+                type: 'Complaint Resolved',
+                category: 'Complaint',
+                priority: 'NORMAL',
+                relatedEntityType: 'COMPLAINT',
+                relatedEntityId: complaintIdStr,
+                actionRoute: '/track-complaint',
+                createdAt: complaint.updatedAt || new Date()
+              });
+            }
           }
         }
       }
 
       // B. Event registrations & payments auto-sync
       const regQuery = { $or: [] };
-      if (userId) regQuery.$or.push({ userId: userId });
+      if (isObjectId) regQuery.$or.push({ userId: userId });
       if (citizenEmail) regQuery.$or.push({ email: new RegExp(`^${citizenEmail.trim()}$`, 'i') });
+      if (citizenPhone) regQuery.$or.push({ phone: citizenPhone });
 
       if (regQuery.$or.length > 0) {
         const userRegs = await EventRegistration.find(regQuery).populate('event').sort({ createdAt: -1 });
@@ -322,6 +460,44 @@ const getNotifications = async (req, res) => {
             }
           }
         }
+      }
+
+      // If no notifications exist yet for citizen, ensure essential park broadcasts exist
+      const citizenNotifCount = await Notification.countDocuments({
+        $or: [
+          { recipientUserId: userId },
+          { recipientUserId: 'CITIZEN_ALL' }
+        ]
+      });
+
+      if (citizenNotifCount === 0) {
+        const publicBroadcasts = [
+          {
+            recipientUserId: 'CITIZEN_ALL',
+            recipientRole: 'citizen',
+            title: 'Welcome to Parks Monitoring System 🌳',
+            message: 'Discover your city’s parks, report maintenance issues in real-time, join yoga/events, and track complaints anytime.',
+            category: 'Park Announcement',
+            type: 'Announcement',
+            priority: 'NORMAL',
+            isRead: false,
+            actionRoute: '/parks',
+            createdAt: new Date()
+          },
+          {
+            recipientUserId: 'CITIZEN_ALL',
+            recipientRole: 'citizen',
+            title: '🔔 Complaint Status Tracking Enabled',
+            message: 'You will receive real-time notifications whenever your submitted complaints are Assigned, In Progress, or Resolved.',
+            category: 'Complaint',
+            type: 'Complaint Status Updated',
+            priority: 'NORMAL',
+            isRead: false,
+            actionRoute: '/track-complaint',
+            createdAt: new Date(Date.now() - 60 * 60 * 1000)
+          }
+        ];
+        await Notification.insertMany(publicBroadcasts);
       }
     }
 

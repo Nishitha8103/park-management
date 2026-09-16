@@ -17,6 +17,11 @@ const contractorSchema = new mongoose.Schema({
   password: { type: String, required: true },
   profilePhoto: { type: String },
   status: { type: String, enum: ['Active', 'Inactive'], default: 'Active' },
+  availabilityStatus: { 
+    type: String, 
+    enum: ['Available', 'On Leave', 'Unavailable'], 
+    default: 'Available' 
+  },
   role: { type: String, default: 'contractor' },
   maintenanceSkills: [{ type: String }],
   resetPasswordOtp: { type: String, default: null },

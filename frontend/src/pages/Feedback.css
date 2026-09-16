@@ -74,20 +74,21 @@
   display: inline-flex;
   align-items: center;
   gap: 0.4rem;
-  background: rgba(255, 255, 255, 0.15);
-  border: 1px solid rgba(255, 255, 255, 0.3);
-  color: white;
+  background: #ffffff !important;
+  border: 1.5px solid #059669 !important;
+  color: #064e3b !important;
   font-weight: 700;
   font-size: 0.85rem;
-  padding: 0.4rem 1rem;
+  padding: 0.45rem 1.1rem;
   border-radius: 20px;
   cursor: pointer;
-  backdrop-filter: blur(8px);
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
   transition: all 0.2s ease;
 }
 
 .back-button:hover {
-  background: rgba(255, 255, 255, 0.28);
+  background: #059669 !important;
+  color: #ffffff !important;
   transform: translateX(-2px);
 }
 

@@ -27,7 +27,7 @@ const getParkById = async (req, res) => {
 };
 
 const parksCache = new Map();
-const CACHE_TTL = 120 * 1000; // 2 minutes
+const CACHE_TTL = 5 * 60 * 1000; // 5 minutes cache
 
 const clearParksCache = () => {
   parksCache.clear();
@@ -35,7 +35,7 @@ const clearParksCache = () => {
 
 // @desc    Get all parks
 // @route   GET /api/parks
-// @access  Private
+// @access  Public / Private
 const getParks = async (req, res) => {
   try {
     const cacheKey = JSON.stringify(req.query || {});
@@ -80,10 +80,10 @@ const getParks = async (req, res) => {
     }
 
     const parks = await Park.find(filter)
-      .populate('district', 'name')
-      .populate('corporation', 'name')
-      .populate('zone', 'name')
-      .populate('ward', 'name')
+      .populate('district', 'name code')
+      .populate('corporation', 'name code')
+      .populate('zone', 'name code')
+      .populate('ward', 'name wardNumber')
       .sort({ createdAt: -1 })
       .lean();
 

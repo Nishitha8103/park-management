@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 import { NavLink, useNavigate } from 'react-router-dom';
-import { Home, TreePine, FileText, Star, ScanLine, User, Search, History, LogOut, Calendar, Bell, Megaphone } from 'lucide-react';
+import { Home, TreePine, FileText, Star, ScanLine, User, Search, History, LogOut, Calendar, Bell, Megaphone, AlertOctagon } from 'lucide-react';
 import './Sidebar.css';
 
 const Sidebar = ({ isOpen = false, toggleSidebar = () => {} }) => {
@@ -54,23 +54,47 @@ const Sidebar = ({ isOpen = false, toggleSidebar = () => {} }) => {
     }
   };
 
+  const formatDisplayRole = (parsed) => {
+    if (!parsed) return 'Public User';
+    const name = (parsed.name || '').toLowerCase();
+    const rawRole = (parsed.role || parsed.userType || '').toLowerCase();
+
+    if (name.includes('nishitha') || rawRole.includes('public')) {
+      return 'Public User';
+    }
+    if (name.includes('vishal') || rawRole.includes('official') || rawRole.includes('gov')) {
+      return 'Government Official';
+    }
+    if (rawRole.includes('contractor')) {
+      return 'Contractor';
+    }
+    if (rawRole.includes('admin')) {
+      return 'Administrator';
+    }
+    return parsed.role || parsed.userType || 'Public User';
+  };
+
   useEffect(() => {
     const updateUserData = () => {
       const stored = localStorage.getItem('user');
+      let parsed = null;
       if (stored) {
         try {
-          const parsed = JSON.parse(stored);
-          setUserData({
-            name: parsed.name || 'Guest User',
-            role: parsed.userType === 'public_user' ? 'Public User' : parsed.userType || 'Public User',
-            profilePic: parsed.profilePic || null
-          });
+          parsed = JSON.parse(stored);
         } catch (e) {
           console.error("Error parsing user data");
         }
+      }
+
+      if (parsed) {
+        setUserData({
+          name: parsed.name || 'User',
+          role: parsed.role || 'Public User',
+          profilePic: parsed.profilePic || null
+        });
       } else {
         setUserData({
-          name: 'Guest User',
+          name: 'Public User',
           role: 'Public User',
           profilePic: null
         });

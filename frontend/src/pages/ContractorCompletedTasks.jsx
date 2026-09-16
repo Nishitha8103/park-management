@@ -17,7 +17,7 @@ const ContractorCompletedTasks = () => {
   useEffect(() => {
     const storedUser = localStorage.getItem('contractorUser');
     if (!storedUser) {
-      navigate('/contractor/login');
+      navigate('/login');
     } else {
       const user = JSON.parse(storedUser);
       setContractor(user);
@@ -54,7 +54,9 @@ const ContractorCompletedTasks = () => {
 
   const handleLogout = () => {
     localStorage.removeItem('contractorUser');
-    navigate('/contractor/login');
+    localStorage.removeItem('user');
+    localStorage.removeItem('token');
+    navigate('/login');
   };
 
   const completedTasks = jobs;
@@ -198,3 +200,4 @@ const ContractorCompletedTasks = () => {
 };
 
 export default ContractorCompletedTasks;
+

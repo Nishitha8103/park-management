@@ -9,20 +9,24 @@ const API_BASE = '/api';
 
 const ContractorReports = () => {
   const navigate = useNavigate();
-  const [contractor, setContractor] = useState(null);
+  const [contractor, setContractor] = useState(() => {
+    try {
+      const stored = localStorage.getItem('contractorUser');
+      return stored ? JSON.parse(stored) : null;
+    } catch {
+      return null;
+    }
+  });
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
   const [reports, setReports] = useState([]);
   const [loading, setLoading] = useState(true);
   const [notifications, setNotifications] = useState([]);
 
   useEffect(() => {
-    const storedUser = localStorage.getItem('contractorUser');
-    if (!storedUser) {
-      navigate('/contractor/login');
-    } else {
-      setContractor(JSON.parse(storedUser));
+    if (!contractor) {
+      navigate('/login');
     }
-  }, [navigate]);
+  }, [contractor, navigate]);
 
   useEffect(() => {
     if (!contractor) return;
@@ -65,7 +69,9 @@ const ContractorReports = () => {
 
   const handleLogout = () => {
     localStorage.removeItem('contractorUser');
-    navigate('/contractor/login');
+    localStorage.removeItem('user');
+    localStorage.removeItem('token');
+    navigate('/login');
   };
 
   const getStatusBadgeClass = (status) => {
@@ -232,3 +238,4 @@ const ContractorReports = () => {
 };
 
 export default ContractorReports;
+

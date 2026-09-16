@@ -1,7 +1,9 @@
 import { useEffect, useState } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
-import { ArrowLeft, X, Download } from 'lucide-react';
+import { ArrowLeft, X, Download, RotateCcw, AlertTriangle } from 'lucide-react';
 import './GovInspectionDetails.css';
+import RequestReassignmentModal from '../components/RequestReassignmentModal';
+import AssignmentHistoryTimeline from '../components/AssignmentHistoryTimeline';
 
 const API_BASE = '/api';
 
@@ -12,6 +14,17 @@ const GovInspectionDetails = () => {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
   const [activeImage, setActiveImage] = useState(null);
+  const [govUser, setGovUser] = useState(null);
+  const [showReassignModal, setShowReassignModal] = useState(false);
+
+  useEffect(() => {
+    const stored = localStorage.getItem('govUser');
+    if (stored) {
+      try {
+        setGovUser(JSON.parse(stored));
+      } catch (e) {}
+    }
+  }, []);
 
   useEffect(() => {
     const fetchDetails = async () => {
@@ -69,14 +82,24 @@ const GovInspectionDetails = () => {
         <button className="btn-back" onClick={() => navigate(-1)}>
           <ArrowLeft size={18} /> Back to Assigned Inspections
         </button>
-        <div className="flex gap-md">
-          {inspection.status !== 'Closed' && (
-            <button
-              className="btn btn-primary"
-              onClick={() => navigate(`/gov-dashboard/conduct-inspection/${inspection._id}`)}
-            >
-              {inspection.inspectionDate ? 'Edit Inspection' : 'Start Inspection'}
-            </button>
+        <div className="flex gap-md" style={{ display: 'flex', gap: '10px' }}>
+          {inspection.status !== 'Closed' && inspection.status !== 'Reassignment Requested' && (
+            <>
+              <button
+                className="btn btn-primary"
+                onClick={() => navigate(`/gov-dashboard/conduct-inspection/${inspection._id}`)}
+              >
+                {inspection.inspectionDate ? 'Edit Inspection' : 'Start Inspection'}
+              </button>
+              <button
+                type="button"
+                className="btn"
+                style={{ display: 'flex', alignItems: 'center', gap: '8px', background: '#fffbeb', color: '#b45309', border: '1px solid #fde68a', padding: '0.6rem 1.2rem', borderRadius: '8px', fontWeight: 600, cursor: 'pointer' }}
+                onClick={() => setShowReassignModal(true)}
+              >
+                <RotateCcw size={16} /> Cannot Complete Task
+              </button>
+            </>
           )}
           {(inspection.inspectionDate || ['Inspection Approved', 'Closed', 'Rework Required', 'Returned by Admin'].includes(inspection.status)) && (
             <button
@@ -89,6 +112,24 @@ const GovInspectionDetails = () => {
           )}
         </div>
       </div>
+
+      {/* Reassignment Pending Banner */}
+      {(inspection.status === 'Reassignment Requested' || inspection.reassignmentStatus === 'Reassignment Requested') && (
+        <div style={{ background: '#fffbeb', border: '1px solid #fde68a', borderRadius: '10px', padding: '1rem 1.25rem', marginBottom: '1.25rem', display: 'flex', alignItems: 'flex-start', gap: '12px' }}>
+          <RotateCcw size={24} color="#d97706" style={{ marginTop: '2px', flexShrink: 0 }} />
+          <div style={{ flex: 1 }}>
+            <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '4px' }}>
+              <span style={{ fontWeight: 'bold', color: '#92400e', fontSize: '0.95rem' }}>Inspection Reassignment Pending Administrator Review</span>
+              <span style={{ backgroundColor: '#d97706', color: 'white', fontSize: '0.7rem', padding: '2px 6px', borderRadius: '10px', fontWeight: 'bold' }}>PENDING REVIEW</span>
+            </div>
+            <p style={{ margin: 0, fontSize: '0.85rem', color: '#78350f' }}>
+              You submitted a reassignment request for this inspection. <strong>Reason:</strong> {inspection.reassignmentReason || 'On Leave / Unavailable'}.
+              {inspection.reassignmentExplanation && ` Note: "${inspection.reassignmentExplanation}"`}.
+              Administrator review is in progress.
+            </p>
+          </div>
+        </div>
+      )}
 
       <h1 className="page-title">Inspection Details — {inspection.complaintNumber}</h1>
 
@@ -309,6 +350,14 @@ const GovInspectionDetails = () => {
         </div>
       </div>
 
+      {/* Assignment & Reassignment Audit History Timeline */}
+      <AssignmentHistoryTimeline 
+        history={inspection.assignmentHistory} 
+        currentAssignee={govUser?.name || 'Government Official'} 
+        currentRole="government_official" 
+        initialAssignedDate={inspection.assignedAt || inspection.createdAt} 
+      />
+
       {/* Full Image Overlay Modal */}
       {activeImage && (
         <div className="image-overlay-modal" onClick={() => setActiveImage(null)}>
@@ -320,6 +369,19 @@ const GovInspectionDetails = () => {
           </div>
         </div>
       )}
+
+      {/* Request Reassignment Modal for Official */}
+      <RequestReassignmentModal
+        isOpen={showReassignModal}
+        onClose={() => setShowReassignModal(false)}
+        task={inspection}
+        user={govUser}
+        userRole="government_official"
+        onSuccess={() => {
+          alert('Inspection reassignment request submitted successfully to Administrator.');
+          window.location.reload();
+        }}
+      />
     </div>
   );
 };

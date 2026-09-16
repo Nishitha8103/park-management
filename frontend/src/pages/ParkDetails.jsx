@@ -10,12 +10,41 @@ const ParkDetails = () => {
   const [loading, setLoading] = useState(true);
   const [announcements, setAnnouncements] = useState([]);
 
+  const defaultImages = [
+    '/parks/park7.jpg',
+    '/parks/park1.jpg',
+    '/parks/park3.jpg',
+    '/parks/park4.jpg',
+    '/parks/park5.jpg',
+    '/parks/park6.jpg',
+    '/parks/park_v3_1.jpg',
+    '/parks/park_v3_2.jpg',
+    '/parks/park_v3_3.jpg',
+    '/parks/park_v3_4.jpg',
+    '/parks/park_v3_5.jpg'
+  ];
+
+  const resolveParkImage = (img, name = '') => {
+    if (img && typeof img === 'string' && img.trim() !== '') {
+      if (img.startsWith('http://') || img.startsWith('https://') || img.startsWith('/')) {
+        return img;
+      }
+      return `/${img}`;
+    }
+    // Deterministic scenic fallback based on name
+    let hash = 0;
+    for (let i = 0; i < name.length; i++) {
+      hash = (hash + name.charCodeAt(i)) % defaultImages.length;
+    }
+    return defaultImages[hash] || '/parks/park7.jpg';
+  };
+
   const defaultPark = {
     name: "Central Park",
     location: "Zone 1 • Ward 10",
     rating: 4.8,
     reviews: 128,
-    image: "/park_hero_new.png",
+    image: "/parks/park7.jpg",
     status: "Well Maintained",
     description: "Central Park is a premier urban green space maintained by the local municipal authorities to promote community well-being, environmental sustainability, and outdoor recreation. It features well-laid walking tracks, lush lawns, and vibrant flower beds that provide a refreshing escape from the city's concrete landscape. The park is equipped with modern amenities including children's play structures, ample seating areas, and proper lighting to ensure safety and comfort for all visitors. Regular maintenance ensures the preservation of its local flora, making it a cherished daily destination for residents seeking fitness, relaxation, and a connection with nature.",
     facilities: [
@@ -54,9 +83,8 @@ const ParkDetails = () => {
             found.district?.name ? `District: ${found.district.name}` : null
           ].filter(Boolean).join(' • ');
 
-          const imgUrl = (found.images && found.images.length > 0)
-            ? (found.images[0].startsWith('http') || found.images[0].startsWith('/parks/') ? found.images[0] : `${found.images[0]}`)
-            : defaultPark.image;
+          const rawImg = (found.images && found.images.length > 0) ? found.images[0] : (found.image || null);
+          const imgUrl = resolveParkImage(rawImg, found.name || '');
 
           setParkData({
             id: found._id,
@@ -192,7 +220,14 @@ const ParkDetails = () => {
       )}
 
       <div className="park-hero-image-compact">
-        <img src={park.image} alt={park.name} />
+        <img 
+          src={park.image || '/parks/park7.jpg'} 
+          alt={park.name} 
+          onError={(e) => {
+            e.target.onerror = null;
+            e.target.src = '/parks/park7.jpg';
+          }}
+        />
         <div className="park-hero-overlay">
           <div className="park-hero-info">
             <h1>{park.name}</h1>

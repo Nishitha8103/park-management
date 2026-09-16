@@ -1,39 +1,71 @@
 import { useState, useEffect, useRef } from 'react';
 import { User, Mail, Phone, MapPin, Calendar, Clock, Lock, Edit, Check, Camera } from 'lucide-react';
+import axios from 'axios';
 import './Profile.css';
 
 const Profile = () => {
   const todayDate = new Date().toLocaleDateString('en-GB', { day: 'numeric', month: 'short', year: 'numeric' });
   const todayTime = new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
 
-  const [userData, setUserData] = useState({
-    name: 'Public User',
-    email: 'publicuser@gmail.com',
-    phone: '9876543210',
-    address: 'JP Nagar, Bangalore',
-    memberSince: todayDate,
-    lastLogin: `${todayDate} ${todayTime}`,
-    role: 'Public User',
-    profilePic: null
+  const getStoredUser = () => {
+    try {
+      const stored = localStorage.getItem('user');
+      if (stored) {
+        return JSON.parse(stored);
+      }
+    } catch (e) {
+      console.error("Error reading stored user:", e);
+    }
+    return null;
+  };
+
+  const [userData, setUserData] = useState(() => {
+    const parsed = getStoredUser();
+    if (parsed) {
+      return {
+        name: parsed.name || 'Public User',
+        email: parsed.email || 'user@example.com',
+        phone: parsed.phone || '',
+        address: parsed.address || '',
+        memberSince: parsed.memberSince || (parsed.createdAt ? new Date(parsed.createdAt).toLocaleDateString('en-GB', { day: 'numeric', month: 'short', year: 'numeric' }) : todayDate),
+        lastLogin: parsed.lastLogin || `${todayDate} ${todayTime}`,
+        role: parsed.role || 'Public User',
+        profilePic: parsed.profilePic || null
+      };
+    }
+    return {
+      name: 'Public User',
+      email: 'user@example.com',
+      phone: '',
+      address: '',
+      memberSince: todayDate,
+      lastLogin: `${todayDate} ${todayTime}`,
+      role: 'Public User',
+      profilePic: null
+    };
   });
 
   const fileInputRef = useRef(null);
 
-  const handleProfilePicChange = (e) => {
+  const handleProfilePicChange = async (e) => {
     const file = e.target.files[0];
     if (file) {
       const reader = new FileReader();
-      reader.onloadend = () => {
+      reader.onloadend = async () => {
         const base64String = reader.result;
         setUserData(prev => ({ ...prev, profilePic: base64String }));
-        const stored = localStorage.getItem('user');
-        if (stored) {
+        const stored = getStoredUser() || {};
+        const updated = { ...stored, profilePic: base64String };
+        localStorage.setItem('user', JSON.stringify(updated));
+        window.dispatchEvent(new Event('user-updated'));
+
+        // If user id exists, try persisting to backend
+        const userId = stored._id || stored.id;
+        if (userId) {
           try {
-            const parsed = JSON.parse(stored);
-            localStorage.setItem('user', JSON.stringify({ ...parsed, profilePic: base64String }));
-            window.dispatchEvent(new Event('user-updated'));
+            await axios.put(`/api/auth/users/${userId}`, { profilePic: base64String });
           } catch (err) {
-            console.error(err);
+            console.error('Failed to sync profile pic to backend:', err);
           }
         }
       };
@@ -48,67 +80,65 @@ const Profile = () => {
   const [passwordForm, setPasswordForm] = useState({ current: '', new: '', confirm: '' });
 
   useEffect(() => {
-    const stored = localStorage.getItem('user');
-    if (stored) {
-      try {
-        const parsed = JSON.parse(stored);
-        
-        // Use registration date if available, otherwise fallback
-        let userMemberSince = parsed.memberSince || todayDate;
-        if (parsed.createdAt) {
-          userMemberSince = new Date(parsed.createdAt).toLocaleDateString('en-GB', { day: 'numeric', month: 'short', year: 'numeric' });
-        }
-        const userLastLogin = parsed.lastLogin || `${todayDate} ${todayTime}`;
-        
+    const syncFromStorage = () => {
+      const parsed = getStoredUser();
+      if (parsed) {
         setUserData(prev => ({
           ...prev,
-          name: parsed.name || 'Public User',
-          email: parsed.email || prev.email,
-          phone: parsed.phone || prev.phone,
-          address: parsed.address || prev.address,
-          role: parsed.userType === 'public_user' ? 'Public User' : parsed.userType || prev.role,
-          memberSince: userMemberSince,
-          lastLogin: userLastLogin,
-          profilePic: parsed.profilePic || null
+          name: parsed.name ?? prev.name,
+          email: parsed.email ?? prev.email,
+          phone: parsed.phone ?? prev.phone,
+          address: parsed.address ?? prev.address,
+          role: parsed.role ?? prev.role,
+          memberSince: parsed.memberSince || (parsed.createdAt ? new Date(parsed.createdAt).toLocaleDateString('en-GB', { day: 'numeric', month: 'short', year: 'numeric' }) : prev.memberSince),
+          profilePic: parsed.profilePic ?? prev.profilePic
         }));
-        
-        // Backfill storage if they were missing
-        if (!parsed.memberSince || !parsed.lastLogin) {
-          localStorage.setItem('user', JSON.stringify({
-            ...parsed,
-            memberSince: userMemberSince,
-            lastLogin: userLastLogin
-          }));
-        }
-      } catch (e) {
-        console.error("Error parsing user data");
       }
-    }
+    };
+
+    syncFromStorage();
+    window.addEventListener('user-updated', syncFromStorage);
+    window.addEventListener('storage', syncFromStorage);
+    return () => {
+      window.removeEventListener('user-updated', syncFromStorage);
+      window.removeEventListener('storage', syncFromStorage);
+    };
   }, []);
 
-  const handleEditClick = () => {
+  const handleEditClick = async () => {
     if (isEditing) {
-      setUserData(prev => ({ ...prev, ...editForm }));
+      const updatedUser = {
+        name: editForm.name.trim() || userData.name,
+        email: editForm.email.trim() || userData.email,
+        phone: editForm.phone.trim(),
+        address: editForm.address.trim()
+      };
+
+      setUserData(prev => ({ ...prev, ...updatedUser }));
       setIsEditing(false);
-      const stored = localStorage.getItem('user');
-      if (stored) {
-        const parsed = JSON.parse(stored);
-        localStorage.setItem('user', JSON.stringify({ 
-          ...parsed, 
-          name: editForm.name,
-          email: editForm.email,
-          phone: editForm.phone,
-          address: editForm.address
-        }));
-        window.dispatchEvent(new Event('user-updated'));
+
+      const stored = getStoredUser() || {};
+      const newStored = { ...stored, ...updatedUser };
+      localStorage.setItem('user', JSON.stringify(newStored));
+      window.dispatchEvent(new Event('user-updated'));
+
+      // If user id exists, persist to backend DB
+      const userId = stored._id || stored.id;
+      if (userId) {
+        try {
+          await axios.put(`/api/auth/users/${userId}`, updatedUser);
+        } catch (err) {
+          console.error('Failed to sync profile update to backend:', err);
+        }
       }
+
       alert('Profile updated successfully!');
     } else {
       setEditForm({ 
-        name: userData.name, 
-        email: userData.email,
-        phone: userData.phone, 
-        address: userData.address 
+        name: userData.name || '', 
+        email: userData.email || '',
+        phone: userData.phone || '', 
+        address: userData.address || '' 
       });
       setIsEditing(true);
     }
@@ -129,14 +159,13 @@ const Profile = () => {
         return;
       }
       
-      const stored = localStorage.getItem('user');
+      const stored = getStoredUser();
       if (stored) {
-        const parsed = JSON.parse(stored);
-        if (parsed.password !== passwordForm.current) {
+        if (stored.password && stored.password !== passwordForm.current) {
           alert("Current password is incorrect!");
           return;
         }
-        localStorage.setItem('user', JSON.stringify({ ...parsed, password: passwordForm.new }));
+        localStorage.setItem('user', JSON.stringify({ ...stored, password: passwordForm.new }));
       }
 
       setIsChangingPassword(false);
@@ -187,17 +216,17 @@ const Profile = () => {
         <div className="profile-hero-info">
           <div className="user-name-row">
             <h2>{isEditing ? editForm.name : userData.name}</h2>
-            <span className="user-role-badge">🟢 {userData.role || 'Public Citizen'}</span>
+            <span className="user-role-badge">🟢 {userData.role || 'Public User'}</span>
           </div>
           <div className="profile-meta-grid">
             <div className="profile-meta-item">
               <Mail size={15} /> <span>{userData.email}</span>
             </div>
             <div className="profile-meta-item">
-              <Phone size={15} /> <span>{isEditing ? editForm.phone : userData.phone}</span>
+              <Phone size={15} /> <span>{isEditing ? editForm.phone : (userData.phone || 'No phone provided')}</span>
             </div>
             <div className="profile-meta-item">
-              <MapPin size={15} /> <span>{isEditing ? editForm.address : userData.address}</span>
+              <MapPin size={15} /> <span>{isEditing ? editForm.address : (userData.address || 'No location provided')}</span>
             </div>
           </div>
         </div>
@@ -251,8 +280,9 @@ const Profile = () => {
                   value={editForm.phone} 
                   onChange={(e) => setEditForm({...editForm, phone: e.target.value})}
                   className="profile-edit-input"
+                  placeholder="e.g. 9876543210"
                 />
-              ) : userData.phone}
+              ) : (userData.phone || '—')}
             </div>
           </div>
 
@@ -265,8 +295,9 @@ const Profile = () => {
                   value={editForm.address} 
                   onChange={(e) => setEditForm({...editForm, address: e.target.value})}
                   className="profile-edit-input"
+                  placeholder="e.g. JP Nagar, Bangalore"
                 />
-              ) : userData.address}
+              ) : (userData.address || '—')}
             </div>
           </div>
 

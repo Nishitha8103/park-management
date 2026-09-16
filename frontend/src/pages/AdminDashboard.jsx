@@ -26,7 +26,7 @@ const AdminDashboard = () => {
   useEffect(() => {
     const storedAdmin = localStorage.getItem('adminUser');
     if (!storedAdmin) {
-      navigate('/admin/login');
+      navigate('/login');
     } else {
       setAdmin(JSON.parse(storedAdmin));
     }
@@ -34,7 +34,9 @@ const AdminDashboard = () => {
 
   const handleLogout = () => {
     localStorage.removeItem('adminUser');
-    navigate('/admin/login');
+    localStorage.removeItem('token');
+    localStorage.removeItem('user');
+    navigate('/login');
   };
 
   // --- Users Operations ---
@@ -450,3 +452,4 @@ const AdminDashboard = () => {
 };
 
 export default AdminDashboard;
+

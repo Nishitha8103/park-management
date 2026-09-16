@@ -16,7 +16,7 @@ const GovReports = () => {
       try {
         const userStr = localStorage.getItem('govUser');
         if (!userStr) {
-          navigate('/gov/login');
+          navigate('/login');
           return;
         }
         const user = JSON.parse(userStr);

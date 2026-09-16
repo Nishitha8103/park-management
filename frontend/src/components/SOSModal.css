@@ -1,0 +1,603 @@
+/* SOS Emergency Modal Styles */
+.sos-modal-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(15, 23, 42, 0.85);
+  backdrop-filter: blur(8px);
+  z-index: 999999;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 1rem;
+  animation: sosFadeIn 0.2s ease-out;
+}
+
+@keyframes sosFadeIn {
+  from { opacity: 0; transform: scale(0.97); }
+  to { opacity: 1; transform: scale(1); }
+}
+
+.sos-modal-card {
+  background: #0f172a;
+  border: 2px solid #ef4444;
+  border-radius: 20px;
+  width: 100%;
+  max-width: 640px;
+  max-height: 90vh;
+  overflow-y: auto;
+  box-shadow: 0 25px 60px -12px rgba(239, 68, 68, 0.35);
+  color: #f8fafc;
+  display: flex;
+  flex-direction: column;
+}
+
+.sos-modal-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 1.25rem 1.5rem;
+  background: linear-gradient(135deg, #7f1d1d 0%, #991b1b 100%);
+  border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.sos-header-title {
+  display: flex;
+  align-items: center;
+  gap: 0.85rem;
+}
+
+.sos-pulsing-icon {
+  background: #ef4444;
+  padding: 8px;
+  border-radius: 12px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: 0 0 15px rgba(239, 68, 68, 0.8);
+  animation: pulseSiren 1.2s infinite;
+}
+
+@keyframes pulseSiren {
+  0%, 100% { transform: scale(1); box-shadow: 0 0 15px rgba(239, 68, 68, 0.8); }
+  50% { transform: scale(1.08); box-shadow: 0 0 25px rgba(239, 68, 68, 1); }
+}
+
+.sos-header-title h3 {
+  margin: 0;
+  font-size: 1.25rem;
+  font-weight: 800;
+  color: #ffffff;
+  letter-spacing: -0.3px;
+}
+
+.sos-header-title p {
+  margin: 2px 0 0 0;
+  font-size: 0.8rem;
+  color: #fecaca;
+  font-weight: 500;
+}
+
+.sos-btn-close {
+  background: rgba(255, 255, 255, 0.15);
+  border: none;
+  color: #fecaca;
+  width: 36px;
+  height: 36px;
+  border-radius: 50%;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.2s;
+}
+
+.sos-btn-close:hover {
+  background: rgba(255, 255, 255, 0.3);
+  color: #ffffff;
+}
+
+.sos-modal-body {
+  padding: 1.25rem 1.5rem;
+  display: flex;
+  flex-direction: column;
+  gap: 1.25rem;
+}
+
+.sos-error-alert {
+  background: rgba(239, 68, 68, 0.2);
+  border: 1px solid #ef4444;
+  color: #fca5a5;
+  padding: 0.75rem 1rem;
+  border-radius: 10px;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  font-size: 0.88rem;
+  font-weight: 600;
+}
+
+/* Direct Dial Bar */
+.sos-direct-dial-bar {
+  background: #1e293b;
+  border: 1px solid rgba(239, 68, 68, 0.4);
+  border-radius: 12px;
+  padding: 0.85rem 1rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.6rem;
+}
+
+.direct-dial-text {
+  display: flex;
+  align-items: center;
+  gap: 0.4rem;
+  font-size: 0.85rem;
+  color: #e2e8f0;
+}
+
+.live-pulse-dot {
+  width: 8px;
+  height: 8px;
+  background: #ef4444;
+  border-radius: 50%;
+  display: inline-block;
+  animation: pulseDot 1.2s infinite;
+}
+
+@keyframes pulseDot {
+  0%, 100% { opacity: 1; transform: scale(1); }
+  50% { opacity: 0.3; transform: scale(0.8); }
+}
+
+.direct-dial-actions {
+  display: flex;
+  gap: 0.75rem;
+  flex-wrap: wrap;
+}
+
+.btn-dial-quick {
+  background: #dc2626;
+  color: #ffffff;
+  text-decoration: none;
+  padding: 0.4rem 0.85rem;
+  border-radius: 8px;
+  font-size: 0.82rem;
+  font-weight: 700;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4rem;
+  transition: background 0.2s;
+}
+
+.btn-dial-quick:hover {
+  background: #b91c1c;
+}
+
+.btn-dial-quick.ambulance {
+  background: #0284c7;
+}
+
+.btn-dial-quick.ambulance:hover {
+  background: #0369a1;
+}
+
+/* Form Styles */
+.sos-form {
+  display: flex;
+  flex-direction: column;
+  gap: 1.15rem;
+}
+
+.sos-form-section {
+  display: flex;
+  flex-direction: column;
+  gap: 0.45rem;
+}
+
+.sos-label {
+  font-size: 0.85rem;
+  font-weight: 700;
+  color: #f1f5f9;
+  display: flex;
+  align-items: center;
+  gap: 0.4rem;
+}
+
+.text-red {
+  color: #ef4444;
+}
+
+.sos-type-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
+  gap: 0.6rem;
+}
+
+.sos-type-card {
+  background: #1e293b;
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: 10px;
+  padding: 0.65rem 0.75rem;
+  display: flex;
+  align-items: center;
+  gap: 0.65rem;
+  text-align: left;
+  cursor: pointer;
+  transition: all 0.2s;
+  color: #f8fafc;
+}
+
+.sos-type-card:hover {
+  border-color: #ef4444;
+  background: #273549;
+}
+
+.sos-type-card.selected {
+  border-color: #ef4444;
+  background: rgba(239, 68, 68, 0.15);
+  box-shadow: 0 0 0 1px #ef4444;
+}
+
+.type-icon-wrap {
+  width: 36px;
+  height: 36px;
+  border-radius: 8px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
+
+.type-info {
+  display: flex;
+  flex-direction: column;
+}
+
+.type-name {
+  font-size: 0.85rem;
+  font-weight: 700;
+  color: #ffffff;
+}
+
+.type-desc {
+  font-size: 0.72rem;
+  color: #94a3b8;
+  line-height: 1.2;
+}
+
+.sos-select-input,
+.sos-text-input,
+.sos-textarea {
+  background: #1e293b;
+  border: 1px solid rgba(255, 255, 255, 0.15);
+  color: #ffffff;
+  padding: 0.6rem 0.85rem;
+  border-radius: 8px;
+  font-size: 0.88rem;
+  outline: none;
+  width: 100%;
+}
+
+.sos-select-input:focus,
+.sos-text-input:focus,
+.sos-textarea:focus {
+  border-color: #ef4444;
+  box-shadow: 0 0 0 2px rgba(239, 68, 68, 0.25);
+}
+
+.sos-gps-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.btn-gps-refresh {
+  background: rgba(255, 255, 255, 0.08);
+  border: 1px solid rgba(255, 255, 255, 0.15);
+  color: #38bdf8;
+  padding: 0.25rem 0.6rem;
+  border-radius: 6px;
+  font-size: 0.75rem;
+  font-weight: 600;
+  display: flex;
+  align-items: center;
+  gap: 0.3rem;
+  cursor: pointer;
+}
+
+.btn-gps-refresh:hover {
+  background: rgba(56, 189, 248, 0.15);
+}
+
+.sos-gps-card {
+  background: #131d31;
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  border-radius: 8px;
+  padding: 0.65rem 0.85rem;
+}
+
+.coords-row {
+  display: flex;
+  gap: 0.5rem;
+  margin-bottom: 0.35rem;
+}
+
+.coords-badge {
+  background: rgba(239, 68, 68, 0.2);
+  color: #fca5a5;
+  font-family: monospace;
+  font-size: 0.75rem;
+  padding: 0.15rem 0.45rem;
+  border-radius: 4px;
+  font-weight: 600;
+}
+
+.sos-loc-address {
+  margin: 0;
+  font-size: 0.8rem;
+  color: #cbd5e1;
+}
+
+.sos-contact-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 0.75rem;
+}
+
+.sos-modal-footer {
+  display: flex;
+  justify-content: flex-end;
+  gap: 0.75rem;
+  margin-top: 0.5rem;
+  padding-top: 1rem;
+  border-top: 1px solid rgba(255, 255, 255, 0.08);
+}
+
+.btn-sos-cancel {
+  background: rgba(255, 255, 255, 0.08);
+  color: #cbd5e1;
+  border: 1px solid rgba(255, 255, 255, 0.15);
+  padding: 0.65rem 1.25rem;
+  border-radius: 10px;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.btn-sos-cancel:hover {
+  background: rgba(255, 255, 255, 0.15);
+  color: #ffffff;
+}
+
+.btn-sos-proceed,
+.btn-sos-confirm-send {
+  background: linear-gradient(135deg, #dc2626 0%, #b91c1c 100%);
+  color: #ffffff;
+  border: none;
+  padding: 0.65rem 1.5rem;
+  border-radius: 10px;
+  font-weight: 700;
+  font-size: 0.95rem;
+  cursor: pointer;
+  box-shadow: 0 4px 12px rgba(220, 38, 38, 0.4);
+  transition: all 0.2s;
+}
+
+.btn-sos-proceed:hover,
+.btn-sos-confirm-send:hover {
+  background: linear-gradient(135deg, #ef4444 0%, #dc2626 100%);
+  transform: translateY(-1px);
+}
+
+/* Confirmation Step */
+.sos-confirm-step,
+.sos-success-step {
+  text-align: center;
+  padding: 1rem 0;
+}
+
+.confirm-icon-box,
+.success-icon-box {
+  display: flex;
+  justify-content: center;
+  margin-bottom: 1rem;
+}
+
+.confirm-title,
+.success-title {
+  font-size: 1.35rem;
+  font-weight: 800;
+  color: #ffffff;
+  margin: 0 0 0.5rem 0;
+}
+
+.confirm-subtitle,
+.success-subtitle {
+  font-size: 0.9rem;
+  color: #94a3b8;
+  max-width: 500px;
+  margin: 0 auto 1.5rem auto;
+  line-height: 1.4;
+}
+
+.confirm-summary-card,
+.success-details-card {
+  background: #1e293b;
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: 12px;
+  padding: 1rem 1.25rem;
+  text-align: left;
+  margin-bottom: 1.5rem;
+}
+
+.summary-item {
+  display: flex;
+  justify-content: space-between;
+  padding: 0.5rem 0;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.06);
+  font-size: 0.88rem;
+}
+
+.summary-item:last-child {
+  border-bottom: none;
+}
+
+.summary-label {
+  color: #94a3b8;
+}
+
+.summary-val {
+  color: #ffffff;
+}
+
+.font-bold { font-weight: 700; }
+.font-semibold { font-weight: 600; }
+
+.success-id-badge {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  background: rgba(16, 185, 129, 0.15);
+  border: 1px solid #10b981;
+  padding: 0.6rem 1rem;
+  border-radius: 8px;
+  color: #34d399;
+  font-size: 0.9rem;
+  margin-bottom: 1rem;
+}
+
+.success-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 0.75rem;
+}
+
+.success-field {
+  display: flex;
+  flex-direction: column;
+}
+
+.success-field.col-span-2 {
+  grid-column: span 2;
+}
+
+.field-name {
+  font-size: 0.75rem;
+  color: #94a3b8;
+}
+
+.field-value {
+  font-size: 0.88rem;
+  color: #ffffff;
+  font-weight: 600;
+  display: flex;
+  align-items: center;
+  gap: 0.3rem;
+}
+
+.status-badge-live {
+  background: #dc2626;
+  color: #ffffff;
+  padding: 0.2rem 0.6rem;
+  border-radius: 6px;
+  font-size: 0.8rem;
+  font-weight: 700;
+  width: fit-content;
+}
+
+.btn-sos-done {
+  background: #10b981;
+  color: white;
+  border: none;
+  padding: 0.75rem 2rem;
+  border-radius: 10px;
+  font-weight: 700;
+  cursor: pointer;
+  margin: 0 auto;
+}
+
+/* Direct 1-Tap Mode Styling */
+.sos-modal-card.direct-mode {
+  max-width: 580px;
+  border: 2.5px solid #ef4444;
+}
+
+.direct-flow {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+}
+
+.direct-emergency-tag {
+  background: rgba(239, 68, 68, 0.15);
+  border: 1px solid rgba(239, 68, 68, 0.4);
+  border-radius: 10px;
+  padding: 0.6rem 1rem;
+  display: flex;
+  align-items: center;
+  gap: 0.6rem;
+  color: #fca5a5;
+  font-size: 0.95rem;
+}
+
+.direct-emergency-tag strong {
+  color: #ffffff;
+  font-weight: 800;
+}
+
+.sos-form-section.compact {
+  margin-bottom: 0;
+}
+
+.direct-action-footer {
+  margin-top: 0.5rem;
+}
+
+.btn-direct-emergency-send {
+  width: 100%;
+  background: linear-gradient(135deg, #ef4444 0%, #dc2626 50%, #991b1b 100%);
+  border: 2px solid #fecaca;
+  border-radius: 16px;
+  padding: 1.15rem 1.25rem;
+  cursor: pointer;
+  box-shadow: 0 0 30px rgba(239, 68, 68, 0.7), 0 8px 25px rgba(0, 0, 0, 0.5);
+  animation: urgentBtnPulse 1.6s infinite alternate;
+  transition: all 0.2s ease;
+}
+
+@keyframes urgentBtnPulse {
+  0% { transform: scale(0.99); box-shadow: 0 0 20px rgba(239, 68, 68, 0.6); }
+  100% { transform: scale(1.02); box-shadow: 0 0 40px rgba(239, 68, 68, 0.95); }
+}
+
+.btn-direct-emergency-send:hover {
+  background: linear-gradient(135deg, #f87171 0%, #ef4444 50%, #b91c1c 100%);
+  transform: translateY(-2px) scale(1.03);
+}
+
+.btn-send-inner {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+  gap: 0.25rem;
+}
+
+.btn-send-title {
+  font-size: 1.15rem;
+  font-weight: 900;
+  color: #ffffff;
+  letter-spacing: 0.5px;
+}
+
+.btn-send-subtitle {
+  font-size: 0.78rem;
+  color: #fee2e2;
+  font-weight: 500;
+}
+
+@media (max-width: 600px) {
+  .sos-contact-grid,
+  .sos-type-grid {
+    grid-template-columns: 1fr;
+  }
+}

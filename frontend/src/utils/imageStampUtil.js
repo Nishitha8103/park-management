@@ -1,7 +1,7 @@
 /**
  * Authentic GPS Map Camera Stamp Utility
  * 
- * Recreates the exact GPS Map Camera format requested:
+ * Recreates the exact GPS Map Camera format:
  * - Left: Map Box with red pin & Google branding
  * - Right: Dark translucent badge with:
  *   - City, State, Country
@@ -9,24 +9,137 @@
  *   - Lat xx.xxxxxx°
  *   - Long xx.xxxxxx°
  *   - DD/MM/YY HH:MM AM/PM
- * - Top Right: Optional GPS Map Camera app watermark icon
+ * - Top Right: GPS Map Camera badge
  */
 
 const geoCache = new Map();
 
+/**
+ * Forward geocode a place / city / park name into exact coordinates
+ */
+/**
+ * Forward geocode a place / city / park name into exact coordinates with rich street details
+ */
+export const forwardGeocode = async (query) => {
+  if (!query || !query.trim()) return null;
+  const q = query.trim();
+
+  // Live lookup via OpenStreetMap Nominatim with full address details
+  try {
+    const controller = new AbortController();
+    const timeoutId = setTimeout(() => controller.abort(), 6000);
+
+    const res = await fetch(
+      `https://nominatim.openstreetmap.org/search?format=json&q=${encodeURIComponent(q)}&limit=1&addressdetails=1`,
+      {
+        headers: { 'Accept-Language': 'en', 'User-Agent': 'ParkMonitorApp/2.0' },
+        signal: controller.signal
+      }
+    );
+    clearTimeout(timeoutId);
+
+    if (res.ok) {
+      const data = await res.json();
+      if (data && data.length > 0) {
+        const item = data[0];
+        const lat = parseFloat(item.lat);
+        const lon = parseFloat(item.lon);
+        const addr = item.address || {};
+        const road = addr.road || addr.pedestrian || addr.street || '';
+        const locality = addr.suburb || addr.neighbourhood || addr.residential || addr.quarter || addr.village || '';
+        const city = addr.city || addr.town || addr.county || addr.state_district || '';
+        const state = addr.state || '';
+        const country = addr.country || '';
+        const postcode = addr.postcode || '';
+
+        const line1Parts = [locality || road, city, country].filter(Boolean);
+        const line1 = line1Parts.join(', ');
+
+        const line2Parts = [road, locality, city, state, postcode, country].filter(Boolean);
+        const line2 = item.display_name || line2Parts.join(', ');
+
+        return {
+          latitude: lat,
+          longitude: lon,
+          cityStateCountry: line1 || item.display_name || `Lat: ${lat.toFixed(4)}, Lon: ${lon.toFixed(4)}`,
+          fullAddress: line2 || item.display_name
+        };
+      }
+    }
+  } catch (err) {
+    console.warn('Forward geocoding error:', err);
+  }
+
+  return null;
+};
+
+/**
+ * Fetch true live geolocation directly from Browser GPS (no IP guessing)
+ */
+export const getLiveGeoLocation = async () => {
+  if (typeof navigator === 'undefined' || !navigator.geolocation) {
+    throw new Error('Geolocation is not supported by your browser.');
+  }
+
+  return new Promise((resolve, reject) => {
+    // 1. Try high accuracy GPS (mobile GPS / Wi-Fi triangulation)
+    navigator.geolocation.getCurrentPosition(
+      (pos) => {
+        if (pos && pos.coords) {
+          resolve({
+            latitude: pos.coords.latitude,
+            longitude: pos.coords.longitude,
+            accuracy: pos.coords.accuracy || 5,
+            source: 'Device GPS'
+          });
+        } else {
+          reject(new Error('Invalid GPS coordinates received.'));
+        }
+      },
+      (err1) => {
+        console.warn('High accuracy GPS error:', err1?.message || err1);
+        // 2. Retry with standard accuracy
+        navigator.geolocation.getCurrentPosition(
+          (pos2) => {
+            if (pos2 && pos2.coords) {
+              resolve({
+                latitude: pos2.coords.latitude,
+                longitude: pos2.coords.longitude,
+                accuracy: pos2.coords.accuracy || 15,
+                source: 'Browser Geolocation'
+              });
+            } else {
+              reject(new Error('Location unavailable.'));
+            }
+          },
+          (err2) => {
+            console.error('Browser GPS failed:', err2);
+            reject(err2);
+          },
+          { enableHighAccuracy: false, timeout: 12000, maximumAge: 0 }
+        );
+      },
+      { enableHighAccuracy: true, timeout: 8000, maximumAge: 0 }
+    );
+  });
+};
+
+/**
+ * Reverse geocode latitude/longitude into human-readable city, state, detailed street address
+ */
 export const reverseGeocodeDetails = async (lat, lon) => {
-  if (!lat || !lon) return null;
+  if (lat === null || lat === undefined || lon === null || lon === undefined) return null;
   const key = `${Number(lat).toFixed(4)},${Number(lon).toFixed(4)}`;
   if (geoCache.has(key)) return geoCache.get(key);
 
   try {
     const controller = new AbortController();
-    const timeoutId = setTimeout(() => controller.abort(), 4000);
+    const timeoutId = setTimeout(() => controller.abort(), 6000);
 
     const res = await fetch(
       `https://nominatim.openstreetmap.org/reverse?format=json&lat=${lat}&lon=${lon}&zoom=18&addressdetails=1`,
       {
-        headers: { 'Accept-Language': 'en' },
+        headers: { 'Accept-Language': 'en', 'User-Agent': 'ParkMonitorApp/2.0' },
         signal: controller.signal
       }
     );
@@ -36,21 +149,24 @@ export const reverseGeocodeDetails = async (lat, lon) => {
       const data = await res.json();
       const addr = data.address || {};
 
-      const city = addr.city || addr.town || addr.village || addr.county || addr.state_district || 'Bengaluru';
-      const state = addr.state || 'Karnataka';
-      const country = addr.country || 'India';
+      const road = addr.road || addr.pedestrian || addr.street || addr.residential || '';
+      const locality = addr.suburb || addr.neighbourhood || addr.quarter || addr.village || addr.hamlet || '';
+      const city = addr.city || addr.town || addr.municipality || addr.county || addr.state_district || '';
+      const state = addr.state || '';
+      const country = addr.country || '';
       const postcode = addr.postcode || '';
 
-      const line1 = `${city}, ${state}, ${country}`;
+      const topArea = locality || road || city;
+      const line1Parts = [topArea, city, country].filter(Boolean);
+      const line1 = line1Parts.filter((item, idx) => line1Parts.indexOf(item) === idx).join(', ');
 
-      // Detailed line with area / road
-      const sub = addr.suburb || addr.neighbourhood || addr.residential || addr.road || addr.quarter || '';
-      const parts = [sub, city, state, postcode, country].filter(Boolean);
-      const line2 = parts.length > 0 ? parts.join(', ') : (data.display_name?.split(',').slice(0, 4).join(',') || line1);
+      const parts = [road, locality, city, state, postcode, country].filter(Boolean);
+      const uniqueParts = parts.filter((item, index) => parts.indexOf(item) === index);
+      const line2 = data.display_name || uniqueParts.join(', ');
 
       const result = {
-        cityStateCountry: line1,
-        fullAddress: line2,
+        cityStateCountry: line1 || data.display_name || `Lat ${Number(lat).toFixed(4)}°, Lon ${Number(lon).toFixed(4)}°`,
+        fullAddress: line2 || `Coordinates: ${lat}, ${lon}`,
         city,
         state,
         country
@@ -60,15 +176,15 @@ export const reverseGeocodeDetails = async (lat, lon) => {
       return result;
     }
   } catch (err) {
-    console.warn('Geocoding error:', err);
+    console.warn('Geocoding lookup error:', err);
   }
 
   return {
-    cityStateCountry: 'Karnataka, India',
-    fullAddress: 'On-Site Location Verified',
-    city: 'City',
-    state: 'Karnataka',
-    country: 'India'
+    cityStateCountry: `Lat ${Number(lat).toFixed(5)}°, Long ${Number(lon).toFixed(5)}°`,
+    fullAddress: `Live GPS Location (${Number(lat).toFixed(6)}°, ${Number(lon).toFixed(6)}°)`,
+    city: '',
+    state: '',
+    country: ''
   };
 };
 
@@ -149,22 +265,22 @@ const drawMiniMap = (width, height, lat, lon) => {
   // Google logo branding in bottom left
   const brandH = Math.max(10, Math.floor(height * 0.14));
   ctx.font = `bold ${brandH}px Roboto, Arial, sans-serif`;
-  ctx.fillStyle = '#4285F4'; // G (Blue)
+  ctx.fillStyle = '#4285F4'; // G
   ctx.fillText('G', 6, height - 6);
   const w1 = ctx.measureText('G').width;
-  ctx.fillStyle = '#EA4335'; // o (Red)
+  ctx.fillStyle = '#EA4335'; // o
   ctx.fillText('o', 6 + w1, height - 6);
   const w2 = w1 + ctx.measureText('o').width;
-  ctx.fillStyle = '#FBBC05'; // o (Yellow)
+  ctx.fillStyle = '#FBBC05'; // o
   ctx.fillText('o', 6 + w2, height - 6);
   const w3 = w2 + ctx.measureText('o').width;
-  ctx.fillStyle = '#4285F4'; // g (Blue)
+  ctx.fillStyle = '#4285F4'; // g
   ctx.fillText('g', 6 + w3, height - 6);
   const w4 = w3 + ctx.measureText('g').width;
-  ctx.fillStyle = '#34A853'; // l (Green)
+  ctx.fillStyle = '#34A853'; // l
   ctx.fillText('l', 6 + w4, height - 6);
   const w5 = w4 + ctx.measureText('l').width;
-  ctx.fillStyle = '#EA4335'; // e (Red)
+  ctx.fillStyle = '#EA4335'; // e
   ctx.fillText('e', 6 + w5, height - 6);
 
   // Clean border around map
@@ -189,25 +305,18 @@ export const stampImageWithGeoAndTimestamp = async (
 
   // 1. Resolve GPS Coordinates
   let geo = location;
-  if ((!geo || !geo.latitude) && navigator.geolocation) {
-    try {
-      geo = await new Promise((resolve) => {
-        navigator.geolocation.getCurrentPosition(
-          (pos) => resolve({ latitude: pos.coords.latitude, longitude: pos.coords.longitude }),
-          () => resolve({ latitude: 12.97860, longitude: 77.36400 }),
-          { timeout: 8000, enableHighAccuracy: true }
-        );
-      });
-    } catch (e) {
-      console.warn('Geolocation capture skipped:', e);
-    }
+  if (!geo || !geo.latitude || !geo.longitude) {
+    geo = await getLiveGeoLocation();
   }
 
-  const lat = geo?.latitude || 12.97860;
-  const lon = geo?.longitude || 77.36400;
+  const lat = geo?.latitude ?? 0;
+  const lon = geo?.longitude ?? 0;
 
   // 2. Resolve Geocoding Address Details
-  const addrDetails = await reverseGeocodeDetails(lat, lon);
+  const addrDetails = (lat !== 0 || lon !== 0) ? await reverseGeocodeDetails(lat, lon) : {
+    cityStateCountry: 'GPS Location Unavailable',
+    fullAddress: 'Please enable GPS permissions in browser'
+  };
 
   // 3. Render Canvas
   return new Promise((resolve, reject) => {
@@ -241,39 +350,64 @@ export const stampImageWithGeoAndTimestamp = async (
         // Dimension calculations
         const margin = Math.max(16, Math.floor(canvas.width * 0.025));
         const mapSize = Math.max(100, Math.floor(canvas.width * 0.17));
-        const fontSize = Math.max(14, Math.floor(canvas.width * 0.022));
-        const lineHeight = fontSize * 1.35;
+        const fontSize = Math.max(13, Math.floor(canvas.width * 0.020));
+        const lineHeight = fontSize * 1.32;
 
         // Text lines
-        const line1 = addrDetails.cityStateCountry;
-        const line2 = addrDetails.fullAddress;
+        const line1 = (geo && geo.placeName) || addrDetails.cityStateCountry;
+        const line2 = (geo && geo.fullAddress) || addrDetails.fullAddress;
         const line3 = `Lat ${Number(lat).toFixed(6)}°`;
         const line4 = `Long ${Number(lon).toFixed(6)}°`;
         const line5 = dateLine;
 
-        // Overlay dimensions
-        const textPadding = Math.max(12, Math.floor(canvas.width * 0.018));
-        const textBlockWidth = Math.max(280, Math.floor(canvas.width * 0.52));
-        const boxHeight = mapSize;
+        // Overlay dimensions & dynamic height
+        const textPadding = Math.max(12, Math.floor(canvas.width * 0.016));
+        const textBlockWidth = Math.max(340, Math.floor(canvas.width * 0.62));
+        
+        // Helper to wrap text into lines
+        const wrapText = (text, maxWidth, font) => {
+          ctx.font = font;
+          const words = text.split(', ');
+          const lines = [];
+          let currentLine = words[0] || '';
+
+          for (let i = 1; i < words.length; i++) {
+            const word = words[i];
+            const width = ctx.measureText(currentLine + ', ' + word).width;
+            if (width < maxWidth) {
+              currentLine += ', ' + word;
+            } else {
+              lines.push(currentLine);
+              currentLine = word;
+            }
+          }
+          if (currentLine) lines.push(currentLine);
+          return lines;
+        };
+
+        const maxTextW = textBlockWidth - textPadding * 2;
+        const fontLine2 = `500 ${Math.floor(fontSize * 0.88)}px Roboto, Arial, sans-serif`;
+        const addressLines = wrapText(line2, maxTextW, fontLine2);
+
+        const totalTextLines = 1 + addressLines.length + 3; // line1 + wrapped address + lat + long + date
+        const calculatedBoxH = Math.max(mapSize, textPadding * 2 + totalTextLines * lineHeight);
+        const boxHeight = calculatedBoxH;
         const startY = canvas.height - margin - boxHeight;
 
         // 1. Draw Mini Map Tile (Left)
         const mapX = margin;
-        const mapTile = drawMiniMap(mapSize, mapSize, lat, lon);
+        const mapTile = drawMiniMap(mapSize, boxHeight, lat, lon);
         ctx.drawImage(mapTile, mapX, startY);
 
         // 2. Draw Dark Translucent Details Box (Right of Map)
         const textX = mapX + mapSize + 8;
         const textWidth = textBlockWidth;
 
-        ctx.fillStyle = 'rgba(28, 25, 23, 0.86)'; // Dark slate/charcoal
+        ctx.fillStyle = 'rgba(28, 25, 23, 0.88)'; // Dark slate/charcoal
         ctx.fillRect(textX, startY, textWidth, boxHeight);
 
         // Text Rendering
-        ctx.font = `600 ${fontSize}px Roboto, -apple-system, BlinkMacSystemFont, "Segoe UI", Arial, sans-serif`;
-        ctx.fillStyle = '#ffffff';
         ctx.textBaseline = 'top';
-
         ctx.shadowColor = 'rgba(0, 0, 0, 0.8)';
         ctx.shadowBlur = 3;
         ctx.shadowOffsetX = 1;
@@ -281,19 +415,20 @@ export const stampImageWithGeoAndTimestamp = async (
 
         let curY = startY + textPadding;
         const textContentX = textX + textPadding;
-        const maxTextW = textWidth - textPadding * 2;
 
-        // Line 1: City, State, Country (Bold white)
+        // Line 1: Area, City, Country (Bold white)
         ctx.font = `bold ${Math.floor(fontSize * 1.05)}px Roboto, Arial, sans-serif`;
         ctx.fillStyle = '#ffffff';
         ctx.fillText(line1, textContentX, curY, maxTextW);
         curY += lineHeight * 1.05;
 
-        // Line 2: Full Detailed Street/Area Address (Light gray/white)
-        ctx.font = `500 ${Math.floor(fontSize * 0.88)}px Roboto, Arial, sans-serif`;
+        // Line 2: Full Detailed Multi-line Street Address (Light gray/white)
+        ctx.font = fontLine2;
         ctx.fillStyle = '#f1f5f9';
-        ctx.fillText(line2, textContentX, curY, maxTextW);
-        curY += lineHeight * 0.95;
+        for (const addrLine of addressLines) {
+          ctx.fillText(addrLine, textContentX, curY, maxTextW);
+          curY += lineHeight * 0.95;
+        }
 
         // Line 3: Lat xx.xxxxxx°
         ctx.font = `500 ${fontSize}px Roboto, Arial, sans-serif`;
@@ -332,7 +467,7 @@ export const stampImageWithGeoAndTimestamp = async (
             resolve({
               file: stampedFile,
               preview: URL.createObjectURL(stampedFile),
-              location: { latitude: lat, longitude: lon, placeName: addrDetails.cityStateCountry },
+              location: { latitude: lat, longitude: lon, placeName: line1, fullAddress: line2 },
               timestamp: now.toISOString()
             });
           },

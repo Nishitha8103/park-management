@@ -18,7 +18,14 @@ const ContractorMyTasks = () => {
     }
     setSearchParams(searchParams);
   };
-  const [contractor, setContractor] = useState(null);
+  const [contractor, setContractor] = useState(() => {
+    try {
+      const stored = localStorage.getItem('contractorUser');
+      return stored ? JSON.parse(stored) : null;
+    } catch {
+      return null;
+    }
+  });
   const [selectedJob, setSelectedJob] = useState(null);
   const [remarks, setRemarks] = useState('');
   const [showModal, setShowModal] = useState(false);
@@ -36,47 +43,40 @@ const ContractorMyTasks = () => {
   const [jobs, setJobs] = useState([]);
 
   useEffect(() => {
-    const storedUser = localStorage.getItem('contractorUser');
-    if (!storedUser) {
-      navigate('/contractor/login');
-    } else {
-      setContractor(JSON.parse(storedUser));
+    if (!contractor) {
+      navigate('/login');
+      return;
     }
-  }, [navigate]);
 
-  useEffect(() => {
-    const contractorId = contractor?.id || contractor?._id;
+    const contractorId = contractor.id || contractor._id;
     if (contractorId) {
-      const fetchJobs = async () => {
-        try {
-          const res = await fetch(`/api/complaints?contractorId=${contractorId}`);
-          if (res.ok) {
-            const data = await res.json();
-            const fetchedJobs = data.map(c => ({
-              id: c.complaintNumber,
-              _id: c._id,
-              park: c.parkName || (c.park ? c.park.name : 'Unknown Park'),
-              type: c.category || 'Maintenance',
-              desc: c.description,
-              priority: c.priority || 'Medium',
-              status: c.status ? (c.status.toLowerCase() === 'new' ? 'assigned' : c.status.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-|-$/g, '')) : 'assigned',
-              date: new Date(c.createdAt).toLocaleDateString(),
-              remarks: c.contractorRemarks || '',
-              rejectionReason: c.rejectionReason || ''
-            }));
-            setJobs(fetchedJobs);
-          }
-        } catch (error) {
-          console.error('Error fetching jobs:', error);
-        }
-      };
-      fetchJobs();
+      fetch(`/api/complaints?contractorId=${contractorId}`)
+        .then(res => res.ok ? res.json() : [])
+        .then(data => {
+          const list = Array.isArray(data) ? data : [];
+          const fetchedJobs = list.map(c => ({
+            id: c.complaintNumber,
+            _id: c._id,
+            park: c.parkName || (c.park ? c.park.name : 'Unknown Park'),
+            type: c.category || 'Maintenance',
+            desc: c.description,
+            priority: c.priority || 'Medium',
+            status: c.status ? (c.status.toLowerCase() === 'new' ? 'assigned' : c.status.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-|-$/g, '')) : 'assigned',
+            date: new Date(c.createdAt).toLocaleDateString(),
+            remarks: c.contractorRemarks || '',
+            rejectionReason: c.rejectionReason || ''
+          }));
+          setJobs(fetchedJobs);
+        })
+        .catch(err => console.error('Error fetching jobs:', err));
     }
-  }, [contractor]);
+  }, [contractor, navigate]);
 
   const handleLogout = () => {
     localStorage.removeItem('contractorUser');
-    navigate('/contractor/login');
+    localStorage.removeItem('user');
+    localStorage.removeItem('token');
+    navigate('/login');
   };
 
   const startJob = async (jobId) => {
@@ -439,3 +439,4 @@ const ContractorMyTasks = () => {
 };
 
 export default ContractorMyTasks;
+

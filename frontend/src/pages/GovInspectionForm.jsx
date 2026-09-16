@@ -104,6 +104,11 @@ const GovInspectionForm = () => {
   };
 
   const handleSaveAndProceed = () => {
+    if (photos.length === 0) {
+      alert("Live On-Site Inspection Photo is mandatory (*). Please capture at least one photo using Live Camera.");
+      return;
+    }
+
     // Navigate to Decision Page
     const complaintId = id || (complaint?._id);
     
@@ -213,7 +218,7 @@ const GovInspectionForm = () => {
 
           <div className="card p-xl">
             <h3 className="card-header-title" style={{ border: 'none', paddingBottom: '0' }}>
-              Inspection Photos <span style={{ fontWeight: 'normal', fontSize: '0.9rem', color: '#64748b' }}>(On Site with Live GPS & Date-Time)</span>
+              Inspection Photos <span style={{ color: '#ef4444' }}>*</span> <span style={{ fontWeight: '600', fontSize: '0.85rem', color: '#dc2626' }}>(Mandatory On-Site Live GPS Camera Photo)</span>
             </h3>
 
             <input
@@ -244,20 +249,12 @@ const GovInspectionForm = () => {
               {/* Camera Trigger */}
               <div 
                 className="upload-placeholder" 
-                style={{ background: 'linear-gradient(135deg, #06402b 0%, #059669 100%)', color: '#ffffff', border: 'none', cursor: 'pointer' }}
+                style={{ background: 'linear-gradient(135deg, #06402b 0%, #059669 100%)', color: '#ffffff', border: 'none', cursor: 'pointer', minWidth: '160px' }}
                 onClick={() => setIsCameraOpen(true)}
               >
                 <div className="upload-content" style={{ color: '#ffffff' }}>
-                  <Camera size={24} />
-                  <span>Live Camera</span>
-                </div>
-              </div>
-
-              {/* Gallery Trigger */}
-              <div className="upload-placeholder" onClick={() => document.getElementById('inspection-photo-input').click()}>
-                <div className="upload-content text-primary">
-                  <Upload size={24} />
-                  <span>Upload File</span>
+                  <Camera size={26} />
+                  <span style={{ fontWeight: 600 }}>Live Camera Capture</span>
                 </div>
               </div>
             </div>
@@ -311,6 +308,10 @@ const GovInspectionForm = () => {
         onClose={() => setIsCameraOpen(false)}
         onCapture={handleCameraCapture}
         tag="Official Field Inspection"
+        defaultLocation={complaint ? {
+          name: complaint.parkId?.name || complaint.parkName || 'Inspected Park',
+          address: complaint.parkId?.address || complaint.address || complaint.parkName || 'Park Field Location'
+        } : null}
       />
     </div>
   );

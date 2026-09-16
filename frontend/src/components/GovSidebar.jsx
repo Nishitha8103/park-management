@@ -7,7 +7,9 @@ import {
   Bell, 
   User, 
   LogOut,
-  Calendar 
+  Calendar,
+  AlertOctagon,
+  CalendarDays
 } from 'lucide-react';
 import '../components/Sidebar.css'; // Use existing project styling
 
@@ -109,6 +111,11 @@ const GovSidebar = ({ isOpen = false, toggleSidebar = () => {} }) => {
           <NavLink to="/gov-dashboard/profile" className={({isActive}) => isActive ? 'nav-item active' : 'nav-item'}>
             <User size={20} />
             <span>Profile</span>
+          </NavLink>
+
+          <NavLink to="/gov-dashboard/leaves" className={({isActive}) => isActive ? 'nav-item active' : 'nav-item'}>
+            <CalendarDays size={20} />
+            <span>My Leaves</span>
           </NavLink>
 
           <NavLink to="/gov-dashboard/logout" className={({isActive}) => isActive ? 'nav-item active' : 'nav-item'} style={{ marginTop: 'auto' }}>

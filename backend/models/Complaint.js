@@ -19,7 +19,7 @@ const complaintSchema = new mongoose.Schema({
   description: { type: String, required: true },
   images: [{ type: String }],
   
-  // Status workflow: New -> Assigned -> In Progress -> Completed - Waiting for Admin Review -> Returned by Admin -> Inspection Pending -> Inspection Approved -> Rework Required -> Reassigned to Contractor -> Closed
+  // Status workflow: New -> Assigned -> In Progress -> Completed - Waiting for Admin Review -> Returned by Admin -> Inspection Pending -> Inspection Approved -> Rework Required -> Reassigned to Contractor -> Reassignment Requested -> Escalated -> Closed
   status: {
     type: String,
     enum: [
@@ -32,6 +32,8 @@ const complaintSchema = new mongoose.Schema({
       'Inspection Approved',
       'Rework Required',
       'Reassigned to Contractor',
+      'Reassignment Requested',
+      'Escalated',
       'Rejected by Contractor',
       'Closed'
     ],
@@ -45,6 +47,44 @@ const complaintSchema = new mongoose.Schema({
   assignedZone: { type: String },
 
   assignedOfficial: { type: mongoose.Schema.Types.ObjectId, ref: 'User' },
+
+  // Reassignment tracking
+  reassignmentStatus: {
+    type: String,
+    enum: ['None', 'Reassignment Requested', 'Reassigned', 'Rejected', 'Escalated'],
+    default: 'None'
+  },
+  reassignmentReason: { type: String },
+  reassignmentExplanation: { type: String },
+  reassignmentAttachment: { type: String },
+  reassignmentRequestedAt: { type: Date },
+  reassignmentRequesterId: { type: String },
+  reassignmentRequesterRole: { type: String },
+
+  // Complete Audit Trail / Assignment History
+  assignmentHistory: [{
+    historyId: { type: String },
+    assignedToId: { type: String },
+    assignedToName: { type: String },
+    assignedToRole: { type: String, enum: ['contractor', 'government_official', 'official', 'Contractor', 'Government Official'] },
+    assignedBy: { type: String, default: 'Admin' },
+    assignedAt: { type: Date, default: Date.now },
+    actionType: { 
+      type: String, 
+      enum: ['Initial Assignment', 'Direct Reassignment', 'Reassignment Requested', 'Reassignment Approved', 'Reassignment Rejected', 'Escalated', 'Work Started', 'Completed', 'Inspection Submitted'] 
+    },
+    reason: { type: String },
+    explanation: { type: String },
+    previousAssigneeId: { type: String },
+    previousAssigneeName: { type: String },
+    previousAssigneeRole: { type: String },
+    previousDeadline: { type: Date },
+    newDeadline: { type: Date },
+    deadlineChangeReason: { type: String },
+    reviewedBy: { type: String },
+    reviewedAt: { type: Date },
+    statusAtTime: { type: String }
+  }],
 
   // Contractor Resolution
   beforeImages: [{ type: String }],

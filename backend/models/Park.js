@@ -53,6 +53,8 @@ const parkSchema = new mongoose.Schema({
   // Assignment
   contractor: { type: mongoose.Schema.Types.ObjectId, ref: 'User' },
   governmentOfficial: { type: mongoose.Schema.Types.ObjectId, ref: 'User' },
+  securityStaff: [{ type: mongoose.Schema.Types.ObjectId, ref: 'User' }],
+  parkStaff: [{ type: mongoose.Schema.Types.ObjectId, ref: 'User' }],
   
   description: { type: String },
   status: { 

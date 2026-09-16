@@ -1,5 +1,5 @@
 import { NavLink } from 'react-router-dom';
-import { TreePine, Home, ClipboardList, CheckCircle, FileText, Bell, User, LogOut, Calendar, Package } from 'lucide-react';
+import { TreePine, Home, ClipboardList, CheckCircle, FileText, Bell, User, LogOut, Calendar, Package, CalendarDays } from 'lucide-react';
 import './ContractorSidebar.css';
 
 const ContractorSidebar = ({ isOpen, toggleSidebar, handleLogout, contractor }) => {
@@ -50,6 +50,14 @@ const ContractorSidebar = ({ isOpen, toggleSidebar, handleLogout, contractor }) 
           <NavLink to="/contractor/materials" className={({isActive}) => isActive ? 'contractor-nav-item active' : 'contractor-nav-item'}>
             <Package size={20} />
             <span>Material Requests</span>
+          </NavLink>
+          <NavLink to="/contractor/leaves" className={({isActive}) => isActive ? 'contractor-nav-item active' : 'contractor-nav-item'}>
+            <CalendarDays size={20} />
+            <span>My Leaves</span>
+          </NavLink>
+          <NavLink to="/contractor/notifications" className={({isActive}) => isActive ? 'contractor-nav-item active' : 'contractor-nav-item'}>
+            <Bell size={20} />
+            <span>Notifications</span>
           </NavLink>
           <NavLink to="/contractor/profile" className={({isActive}) => isActive ? 'contractor-nav-item active' : 'contractor-nav-item'}>
             <User size={20} />

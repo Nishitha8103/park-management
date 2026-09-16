@@ -346,7 +346,7 @@ const AdminContractorsAdd = () => {
               <label style={{ display: 'block', marginBottom: '0.5rem', fontWeight: '600', fontSize: '0.9rem', color: '#475569' }}>Select Maintenance Skills</label>
               <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(200px, 1fr))', gap: '0.75rem', background: '#f1f5f9', padding: '1rem', borderRadius: '6px' }}>
                 {[
-                  'Electrical Maintenance', 'Plumbing Maintenance', 'Gardening / Horticulture',
+                  'Park Gardener', 'Gardening / Horticulture', 'Electrical Maintenance', 'Plumbing Maintenance',
                   'Cleaning / Sanitation', 'Civil / Masonry', 'Carpentry', 'Painting',
                   'Playground Equipment Maintenance', 'Water Supply / Drainage', 
                   'Gate / Fencing Maintenance', 'General Park Maintenance'

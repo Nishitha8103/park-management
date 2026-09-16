@@ -55,7 +55,7 @@ const GovDashboard = () => {
   useEffect(() => {
     const stored = localStorage.getItem('govUser');
     if (!stored) {
-      navigate('/gov/login');
+      navigate('/login');
       return;
     }
     setUser(JSON.parse(stored));

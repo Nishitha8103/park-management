@@ -10,7 +10,7 @@
   align-items: center;
   justify-content: center;
   background-color: #03140a;
-  background-image: url('/login_bg_park.jpg');
+  background-image: url('/landing_bg_leaves.jpg');
   background-repeat: no-repeat;
   background-position: center center;
   background-size: cover;
@@ -23,7 +23,7 @@
 .register-dark-overlay {
   position: absolute;
   inset: 0;
-  background: radial-gradient(circle at center, rgba(3, 22, 12, 0.3) 0%, rgba(2, 14, 8, 0.65) 100%);
+  background: radial-gradient(circle at center, rgba(3, 22, 12, 0.12) 0%, rgba(2, 14, 8, 0.4) 100%);
   pointer-events: none;
   z-index: 1;
 }
@@ -322,7 +322,7 @@
   background: linear-gradient(180deg, #10b981 0%, #047857 60%, #064e3b 100%);
   color: #ffffff;
   border: 1.5px solid rgba(110, 231, 183, 0.4);
-  border-radius: 9999px;
+  border-radius: 12px;
   padding: 0.9rem 1.5rem;
   font-size: 1.05rem;
   font-weight: 700;
@@ -350,61 +350,6 @@
 
 .register-submit-button:hover:not(:disabled) .btn-icon-end {
   transform: translateX(4px);
-}
-
-/* OR Divider */
-.register-divider-container {
-  display: flex;
-  align-items: center;
-  gap: 0.75rem;
-  margin: 0.35rem 0;
-}
-
-.divider-line {
-  flex: 1;
-  height: 1px;
-  background: rgba(52, 211, 153, 0.3);
-}
-
-.divider-text {
-  color: #94a3b8;
-  font-size: 0.8rem;
-  font-weight: 600;
-  letter-spacing: 1px;
-}
-
-/* Google Button */
-.register-google-button {
-  width: 100%;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  gap: 0.75rem;
-  background: rgba(2, 20, 10, 0.82);
-  border: 1.5px solid rgba(52, 211, 153, 0.35);
-  border-radius: 12px;
-  padding: 0.85rem 1.25rem;
-  color: #ffffff;
-  font-size: 0.95rem;
-  font-weight: 600;
-  cursor: pointer;
-  transition: all 0.2s ease;
-}
-
-.register-google-button:hover:not(:disabled) {
-  background: rgba(6, 36, 20, 0.95);
-  border-color: rgba(52, 211, 153, 0.65);
-  box-shadow: 0 4px 18px rgba(16, 185, 129, 0.25);
-  transform: translateY(-1px);
-}
-
-.register-google-button:disabled {
-  opacity: 0.6;
-  cursor: not-allowed;
-}
-
-.google-svg {
-  flex-shrink: 0;
 }
 
 /* Bottom Card Footer */

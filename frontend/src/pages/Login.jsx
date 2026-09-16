@@ -118,7 +118,7 @@ const Login = () => {
   });
 
   return (
-    <div className="login-dark-page">
+    <div className="login-dark-page" style={{ backgroundImage: "url('/landing_bg_leaves.jpg?v=5')" }}>
       <div className="login-dark-overlay"></div>
 
       <div className="login-main-wrapper">

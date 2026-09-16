@@ -2,13 +2,83 @@ const StallBooking = require('../models/StallBooking');
 const Park = require('../models/Park');
 const StallSlot = require('../models/StallSlot');
 const Notification = require('../models/Notification');
+const User = require('../models/User');
+const Setting = require('../models/Setting');
+const Razorpay = require('razorpay');
+const crypto = require('crypto');
+
+const DEFAULT_PROOF_TYPES = [
+  'Rental Agreement',
+  'Electricity Bill / Water Bill',
+  'Gas Connection Bill',
+  'College ID / Bonafide Certificate',
+  'Employer Letter / HR Certificate',
+  'Bank Statement with Local Address',
+  'Other Valid Address Proof'
+];
+
+// @desc    Get accepted address proof types (public/citizen/admin)
+// @route   GET /api/stall-bookings/config/proof-types
+const getProofTypesConfig = async (req, res) => {
+  try {
+    let setting = await Setting.findOne({ key: 'acceptedAddressProofTypes' });
+    if (!setting) {
+      setting = await Setting.create({
+        key: 'acceptedAddressProofTypes',
+        value: DEFAULT_PROOF_TYPES,
+        description: 'Configurable accepted document proof types for current address verification'
+      });
+    }
+    res.json({ success: true, proofTypes: setting.value });
+  } catch (error) {
+    console.error('Error fetching proof types:', error);
+    res.status(500).json({ success: false, message: 'Server error', error: error.message });
+  }
+};
+
+// @desc    Update accepted address proof types (Admin only)
+// @route   PUT /api/stall-bookings/config/proof-types
+const updateProofTypesConfig = async (req, res) => {
+  try {
+    const { proofTypes } = req.body;
+    if (!Array.isArray(proofTypes) || proofTypes.length === 0) {
+      return res.status(400).json({ success: false, message: 'Proof types must be a non-empty array of strings.' });
+    }
+
+    const setting = await Setting.findOneAndUpdate(
+      { key: 'acceptedAddressProofTypes' },
+      { value: proofTypes },
+      { upsert: true, new: true }
+    );
+
+    res.json({ success: true, message: 'Address proof types updated successfully.', proofTypes: setting.value });
+  } catch (error) {
+    console.error('Error updating proof types:', error);
+    res.status(500).json({ success: false, message: 'Server error', error: error.message });
+  }
+};
 
 // @desc    Book a stall slot
 // @route   POST /api/stall-bookings
 // @access  Private (Citizen/Stall Owner)
 const createBooking = async (req, res) => {
   try {
-    const { parkId, slotId, userId, stallName, productsType, applicantName, applicantPhone, amountPaid } = req.body;
+    const {
+      parkId,
+      slotId,
+      userId,
+      stallName,
+      productsType,
+      applicantName,
+      applicantPhone,
+      amountPaid,
+      nativeAddress,
+      currentAddress,
+      isAddressSameAsAadhaar,
+      differentAddressReason,
+      differentAddressOtherReason,
+      currentAddressProofType
+    } = req.body;
 
     const park = await Park.findById(parkId);
     if (!park) {
@@ -26,12 +96,38 @@ const createBooking = async (req, res) => {
 
     let documentUrl = '';
     let photoUrl = '';
+    let currentAddressProofUrl = '';
+
     if (req.files) {
       if (req.files.document && req.files.document.length > 0) {
         documentUrl = `/uploads/parks/${req.files.document[0].filename}`;
       }
       if (req.files.photo && req.files.photo.length > 0) {
         photoUrl = `/uploads/parks/${req.files.photo[0].filename}`;
+      }
+      if (req.files.currentAddressProof && req.files.currentAddressProof.length > 0) {
+        currentAddressProofUrl = `/uploads/parks/${req.files.currentAddressProof[0].filename}`;
+      }
+    }
+
+    // Determine initial verification statuses
+    const sameAddressBool = isAddressSameAsAadhaar === 'true' || isAddressSameAsAadhaar === true;
+    
+    let initialAddressStatus = 'Verified';
+    if (!sameAddressBool) {
+      if (currentAddressProofUrl) {
+        initialAddressStatus = 'Proof Submitted';
+      } else {
+        initialAddressStatus = 'Proof Missing/Invalid';
+      }
+    }
+
+    // Check if user already has verified Aadhaar KYC
+    let initialIdentityStatus = 'Pending';
+    if (userId) {
+      const user = await User.findById(userId);
+      if (user && user.aadhaarKycStatus === 'verified') {
+        initialIdentityStatus = 'Verified';
       }
     }
 
@@ -45,14 +141,22 @@ const createBooking = async (req, res) => {
       applicantName,
       applicantPhone,
       amountPaid,
-      documentUrl,
       photoUrl,
+      documentUrl,
+      nativeAddress: nativeAddress || '',
+      currentAddress: currentAddress || '',
+      isAddressSameAsAadhaar: sameAddressBool,
+      differentAddressReason: sameAddressBool ? '' : (differentAddressReason || ''),
+      differentAddressOtherReason: sameAddressBool ? '' : (differentAddressOtherReason || ''),
+      currentAddressProofType: sameAddressBool ? '' : (currentAddressProofType || ''),
+      currentAddressProofUrl,
+      identityVerificationStatus: initialIdentityStatus,
+      addressVerificationStatus: initialAddressStatus,
       status: 'Pending Approval'
     });
 
     await booking.save();
 
-    // Slot decrement happens on Admin Approval now, not on creation
     res.status(201).json(booking);
   } catch (error) {
     console.error('Error creating stall booking:', error);
@@ -68,7 +172,7 @@ const getBookings = async (req, res) => {
     const bookings = await StallBooking.find()
       .populate('park', 'name parkCode')
       .populate('slot')
-      .populate('user', 'name email phone')
+      .populate('user', 'name email phone aadhaarNumber aadhaarKycStatus aadhaarFrontImage aadhaarBackImage aadhaarKycReviewedAt')
       .sort({ createdAt: -1 });
     res.json(bookings);
   } catch (error) {
@@ -79,17 +183,121 @@ const getBookings = async (req, res) => {
 
 // @desc    Get bookings for a specific user
 // @route   GET /api/stall-bookings/user/:userId
-// @access  Private
+// @access  Public / Private
 const getUserBookings = async (req, res) => {
   try {
     const { userId } = req.params;
-    const bookings = await StallBooking.find({ user: userId })
-      .populate('park', 'name parkCode')
+    const { email, phone } = req.query;
+
+    let queryConditions = [];
+    if (userId && userId !== 'undefined' && userId !== 'null' && userId !== 'GUEST_USER') {
+      queryConditions.push({ user: userId });
+    }
+    if (email) {
+      queryConditions.push({ applicantEmail: email });
+    }
+    if (phone) {
+      queryConditions.push({ applicantPhone: phone });
+    }
+
+    const query = queryConditions.length > 0 ? { $or: queryConditions } : { user: userId };
+
+    const bookings = await StallBooking.find(query)
+      .populate('park', 'name parkCode address')
       .populate('slot')
       .sort({ createdAt: -1 });
     res.json(bookings);
   } catch (error) {
     console.error('Error fetching user bookings:', error);
+    res.status(500).json({ message: 'Server error', error: error.message });
+  }
+};
+
+// @desc    Verify Applicant Identity (Admin action)
+// @route   PUT /api/stall-bookings/:id/verify-identity
+// @access  Private (Admin)
+const verifyIdentity = async (req, res) => {
+  try {
+    const { id } = req.params;
+    const { status, adminNotes } = req.body; // status: 'Verified' | 'Rejected'
+
+    const booking = await StallBooking.findById(id);
+    if (!booking) {
+      return res.status(404).json({ message: 'Booking not found' });
+    }
+
+    booking.identityVerificationStatus = status || 'Verified';
+    booking.identityReviewedAt = new Date();
+    if (adminNotes) booking.adminNotes = adminNotes;
+    await booking.save();
+
+    res.json({ success: true, message: `Identity marked as ${booking.identityVerificationStatus}`, booking });
+  } catch (error) {
+    console.error('Error verifying identity:', error);
+    res.status(500).json({ message: 'Server error', error: error.message });
+  }
+};
+
+// @desc    Verify Current Residential Address (Admin action)
+// @route   PUT /api/stall-bookings/:id/verify-address
+// @access  Private (Admin)
+const verifyAddress = async (req, res) => {
+  try {
+    const { id } = req.params;
+    const { status, adminNotes } = req.body; // status: 'Verified' | 'Proof Missing/Invalid'
+
+    const booking = await StallBooking.findById(id);
+    if (!booking) {
+      return res.status(404).json({ message: 'Booking not found' });
+    }
+
+    booking.addressVerificationStatus = status || 'Verified';
+    booking.addressReviewedAt = new Date();
+    if (adminNotes) booking.adminNotes = adminNotes;
+    await booking.save();
+
+    res.json({ success: true, message: `Address marked as ${booking.addressVerificationStatus}`, booking });
+  } catch (error) {
+    console.error('Error verifying address:', error);
+    res.status(500).json({ message: 'Server error', error: error.message });
+  }
+};
+
+// @desc    Request More Information (Admin action)
+// @route   PUT /api/stall-bookings/:id/request-info
+// @access  Private (Admin)
+const requestMoreInfo = async (req, res) => {
+  try {
+    const { id } = req.params;
+    const { message } = req.body;
+
+    if (!message || !message.trim()) {
+      return res.status(400).json({ message: 'Please provide a message describing the required info.' });
+    }
+
+    const booking = await StallBooking.findById(id).populate('park');
+    if (!booking) {
+      return res.status(404).json({ message: 'Booking not found' });
+    }
+
+    booking.identityVerificationStatus = 'More Info Requested';
+    booking.requestInfoMessage = message.trim();
+    await booking.save();
+
+    // Send Notification to Citizen
+    const notification = new Notification({
+      recipientUserId: booking.user,
+      recipientRole: 'citizen',
+      title: 'Action Required: Additional Stall Booking Info Needed',
+      message: `Admin requested more information for your stall booking at ${booking.park?.name || 'the park'}: "${message.trim()}"`,
+      type: 'STALL_INFO_REQUESTED',
+      category: 'Park Updates'
+    });
+    await notification.save();
+
+    res.json({ success: true, message: 'Request sent to applicant successfully.', booking });
+  } catch (error) {
+    console.error('Error requesting info:', error);
     res.status(500).json({ message: 'Server error', error: error.message });
   }
 };
@@ -123,7 +331,6 @@ const approveBooking = async (req, res) => {
       const timeStr = booking.slot.paymentDeadlineTime || '23:59';
       const [h, m] = timeStr.split(':').map(Number);
       d.setHours(h || 23, m || 59, 0, 0);
-      // Use earlier of slot cutoff date/time or window expiry
       expiresAt = (d > now && d < windowExpiry) ? d : windowExpiry;
     } else {
       expiresAt = windowExpiry;
@@ -177,9 +384,6 @@ const rejectBooking = async (req, res) => {
     }
     await booking.save();
 
-    // No need to increment slot availability here since we only decrement upon approval now
-
-
     // Notify citizen
     const reasonText = reason ? ` Reason: ${reason}` : ' Please review your documents and try again.';
     const notification = new Notification({
@@ -199,9 +403,6 @@ const rejectBooking = async (req, res) => {
   }
 };
 
-const Razorpay = require('razorpay');
-const crypto = require('crypto');
-
 // @desc    Create Razorpay Order for stall booking
 // @route   POST /api/stall-bookings/:id/create-order
 // @access  Private (Citizen)
@@ -217,7 +418,6 @@ const createRazorpayOrder = async (req, res) => {
       return res.status(400).json({ message: `Cannot create order for booking in status: ${booking.status}` });
     }
 
-    // Check if slots are still available before allowing payment
     if (booking.slot) {
       const slot = await StallSlot.findById(booking.slot);
       if (slot) {
@@ -292,10 +492,7 @@ const payBooking = async (req, res) => {
       const slot = await StallSlot.findById(booking.slot);
       if (slot) {
         if (slot.availableSlots !== undefined) {
-          if (slot.availableSlots <= 0) {
-            // In a real system, we would process a refund here since they paid but the slot is full.
-            // For now, we allow the booking but it means we slightly overbooked.
-          } else {
+          if (slot.availableSlots > 0) {
             slot.availableSlots -= 1;
             slot.isAvailable = slot.availableSlots > 0;
           }
@@ -328,9 +525,14 @@ const payBooking = async (req, res) => {
 };
 
 module.exports = {
+  getProofTypesConfig,
+  updateProofTypesConfig,
   createBooking,
   getBookings,
   getUserBookings,
+  verifyIdentity,
+  verifyAddress,
+  requestMoreInfo,
   approveBooking,
   rejectBooking,
   createRazorpayOrder,

@@ -131,6 +131,7 @@ const SubmitComplaint = () => {
     if (!/^\d{10}$/.test(formData.mobileNumber)) return setErrorMsg('Mobile number must be exactly 10 digits');
     if (formData.email && !/^\S+@\S+\.\S+$/.test(formData.email)) return setErrorMsg('Please enter a valid email format');
     if (!formData.description.trim() || formData.description.trim().length < 10) return setErrorMsg('Please provide a detailed description (minimum 10 characters)');
+    if (!selectedFile) return setErrorMsg('Live Geotagged Photo Evidence is mandatory (*). Please capture a photo using the Live Camera.');
 
     setLoading(true);
     try {
@@ -480,22 +481,22 @@ const SubmitComplaint = () => {
             {/* Photo Upload Zone */}
             <div className="form-group">
               <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '6px', flexWrap: 'wrap', gap: '6px' }}>
-                <label className="input-label" style={{ margin: 0 }}>
-                  📷 Geotagged Photo Evidence / GPS-Stamped Photo (Optional)
+                <label className="input-label" style={{ margin: 0, fontWeight: 700, color: '#111827' }}>
+                  📷 Geotagged Photo Evidence / GPS-Stamped Photo <span style={{ color: '#ef4444' }}>*</span>
                 </label>
                 <span style={{ 
-                  background: '#ecfdf5', 
-                  color: '#059669', 
-                  border: '1px solid #a7f3d0', 
+                  background: '#fef2f2', 
+                  color: '#dc2626', 
+                  border: '1px solid #fecaca', 
                   fontSize: '0.75rem', 
                   padding: '2px 8px', 
                   borderRadius: '9999px', 
-                  fontWeight: 600,
+                  fontWeight: 700,
                   display: 'inline-flex',
                   alignItems: 'center',
                   gap: '4px'
                 }}>
-                  🛡️ Live GPS Location & Timestamp Protected
+                  🚨 Mandatory Live Verification
                 </span>
               </div>
               <div className="upload-dropzone" style={{ padding: '1.25rem' }}>
@@ -548,51 +549,29 @@ const SubmitComplaint = () => {
                         onClick={() => setIsCameraOpen(true)}
                         style={{
                           flex: 1,
-                          minWidth: '160px',
+                          width: '100%',
+                          minWidth: '200px',
                           display: 'flex',
                           alignItems: 'center',
                           justifyContent: 'center',
                           gap: '0.5rem',
-                          padding: '1rem',
+                          padding: '1.1rem',
                           background: 'linear-gradient(135deg, #059669 0%, #10b981 100%)',
                           color: '#ffffff',
                           border: 'none',
                           borderRadius: '12px',
                           fontWeight: 600,
+                          fontSize: '1rem',
                           cursor: 'pointer',
                           boxShadow: '0 4px 6px -1px rgba(16, 185, 129, 0.25)'
                         }}
                       >
-                        <Camera size={20} />
-                        <span>Take Photo (Camera)</span>
-                      </button>
-
-                      {/* Upload from Gallery Button */}
-                      <button 
-                        type="button" 
-                        onClick={() => document.getElementById('image-upload').click()}
-                        style={{
-                          flex: 1,
-                          minWidth: '160px',
-                          display: 'flex',
-                          alignItems: 'center',
-                          justifyContent: 'center',
-                          gap: '0.5rem',
-                          padding: '1rem',
-                          background: '#f8fafc',
-                          color: '#334155',
-                          border: '1.5px dashed #cbd5e1',
-                          borderRadius: '12px',
-                          fontWeight: 600,
-                          cursor: 'pointer'
-                        }}
-                      >
-                        <Upload size={20} color="#059669" />
-                        <span>Upload from Gallery</span>
+                        <Camera size={22} />
+                        <span>Take Photo (Live Camera)</span>
                       </button>
                     </div>
                     <p style={{ margin: 0, fontSize: '0.8rem', color: '#64748b', textAlign: 'center' }}>
-                      📸 Photos are automatically stamped with your verified <strong>GPS coordinates, date, and live time</strong>.
+                      📸 Photos are automatically captured via live camera and stamped with your verified <strong>GPS coordinates, date, and live time</strong>.
                     </p>
                   </div>
                 )}
@@ -625,6 +604,10 @@ const SubmitComplaint = () => {
         onClose={() => setIsCameraOpen(false)}
         onCapture={handleCameraCapture}
         tag="Citizen Grievance"
+        defaultLocation={formData.parkName ? {
+          name: formData.parkName,
+          address: formData.address || formData.parkName
+        } : null}
       />
     </div>
   );

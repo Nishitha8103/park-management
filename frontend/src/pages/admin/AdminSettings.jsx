@@ -1,6 +1,16 @@
-import { useState } from 'react';
-import { User, Lock, Bell, Shield, Mail, Phone, Save } from 'lucide-react';
+import { useState, useEffect } from 'react';
+import { User, Lock, Bell, Shield, Mail, Phone, Save, FileCheck, Plus, Trash2, CheckCircle2 } from 'lucide-react';
 import axios from 'axios';
+
+const DEFAULT_PROOF_TYPES = [
+  'Rental Agreement',
+  'Electricity Bill / Water Bill',
+  'Gas Connection Bill',
+  'College ID / Bonafide Certificate',
+  'Employer Letter / HR Certificate',
+  'Bank Statement with Local Address',
+  'Other Valid Address Proof'
+];
 
 const AdminSettings = () => {
   const [activeTab, setActiveTab] = useState('profile');
@@ -25,19 +35,37 @@ const AdminSettings = () => {
     taskCompletion: true,
   });
 
+  // Configurable address proof types for Stall Booking
+  const [proofTypes, setProofTypes] = useState(DEFAULT_PROOF_TYPES);
+  const [newProofType, setNewProofType] = useState('');
+
   const [saving, setSaving] = useState(false);
   const [message, setMessage] = useState({ type: '', text: '' });
+
+  useEffect(() => {
+    fetchProofTypesConfig();
+  }, []);
+
+  const fetchProofTypesConfig = async () => {
+    try {
+      const res = await axios.get('/api/stall-bookings/config/proof-types');
+      if (res.data?.success && Array.isArray(res.data.proofTypes)) {
+        setProofTypes(res.data.proofTypes);
+      }
+    } catch (_) {
+      // fallback to defaults
+    }
+  };
 
   const handleProfileSave = async (e) => {
     e.preventDefault();
     setSaving(true);
     setMessage({ type: '', text: '' });
-    // Mock save delay
     setTimeout(() => {
       setSaving(false);
       setMessage({ type: 'success', text: 'Profile settings updated successfully!' });
       setTimeout(() => setMessage({ type: '', text: '' }), 3000);
-    }, 1000);
+    }, 800);
   };
 
   const handlePasswordSave = (e) => {
@@ -52,7 +80,42 @@ const AdminSettings = () => {
       setMessage({ type: 'success', text: 'Password updated successfully!' });
       setPasswords({ current: '', new: '', confirm: '' });
       setTimeout(() => setMessage({ type: '', text: '' }), 3000);
-    }, 1000);
+    }, 800);
+  };
+
+  const handleAddProofType = () => {
+    if (!newProofType.trim()) return;
+    if (proofTypes.includes(newProofType.trim())) {
+      setMessage({ type: 'error', text: 'This document type already exists.' });
+      return;
+    }
+    setProofTypes(prev => [...prev, newProofType.trim()]);
+    setNewProofType('');
+  };
+
+  const handleDeleteProofType = (index) => {
+    setProofTypes(prev => prev.filter((_, i) => i !== index));
+  };
+
+  const handleSaveProofTypes = async () => {
+    setSaving(true);
+    setMessage({ type: '', text: '' });
+    try {
+      const token = JSON.parse(localStorage.getItem('adminUser'))?.token;
+      const res = await axios.put('/api/stall-bookings/config/proof-types', { proofTypes }, {
+        headers: { Authorization: `Bearer ${token}` }
+      });
+      if (res.data?.success) {
+        setMessage({ type: 'success', text: 'Accepted address proof types updated successfully!' });
+      } else {
+        setMessage({ type: 'error', text: res.data?.message || 'Failed to update.' });
+      }
+    } catch (err) {
+      setMessage({ type: 'error', text: err.response?.data?.message || 'Failed to save proof types.' });
+    } finally {
+      setSaving(false);
+      setTimeout(() => setMessage({ type: '', text: '' }), 3000);
+    }
   };
 
   const renderTabContent = () => {
@@ -91,6 +154,68 @@ const AdminSettings = () => {
             </div>
           </form>
         );
+
+      case 'stall_docs':
+        return (
+          <div style={{ display: 'flex', flexDirection: 'column', gap: '1.5rem' }}>
+            <div>
+              <h4 style={{ margin: '0 0 6px 0', color: '#0f172a', fontSize: '1.1rem', fontWeight: 700 }}>
+                Accepted Address Proof Types (Stall Bookings)
+              </h4>
+              <p style={{ margin: 0, fontSize: '0.86rem', color: '#64748b' }}>
+                Configure which document types applicants can upload when their current city address differs from their native Aadhaar card address.
+              </p>
+            </div>
+
+            {/* Add New Type */}
+            <div style={{ display: 'flex', gap: '10px', maxWidth: '600px' }}>
+              <input
+                type="text"
+                placeholder="e.g. Hostels / PG Rent Agreement, Work Permit..."
+                value={newProofType}
+                onChange={(e) => setNewProofType(e.target.value)}
+                onKeyDown={(e) => { if (e.key === 'Enter') { e.preventDefault(); handleAddProofType(); } }}
+                style={{ flex: 1, padding: '0.75rem 1rem', border: '1px solid #cbd5e1', borderRadius: '8px', fontSize: '0.9rem' }}
+              />
+              <button
+                type="button"
+                onClick={handleAddProofType}
+                style={{ padding: '0.75rem 1.25rem', background: '#059669', color: 'white', border: 'none', borderRadius: '8px', fontWeight: 700, cursor: 'pointer', display: 'flex', alignItems: 'center', gap: '6px' }}
+              >
+                <Plus size={18} /> Add
+              </button>
+            </div>
+
+            {/* List of current types */}
+            <div style={{ display: 'flex', flexDirection: 'column', gap: '8px', maxWidth: '600px' }}>
+              {proofTypes.map((type, idx) => (
+                <div key={idx} style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', padding: '0.75rem 1rem', background: '#f8fafc', borderRadius: '8px', border: '1px solid #e2e8f0' }}>
+                  <span style={{ fontSize: '0.92rem', color: '#1e293b', fontWeight: 600 }}>{type}</span>
+                  <button
+                    type="button"
+                    onClick={() => handleDeleteProofType(idx)}
+                    style={{ background: 'none', border: 'none', color: '#ef4444', cursor: 'pointer', padding: '4px', borderRadius: '4px' }}
+                    title="Remove"
+                  >
+                    <Trash2 size={16} />
+                  </button>
+                </div>
+              ))}
+            </div>
+
+            <div style={{ display: 'flex', justifyContent: 'flex-start', marginTop: '0.5rem' }}>
+              <button
+                type="button"
+                onClick={handleSaveProofTypes}
+                disabled={saving}
+                style={{ display: 'flex', alignItems: 'center', gap: '8px', background: '#059669', color: '#fff', padding: '0.75rem 2rem', border: 'none', borderRadius: '8px', fontWeight: 700, cursor: 'pointer', opacity: saving ? 0.7 : 1 }}
+              >
+                <Save size={18} /> {saving ? 'Saving...' : 'Save Document Types'}
+              </button>
+            </div>
+          </div>
+        );
+
       case 'security':
         return (
           <form onSubmit={handlePasswordSave} style={{ display: 'flex', flexDirection: 'column', gap: '1.5rem' }}>
@@ -125,6 +250,7 @@ const AdminSettings = () => {
             </div>
           </form>
         );
+
       case 'notifications':
         return (
           <div style={{ display: 'flex', flexDirection: 'column', gap: '1.5rem' }}>
@@ -172,6 +298,7 @@ const AdminSettings = () => {
             </div>
           </div>
         );
+
       default:
         return null;
     }
@@ -181,31 +308,39 @@ const AdminSettings = () => {
     <div className="admin-panel" style={{ padding: '2rem', background: '#f1f5f9', minHeight: '100vh' }}>
       <div className="admin-panel-header" style={{ marginBottom: '2rem' }}>
         <h3 style={{ display: 'flex', alignItems: 'center', gap: '10px', fontSize: '1.5rem', margin: 0, color: '#0f172a' }}>
-          <Shield size={28} color="#8b5cf6" />
-          System Settings
+          <Shield size={28} color="#059669" />
+          System Settings & Verification Rules
         </h3>
-        <p style={{ color: '#64748b', marginTop: '0.5rem', marginBottom: 0 }}>Manage your account settings and system preferences</p>
+        <p style={{ color: '#64748b', marginTop: '0.5rem', marginBottom: 0 }}>
+          Manage your account settings, notification preferences, and configurable stall verification documents.
+        </p>
       </div>
 
       <div style={{ display: 'flex', gap: '2rem', alignItems: 'flex-start' }}>
         
         {/* Sidebar Tabs */}
-        <div style={{ width: '250px', background: '#fff', borderRadius: '12px', padding: '1rem', boxShadow: '0 4px 6px -1px rgba(0,0,0,0.05)' }}>
+        <div style={{ width: '260px', background: '#fff', borderRadius: '12px', padding: '1rem', boxShadow: '0 4px 6px -1px rgba(0,0,0,0.05)' }}>
           <button 
             onClick={() => setActiveTab('profile')}
-            style={{ display: 'flex', alignItems: 'center', gap: '12px', width: '100%', padding: '1rem', border: 'none', background: activeTab === 'profile' ? '#eff6ff' : 'transparent', color: activeTab === 'profile' ? '#2563eb' : '#475569', fontWeight: activeTab === 'profile' ? 700 : 500, borderRadius: '8px', cursor: 'pointer', textAlign: 'left', transition: 'all 0.2s', marginBottom: '4px' }}
+            style={{ display: 'flex', alignItems: 'center', gap: '12px', width: '100%', padding: '0.9rem', border: 'none', background: activeTab === 'profile' ? '#eff6ff' : 'transparent', color: activeTab === 'profile' ? '#2563eb' : '#475569', fontWeight: activeTab === 'profile' ? 700 : 500, borderRadius: '8px', cursor: 'pointer', textAlign: 'left', transition: 'all 0.2s', marginBottom: '4px' }}
           >
             <User size={18} /> Account Profile
           </button>
           <button 
+            onClick={() => setActiveTab('stall_docs')}
+            style={{ display: 'flex', alignItems: 'center', gap: '12px', width: '100%', padding: '0.9rem', border: 'none', background: activeTab === 'stall_docs' ? '#ecfdf5' : 'transparent', color: activeTab === 'stall_docs' ? '#059669' : '#475569', fontWeight: activeTab === 'stall_docs' ? 700 : 500, borderRadius: '8px', cursor: 'pointer', textAlign: 'left', transition: 'all 0.2s', marginBottom: '4px' }}
+          >
+            <FileCheck size={18} /> Stall Address Proofs
+          </button>
+          <button 
             onClick={() => setActiveTab('security')}
-            style={{ display: 'flex', alignItems: 'center', gap: '12px', width: '100%', padding: '1rem', border: 'none', background: activeTab === 'security' ? '#eff6ff' : 'transparent', color: activeTab === 'security' ? '#2563eb' : '#475569', fontWeight: activeTab === 'security' ? 700 : 500, borderRadius: '8px', cursor: 'pointer', textAlign: 'left', transition: 'all 0.2s', marginBottom: '4px' }}
+            style={{ display: 'flex', alignItems: 'center', gap: '12px', width: '100%', padding: '0.9rem', border: 'none', background: activeTab === 'security' ? '#eff6ff' : 'transparent', color: activeTab === 'security' ? '#2563eb' : '#475569', fontWeight: activeTab === 'security' ? 700 : 500, borderRadius: '8px', cursor: 'pointer', textAlign: 'left', transition: 'all 0.2s', marginBottom: '4px' }}
           >
             <Lock size={18} /> Security
           </button>
           <button 
             onClick={() => setActiveTab('notifications')}
-            style={{ display: 'flex', alignItems: 'center', gap: '12px', width: '100%', padding: '1rem', border: 'none', background: activeTab === 'notifications' ? '#eff6ff' : 'transparent', color: activeTab === 'notifications' ? '#2563eb' : '#475569', fontWeight: activeTab === 'notifications' ? 700 : 500, borderRadius: '8px', cursor: 'pointer', textAlign: 'left', transition: 'all 0.2s' }}
+            style={{ display: 'flex', alignItems: 'center', gap: '12px', width: '100%', padding: '0.9rem', border: 'none', background: activeTab === 'notifications' ? '#eff6ff' : 'transparent', color: activeTab === 'notifications' ? '#2563eb' : '#475569', fontWeight: activeTab === 'notifications' ? 700 : 500, borderRadius: '8px', cursor: 'pointer', textAlign: 'left', transition: 'all 0.2s' }}
           >
             <Bell size={18} /> Notifications
           </button>
@@ -225,13 +360,5 @@ const AdminSettings = () => {
     </div>
   );
 };
-
-// Helper icon component for success message
-const CheckCircle2 = ({ size }) => (
-  <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-    <path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"></path>
-    <polyline points="22 4 12 14.01 9 11.01"></polyline>
-  </svg>
-);
 
 export default AdminSettings;

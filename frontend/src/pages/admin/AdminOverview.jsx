@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { TreePine, Users, UserCheck, AlertTriangle, Clock, CheckCircle2, XCircle, ShieldAlert } from 'lucide-react';
+import { TreePine, Users, UserCheck, AlertTriangle, Clock, CheckCircle2, XCircle, ShieldAlert, TrendingUp, Activity } from 'lucide-react';
 import axios from 'axios';
 import { PieChart, Pie, Cell, Tooltip as RechartsTooltip, Legend, ResponsiveContainer, BarChart, Bar, XAxis, YAxis, CartesianGrid } from 'recharts';
 import { MapContainer, TileLayer, Marker, Popup } from 'react-leaflet';
@@ -33,6 +33,45 @@ const redIcon = new L.Icon({
   shadowSize: [41, 41]
 });
 
+// Dark theme color constants
+const DARK = {
+  card: '#1E2438',
+  cardHover: '#252D47',
+  bg: '#151A2B',
+  border: 'rgba(255,255,255,0.06)',
+  textPrimary: '#F0F4FF',
+  textSec: '#A8B0C8',
+  textMuted: '#666E85',
+  accent: '#4F6FF5',
+  success: '#32C48D',
+  warning: '#F5B942',
+  danger: '#FF5C67',
+  purple: '#8B5CF6',
+};
+
+// Custom tooltip for dark theme charts
+const DarkTooltip = ({ active, payload, label }) => {
+  if (active && payload && payload.length) {
+    return (
+      <div style={{
+        background: '#252D47',
+        border: `1px solid ${DARK.border}`,
+        borderRadius: '8px',
+        padding: '10px 14px',
+        boxShadow: '0 8px 24px rgba(0,0,0,0.3)',
+        color: DARK.textPrimary,
+        fontSize: '0.85rem'
+      }}>
+        <p style={{ margin: 0, fontWeight: 600 }}>{label || payload[0].name}</p>
+        <p style={{ margin: '4px 0 0 0', color: DARK.textSec }}>
+          Count: <span style={{ color: DARK.accent, fontWeight: 700 }}>{payload[0].value}</span>
+        </p>
+      </div>
+    );
+  }
+  return null;
+};
+
 const AdminOverview = () => {
   const [stats, setStats] = useState({
     totalParks: 0,
@@ -63,14 +102,14 @@ const AdminOverview = () => {
   const [statusData, setStatusData] = useState([]);
 
   // Colors for charts
-  const COLORS = ['#0088FE', '#00C49F', '#FFBB28', '#FF8042', '#8884d8', '#f43f5e', '#8b5cf6'];
+  const COLORS = ['#4F6FF5', '#32C48D', '#F5B942', '#FF5C67', '#8B5CF6', '#f43f5e', '#6C7CFF'];
   const STATUS_COLORS = {
-    'New': '#facc15',
-    'Assigned': '#3b82f6',
-    'In Progress': '#8b5cf6',
-    'Completed': '#22c55e',
+    'New': '#F5B942',
+    'Assigned': '#4F6FF5',
+    'In Progress': '#8B5CF6',
+    'Completed': '#32C48D',
     'Closed': '#14b8a6',
-    'Rejected': '#ef4444'
+    'Rejected': '#FF5C67'
   };
 
   useEffect(() => {
@@ -99,7 +138,6 @@ const AdminOverview = () => {
               !['Closed', 'Verified'].includes(c.status)
            );
            
-           // Generate random mock offset around Bangalore (12.9716, 77.5946) if lat/lng missing
            const lat = parseFloat(p.latitude) || (12.9716 + (Math.random() - 0.5) * 0.1);
            const lng = parseFloat(p.longitude) || (77.5946 + (Math.random() - 0.5) * 0.1);
            
@@ -167,144 +205,173 @@ const AdminOverview = () => {
     fetchData();
   }, []);
 
+  const kpiCards = [
+    { label: 'Total Parks', value: stats.totalParks, icon: <TreePine size={22} />, color: DARK.success, bgTint: 'rgba(50,196,141,0.12)' },
+    { label: 'Contractors', value: stats.totalContractors, icon: <Users size={22} />, color: DARK.accent, bgTint: 'rgba(79,111,245,0.12)' },
+    { label: 'Gov Officials', value: stats.totalOfficials, icon: <UserCheck size={22} />, color: DARK.purple, bgTint: 'rgba(139,92,246,0.12)' },
+    { label: 'Total Complaints', value: stats.totalComplaints, icon: <AlertTriangle size={22} />, color: DARK.warning, bgTint: 'rgba(245,185,66,0.12)' },
+  ];
+
+  const slaCards = [
+    { label: 'On Time', value: slaStats.onTime, color: DARK.success, bgTint: 'rgba(50,196,141,0.1)' },
+    { label: 'Due Soon', value: slaStats.dueSoon, color: DARK.warning, bgTint: 'rgba(245,185,66,0.1)' },
+    { label: 'Overdue', value: slaStats.overdue, color: DARK.danger, bgTint: 'rgba(255,92,103,0.1)' },
+    { label: 'SLA Compliance Rate', value: `${slaStats.complianceRate}%`, color: DARK.accent, bgTint: 'rgba(79,111,245,0.1)', isRate: true },
+  ];
+
+  const renderDarkLegend = (props) => {
+    const { payload } = props;
+    return (
+      <div style={{ display: 'flex', flexWrap: 'wrap', justifyContent: 'center', gap: '12px', paddingTop: '8px' }}>
+        {payload.map((entry, index) => (
+          <div key={`legend-${index}`} style={{ display: 'flex', alignItems: 'center', gap: '6px', fontSize: '0.78rem', color: DARK.textSec }}>
+            <div style={{ width: 10, height: 10, borderRadius: '50%', background: entry.color }} />
+            {entry.value}
+          </div>
+        ))}
+      </div>
+    );
+  };
+
   return (
-    <div className="admin-panel" style={{ padding: '1rem' }}>
-      <div className="admin-panel-header" style={{ marginBottom: '1.5rem' }}>
-        <h2 style={{ color: '#0f2d52', margin: 0, fontWeight: 700 }}>System Overview Dashboard</h2>
-        <p style={{ color: '#64748b', margin: '4px 0 0 0' }}>Real-time statistics, geographical mapping, and analytics</p>
+    <div style={{ padding: '0.5rem', fontFamily: "'Inter', sans-serif" }}>
+      {/* Dashboard Header */}
+      <div style={{ marginBottom: '1.75rem' }}>
+        <h2 style={{ color: DARK.textPrimary, margin: 0, fontWeight: 700, fontSize: '1.5rem' }}>Dashboard</h2>
+        <p style={{ color: DARK.textMuted, margin: '4px 0 0 0', fontSize: '0.88rem' }}>Real-time overview of parks, complaints, maintenance and operations</p>
       </div>
 
-      {/* Dashboard Cards Grid */}
-      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(220px, 1fr))', gap: '1.25rem', marginBottom: '2rem' }}>
-        <div style={{ background: '#fff', borderRadius: '12px', padding: '1.25rem', boxShadow: '0 2px 4px rgba(0,0,0,0.05)', borderLeft: '4px solid #16a34a' }}>
-          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+      {/* KPI Cards Grid */}
+      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(220px, 1fr))', gap: '1rem', marginBottom: '1.75rem' }}>
+        {kpiCards.map((card, i) => (
+          <div key={i} style={{
+            background: DARK.card,
+            borderRadius: '14px',
+            padding: '1.25rem 1.35rem',
+            border: `1px solid ${DARK.border}`,
+            boxShadow: '0 4px 16px rgba(0,0,0,0.15)',
+            display: 'flex',
+            justifyContent: 'space-between',
+            alignItems: 'center',
+            transition: 'transform 0.2s, box-shadow 0.2s',
+            cursor: 'default',
+          }}
+          onMouseEnter={e => { e.currentTarget.style.transform = 'translateY(-2px)'; e.currentTarget.style.boxShadow = '0 8px 24px rgba(0,0,0,0.25)'; }}
+          onMouseLeave={e => { e.currentTarget.style.transform = 'translateY(0)'; e.currentTarget.style.boxShadow = '0 4px 16px rgba(0,0,0,0.15)'; }}
+          >
             <div>
-              <span style={{ fontSize: '0.85rem', color: '#64748b', fontWeight: 600 }}>Total Parks</span>
-              <h3 style={{ fontSize: '1.8rem', color: '#0f2d52', margin: '0.2rem 0 0 0' }}>{stats.totalParks}</h3>
+              <span style={{ fontSize: '0.8rem', color: DARK.textMuted, fontWeight: 600, textTransform: 'uppercase', letterSpacing: '0.04em' }}>{card.label}</span>
+              <h3 style={{ fontSize: '2rem', color: DARK.textPrimary, margin: '4px 0 0 0', fontWeight: 800 }}>{card.value}</h3>
             </div>
-            <div style={{ background: '#dcfce7', padding: '10px', borderRadius: '50%', color: '#16a34a' }}>
-              <TreePine size={24} />
+            <div style={{
+              background: card.bgTint,
+              padding: '12px',
+              borderRadius: '12px',
+              color: card.color,
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center'
+            }}>
+              {card.icon}
             </div>
           </div>
-        </div>
-
-        <div style={{ background: '#fff', borderRadius: '12px', padding: '1.25rem', boxShadow: '0 2px 4px rgba(0,0,0,0.05)', borderLeft: '4px solid #2563eb' }}>
-          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-            <div>
-              <span style={{ fontSize: '0.85rem', color: '#64748b', fontWeight: 600 }}>Contractors</span>
-              <h3 style={{ fontSize: '1.8rem', color: '#0f2d52', margin: '0.2rem 0 0 0' }}>{stats.totalContractors}</h3>
-            </div>
-            <div style={{ background: '#dbeafe', padding: '10px', borderRadius: '50%', color: '#2563eb' }}>
-              <Users size={24} />
-            </div>
-          </div>
-        </div>
-
-        <div style={{ background: '#fff', borderRadius: '12px', padding: '1.25rem', boxShadow: '0 2px 4px rgba(0,0,0,0.05)', borderLeft: '4px solid #9333ea' }}>
-          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-            <div>
-              <span style={{ fontSize: '0.85rem', color: '#64748b', fontWeight: 600 }}>Gov Officials</span>
-              <h3 style={{ fontSize: '1.8rem', color: '#0f2d52', margin: '0.2rem 0 0 0' }}>{stats.totalOfficials}</h3>
-            </div>
-            <div style={{ background: '#f3e8ff', padding: '10px', borderRadius: '50%', color: '#9333ea' }}>
-              <UserCheck size={24} />
-            </div>
-          </div>
-        </div>
-
-        <div style={{ background: '#fff', borderRadius: '12px', padding: '1.25rem', boxShadow: '0 2px 4px rgba(0,0,0,0.05)', borderLeft: '4px solid #eab308' }}>
-          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-            <div>
-              <span style={{ fontSize: '0.85rem', color: '#64748b', fontWeight: 600 }}>Total Complaints</span>
-              <h3 style={{ fontSize: '1.8rem', color: '#0f2d52', margin: '0.2rem 0 0 0' }}>{stats.totalComplaints}</h3>
-            </div>
-            <div style={{ background: '#fef9c3', padding: '10px', borderRadius: '50%', color: '#ca8a04' }}>
-              <AlertTriangle size={24} />
-            </div>
-          </div>
-        </div>
+        ))}
       </div>
 
       {/* SLA Overview Section */}
-      <h3 style={{ color: '#0f2d52', marginTop: '1rem', marginBottom: '1rem', fontSize: '1.2rem' }}>Service Level Agreement (SLA) Overview</h3>
-      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))', gap: '1.25rem', marginBottom: '2rem' }}>
-        <div style={{ background: '#fff', borderRadius: '12px', padding: '1.25rem', boxShadow: '0 2px 4px rgba(0,0,0,0.05)', borderLeft: '4px solid #10b981' }}>
-          <span style={{ fontSize: '0.85rem', color: '#64748b', fontWeight: 600 }}>On Time</span>
-          <h3 style={{ fontSize: '1.6rem', color: '#10b981', margin: '0.2rem 0 0 0' }}>{slaStats.onTime}</h3>
+      <div style={{ marginBottom: '1.75rem' }}>
+        <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '0.85rem' }}>
+          <Activity size={18} color={DARK.accent} />
+          <h3 style={{ color: DARK.textPrimary, margin: 0, fontSize: '1.1rem', fontWeight: 700 }}>SLA Overview</h3>
         </div>
-        <div style={{ background: '#fff', borderRadius: '12px', padding: '1.25rem', boxShadow: '0 2px 4px rgba(0,0,0,0.05)', borderLeft: '4px solid #eab308' }}>
-          <span style={{ fontSize: '0.85rem', color: '#64748b', fontWeight: 600 }}>Due Soon</span>
-          <h3 style={{ fontSize: '1.6rem', color: '#eab308', margin: '0.2rem 0 0 0' }}>{slaStats.dueSoon}</h3>
-        </div>
-        <div style={{ background: '#fff', borderRadius: '12px', padding: '1.25rem', boxShadow: '0 2px 4px rgba(0,0,0,0.05)', borderLeft: '4px solid #ef4444' }}>
-          <span style={{ fontSize: '0.85rem', color: '#64748b', fontWeight: 600 }}>Overdue</span>
-          <h3 style={{ fontSize: '1.6rem', color: '#ef4444', margin: '0.2rem 0 0 0' }}>{slaStats.overdue}</h3>
-        </div>
-        <div style={{ background: '#fff', borderRadius: '12px', padding: '1.25rem', boxShadow: '0 2px 4px rgba(0,0,0,0.05)', borderLeft: '4px solid #3b82f6' }}>
-          <span style={{ fontSize: '0.85rem', color: '#64748b', fontWeight: 600 }}>SLA Compliance Rate</span>
-          <h3 style={{ fontSize: '1.6rem', color: '#3b82f6', margin: '0.2rem 0 0 0' }}>{slaStats.complianceRate}%</h3>
+        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(190px, 1fr))', gap: '1rem' }}>
+          {slaCards.map((card, i) => (
+            <div key={i} style={{
+              background: DARK.card,
+              borderRadius: '14px',
+              padding: '1.1rem 1.25rem',
+              border: `1px solid ${DARK.border}`,
+              boxShadow: '0 4px 16px rgba(0,0,0,0.12)',
+              borderLeft: `3px solid ${card.color}`,
+              transition: 'transform 0.2s',
+            }}
+            onMouseEnter={e => e.currentTarget.style.transform = 'translateY(-1px)'}
+            onMouseLeave={e => e.currentTarget.style.transform = 'translateY(0)'}
+            >
+              <span style={{ fontSize: '0.78rem', color: DARK.textMuted, fontWeight: 600, textTransform: 'uppercase', letterSpacing: '0.04em' }}>{card.label}</span>
+              <h3 style={{ fontSize: card.isRate ? '1.8rem' : '1.5rem', color: card.color, margin: '4px 0 0 0', fontWeight: 800 }}>{card.value}</h3>
+            </div>
+          ))}
         </div>
       </div>
 
-      {/* Main Content Grid: Maps and Charts */}
-      <div style={{ display: 'grid', gridTemplateColumns: '1fr', gap: '1.5rem', marginBottom: '2rem' }}>
-        
-        {/* Geographic Map Section */}
-        <div style={{ background: '#fff', borderRadius: '12px', padding: '1.5rem', boxShadow: '0 2px 4px rgba(0,0,0,0.05)' }}>
-          <h3 style={{ color: '#0f2d52', marginTop: 0, marginBottom: '1rem', fontSize: '1.2rem' }}>Park Health & Live Issues Map</h3>
-          <div style={{ height: '400px', width: '100%', borderRadius: '8px', overflow: 'hidden', border: '1px solid #e2e8f0' }}>
-            {loading ? (
-              <div style={{ height: '100%', display: 'flex', alignItems: 'center', justifyContent: 'center', color: '#64748b' }}>Loading Map Data...</div>
-            ) : (
-              <MapContainer center={[12.9716, 77.5946]} zoom={11} style={{ height: '100%', width: '100%' }}>
-                <TileLayer
-                  url="https://{s}.basemaps.cartocdn.com/rastertiles/voyager/{z}/{x}/{y}{r}.png"
-                  attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors &copy; <a href="https://carto.com/">CARTO</a>'
-                />
-                {parksData.map((park) => (
-                  <Marker 
-                    key={park._id} 
-                    position={[park.lat, park.lng]}
-                    icon={park.hasIssues ? redIcon : DefaultIcon}
-                  >
-                    <Popup>
-                      <div style={{ minWidth: '150px' }}>
-                        <h4 style={{ margin: '0 0 5px 0', color: '#0f172a' }}>{park.name}</h4>
-                        <p style={{ margin: '0 0 5px 0', fontSize: '0.85rem', color: '#64748b' }}>Code: {park.parkCode}</p>
-                        {park.hasIssues ? (
-                          <div style={{ padding: '4px 8px', background: '#fee2e2', color: '#ef4444', borderRadius: '4px', fontSize: '0.8rem', fontWeight: 'bold' }}>
-                            {park.activeComplaints} Active Issue(s)
-                          </div>
-                        ) : (
-                          <div style={{ padding: '4px 8px', background: '#dcfce7', color: '#15803d', borderRadius: '4px', fontSize: '0.8rem', fontWeight: 'bold' }}>
-                            Healthy (No issues)
-                          </div>
-                        )}
-                      </div>
-                    </Popup>
-                  </Marker>
-                ))}
-              </MapContainer>
-            )}
-          </div>
+      {/* Map Section */}
+      <div style={{
+        background: DARK.card,
+        borderRadius: '14px',
+        padding: '1.35rem',
+        border: `1px solid ${DARK.border}`,
+        boxShadow: '0 4px 16px rgba(0,0,0,0.12)',
+        marginBottom: '1.75rem'
+      }}>
+        <h3 style={{ color: DARK.textPrimary, marginTop: 0, marginBottom: '1rem', fontSize: '1.05rem', fontWeight: 700 }}>Park Health & Live Issues Map</h3>
+        <div style={{ height: '400px', width: '100%', borderRadius: '10px', overflow: 'hidden', border: `1px solid ${DARK.border}` }}>
+          {loading ? (
+            <div style={{ height: '100%', display: 'flex', alignItems: 'center', justifyContent: 'center', color: DARK.textMuted, background: DARK.bg }}>Loading Map Data...</div>
+          ) : (
+            <MapContainer center={[12.9716, 77.5946]} zoom={11} style={{ height: '100%', width: '100%' }}>
+              <TileLayer
+                url="https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png"
+                attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors &copy; <a href="https://carto.com/">CARTO</a>'
+              />
+              {parksData.map((park) => (
+                <Marker 
+                  key={park._id} 
+                  position={[park.lat, park.lng]}
+                  icon={park.hasIssues ? redIcon : DefaultIcon}
+                >
+                  <Popup>
+                    <div style={{ minWidth: '150px' }}>
+                      <h4 style={{ margin: '0 0 5px 0', color: '#0f172a' }}>{park.name}</h4>
+                      <p style={{ margin: '0 0 5px 0', fontSize: '0.85rem', color: '#64748b' }}>Code: {park.parkCode}</p>
+                      {park.hasIssues ? (
+                        <div style={{ padding: '4px 8px', background: '#fee2e2', color: '#ef4444', borderRadius: '4px', fontSize: '0.8rem', fontWeight: 'bold' }}>
+                          {park.activeComplaints} Active Issue(s)
+                        </div>
+                      ) : (
+                        <div style={{ padding: '4px 8px', background: '#dcfce7', color: '#15803d', borderRadius: '4px', fontSize: '0.8rem', fontWeight: 'bold' }}>
+                          Healthy (No issues)
+                        </div>
+                      )}
+                    </div>
+                  </Popup>
+                </Marker>
+              ))}
+            </MapContainer>
+          )}
         </div>
-
       </div>
 
       {/* Analytics Charts Row */}
-      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(400px, 1fr))', gap: '1.5rem', marginBottom: '2rem' }}>
+      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(380px, 1fr))', gap: '1.25rem', marginBottom: '1.75rem' }}>
         
         {/* Complaints by Category Chart */}
-        <div style={{ background: '#fff', borderRadius: '12px', padding: '1.5rem', boxShadow: '0 2px 4px rgba(0,0,0,0.05)' }}>
-          <h3 style={{ color: '#0f2d52', marginTop: 0, marginBottom: '1rem', fontSize: '1.2rem' }}>Complaints by Category</h3>
+        <div style={{
+          background: DARK.card,
+          borderRadius: '14px',
+          padding: '1.35rem',
+          border: `1px solid ${DARK.border}`,
+          boxShadow: '0 4px 16px rgba(0,0,0,0.12)',
+        }}>
+          <h3 style={{ color: DARK.textPrimary, marginTop: 0, marginBottom: '1rem', fontSize: '1.05rem', fontWeight: 700 }}>Complaints by Category</h3>
           <div style={{ height: '300px' }}>
             <ResponsiveContainer width="100%" height="100%">
               <BarChart data={categoryData} margin={{ top: 10, right: 10, left: -20, bottom: 20 }}>
-                <CartesianGrid strokeDasharray="3 3" vertical={false} />
-                <XAxis dataKey="name" tick={{fontSize: 12}} angle={-45} textAnchor="end" height={60} />
-                <YAxis tick={{fontSize: 12}} />
-                <RechartsTooltip contentStyle={{ borderRadius: '8px', border: 'none', boxShadow: '0 4px 6px -1px rgba(0, 0, 0, 0.1)' }} />
-                <Bar dataKey="value" fill="#3b82f6" radius={[4, 4, 0, 0]}>
+                <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="rgba(255,255,255,0.05)" />
+                <XAxis dataKey="name" tick={{ fontSize: 11, fill: DARK.textMuted }} angle={-45} textAnchor="end" height={60} axisLine={{ stroke: DARK.border }} tickLine={false} />
+                <YAxis tick={{ fontSize: 11, fill: DARK.textMuted }} axisLine={{ stroke: DARK.border }} tickLine={false} />
+                <RechartsTooltip content={<DarkTooltip />} />
+                <Bar dataKey="value" fill={DARK.accent} radius={[6, 6, 0, 0]}>
                   {categoryData.map((entry, index) => (
                     <Cell key={`cell-${index}`} fill={COLORS[index % COLORS.length]} />
                   ))}
@@ -315,8 +382,14 @@ const AdminOverview = () => {
         </div>
 
         {/* Complaints by Status Chart */}
-        <div style={{ background: '#fff', borderRadius: '12px', padding: '1.5rem', boxShadow: '0 2px 4px rgba(0,0,0,0.05)' }}>
-          <h3 style={{ color: '#0f2d52', marginTop: 0, marginBottom: '1rem', fontSize: '1.2rem' }}>Complaint Status Breakdown</h3>
+        <div style={{
+          background: DARK.card,
+          borderRadius: '14px',
+          padding: '1.35rem',
+          border: `1px solid ${DARK.border}`,
+          boxShadow: '0 4px 16px rgba(0,0,0,0.12)',
+        }}>
+          <h3 style={{ color: DARK.textPrimary, marginTop: 0, marginBottom: '1rem', fontSize: '1.05rem', fontWeight: 700 }}>Complaint Status Breakdown</h3>
           <div style={{ height: '300px' }}>
             <ResponsiveContainer width="100%" height="100%">
               <PieChart>
@@ -326,17 +399,18 @@ const AdminOverview = () => {
                   cy="50%"
                   innerRadius={60}
                   outerRadius={100}
-                  paddingAngle={5}
+                  paddingAngle={4}
                   dataKey="value"
                   label={({ name, percent }) => `${name} ${(percent * 100).toFixed(0)}%`}
                   labelLine={false}
+                  stroke="none"
                 >
                   {statusData.map((entry, index) => (
                     <Cell key={`cell-${index}`} fill={STATUS_COLORS[entry.name] || COLORS[index % COLORS.length]} />
                   ))}
                 </Pie>
-                <RechartsTooltip contentStyle={{ borderRadius: '8px', border: 'none', boxShadow: '0 4px 6px -1px rgba(0, 0, 0, 0.1)' }} />
-                <Legend verticalAlign="bottom" height={36} />
+                <RechartsTooltip content={<DarkTooltip />} />
+                <Legend content={renderDarkLegend} verticalAlign="bottom" height={36} />
               </PieChart>
             </ResponsiveContainer>
           </div>
@@ -344,42 +418,51 @@ const AdminOverview = () => {
       </div>
 
       {/* Recent Activity Section */}
-      <div style={{ background: '#fff', borderRadius: '12px', padding: '1.5rem', boxShadow: '0 2px 4px rgba(0,0,0,0.05)' }}>
-        <h3 style={{ color: '#0f2d52', marginTop: 0, marginBottom: '1rem', fontSize: '1.2rem' }}>Recent Complaints Log</h3>
+      <div style={{
+        background: DARK.card,
+        borderRadius: '14px',
+        padding: '1.35rem',
+        border: `1px solid ${DARK.border}`,
+        boxShadow: '0 4px 16px rgba(0,0,0,0.12)',
+      }}>
+        <h3 style={{ color: DARK.textPrimary, marginTop: 0, marginBottom: '1rem', fontSize: '1.05rem', fontWeight: 700 }}>Recent Complaints Log</h3>
         {recentComplaints.length === 0 ? (
-          <p style={{ color: '#64748b', fontStyle: 'italic' }}>No complaints submitted yet.</p>
+          <p style={{ color: DARK.textMuted, fontStyle: 'italic' }}>No complaints submitted yet.</p>
         ) : (
           <div style={{ overflowX: 'auto' }}>
-            <table style={{ width: '100%', borderCollapse: 'collapse', textAlign: 'left', fontSize: '0.9rem' }}>
+            <table style={{ width: '100%', borderCollapse: 'collapse', textAlign: 'left', fontSize: '0.88rem' }}>
               <thead>
-                <tr style={{ borderBottom: '2px solid #e2e8f0', color: '#475569' }}>
-                  <th style={{ padding: '8px' }}>Complaint #</th>
-                  <th style={{ padding: '8px' }}>Park</th>
-                  <th style={{ padding: '8px' }}>Category</th>
-                  <th style={{ padding: '8px' }}>Priority</th>
-                  <th style={{ padding: '8px' }}>Status</th>
+                <tr style={{ borderBottom: `1px solid ${DARK.border}` }}>
+                  <th style={{ padding: '10px 12px', color: DARK.textMuted, fontWeight: 700, fontSize: '0.76rem', textTransform: 'uppercase', letterSpacing: '0.05em' }}>Complaint #</th>
+                  <th style={{ padding: '10px 12px', color: DARK.textMuted, fontWeight: 700, fontSize: '0.76rem', textTransform: 'uppercase', letterSpacing: '0.05em' }}>Park</th>
+                  <th style={{ padding: '10px 12px', color: DARK.textMuted, fontWeight: 700, fontSize: '0.76rem', textTransform: 'uppercase', letterSpacing: '0.05em' }}>Category</th>
+                  <th style={{ padding: '10px 12px', color: DARK.textMuted, fontWeight: 700, fontSize: '0.76rem', textTransform: 'uppercase', letterSpacing: '0.05em' }}>Priority</th>
+                  <th style={{ padding: '10px 12px', color: DARK.textMuted, fontWeight: 700, fontSize: '0.76rem', textTransform: 'uppercase', letterSpacing: '0.05em' }}>Status</th>
                 </tr>
               </thead>
               <tbody>
                 {recentComplaints.map(c => (
-                  <tr key={c._id} style={{ borderBottom: '1px solid #f1f5f9' }}>
-                    <td style={{ padding: '10px 8px', fontWeight: 600, color: '#2563eb' }}>{c.complaintNumber}</td>
-                    <td style={{ padding: '10px 8px' }}>{c.parkName || c.park?.name || 'N/A'}</td>
-                    <td style={{ padding: '10px 8px' }}>{c.category}</td>
-                    <td style={{ padding: '10px 8px' }}>
+                  <tr key={c._id} style={{ borderBottom: `1px solid rgba(255,255,255,0.03)`, transition: 'background 0.15s' }}
+                    onMouseEnter={e => e.currentTarget.style.background = 'rgba(79,111,245,0.04)'}
+                    onMouseLeave={e => e.currentTarget.style.background = 'transparent'}
+                  >
+                    <td style={{ padding: '12px', fontWeight: 600, color: DARK.accent }}>{c.complaintNumber}</td>
+                    <td style={{ padding: '12px', color: DARK.textSec }}>{c.parkName || c.park?.name || 'N/A'}</td>
+                    <td style={{ padding: '12px', color: DARK.textSec }}>{c.category}</td>
+                    <td style={{ padding: '12px' }}>
                       <span style={{
-                        padding: '2px 8px', borderRadius: '12px', fontSize: '0.75rem', fontWeight: 600,
-                        background: c.priority === 'Urgent' ? '#fee2e2' : c.priority === 'High' ? '#ffedd5' : '#e0f2fe',
-                        color: c.priority === 'Urgent' ? '#ef4444' : c.priority === 'High' ? '#f97316' : '#0284c7'
+                        padding: '3px 10px', borderRadius: '100px', fontSize: '0.74rem', fontWeight: 700,
+                        background: c.priority === 'Urgent' ? 'rgba(255,92,103,0.15)' : c.priority === 'High' ? 'rgba(245,185,66,0.15)' : 'rgba(79,111,245,0.12)',
+                        color: c.priority === 'Urgent' ? DARK.danger : c.priority === 'High' ? DARK.warning : DARK.accent
                       }}>
                         {c.priority}
                       </span>
                     </td>
-                    <td style={{ padding: '10px 8px' }}>
+                    <td style={{ padding: '12px' }}>
                       <span style={{
-                        padding: '2px 8px', borderRadius: '12px', fontSize: '0.75rem', fontWeight: 600,
-                        background: c.status === 'Completed' || c.status === 'Verified' ? '#dcfce7' : c.status === 'New' ? '#fef9c3' : '#f1f5f9',
-                        color: c.status === 'Completed' || c.status === 'Verified' ? '#15803d' : c.status === 'New' ? '#ca8a04' : '#475569'
+                        padding: '3px 10px', borderRadius: '100px', fontSize: '0.74rem', fontWeight: 700,
+                        background: c.status === 'Completed' || c.status === 'Verified' ? 'rgba(50,196,141,0.15)' : c.status === 'New' ? 'rgba(245,185,66,0.15)' : 'rgba(255,255,255,0.06)',
+                        color: c.status === 'Completed' || c.status === 'Verified' ? DARK.success : c.status === 'New' ? DARK.warning : DARK.textSec
                       }}>
                         {c.status}
                       </span>

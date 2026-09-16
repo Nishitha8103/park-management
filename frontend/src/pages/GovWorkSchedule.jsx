@@ -28,7 +28,7 @@ const GovWorkSchedule = () => {
   useEffect(() => {
     const stored = localStorage.getItem('govUser');
     if (!stored) {
-      navigate('/gov/login');
+      navigate('/login');
       return;
     }
     const user = JSON.parse(stored);

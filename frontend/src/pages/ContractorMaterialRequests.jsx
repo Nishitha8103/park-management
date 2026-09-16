@@ -47,7 +47,12 @@ const ContractorMaterialRequests = () => {
   const [message, setMessage] = useState({ type: '', text: '' });
 
   const toggleSidebar = () => setIsSidebarOpen(!isSidebarOpen);
-  const handleLogout = () => { localStorage.removeItem('contractorUser'); navigate('/contractor/login'); };
+  const handleLogout = () => {
+    localStorage.removeItem('contractorUser');
+    localStorage.removeItem('user');
+    localStorage.removeItem('token');
+    navigate('/login');
+  };
 
   const showMsg = (type, text) => {
     setMessage({ type, text });
@@ -56,7 +61,7 @@ const ContractorMaterialRequests = () => {
 
   useEffect(() => {
     const stored = localStorage.getItem('contractorUser');
-    if (!stored) { navigate('/contractor/login'); return; }
+    if (!stored) { navigate('/login'); return; }
     const user = JSON.parse(stored);
     setContractor(user);
     fetchRequests(user);
@@ -347,3 +352,4 @@ const ContractorMaterialRequests = () => {
 };
 
 export default ContractorMaterialRequests;
+

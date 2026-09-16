@@ -44,11 +44,16 @@ const ContractorMapView = () => {
   const [selectedStatus, setSelectedStatus] = useState('All');
 
   const toggleSidebar = () => setIsSidebarOpen(!isSidebarOpen);
-  const handleLogout = () => { localStorage.removeItem('contractorUser'); navigate('/contractor/login'); };
+  const handleLogout = () => {
+    localStorage.removeItem('contractorUser');
+    localStorage.removeItem('user');
+    localStorage.removeItem('token');
+    navigate('/login');
+  };
 
   useEffect(() => {
     const stored = localStorage.getItem('contractorUser');
-    if (!stored) { navigate('/contractor/login'); return; }
+    if (!stored) { navigate('/login'); return; }
     const user = JSON.parse(stored);
     setContractor(user);
 
@@ -240,3 +245,4 @@ const ContractorMapView = () => {
 };
 
 export default ContractorMapView;
+

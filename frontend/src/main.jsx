@@ -5,6 +5,45 @@ import axios from 'axios'
 import './index.css'
 import App from './App.jsx'
 
+// Globally silence and disable any Web Audio / AudioContext / Speech instances
+if (typeof window !== 'undefined') {
+  try {
+    if (window.speechSynthesis) {
+      window.speechSynthesis.cancel();
+    }
+  } catch (e) {}
+
+  const DummyAudioContext = function () {
+    return {
+      state: 'closed',
+      currentTime: 0,
+      destination: {},
+      resume: () => Promise.resolve(),
+      suspend: () => Promise.resolve(),
+      close: () => Promise.resolve(),
+      createOscillator: () => ({
+        type: 'sine',
+        frequency: { setValueAtTime: () => {}, linearRampToValueAtTime: () => {} },
+        connect: () => {},
+        disconnect: () => {},
+        start: () => {},
+        stop: () => {},
+        onended: null
+      }),
+      createGain: () => ({
+        gain: { setValueAtTime: () => {}, exponentialRampToValueAtTime: () => {} },
+        connect: () => {},
+        disconnect: () => {}
+      })
+    };
+  };
+
+  try {
+    window.AudioContext = DummyAudioContext;
+    window.webkitAudioContext = DummyAudioContext;
+  } catch (e) {}
+}
+
 // In production on Vercel or separate hosts, use VITE_API_URL if provided
 const rawApiUrl = import.meta.env.VITE_API_URL || import.meta.env.VITE_API_BASE_URL || '';
 const API_BASE = rawApiUrl.replace(/\/+$/, '');

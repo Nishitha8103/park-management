@@ -1,6 +1,7 @@
 import { useState, useRef, useEffect } from 'react';
-import { Camera, User, Lock, Mail, Phone, Building, ShieldCheck, Save, CheckCircle2, AlertCircle, Key, UserCheck, BadgeCheck } from 'lucide-react';
+import { Camera, User, Lock, Mail, Phone, Building, ShieldCheck, ShieldX, Save, CheckCircle2, AlertCircle, Key, UserCheck, BadgeCheck, Fingerprint } from 'lucide-react';
 import './GovProfile.css';
+import AadhaarKycModal from '../components/AadhaarKycModal';
 
 const GovProfile = () => {
   const fileInputRef = useRef(null);
@@ -29,6 +30,11 @@ const GovProfile = () => {
   const [savingProfile, setSavingProfile] = useState(false);
   const [savingPassword, setSavingPassword] = useState(false);
 
+  // Aadhaar KYC state
+  const [kycModalOpen, setKycModalOpen] = useState(false);
+  const [kycStatus, setKycStatus] = useState('not_started');
+  const [kycData, setKycData] = useState(null);
+
   useEffect(() => {
     if (user) {
       setProfileData({
@@ -39,8 +45,25 @@ const GovProfile = () => {
         designation: user.role || 'Government Official',
         profilePic: user.profilePic || null
       });
+
+      // Fetch KYC status from backend
+      fetch('/api/kyc/status', {
+        headers: { Authorization: `Bearer ${user.token}` }
+      })
+        .then(res => res.ok ? res.json() : null)
+        .then(data => {
+          if (data && data.success) {
+            setKycStatus(data.kycStatus || 'not_started');
+            if (data.rejectionReason) setKycData({ rejectionReason: data.rejectionReason });
+          }
+        })
+        .catch(() => {});
     }
   }, [user]);
+
+  const handleKycVerified = () => {
+    setKycStatus('pending');
+  };
 
   const showAlert = (type, message) => {
     setAlert({ type, message });
@@ -389,7 +412,70 @@ const GovProfile = () => {
             </form>
           </div>
 
-          {/* Card 2: Change Password */}
+          {/* Card 2: Aadhaar KYC Verification */}
+          <div className="gov-card profile-form-card">
+            <div className="card-section-header">
+              <div className="section-icon-box" style={{ background: 'linear-gradient(135deg,#e8eaf6,#c5cae9)', color: '#1a237e' }}>
+                <Fingerprint size={20} />
+              </div>
+              <div>
+                <h3>Aadhaar KYC Verification</h3>
+                <p>Upload your Aadhaar card. Admin will verify within 1–2 business days.</p>
+              </div>
+            </div>
+
+            {kycStatus === 'verified' && (
+              <div style={{ background: 'linear-gradient(135deg,#e8f5e9,#f1f8e9)', border: '1.5px solid #a5d6a7', borderRadius: '12px', padding: '16px 20px', display: 'flex', alignItems: 'center', gap: '12px' }}>
+                <ShieldCheck size={24} style={{ color: '#2e7d32', flexShrink: 0 }} />
+                <div>
+                  <p style={{ margin: 0, fontWeight: 700, color: '#1b5e20', fontSize: '15px' }}>KYC Verified ✓</p>
+                  <p style={{ margin: '2px 0 0', fontSize: '12.5px', color: '#388e3c' }}>Your identity has been verified by the administrator.</p>
+                </div>
+                <span style={{ marginLeft: 'auto', background: '#2e7d32', color: '#fff', fontSize: '11px', fontWeight: 700, padding: '3px 12px', borderRadius: '20px' }}>VERIFIED</span>
+              </div>
+            )}
+
+            {kycStatus === 'pending' && (
+              <div style={{ background: '#fffde7', border: '1.5px solid #ffe082', borderRadius: '12px', padding: '16px 20px', display: 'flex', alignItems: 'center', gap: '12px' }}>
+                <ShieldCheck size={24} style={{ color: '#f57f17', flexShrink: 0 }} />
+                <div>
+                  <p style={{ margin: 0, fontWeight: 700, color: '#e65100', fontSize: '15px' }}>Under Review</p>
+                  <p style={{ margin: '2px 0 0', fontSize: '12.5px', color: '#795548' }}>Documents submitted. Admin will verify them soon.</p>
+                </div>
+                <span style={{ marginLeft: 'auto', background: '#ff8f00', color: '#fff', fontSize: '11px', fontWeight: 700, padding: '3px 12px', borderRadius: '20px' }}>PENDING</span>
+              </div>
+            )}
+
+            {kycStatus === 'rejected' && (
+              <div style={{ background: '#fff8f8', border: '1.5px solid #ef9a9a', borderRadius: '12px', padding: '16px 20px', display: 'flex', flexDirection: 'column', gap: '10px' }}>
+                <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
+                  <ShieldX size={22} style={{ color: '#c62828' }} />
+                  <span style={{ fontWeight: 700, color: '#c62828', fontSize: '15px' }}>KYC Rejected</span>
+                </div>
+                {kycData?.rejectionReason && <p style={{ margin: 0, fontSize: '13px', color: '#546e7a', background: '#f5f5f5', padding: '8px 12px', borderRadius: '8px' }}><strong>Reason:</strong> {kycData.rejectionReason}</p>}
+                <button id="gov-kyc-retry-btn" onClick={() => setKycModalOpen(true)} style={{ alignSelf: 'flex-start', display: 'flex', alignItems: 'center', gap: '6px', padding: '9px 18px', background: 'linear-gradient(135deg,#1a237e,#1565c0)', color: '#fff', border: 'none', borderRadius: '8px', fontWeight: 600, fontSize: '13px', cursor: 'pointer' }}>
+                  <Fingerprint size={14} /> Resubmit Documents
+                </button>
+              </div>
+            )}
+
+            {kycStatus === 'not_started' && (
+              <div style={{ background: '#f8f9ff', border: '1.5px solid #c5cae9', borderRadius: '12px', padding: '16px 20px', display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: '16px', flexWrap: 'wrap' }}>
+                <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
+                  <ShieldCheck size={22} style={{ color: '#90a4ae' }} />
+                  <div>
+                    <p style={{ margin: 0, fontWeight: 600, color: '#546e7a', fontSize: '14px' }}>Not Verified</p>
+                    <p style={{ margin: '2px 0 0', fontSize: '12px', color: '#90a4ae' }}>Upload your Aadhaar card to get verified.</p>
+                  </div>
+                </div>
+                <button id="gov-kyc-open-modal-btn" onClick={() => setKycModalOpen(true)} style={{ display: 'flex', alignItems: 'center', gap: '8px', padding: '10px 20px', background: 'linear-gradient(135deg,#1a237e,#1565c0)', color: '#fff', border: 'none', borderRadius: '8px', fontWeight: 600, fontSize: '14px', cursor: 'pointer', boxShadow: '0 4px 14px rgba(26,35,126,0.28)' }}>
+                  <Fingerprint size={16} /> Verify Aadhaar
+                </button>
+              </div>
+            )}
+          </div>
+
+          {/* Card 3: Change Password */}
           <div className="gov-card profile-form-card">
             <div className="card-section-header">
               <div className="section-icon-box text-purple">
@@ -469,6 +555,14 @@ const GovProfile = () => {
         </div>
 
       </div>
+
+      {/* Aadhaar KYC Modal */}
+      <AadhaarKycModal
+        isOpen={kycModalOpen}
+        onClose={() => setKycModalOpen(false)}
+        onSubmitted={handleKycVerified}
+        currentStatus={kycStatus}
+      />
 
     </div>
   );

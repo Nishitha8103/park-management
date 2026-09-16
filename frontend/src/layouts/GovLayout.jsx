@@ -12,7 +12,7 @@ const GovLayout = () => {
   useEffect(() => {
     const storedUser = localStorage.getItem('govUser');
     if (!storedUser) {
-      navigate('/gov/login');
+      navigate('/login');
     }
   }, [navigate]);
 

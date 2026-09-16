@@ -14,7 +14,8 @@ import {
   ChevronRight, 
   Info,
   Calendar,
-  AlertCircle
+  AlertCircle,
+  Clock
 } from 'lucide-react';
 import './NotificationsPage.css';
 
@@ -39,18 +40,15 @@ const NotificationsPage = () => {
     const officialUser = localStorage.getItem('officialUser');
     if (officialUser) return { ...JSON.parse(officialUser), role: 'official' };
 
-    return null;
+    // Fallback for public visitor / guest
+    return { id: 'CITIZEN_GUEST', name: 'Public Visitor', role: 'citizen' };
   };
 
   const user = getUserInfo();
 
   const fetchNotifications = async () => {
     try {
-      if (!user) {
-        navigate('/');
-        return;
-      }
-      const userId = user._id || user.id;
+      const userId = user._id || user.id || 'CITIZEN_GUEST';
       const phone = user.phone || user.userPhone || '';
       const phoneParam = (user.role === 'citizen' && phone) ? `&phone=${encodeURIComponent(phone)}` : '';
       const res = await axios.get(`/api/notifications?userId=${userId}&role=${user.role}${phoneParam}`);
@@ -166,7 +164,36 @@ const NotificationsPage = () => {
       };
     }
 
-    // 3. COMPLAINT: Complaint Submitted, Complaint In Progress, Complaint Resolved
+    // 3. COMPLAINT: Resolved, In Progress, Submitted, Assigned
+    if (
+      title.includes('complaint resolved') || 
+      type.includes('complaint resolved')
+    ) {
+      return {
+        icon: <CheckCircle2 size={22} />,
+        badgeText: 'Complaint Resolved ✅',
+        iconColor: '#059669',
+        bgColor: '#dcfce7',
+        actionText: 'Track Status →',
+        defaultRoute: '/track-complaint'
+      };
+    }
+
+    if (
+      title.includes('in progress') || 
+      title.includes('complaint status updated') ||
+      title.includes('complaint assigned')
+    ) {
+      return {
+        icon: <Clock size={22} />,
+        badgeText: 'Status Update 🔔',
+        iconColor: '#2563eb',
+        bgColor: '#dbeafe',
+        actionText: 'Track Status →',
+        defaultRoute: '/track-complaint'
+      };
+    }
+
     if (
       title.includes('complaint') || 
       cat === 'complaint' || 
@@ -180,6 +207,29 @@ const NotificationsPage = () => {
         bgColor: '#dbeafe',
         actionText: 'View Complaint Details →',
         defaultRoute: '/track-complaint'
+      };
+    }
+
+    // 4. MAINTENANCE & INSPECTION
+    if (title.includes('maintenance') || cat.includes('maintenance') || type.includes('maintenance')) {
+      return {
+        icon: <FileText size={22} />,
+        badgeText: 'Maintenance Alert 🔔',
+        iconColor: '#ea580c',
+        bgColor: '#ffedd5',
+        actionText: 'View Task →',
+        defaultRoute: '/contractor/tasks'
+      };
+    }
+
+    if (title.includes('inspection') || cat.includes('inspection') || type.includes('inspection')) {
+      return {
+        icon: <Calendar size={22} />,
+        badgeText: 'Inspection Reminder 🔔',
+        iconColor: '#7c3aed',
+        bgColor: '#f3e8ff',
+        actionText: 'View Inspection →',
+        defaultRoute: '/gov-dashboard/my-inspections'
       };
     }
 

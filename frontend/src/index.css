@@ -62,18 +62,44 @@ html, body, #root, .app-layout {
   -webkit-tap-highlight-color: transparent;
 }
 
-body {
-  background: url('/login_bg_v2.jpg') no-repeat center center fixed !important;
+html {
+  min-height: 100%;
+  width: 100%;
+  background: url('/user_public_bg.png?v=4') no-repeat center center fixed !important;
   background-size: cover !important;
-  background-color: #03140a !important;
+  background-color: #f8fafc !important;
+}
+
+body {
+  min-height: 100vh;
+  min-height: -webkit-fill-available;
+  width: 100%;
+  max-width: 100vw;
+  margin: 0;
+  padding: 0;
+  background: url('/user_public_bg.png?v=4') no-repeat center center fixed !important;
+  background-size: cover !important;
+  background-color: transparent !important;
   padding-top: var(--sat);
   padding-bottom: var(--sab);
+}
+
+@media screen and (max-width: 768px) {
+  html, body {
+    background-size: 100% 100% !important;
+    background-attachment: scroll !important;
+  }
 }
 
 .admin-dashboard-page, 
 .contractor-dashboard-page, 
 .gov-dashboard-container, 
 .gov-layout,
+.gov-main-content,
+.gov-content,
+.contractor-main-wrapper,
+.admin-layout,
+.app-layout,
 .notifications-page-container, 
 .gov-notifications-page,
 .admin-panel,
@@ -84,6 +110,8 @@ body {
 .contractor-register-page,
 .admin-login-page,
 .admin-register-page,
+.login-dark-page,
+.register-dark-page,
 .parks-page,
 .park-details-page,
 .profile-page,
@@ -104,8 +132,8 @@ body {
 .stall-booking-page,
 .home-page {
   background-color: transparent !important;
-  background-image: none !important;
 }
+
 
 a {
   color: inherit;

@@ -4,23 +4,27 @@
   gap: 1.5rem;
 }
 
-.gov-back-btn {
+.gov-back-btn,
+.gov-back-link {
   display: inline-flex;
   align-items: center;
   gap: 0.5rem;
-  color: #06402b;
-  background-color: white;
-  border: 1px solid #e2e8f0;
+  color: #064e3b !important;
+  background-color: #ffffff !important;
+  border: 1.5px solid #059669 !important;
   padding: 0.5rem 1rem;
-  border-radius: 6px;
-  font-weight: 500;
+  border-radius: 20px;
+  font-weight: 700;
   text-decoration: none;
   width: fit-content;
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.08);
   transition: all 0.2s;
 }
 
-.gov-back-btn:hover {
-  background-color: #f8fafc;
+.gov-back-btn:hover,
+.gov-back-link:hover {
+  background-color: #059669 !important;
+  color: #ffffff !important;
 }
 
 .gov-park-hero {

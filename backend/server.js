@@ -19,6 +19,10 @@ initAnnouncementCron();
 const { initStallPaymentCron } = require('./cron/stallPaymentCron');
 initStallPaymentCron();
 
+// Initialize Inspection Reminder Cron Job
+const { initInspectionCron } = require('./cron/inspectionCron');
+initInspectionCron();
+
 const compression = require('compression');
 
 const app = express();
@@ -43,6 +47,11 @@ app.use('/api/notifications', require('./routes/notificationRoutes'));
 app.use('/api/stall-bookings', require('./routes/stallBookingRoutes'));
 app.use('/api/stall-slots', require('./routes/stallSlotRoutes'));
 app.use('/api/material-requests', require('./routes/materialRequestRoutes'));
+app.use('/api/emergencies', require('./routes/emergencyRoutes'));
+app.use('/api/reassignments', require('./routes/reassignmentRoutes'));
+app.use('/api/leaves', require('./routes/leaveRoutes'));
+app.use('/api/kyc', require('./routes/kycRoutes'));
+
 
 // Basic health check endpoint
 app.get('/api/health', (req, res) => {
