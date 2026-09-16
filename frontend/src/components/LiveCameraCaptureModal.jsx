@@ -384,89 +384,11 @@ export default function LiveCameraCaptureModal({
             >
               <Crosshair size={13} /> {locLoading ? '...' : 'Live GPS'}
             </button>
-            <button 
-              type="button" 
-              className="btn-toolbar-search"
-              onClick={() => {
-                setShowSearch(!showSearch);
-                setCustomPlaceInput(placeName);
-                setCustomAddrInput(fullAddress);
-              }}
-            >
-              <Search size={13} /> {showSearch ? 'Close' : 'Edit / Search'}
-            </button>
+
           </div>
         </div>
 
-        {/* Location Search & Direct Edit Drawer */}
-        {showSearch && (
-          <div className="camera-search-drawer">
-            <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
-              <form onSubmit={async (e) => {
-                await handleSearchSubmit(e);
-                if (capturedData && searchQuery.trim()) {
-                  reStampPhotoWithNewLocation(searchQuery.trim(), searchQuery.trim());
-                }
-              }} className="camera-search-form">
-                <input 
-                  type="text"
-                  className="camera-search-input"
-                  placeholder="Search any park, landmark or area (e.g. Cubbon Park, MG Road)..."
-                  value={searchQuery}
-                  onChange={(e) => setSearchQuery(e.target.value)}
-                  autoFocus
-                />
-                <button type="submit" className="btn-camera-search-submit" disabled={isSearching}>
-                  {isSearching ? 'Locating...' : 'Search'}
-                </button>
-              </form>
 
-              <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginTop: '4px' }}>
-                <span style={{ fontSize: '0.75rem', color: '#94a3b8', fontWeight: 600 }}>Or type custom address:</span>
-              </div>
-
-              <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '6px' }}>
-                <input 
-                  type="text" 
-                  placeholder="Area, City (e.g. Coles Park, Bengaluru)" 
-                  value={customPlaceInput} 
-                  onChange={(e) => setCustomPlaceInput(e.target.value)}
-                  style={{ padding: '0.4rem 0.6rem', background: '#1e293b', border: '1px solid #334155', color: '#f8fafc', borderRadius: '6px', fontSize: '0.8rem' }}
-                />
-                <input 
-                  type="text" 
-                  placeholder="Full Street Details" 
-                  value={customAddrInput} 
-                  onChange={(e) => setCustomAddrInput(e.target.value)}
-                  style={{ padding: '0.4rem 0.6rem', background: '#1e293b', border: '1px solid #334155', color: '#f8fafc', borderRadius: '6px', fontSize: '0.8rem' }}
-                />
-              </div>
-              <button 
-                type="button" 
-                onClick={() => {
-                  if (customPlaceInput || customAddrInput) {
-                    const chosenPlace = customPlaceInput || customAddrInput;
-                    const chosenAddr = customAddrInput || customPlaceInput;
-                    setPlaceName(chosenPlace);
-                    setFullAddress(chosenAddr);
-                    setShowSearch(false);
-                    if (capturedData) {
-                      reStampPhotoWithNewLocation(chosenPlace, chosenAddr);
-                    }
-                  }
-                }}
-                style={{ padding: '0.45rem', backgroundColor: '#059669', color: 'white', border: 'none', borderRadius: '6px', fontWeight: 700, fontSize: '0.82rem', cursor: 'pointer' }}
-              >
-                Apply Custom Location on Photo
-              </button>
-            </div>
-            {locError && (
-              <div style={{ color: '#ef4444', fontSize: '0.8rem', marginTop: '6px' }}>
-                {locError}
-              </div>
-            )}
-          </div>
-        )}
 
         <div className="live-camera-body">
           {cameraError ? (
@@ -524,17 +446,7 @@ export default function LiveCameraCaptureModal({
               <button className="btn-camera-retake" onClick={handleRetake}>
                 <RefreshCw size={16} /> Retake
               </button>
-              <button 
-                type="button" 
-                onClick={() => {
-                  setShowSearch(true);
-                  setCustomPlaceInput(placeName);
-                  setCustomAddrInput(fullAddress);
-                }}
-                style={{ padding: '0.65rem 1rem', background: '#334155', color: '#f8fafc', border: '1px solid #475569', borderRadius: '8px', fontWeight: 600, fontSize: '0.85rem', cursor: 'pointer' }}
-              >
-                ✏️ Edit Location Text
-              </button>
+
               <button className="btn-camera-confirm" onClick={handleConfirm} disabled={processing}>
                 <Check size={18} /> {processing ? 'Applying...' : 'Use This Photo'}
               </button>

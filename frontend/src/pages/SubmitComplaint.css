@@ -2,10 +2,8 @@
 
 .complaint-page {
   min-height: calc(100vh - 64px);
-  margin: calc(-1 * var(--spacing-xl, 2rem));
-  padding: 1.5rem 2rem 3rem 2rem;
-  background: url('/login_bg_v2.jpg') no-repeat center center fixed;
-  background-size: cover;
+  padding: 0.5rem 0 2rem 0;
+  background: transparent !important;
   box-sizing: border-box;
   position: relative;
 }

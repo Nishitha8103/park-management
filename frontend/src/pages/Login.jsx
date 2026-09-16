@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { Link, useNavigate } from 'react-router-dom';
+import { Link, useNavigate, useSearchParams } from 'react-router-dom';
 import { Mail, Lock, Eye, EyeOff, LogIn, ArrowRight, Sprout } from 'lucide-react';
 import { useGoogleLogin } from '@react-oauth/google';
 import ForgotPasswordModal from '../components/ForgotPasswordModal';
@@ -7,6 +7,8 @@ import './Login.css';
 
 const Login = () => {
   const navigate = useNavigate();
+  const [searchParams] = useSearchParams();
+  const redirectPath = searchParams.get('redirect');
   const [showPassword, setShowPassword] = useState(false);
   const [showForgotModal, setShowForgotModal] = useState(false);
   const [email, setEmail] = useState('');
@@ -27,6 +29,11 @@ const Login = () => {
       localStorage.setItem('govUser', JSON.stringify(userData));
     }
     
+    if (redirectPath) {
+      navigate(redirectPath);
+      return;
+    }
+
     switch (userData.role) {
       case 'Admin':
         navigate('/admin-dashboard');
@@ -118,7 +125,7 @@ const Login = () => {
   });
 
   return (
-    <div className="login-dark-page" style={{ backgroundImage: "url('/landing_bg_leaves.jpg?v=5')" }}>
+    <div className="login-dark-page" style={{ backgroundImage: "url('/landing_dark_leaves.jpg?v=100')" }}>
       <div className="login-dark-overlay"></div>
 
       <div className="login-main-wrapper">

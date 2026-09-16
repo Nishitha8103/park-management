@@ -54,7 +54,7 @@ const Register = () => {
   };
 
   return (
-    <div className="register-dark-page" style={{ backgroundImage: "url('/landing_bg_leaves.jpg?v=5')" }}>
+    <div className="register-dark-page" style={{ backgroundImage: "url('/landing_dark_leaves.jpg?v=100')" }}>
       <div className="register-dark-overlay"></div>
 
       <div className="register-main-wrapper">
