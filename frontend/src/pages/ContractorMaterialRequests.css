@@ -1,5 +1,5 @@
 /* ============================================================
-   CONTRACTOR MATERIAL REQUESTS — Professional Park Theme
+   CONTRACTOR MATERIAL REQUESTS — Green Nature-Inspired Park Theme
    ============================================================ */
 
 /* ---- Page wrapper ---- */
@@ -15,11 +15,11 @@
   flex-wrap: wrap;
   gap: 1rem;
   margin-bottom: 1.75rem;
-  padding: 1.5rem;
-  background: linear-gradient(135deg, #0f172a 0%, #1e293b 65%, #1a2e4a 100%);
-  border-radius: 16px;
-  border: 1px solid rgba(59,130,246,0.2);
-  box-shadow: 0 8px 24px rgba(15,23,42,0.2);
+  padding: 1.5rem 2rem;
+  background: linear-gradient(135deg, #0b3d2c 0%, #06402B 65%, #042e1f 100%);
+  border-radius: 18px;
+  border: 1px solid rgba(74, 222, 128, 0.25);
+  box-shadow: 0 8px 24px rgba(6, 64, 43, 0.25);
 }
 
 .mr-title {
@@ -29,20 +29,21 @@
 }
 
 .mr-title-icon {
-  color: #60a5fa;
+  color: #4ade80;
   flex-shrink: 0;
 }
 
 .mr-title h2 {
-  font-size: 1.35rem;
+  font-size: 1.4rem;
   font-weight: 800;
   color: #fff;
   margin: 0 0 3px;
+  letter-spacing: -0.01em;
 }
 
 .mr-title p {
-  font-size: 0.82rem;
-  color: #94a3b8;
+  font-size: 0.85rem;
+  color: #bbf7d0;
   margin: 0;
 }
 
@@ -50,22 +51,23 @@
   display: inline-flex;
   align-items: center;
   gap: 0.5rem;
-  background: #d97706;
+  background: linear-gradient(135deg, #16a34a 0%, #15803d 100%);
   color: #fff;
-  border: none;
+  border: 1px solid rgba(255, 255, 255, 0.2);
   padding: 0.65rem 1.35rem;
   border-radius: 10px;
   font-size: 0.9rem;
   font-weight: 700;
   cursor: pointer;
   transition: all 0.2s ease;
-  box-shadow: 0 4px 12px rgba(217,119,6,0.3);
+  box-shadow: 0 4px 12px rgba(22, 163, 74, 0.35);
   white-space: nowrap;
 }
 
 .mr-add-btn:hover {
-  background: #b45309;
+  background: linear-gradient(135deg, #15803d 0%, #14532d 100%);
   transform: translateY(-1px);
+  box-shadow: 0 6px 18px rgba(22, 163, 74, 0.45);
 }
 
 /* ---- Alert ---- */

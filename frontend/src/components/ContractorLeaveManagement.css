@@ -1,27 +1,29 @@
 .leave-mgmt-container {
   display: flex;
   flex-direction: column;
-  gap: 1.25rem;
-  margin-top: 1rem;
+  gap: 1.5rem;
+  margin-top: 0.5rem;
+  width: 100%;
 }
 
-/* Status Banner */
+/* Status Banner matching Contractor Lime Green Theme */
 .leave-status-banner {
-  background: linear-gradient(135deg, #ffffff 0%, #f0fdf4 100%);
-  border: 1px solid #bbf7d0;
-  border-radius: 12px;
-  padding: 1.5rem;
+  background: linear-gradient(135deg, #65a30d 0%, #84cc16 65%, #a3e635 100%);
+  border: 1px solid #a3e635;
+  border-radius: 16px;
+  padding: 1.75rem 2rem;
   display: flex;
   justify-content: space-between;
   align-items: center;
   gap: 1.5rem;
-  box-shadow: 0 4px 15px -3px rgba(16, 185, 129, 0.08);
+  box-shadow: 0 10px 25px -5px rgba(101, 163, 13, 0.35);
+  color: #ffffff;
 }
 
 .status-banner-info {
   display: flex;
   flex-direction: column;
-  gap: 0.5rem;
+  gap: 0.6rem;
 }
 
 .status-badge-wrap {
@@ -30,19 +32,20 @@
 }
 
 .status-pill {
-  font-size: 0.82rem;
-  font-weight: 700;
-  padding: 4px 12px;
+  font-size: 0.8rem;
+  font-weight: 800;
+  padding: 4px 14px;
   border-radius: 20px;
-  letter-spacing: 0.3px;
+  letter-spacing: 0.4px;
   display: inline-flex;
   align-items: center;
+  backdrop-filter: blur(4px);
 }
 
 .status-pill.available {
-  background: #dcfce7;
-  color: #15803d;
-  border: 1px solid #86efac;
+  background: rgba(255, 255, 255, 0.25);
+  color: #ffffff;
+  border: 1px solid rgba(255, 255, 255, 0.45);
 }
 
 .status-pill.on-leave {
@@ -58,47 +61,56 @@
 }
 
 .status-banner-title {
-  font-size: 1.2rem;
+  font-size: 1.45rem;
   font-weight: 800;
-  color: #0f172a;
+  color: #ffffff;
   margin: 0;
+  letter-spacing: -0.01em;
 }
 
 .status-banner-desc {
-  font-size: 0.88rem;
-  color: #475569;
-  line-height: 1.45;
+  font-size: 0.92rem;
+  color: #f7fee7;
+  line-height: 1.5;
   margin: 0;
-  max-width: 650px;
+  max-width: 720px;
+  font-weight: 500;
+}
+
+.status-banner-desc strong {
+  color: #ffffff;
+  font-weight: 800;
 }
 
 .btn-apply-leave {
-  background: #0f766e;
-  color: white;
+  background: #ffffff;
+  color: #3f6212;
   border: none;
-  padding: 0.75rem 1.4rem;
-  border-radius: 8px;
-  font-weight: 700;
-  font-size: 0.92rem;
+  padding: 0.8rem 1.6rem;
+  border-radius: 10px;
+  font-weight: 800;
+  font-size: 0.95rem;
   cursor: pointer;
   display: flex;
   align-items: center;
   gap: 8px;
-  box-shadow: 0 4px 12px rgba(15, 118, 110, 0.25);
+  box-shadow: 0 4px 14px rgba(0, 0, 0, 0.15);
   transition: all 0.2s ease;
   white-space: nowrap;
 }
 
 .btn-apply-leave:hover {
-  background: #115e59;
-  transform: translateY(-1px);
+  background: #f7fee7;
+  color: #365314;
+  transform: translateY(-2px);
+  box-shadow: 0 6px 18px rgba(0, 0, 0, 0.2);
 }
 
 /* Alert Boxes */
 .leave-alert {
-  padding: 0.85rem 1.2rem;
-  border-radius: 8px;
-  font-size: 0.88rem;
+  padding: 0.9rem 1.3rem;
+  border-radius: 10px;
+  font-size: 0.9rem;
   font-weight: 600;
   display: flex;
   align-items: center;
@@ -119,15 +131,16 @@
 
 /* History Card */
 .leave-history-card {
-  background: white;
-  border-radius: 12px;
+  background: #ffffff;
+  border-radius: 14px;
   border: 1px solid #e2e8f0;
   overflow: hidden;
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.04);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
 }
 
 .history-card-header {
-  padding: 1.1rem 1.4rem;
+  padding: 1.2rem 1.5rem;
+  background: #ffffff;
   border-bottom: 1px solid #f1f5f9;
   display: flex;
   justify-content: space-between;
@@ -136,7 +149,7 @@
 
 .history-card-header h4 {
   margin: 0;
-  font-size: 1.05rem;
+  font-size: 1.1rem;
   font-weight: 700;
   color: #1e293b;
 }
@@ -396,8 +409,8 @@
 .form-field input:focus,
 .form-field select:focus,
 .form-field textarea:focus {
-  border-color: #0f766e;
-  box-shadow: 0 0 0 3px rgba(15, 118, 110, 0.15);
+  border-color: #65a30d;
+  box-shadow: 0 0 0 3px rgba(101, 163, 13, 0.15);
 }
 
 /* Duration Radio Group */
@@ -430,14 +443,14 @@
 }
 
 .duration-radio-label.active {
-  background: #f0fdf4;
-  border-color: #16a34a;
-  color: #15803d;
-  box-shadow: 0 2px 6px rgba(22, 163, 74, 0.12);
+  background: #f7fee7;
+  border-color: #84cc16;
+  color: #3f6212;
+  box-shadow: 0 2px 6px rgba(132, 204, 22, 0.15);
 }
 
 .duration-radio-label input[type="radio"] {
-  accent-color: #16a34a;
+  accent-color: #65a30d;
   cursor: pointer;
   margin: 0;
 }
@@ -458,8 +471,8 @@
 }
 
 .upload-dropzone:hover {
-  border-color: #0f766e;
-  background: #f0fdfa;
+  border-color: #65a30d;
+  background: #f7fee7;
 }
 
 .upload-btn-label {
@@ -468,7 +481,7 @@
   gap: 8px;
   background: white;
   border: 1px solid #cbd5e1;
-  color: #0f766e;
+  color: #4d7c0f;
   font-weight: 700;
   font-size: 0.88rem;
   padding: 0.5rem 1rem;
@@ -538,7 +551,7 @@
 }
 
 .btn-modal-submit {
-  background: #0f766e;
+  background: linear-gradient(135deg, #65a30d 0%, #84cc16 100%);
   color: white;
   border: none;
   padding: 0.65rem 1.4rem;
@@ -550,22 +563,24 @@
   align-items: center;
   gap: 8px;
   transition: all 0.2s;
+  box-shadow: 0 4px 12px rgba(101, 163, 13, 0.25);
 }
 
 .btn-modal-submit:hover {
-  background: #115e59;
+  background: linear-gradient(135deg, #4d7c0f 0%, #65a30d 100%);
 }
 
 /* Badge for leave type & duration in table */
 .badge-leave-type {
   display: inline-block;
-  background: #e0e7ff;
-  color: #3730a3;
+  background: #ecfccb;
+  color: #365314;
   font-size: 0.75rem;
   font-weight: 700;
   padding: 2px 7px;
   border-radius: 6px;
   margin-bottom: 3px;
+  border: 1px solid #d9f99d;
 }
 
 .badge-duration {
@@ -584,12 +599,12 @@
   gap: 4px;
   font-size: 0.78rem;
   font-weight: 600;
-  color: #0f766e;
+  color: #65a30d;
   text-decoration: underline;
   cursor: pointer;
 }
 
 .link-doc:hover {
-  color: #115e59;
+  color: #4d7c0f;
 }
 

@@ -205,15 +205,14 @@
   gap: 0.85rem;
   text-align: left;
   text-decoration: none;
+  cursor: default;
   transition: all 0.25s cubic-bezier(0.16, 1, 0.3, 1);
   box-shadow: 0 8px 24px -4px rgba(0, 0, 0, 0.55);
 }
 
 .landing-card:hover {
-  transform: translateY(-3px);
-  border-color: rgba(52, 211, 153, 0.65);
-  background: rgba(6, 42, 25, 0.9);
-  box-shadow: 0 12px 28px -4px rgba(16, 185, 129, 0.35);
+  border-color: rgba(52, 211, 153, 0.5);
+  background: rgba(6, 38, 22, 0.85);
 }
 
 .landing-card-icon {

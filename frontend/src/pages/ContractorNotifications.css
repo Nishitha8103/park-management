@@ -1,5 +1,5 @@
 /* ============================================================
-   CONTRACTOR NOTIFICATIONS — Professional Park Theme
+   CONTRACTOR NOTIFICATIONS — Green Nature-Inspired Park Theme
    ============================================================ */
 
 /* ---- Page wrapper ---- */
@@ -15,18 +15,19 @@
   flex-wrap: wrap;
   gap: 1rem;
   margin-bottom: 1.75rem;
-  padding: 1.5rem;
-  background: linear-gradient(135deg, #0f172a 0%, #1e293b 65%, #1a2530 100%);
-  border-radius: 16px;
-  border: 1px solid rgba(148,163,184,0.15);
-  box-shadow: 0 8px 24px rgba(15,23,42,0.2);
+  padding: 1.5rem 2rem;
+  background: linear-gradient(135deg, #0b3d2c 0%, #06402B 65%, #042e1f 100%);
+  border-radius: 18px;
+  border: 1px solid rgba(74, 222, 128, 0.25);
+  box-shadow: 0 8px 24px rgba(6, 64, 43, 0.25);
 }
 
 .notifications-header h2 {
-  font-size: 1.35rem;
+  font-size: 1.4rem;
   font-weight: 800;
-  color: #fff;
+  color: #ffffff;
   margin: 0;
+  letter-spacing: -0.01em;
 }
 
 .notifications-header > div {
@@ -39,21 +40,22 @@
   display: inline-flex;
   align-items: center;
   gap: 0.45rem;
-  background: rgba(22,163,74,0.15);
-  color: #4ade80;
-  border: 1px solid rgba(22,163,74,0.25);
-  padding: 0.5rem 1.1rem;
-  border-radius: 8px;
+  background: linear-gradient(135deg, #16a34a 0%, #15803d 100%);
+  color: #ffffff;
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  padding: 0.55rem 1.2rem;
+  border-radius: 9px;
   font-size: 0.82rem;
   font-weight: 700;
   cursor: pointer;
   transition: all 0.2s;
+  box-shadow: 0 2px 8px rgba(22, 163, 74, 0.3);
 }
 
 .btn-mark-all:hover {
-  background: #16a34a;
+  background: linear-gradient(135deg, #15803d 0%, #14532d 100%);
   color: #fff;
-  border-color: #16a34a;
+  transform: translateY(-1px);
 }
 
 /* ---- Notifications List ---- */

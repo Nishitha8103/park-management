@@ -1,15 +1,11 @@
-import React, { useState } from 'react';
+import React, { useState, useRef } from 'react';
 import { 
   AlertTriangle, 
-  RotateCcw, 
   X, 
   Upload, 
-  CheckCircle2, 
-  HelpCircle,
-  FileText,
-  Clock,
-  Send,
-  Loader2
+  Send, 
+  Loader2, 
+  Check 
 } from 'lucide-react';
 import axios from 'axios';
 import './RequestReassignmentModal.css';
@@ -18,7 +14,7 @@ const REASON_OPTIONS = [
   'On Leave',
   'Not Available',
   'Emergency',
-  'Already Assigned to an Urgent Task',
+  'Already Assigned to Urgent Task',
   'Insufficient Manpower',
   'Equipment/Material Unavailable',
   'Outside My Responsibility',
@@ -35,19 +31,56 @@ export default function RequestReassignmentModal({
 }) {
   const [reason, setReason] = useState('On Leave');
   const [explanation, setExplanation] = useState('');
+  const [wantsReassignment, setWantsReassignment] = useState('yes'); // 'yes' | 'no'
+  
+  const [attachmentFile, setAttachmentFile] = useState(null);
   const [attachmentUrl, setAttachmentUrl] = useState('');
-  const [uploading, setUploading] = useState(false);
+  const [uploadingFile, setUploadingFile] = useState(false);
+  
   const [submitting, setSubmitting] = useState(false);
   const [errorMsg, setErrorMsg] = useState('');
+  const fileInputRef = useRef(null);
+
+  const isContractor = ['contractor', 'Contractor'].includes(userRole);
 
   if (!isOpen || !task) return null;
 
-  const isContractor = ['contractor', 'Contractor'].includes(userRole);
+  const handleFileChange = async (e) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+
+    setAttachmentFile(file);
+    setUploadingFile(true);
+    setErrorMsg('');
+
+    try {
+      const formData = new FormData();
+      formData.append('attachment', file);
+
+      const res = await axios.post('/api/reassignments/upload', formData, {
+        headers: { 'Content-Type': 'multipart/form-data' }
+      });
+
+      if (res.data && res.data.fileUrl) {
+        setAttachmentUrl(res.data.fileUrl);
+      }
+    } catch (err) {
+      console.error('File upload failed:', err);
+      setErrorMsg('Failed to upload attachment file. You can still submit without it.');
+    } finally {
+      setUploadingFile(false);
+    }
+  };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
     if (!reason) {
-      setErrorMsg('Please select a reason for reassignment.');
+      setErrorMsg('Please select a Reason for Rejection / Reassignment.');
+      return;
+    }
+
+    if (!explanation.trim()) {
+      setErrorMsg('Please provide an Additional Explanation why you cannot complete this task.');
       return;
     }
 
@@ -59,12 +92,13 @@ export default function RequestReassignmentModal({
       const requesterName = user?.name || (isContractor ? 'Contractor' : 'Government Official');
 
       const payload = {
-        taskId: task._id,
+        taskId: task._id || task.id,
         requesterId: String(requesterId),
         requesterName,
         requesterRole: isContractor ? 'contractor' : 'government_official',
         reason,
         explanation: explanation.trim(),
+        wantsReassignment: wantsReassignment === 'yes',
         attachmentUrl: attachmentUrl || null
       };
 
@@ -89,11 +123,11 @@ export default function RequestReassignmentModal({
         <div className="reassign-modal-header">
           <div className="reassign-title-group">
             <div className="reassign-icon-circle">
-              <RotateCcw size={22} color="#d97706" />
+              <AlertTriangle size={22} color="#dc2626" />
             </div>
             <div>
-              <h3>Request Task Reassignment</h3>
-              <p>Notify Administrator that you cannot complete this assigned task</p>
+              <h3>Decline / Request Reassignment</h3>
+              <p>Job <strong>{task.complaintNumber || task.id}</strong> at <strong>{task.parkName || task.park || 'Park'}</strong></p>
             </div>
           </div>
           <button className="reassign-close-btn" onClick={onClose}>
@@ -101,34 +135,18 @@ export default function RequestReassignmentModal({
           </button>
         </div>
 
-        {/* Task Summary Banner */}
-        <div className="reassign-task-summary">
-          <div className="summary-row">
-            <span className="summary-label">Task:</span>
-            <span className="summary-val">{task.category || task.issueTitle || 'Maintenance Task'} (#{task.complaintNumber || task.id})</span>
-          </div>
-          <div className="summary-row">
-            <span className="summary-label">Park:</span>
-            <span className="summary-val">{task.parkName || task.park?.name || 'Park Premises'}</span>
-          </div>
-          <div className="summary-row">
-            <span className="summary-label">Role:</span>
-            <span className="summary-val role-badge">{isContractor ? 'Contractor Task' : 'Official Inspection'}</span>
-          </div>
-        </div>
-
         {errorMsg && (
-          <div className="reassign-error-alert">
+          <div className="reassign-error-alert" style={{ margin: '1rem 1.5rem 0' }}>
             <AlertTriangle size={18} />
             <span>{errorMsg}</span>
           </div>
         )}
 
         <form onSubmit={handleSubmit} className="reassign-form">
-          {/* Reason Selection */}
+          {/* Reason for Rejection / Reassignment */}
           <div className="reassign-form-group">
             <label className="reassign-form-label">
-              Primary Reason for Inability to Complete <span className="req-star">*</span>
+              Reason for Rejection / Reassignment <span className="req-star">*</span>
             </label>
             <select 
               className="reassign-select"
@@ -145,36 +163,90 @@ export default function RequestReassignmentModal({
           {/* Additional Explanation */}
           <div className="reassign-form-group">
             <label className="reassign-form-label">
-              Additional Explanation / Details
+              Additional Explanation <span className="req-star">*</span>
             </label>
             <textarea
               className="reassign-textarea"
-              rows={4}
-              placeholder="Please describe why you cannot undertake or finish this task, current bottlenecks, or expected availability date..."
+              rows={3}
+              placeholder="Please explain why you cannot complete this task. (Example: I am unavailable due to approved leave from 17 Sep to 18 Sep.)"
               value={explanation}
               onChange={(e) => setExplanation(e.target.value)}
+              required
             />
           </div>
 
-          {/* Optional Attachment URL / Evidence */}
+          {/* Do you want this task to be reassigned? */}
           <div className="reassign-form-group">
             <label className="reassign-form-label">
-              Optional Attachment / Evidence (Document or Image Link)
+              Do you want this task to be reassigned? <span className="req-star">*</span>
             </label>
-            <input
-              type="text"
-              className="reassign-input"
-              placeholder="e.g. Leave letter link, medical certificate, or site hindrance photo"
-              value={attachmentUrl}
-              onChange={(e) => setAttachmentUrl(e.target.value)}
-            />
+            <div style={{ display: 'flex', gap: '1rem', marginTop: '4px' }}>
+              <label style={{ display: 'flex', alignItems: 'center', gap: '6px', fontSize: '0.9rem', cursor: 'pointer', fontWeight: wantsReassignment === 'yes' ? '600' : 'normal', color: wantsReassignment === 'yes' ? '#0f172a' : '#64748b' }}>
+                <input 
+                  type="radio" 
+                  name="wantsReassignment" 
+                  value="yes" 
+                  checked={wantsReassignment === 'yes'} 
+                  onChange={() => setWantsReassignment('yes')} 
+                />
+                Yes, Request Reassignment
+              </label>
+              <label style={{ display: 'flex', alignItems: 'center', gap: '6px', fontSize: '0.9rem', cursor: 'pointer', fontWeight: wantsReassignment === 'no' ? '600' : 'normal', color: wantsReassignment === 'no' ? '#0f172a' : '#64748b' }}>
+                <input 
+                  type="radio" 
+                  name="wantsReassignment" 
+                  value="no" 
+                  checked={wantsReassignment === 'no'} 
+                  onChange={() => setWantsReassignment('no')} 
+                />
+                No
+              </label>
+            </div>
           </div>
 
-          {/* SLA Notice */}
-          <div className="reassign-sla-notice">
-            <Clock size={15} color="#0284c7" />
-            <span>
-              <strong>Note:</strong> Submitting a reassignment request does not automatically reset the SLA deadline. The Administrator will review and assign an eligible replacement {isContractor ? 'Contractor' : 'Government Official'}.
+          {/* Attachment (Optional) */}
+          <div className="reassign-form-group">
+            <label className="reassign-form-label">
+              Attachment (Optional)
+            </label>
+            <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
+              <input 
+                type="file" 
+                ref={fileInputRef} 
+                style={{ display: 'none' }} 
+                onChange={handleFileChange}
+                accept="image/*,.pdf,.doc,.docx"
+              />
+              <button
+                type="button"
+                onClick={() => fileInputRef.current?.click()}
+                disabled={uploadingFile}
+                style={{
+                  display: 'flex',
+                  alignItems: 'center',
+                  gap: '6px',
+                  padding: '8px 14px',
+                  background: '#f1f5f9',
+                  border: '1px solid #cbd5e1',
+                  borderRadius: '6px',
+                  fontSize: '0.85rem',
+                  fontWeight: '500',
+                  color: '#334155',
+                  cursor: 'pointer'
+                }}
+              >
+                {uploadingFile ? <Loader2 size={15} className="spinning" /> : <Upload size={15} />}
+                {uploadingFile ? 'Uploading...' : 'Upload File / Image'}
+              </button>
+
+              {attachmentFile && (
+                <span style={{ fontSize: '0.82rem', color: '#16a34a', display: 'flex', alignItems: 'center', gap: '4px' }}>
+                  <Check size={14} /> {attachmentFile.name}
+                </span>
+              )}
+            </div>
+            <span style={{ fontSize: '0.75rem', color: '#94a3b8', marginTop: '4px', display: 'block' }}>
+              Upload supporting document/image if required (Leave letter, site hindrance photo, etc.).
             </span>
           </div>
 
@@ -191,7 +263,8 @@ export default function RequestReassignmentModal({
             <button 
               type="submit" 
               className="btn-reassign-submit"
-              disabled={submitting}
+              style={{ background: '#dc2626', borderColor: '#dc2626' }}
+              disabled={submitting || uploadingFile}
             >
               {submitting ? (
                 <>
@@ -199,7 +272,7 @@ export default function RequestReassignmentModal({
                 </>
               ) : (
                 <>
-                  <Send size={16} /> Submit Reassignment Request
+                  <Send size={16} /> Submit Rejection Request
                 </>
               )}
             </button>
@@ -210,3 +283,4 @@ export default function RequestReassignmentModal({
     </div>
   );
 }
+

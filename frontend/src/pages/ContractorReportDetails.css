@@ -51,10 +51,11 @@
   flex-wrap: wrap;
   gap: 1.2rem;
   padding: 1.5rem 2rem;
-  background: linear-gradient(135deg, #0f172a 0%, #1e293b 60%, #064e3b 100%);
-  border-radius: 20px;
-  border: 1px solid rgba(16, 185, 129, 0.25);
-  box-shadow: 0 10px 30px rgba(15, 23, 42, 0.25);
+  background: #84cc16;
+  background: linear-gradient(135deg, #65a30d 0%, #84cc16 65%, #a3e635 100%);
+  border-radius: 16px;
+  border: 1px solid #bef264;
+  box-shadow: 0 10px 25px -5px rgba(101, 163, 13, 0.3);
   position: relative;
   overflow: hidden;
 }
@@ -63,7 +64,7 @@
   content: '';
   position: absolute;
   top: 0; right: 0; bottom: 0; left: 0;
-  background: radial-gradient(circle at 90% 10%, rgba(16, 185, 129, 0.15), transparent 50%);
+  background: radial-gradient(circle at 90% 10%, rgba(255, 255, 255, 0.25), transparent 50%);
   pointer-events: none;
 }
 
@@ -81,12 +82,13 @@
   font-weight: 800;
   letter-spacing: 0.08em;
   text-transform: uppercase;
-  color: #34d399;
-  background: rgba(16, 185, 129, 0.15);
+  color: #365314;
+  background: #ffffff;
   padding: 0.25rem 0.65rem;
-  border-radius: 6px;
+  border-radius: 20px;
   width: fit-content;
-  border: 1px solid rgba(52, 211, 153, 0.3);
+  border: 1px solid rgba(255, 255, 255, 0.6);
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.08);
 }
 
 .page-title {
@@ -98,9 +100,10 @@
 }
 
 .page-subtitle {
-  color: #94a3b8;
-  font-size: 0.85rem;
+  color: #f7fee7;
+  font-size: 0.88rem;
   margin: 0;
+  font-weight: 500;
 }
 
 .header-actions-group {

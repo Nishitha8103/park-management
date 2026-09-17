@@ -25,6 +25,9 @@ const submitReassignmentRequest = async (req, res) => {
       requesterRole, // 'contractor' | 'government_official' | 'official'
       reason,
       explanation,
+      wantsReassignment,
+      preferredReplacementContractor,
+      preferredReplacementName,
       attachmentUrl
     } = req.body;
 
@@ -91,6 +94,9 @@ const submitReassignmentRequest = async (req, res) => {
       currentAssigneeRole: isContractor ? 'contractor' : 'government_official',
       reason,
       explanation: explanation || '',
+      wantsReassignment: wantsReassignment !== false,
+      preferredReplacementContractor: preferredReplacementContractor || undefined,
+      preferredReplacementName: preferredReplacementName || '',
       attachmentUrl: attachmentUrl || null,
       priority: task.priority || 'Medium',
       deadline: task.slaDeadline || null,

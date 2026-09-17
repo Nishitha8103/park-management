@@ -18,9 +18,14 @@ const NotificationDropdown = ({ userId, role, onNotificationClick }) => {
       if (!userId || !role) return;
       const res = await axios.get(`/api/notifications?userId=${userId}&role=${role}`);
       if (res.data) {
-        const notifList = res.data.notifications || [];
+        const notifList = (res.data.notifications || []).filter(n => {
+          const title = (n.title || '').toLowerCase();
+          const cat = (n.category || '').toLowerCase();
+          const type = (n.type || n.relatedEntityType || '').toLowerCase();
+          return !title.includes('sos') && !cat.includes('sos') && !type.includes('sos') && !title.includes('emergency');
+        });
         setNotifications(notifList);
-        setUnreadCount(res.data.unreadCount || 0);
+        setUnreadCount(notifList.filter(n => !n.isRead).length);
       }
     } catch (err) {
       console.error('Failed to fetch notifications', err);

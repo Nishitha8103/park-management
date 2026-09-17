@@ -1,4 +1,4 @@
-import { useNavigate, Link } from 'react-router-dom';
+import { Link } from 'react-router-dom';
 import { LogIn, ArrowRight } from 'lucide-react';
 import './Home.css';
 
@@ -38,30 +38,6 @@ const BookStallIcon = ({ size = 22 }) => (
 );
 
 const Home = () => {
-  const navigate = useNavigate();
-
-  const handleCardClick = (e, path) => {
-    e.preventDefault();
-    const stored = localStorage.getItem('user');
-    let loggedIn = false;
-    if (stored) {
-      try {
-        const u = JSON.parse(stored);
-        if (u && (u.token || u.id || u._id)) {
-          loggedIn = true;
-        }
-      } catch (err) {
-        loggedIn = false;
-      }
-    }
-
-    if (loggedIn) {
-      navigate(path);
-    } else {
-      navigate(`/login?redirect=${encodeURIComponent(path)}`);
-    }
-  };
-
   return (
     <div className="landing-dark-page">
       <div className="landing-dark-overlay"></div>
@@ -86,10 +62,10 @@ const Home = () => {
           </p>
         </div>
 
-        {/* 4 Feature Cards Grid matching Image 2 */}
+        {/* 4 Feature Cards Grid (Informational Showcase Cards) */}
         <div className="landing-feature-grid">
           {/* Card 1: Explore Parks */}
-          <div onClick={(e) => handleCardClick(e, '/parks')} className="landing-card card-explore" style={{ cursor: 'pointer' }}>
+          <div className="landing-card card-explore" style={{ cursor: 'default' }}>
             <div className="landing-card-icon icon-explore">
               <ExploreParksIcon size={22} />
             </div>
@@ -100,7 +76,7 @@ const Home = () => {
           </div>
 
           {/* Card 2: Report Issues */}
-          <div onClick={(e) => handleCardClick(e, '/complaint')} className="landing-card card-report" style={{ cursor: 'pointer' }}>
+          <div className="landing-card card-report" style={{ cursor: 'default' }}>
             <div className="landing-card-icon icon-report">
               <ReportIssuesIcon size={22} />
             </div>
@@ -111,7 +87,7 @@ const Home = () => {
           </div>
 
           {/* Card 3: Attend Events */}
-          <div onClick={(e) => handleCardClick(e, '/events')} className="landing-card card-events" style={{ cursor: 'pointer' }}>
+          <div className="landing-card card-events" style={{ cursor: 'default' }}>
             <div className="landing-card-icon icon-events">
               <AttendEventsIcon size={22} />
             </div>
@@ -122,7 +98,7 @@ const Home = () => {
           </div>
 
           {/* Card 4: Book Stall */}
-          <div onClick={(e) => handleCardClick(e, '/events')} className="landing-card card-stall" style={{ cursor: 'pointer' }}>
+          <div className="landing-card card-stall" style={{ cursor: 'default' }}>
             <div className="landing-card-icon icon-stall">
               <BookStallIcon size={22} />
             </div>

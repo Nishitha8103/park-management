@@ -4,10 +4,11 @@ import {
   ClipboardList, 
   Calendar, 
   CheckCircle, 
-  RotateCcw,
-  Bell,
-  Activity,
-  CalendarDays
+  RotateCcw, 
+  Bell, 
+  Activity, 
+  CalendarDays,
+  Sparkles 
 } from 'lucide-react';
 import { 
   BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, Legend,
@@ -195,62 +196,68 @@ const GovDashboard = () => {
 
   return (
     <div className="dashboard-container">
-      <div className="dashboard-header flex justify-between items-center">
-        <div>
-          <h1 className="dashboard-title">Welcome back,<br/><span className="text-primary font-bold">{user.name}!</span></h1>
-          <p className="text-secondary">Here's what's happening today.</p>
-        </div>
-        <div className="dashboard-date flex items-center gap-md">
-          <div className="date-icon-box">
-            <CalendarDays size={24} className="text-primary" />
-          </div>
-          <div className="date-text">
-            <span className="day">{String(dayNum).padStart(2, '0')}</span>
-            <div className="month-year">
-              <span>{monthYear}</span>
-              <span className="text-secondary" style={{fontSize: '0.8rem'}}>{weekday}</span>
+      {/* Welcome Hero Banner matching Contractor format */}
+      <div className="gov-hero-banner">
+        <div className="gov-hero-banner-main">
+          <div className="gov-hero-greeting">
+            <div className="gov-hero-badge">
+              <Sparkles size={14} /> Official Governance Dashboard
             </div>
+            <h2>Welcome back, <span className="highlight">{user.name}!</span></h2>
+            <p>Overview of assigned parks, active inspections, and complaint resolutions.</p>
           </div>
         </div>
       </div>
 
-      {/* Top Cards */}
-      <div className="stats-grid">
-        <div className="card stat-card">
-          <div className="stat-icon-wrapper text-warning bg-warning-light">
-            <ClipboardList size={24} />
+      {/* 4 Metric KPI Stat Cards matching Contractor format */}
+      <div className="gov-stats-grid">
+        <div className="gov-stat-card" onClick={() => navigate('/gov-dashboard/my-inspections')}>
+          <div className="stat-card-top">
+            <div className="gov-stat-icon">
+              <ClipboardList size={24} />
+            </div>
+            <span className="gov-stat-tag">Active Work</span>
           </div>
-          <div className="stat-info">
+          <div className="stat-card-bottom">
             <h3>{loading ? '—' : String(stats.pending).padStart(2, '0')}</h3>
             <p>Pending Complaints</p>
           </div>
         </div>
         
-        <div className="card stat-card">
-          <div className="stat-icon-wrapper text-blue bg-blue-light">
-            <Calendar size={24} />
+        <div className="gov-stat-card" onClick={() => navigate('/gov-dashboard/schedule')}>
+          <div className="stat-card-top">
+            <div className="gov-stat-icon">
+              <Calendar size={24} />
+            </div>
+            <span className="gov-stat-tag">Scheduled</span>
           </div>
-          <div className="stat-info">
+          <div className="stat-card-bottom">
             <h3>{loading ? '—' : String(stats.today).padStart(2, '0')}</h3>
             <p>Complaints Today</p>
           </div>
         </div>
 
-        <div className="card stat-card">
-          <div className="stat-icon-wrapper text-success bg-success-light">
-            <CheckCircle size={24} />
+        <div className="gov-stat-card" onClick={() => navigate('/gov-dashboard/analytics')}>
+          <div className="stat-card-top">
+            <div className="gov-stat-icon">
+              <CheckCircle size={24} />
+            </div>
+            <span className="gov-stat-tag">Verified</span>
           </div>
-          <div className="stat-info">
+          <div className="stat-card-bottom">
             <h3>{loading ? '—' : String(stats.completed).padStart(2, '0')}</h3>
-            <p>Completed</p>
+            <p>Completed Tasks</p>
           </div>
         </div>
 
-        <div className="card stat-card">
-          <div className="stat-icon-wrapper text-error bg-error-light">
-            <RotateCcw size={24} />
+        <div className="gov-stat-card" onClick={() => navigate('/gov-dashboard/complaints')}>
+          <div className="stat-card-top">
+            <div className="gov-stat-icon">
+              <RotateCcw size={24} />
+            </div>
+            <span className="gov-stat-tag">Needs Action</span>
           </div>
-          <div className="stat-info">
+          <div className="stat-card-bottom">
             <h3>{loading ? '—' : String(stats.rework).padStart(2, '0')}</h3>
             <p>Rework Requests</p>
           </div>

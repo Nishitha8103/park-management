@@ -220,7 +220,7 @@ export default function ContractorLeaveManagement({ contractor }) {
       <div className="leave-history-card">
         <div className="history-card-header">
           <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
-            <CalendarDays size={20} color="#0f766e" />
+            <CalendarDays size={20} color="#65a30d" />
             <h4>My Leave Applications & Status</h4>
           </div>
           <button className="btn-refresh-leaves" onClick={fetchLeaves} title="Refresh">
@@ -266,7 +266,7 @@ export default function ContractorLeaveManagement({ contractor }) {
                     <tr key={l._id}>
                       <td style={{ fontWeight: 700, color: '#1e293b' }}>
                         <button 
-                          style={{ background: 'none', border: 'none', color: '#0f766e', fontWeight: 700, cursor: 'pointer', textDecoration: 'underline', padding: 0 }}
+                          style={{ background: 'none', border: 'none', color: '#65a30d', fontWeight: 700, cursor: 'pointer', textDecoration: 'underline', padding: 0 }}
                           onClick={() => setSelectedLeaveDetails(l)}
                         >
                           {l.leaveId}
@@ -354,7 +354,7 @@ export default function ContractorLeaveManagement({ contractor }) {
           <div className="leave-modal-dialog" onClick={(e) => e.stopPropagation()}>
             <div className="leave-modal-header">
               <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
-                <Calendar size={20} color="#0f766e" />
+                <Calendar size={20} color="#65a30d" />
                 <h3>Apply for Leave / Time Off</h3>
               </div>
               <button className="btn-modal-close" onClick={() => setShowApplyModal(false)}>
@@ -540,7 +540,7 @@ export default function ContractorLeaveManagement({ contractor }) {
           <div className="leave-modal-dialog" onClick={(e) => e.stopPropagation()}>
             <div className="leave-modal-header">
               <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
-                <Calendar size={20} color="#0f766e" />
+                <Calendar size={20} color="#65a30d" />
                 <h3>Leave Application Details ({selectedLeaveDetails.leaveId})</h3>
               </div>
               <button className="btn-modal-close" onClick={() => setSelectedLeaveDetails(null)}>

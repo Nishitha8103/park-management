@@ -17,11 +17,11 @@ import {
   ExternalLink
 } from 'lucide-react';
 import axios from 'axios';
-import './ContractorLeaveManagement.css'; // Reusing unified leave styles
+import './GovLeaveManagement.css';
 
 const LEAVE_STATUS_COLORS = {
   Pending: { bg: '#fef3c7', text: '#b45309', border: '#fde68a' },
-  Approved: { bg: '#dcfce7', text: '#15803d', border: '#bbf7d0' },
+  Approved: { bg: '#edf2ee', text: '#28372b', border: '#cbd7cd' },
   Rejected: { bg: '#fee2e2', text: '#b91c1c', border: '#fecaca' },
   Cancelled: { bg: '#f1f5f9', text: '#475569', border: '#cbd5e1' }
 };
@@ -183,23 +183,23 @@ export default function GovLeaveManagement({ official }) {
   const currentAvailability = official?.availabilityStatus || 'Available';
 
   return (
-    <div className="leave-mgmt-container">
+    <div className="gov-leave-mgmt-container">
       {/* Status Banner */}
-      <div className="leave-status-banner">
-        <div className="status-banner-info">
-          <div className="status-badge-wrap">
-            <span className={`status-pill ${currentAvailability.toLowerCase().replace(/\s+/g, '-')}`}>
-              {currentAvailability === 'Available' ? '🟢 Available for Inspections' : currentAvailability === 'On Leave' ? '🟡 Currently On Leave' : '🔴 Unavailable'}
+      <div className="gov-leave-status-banner">
+        <div className="gov-status-banner-info">
+          <div className="gov-status-badge-wrap">
+            <span className={`gov-status-pill ${currentAvailability.toLowerCase().replace(/\s+/g, '-')}`}>
+              {currentAvailability === 'Available' ? '🟢 Available For Inspections' : currentAvailability === 'On Leave' ? '🟡 Currently On Leave' : '🔴 Unavailable'}
             </span>
           </div>
-          <h3 className="status-banner-title">Official Leave & Availability Dashboard</h3>
-          <p className="status-banner-desc">
+          <h3 className="gov-status-banner-title">Official Leave & Availability Dashboard</h3>
+          <p className="gov-status-banner-desc">
             Apply for planned leaves or time off. Once approved by the administrator, your profile will be marked <strong>On Leave</strong> and new inspection assignments will be held until your return.
           </p>
         </div>
-        <div className="status-banner-action">
+        <div className="gov-status-banner-action">
           <button
-            className="btn-apply-leave"
+            className="gov-btn-apply-leave"
             onClick={() => { setShowApplyModal(true); setErrorMsg(''); setSuccessMsg(''); }}
           >
             <Plus size={18} /> Apply for Leave
@@ -208,37 +208,37 @@ export default function GovLeaveManagement({ official }) {
       </div>
 
       {successMsg && (
-        <div className="leave-alert success">
+        <div className="gov-leave-alert success">
           <CheckCircle2 size={18} /> {successMsg}
         </div>
       )}
 
       {/* History Table */}
-      <div className="leave-history-card">
-        <div className="history-card-header">
+      <div className="gov-leave-history-card">
+        <div className="gov-history-card-header">
           <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
-            <CalendarDays size={20} color="#0f766e" />
+            <CalendarDays size={20} color="#4f6d54" />
             <h4>My Leave Applications & Status</h4>
           </div>
-          <button className="btn-refresh-leaves" onClick={fetchLeaves} title="Refresh">
+          <button className="gov-btn-refresh-leaves" onClick={fetchLeaves} title="Refresh">
             <RefreshCw size={15} /> Refresh
           </button>
         </div>
 
         {loading ? (
-          <div className="leave-loading">
-            <Loader2 className="spin-icon" size={24} />
+          <div className="gov-leave-loading">
+            <Loader2 className="gov-spin-icon" size={28} />
             <span>Loading leave records...</span>
           </div>
         ) : leaves.length === 0 ? (
-          <div className="leave-empty-state">
-            <Calendar size={36} color="#94a3b8" />
-            <p className="empty-title">No leave applications recorded</p>
-            <p className="empty-sub">When you submit a leave request, its approval status, leave type, and admin remarks will appear here.</p>
+          <div className="gov-leave-empty-state">
+            <Calendar size={42} color="#8a9e90" />
+            <p className="gov-empty-title">No leave applications recorded</p>
+            <p className="gov-empty-sub">When you submit a leave request, its approval status, leave type, and admin remarks will appear here.</p>
           </div>
         ) : (
-          <div className="leave-table-wrapper">
-            <table className="leave-table">
+          <div className="gov-leave-table-wrapper">
+            <table className="gov-leave-table">
               <thead>
                 <tr>
                   <th>Leave ID</th>
@@ -260,19 +260,19 @@ export default function GovLeaveManagement({ official }) {
                   const colors = LEAVE_STATUS_COLORS[l.status] || LEAVE_STATUS_COLORS.Pending;
                   return (
                     <tr key={l._id}>
-                      <td style={{ fontWeight: 700, color: '#1e293b' }}>
+                      <td style={{ fontWeight: 700, color: '#1f2a21' }}>
                         <button 
-                          style={{ background: 'none', border: 'none', color: '#0f766e', fontWeight: 700, cursor: 'pointer', textDecoration: 'underline', padding: 0 }}
+                          style={{ background: 'none', border: 'none', color: '#4f6d54', fontWeight: 800, cursor: 'pointer', textDecoration: 'underline', padding: 0 }}
                           onClick={() => setSelectedLeaveDetails(l)}
                         >
                           {l.leaveId}
                         </button>
                       </td>
                       <td>
-                        <span className="badge-leave-type">{l.leaveType || 'Casual Leave'}</span>
+                        <span className="gov-badge-leave-type">{l.leaveType || 'Casual Leave'}</span>
                       </td>
                       <td>
-                        <div style={{ fontWeight: 600, color: '#0f172a' }}>
+                        <div style={{ fontWeight: 600, color: '#1f2a21' }}>
                           {sDate.toLocaleDateString('en-IN', { day: '2-digit', month: '2-digit', year: 'numeric' })}
                           {' → '}
                           {eDate.toLocaleDateString('en-IN', { day: '2-digit', month: '2-digit', year: 'numeric' })}
@@ -280,13 +280,13 @@ export default function GovLeaveManagement({ official }) {
                       </td>
                       <td>
                         <div style={{ display: 'flex', flexDirection: 'column', gap: '3px' }}>
-                          <span className="duration-pill">{diffDays} Day{diffDays > 1 ? 's' : ''}</span>
+                          <span className="gov-duration-pill">{diffDays} Day{diffDays > 1 ? 's' : ''}</span>
                           {l.duration && l.duration !== 'Full Day' && (
-                            <span className="badge-duration">{l.duration}</span>
+                            <span className="gov-badge-duration">{l.duration}</span>
                           )}
                         </div>
                       </td>
-                      <td style={{ maxWidth: '200px', color: '#475569' }}>
+                      <td style={{ maxWidth: '200px', color: '#5e7263' }}>
                         <div style={{ textOverflow: 'ellipsis', overflow: 'hidden', whiteSpace: 'nowrap' }} title={l.reason}>
                           {l.reason}
                         </div>
@@ -297,30 +297,30 @@ export default function GovLeaveManagement({ official }) {
                             href={l.supportingDocument} 
                             target="_blank" 
                             rel="noopener noreferrer" 
-                            className="link-doc"
+                            className="gov-link-doc"
                             title="View Supporting Document"
                           >
                             <Paperclip size={13} /> Document
                           </a>
                         ) : (
-                          <span style={{ color: '#cbd5e1', fontSize: '0.8rem' }}>—</span>
+                          <span style={{ color: '#cbd7cd', fontSize: '0.8rem' }}>—</span>
                         )}
                       </td>
                       <td>
                         <span
-                          className="leave-status-tag"
+                          className="gov-leave-status-tag"
                           style={{ backgroundColor: colors.bg, color: colors.text, borderColor: colors.border }}
                         >
                           {l.status}
                         </span>
                       </td>
-                      <td style={{ fontSize: '0.85rem', color: l.adminRemarks ? '#334155' : '#94a3b8', fontStyle: l.adminRemarks ? 'normal' : 'italic' }}>
+                      <td style={{ fontSize: '0.85rem', color: l.adminRemarks ? '#2d3e30' : '#8a9e90', fontStyle: l.adminRemarks ? 'normal' : 'italic' }}>
                         {l.adminRemarks || 'No remarks yet'}
                       </td>
                       <td>
                         {l.status === 'Pending' ? (
                           <button
-                            className="btn-cancel-leave"
+                            className="gov-btn-cancel-leave"
                             onClick={() => handleCancel(l._id)}
                             title="Cancel Leave Application"
                           >
@@ -328,7 +328,7 @@ export default function GovLeaveManagement({ official }) {
                           </button>
                         ) : (
                           <button
-                            style={{ background: '#f8fafc', border: '1px solid #e2e8f0', borderRadius: '6px', fontSize: '0.75rem', padding: '3px 8px', cursor: 'pointer', color: '#475569' }}
+                            style={{ background: '#f4f7f4', border: '1px solid #cbd7cd', borderRadius: '8px', fontSize: '0.78rem', padding: '4px 10px', cursor: 'pointer', color: '#2d3e30', fontWeight: 600 }}
                             onClick={() => setSelectedLeaveDetails(l)}
                           >
                             View
@@ -346,34 +346,34 @@ export default function GovLeaveManagement({ official }) {
 
       {/* Apply Leave Modal */}
       {showApplyModal && (
-        <div className="leave-modal-overlay" onClick={() => setShowApplyModal(false)}>
-          <div className="leave-modal-dialog" onClick={(e) => e.stopPropagation()}>
-            <div className="leave-modal-header">
+        <div className="gov-leave-modal-overlay" onClick={() => setShowApplyModal(false)}>
+          <div className="gov-leave-modal-dialog" onClick={(e) => e.stopPropagation()}>
+            <div className="gov-leave-modal-header">
               <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
-                <Calendar size={20} color="#0f766e" />
+                <Calendar size={20} color="#4f6d54" />
                 <h3>Apply for Official Leave / Time Off</h3>
               </div>
-              <button className="btn-modal-close" onClick={() => setShowApplyModal(false)}>
+              <button className="gov-btn-modal-close" onClick={() => setShowApplyModal(false)}>
                 <X size={18} />
               </button>
             </div>
 
-            <form onSubmit={handleApply} className="leave-modal-form">
+            <form onSubmit={handleApply} className="gov-leave-modal-form">
               {errorMsg && (
-                <div className="leave-alert error">
+                <div className="gov-leave-alert error">
                   <AlertCircle size={16} /> {errorMsg}
                 </div>
               )}
 
-              <div className="form-info-notice">
-                <Info size={16} color="#0369a1" />
+              <div className="gov-form-info-notice">
+                <Info size={18} color="#4f6d54" style={{ flexShrink: 0, marginTop: '2px' }} />
                 <span>
-                  Admin approval is required for all leave requests. Existing inspection assignments can be reassigned during your absence.
+                  Admin approval is required for all official leave requests. Existing inspection assignments can be reassigned to other officers during your absence.
                 </span>
               </div>
 
               {/* 1. Leave Type */}
-              <div className="form-field">
+              <div className="gov-form-field">
                 <label>Leave Type *</label>
                 <select
                   value={leaveType}
@@ -388,8 +388,8 @@ export default function GovLeaveManagement({ official }) {
               </div>
 
               {/* 2. From Date → To Date */}
-              <div className="form-row-dates">
-                <div className="form-field">
+              <div className="gov-form-row-dates">
+                <div className="gov-form-field">
                   <label>From Date *</label>
                   <input
                     type="date"
@@ -404,8 +404,8 @@ export default function GovLeaveManagement({ official }) {
                     required
                   />
                 </div>
-                <div className="form-date-separator">→</div>
-                <div className="form-field">
+                <div className="gov-form-date-separator">→</div>
+                <div className="gov-form-field">
                   <label>To Date *</label>
                   <input
                     type="date"
@@ -418,13 +418,13 @@ export default function GovLeaveManagement({ official }) {
               </div>
 
               {/* 3. Duration */}
-              <div className="form-field">
+              <div className="gov-form-field">
                 <label>Duration</label>
-                <div className="duration-radio-group">
+                <div className="gov-duration-radio-group">
                   {['Full Day', 'Half Day – Morning', 'Half Day – Afternoon'].map((opt) => (
                     <label 
                       key={opt} 
-                      className={`duration-radio-label ${duration === opt ? 'active' : ''}`}
+                      className={`gov-duration-radio-label ${duration === opt ? 'active' : ''}`}
                     >
                       <input 
                         type="radio" 
@@ -440,7 +440,7 @@ export default function GovLeaveManagement({ official }) {
               </div>
 
               {/* 4. Reason for Leave */}
-              <div className="form-field">
+              <div className="gov-form-field">
                 <label>Reason for Leave *</label>
                 <textarea
                   rows={3}
@@ -452,7 +452,7 @@ export default function GovLeaveManagement({ official }) {
               </div>
 
               {/* 5. Supporting Document (Optional) */}
-              <div className="form-field">
+              <div className="gov-form-field">
                 <label>Supporting Document (Optional)</label>
                 <input 
                   type="file" 
@@ -462,24 +462,24 @@ export default function GovLeaveManagement({ official }) {
                   accept=".jpg,.jpeg,.png,.pdf,.doc,.docx"
                 />
                 {!supportingFile ? (
-                  <div className="upload-dropzone" onClick={() => fileInputRef.current?.click()}>
-                    <span className="upload-btn-label">
+                  <div className="gov-upload-dropzone" onClick={() => fileInputRef.current?.click()}>
+                    <span className="gov-upload-btn-label">
                       <Paperclip size={16} /> 📎 Upload Document
                     </span>
-                    <span className="upload-hint">PDF, DOC, DOCX, JPG or PNG (Max 10MB)</span>
+                    <span className="gov-upload-hint">PDF, DOC, DOCX, JPG or PNG (Max 10MB)</span>
                   </div>
                 ) : (
-                  <div className="uploaded-file-pill">
-                    <div className="file-info">
+                  <div className="gov-uploaded-file-pill">
+                    <div className="gov-file-info">
                       <FileText size={16} />
                       <span>{supportingFile.name}</span>
-                      <span style={{ fontSize: '0.75rem', color: '#64748b' }}>
+                      <span style={{ fontSize: '0.75rem', color: '#5e7263' }}>
                         ({(supportingFile.size / 1024).toFixed(1)} KB)
                       </span>
                     </div>
                     <button 
                       type="button" 
-                      className="btn-remove-file" 
+                      className="gov-btn-remove-file" 
                       onClick={removeSelectedFile}
                       title="Remove Document"
                     >
@@ -490,7 +490,7 @@ export default function GovLeaveManagement({ official }) {
               </div>
 
               {/* 6. Handover Notes (Optional) */}
-              <div className="form-field">
+              <div className="gov-form-field">
                 <label>Handover Notes (Optional)</label>
                 <textarea 
                   rows={2}
@@ -500,10 +500,10 @@ export default function GovLeaveManagement({ official }) {
                 />
               </div>
 
-              <div className="leave-modal-actions">
+              <div className="gov-leave-modal-actions">
                 <button
                   type="button"
-                  className="btn-modal-cancel"
+                  className="gov-btn-modal-cancel"
                   onClick={() => setShowApplyModal(false)}
                   disabled={submitting}
                 >
@@ -511,11 +511,11 @@ export default function GovLeaveManagement({ official }) {
                 </button>
                 <button
                   type="submit"
-                  className="btn-modal-submit"
+                  className="gov-btn-modal-submit"
                   disabled={submitting}
                 >
                   {submitting ? (
-                    <><Loader2 className="spin-icon" size={16} /> Submitting...</>
+                    <><Loader2 className="gov-spin-icon" size={16} /> Submitting...</>
                   ) : (
                     <><Send size={16} /> Submit Leave Request</>
                   )}
@@ -528,44 +528,44 @@ export default function GovLeaveManagement({ official }) {
 
       {/* Leave Details Modal */}
       {selectedLeaveDetails && (
-        <div className="leave-modal-overlay" onClick={() => setSelectedLeaveDetails(null)}>
-          <div className="leave-modal-dialog" onClick={(e) => e.stopPropagation()}>
-            <div className="leave-modal-header">
+        <div className="gov-leave-modal-overlay" onClick={() => setSelectedLeaveDetails(null)}>
+          <div className="gov-leave-modal-dialog" onClick={(e) => e.stopPropagation()}>
+            <div className="gov-leave-modal-header">
               <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
-                <Calendar size={20} color="#0f766e" />
+                <Calendar size={20} color="#4f6d54" />
                 <h3>Leave Application Details ({selectedLeaveDetails.leaveId})</h3>
               </div>
-              <button className="btn-modal-close" onClick={() => setSelectedLeaveDetails(null)}>
+              <button className="gov-btn-modal-close" onClick={() => setSelectedLeaveDetails(null)}>
                 <X size={18} />
               </button>
             </div>
-            <div style={{ padding: '1.5rem', display: 'flex', flexDirection: 'column', gap: '1rem' }}>
-              <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '1rem', background: '#f8fafc', padding: '1rem', borderRadius: '10px' }}>
+            <div style={{ padding: '1.75rem', display: 'flex', flexDirection: 'column', gap: '1.1rem' }}>
+              <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '1rem', background: '#f8faf8', padding: '1.2rem', borderRadius: '14px', border: '1px solid #d8e2da' }}>
                 <div>
-                  <div style={{ fontSize: '0.78rem', color: '#64748b', fontWeight: 700 }}>LEAVE TYPE</div>
-                  <div style={{ fontSize: '0.95rem', fontWeight: 700, color: '#1e293b', marginTop: '2px' }}>
+                  <div style={{ fontSize: '0.78rem', color: '#5e7263', fontWeight: 800, textTransform: 'uppercase' }}>LEAVE TYPE</div>
+                  <div style={{ fontSize: '0.95rem', fontWeight: 800, color: '#1f2a21', marginTop: '3px' }}>
                     {selectedLeaveDetails.leaveType || 'Casual Leave'}
                   </div>
                 </div>
                 <div>
-                  <div style={{ fontSize: '0.78rem', color: '#64748b', fontWeight: 700 }}>DURATION</div>
-                  <div style={{ fontSize: '0.95rem', fontWeight: 700, color: '#1e293b', marginTop: '2px' }}>
+                  <div style={{ fontSize: '0.78rem', color: '#5e7263', fontWeight: 800, textTransform: 'uppercase' }}>DURATION</div>
+                  <div style={{ fontSize: '0.95rem', fontWeight: 800, color: '#1f2a21', marginTop: '3px' }}>
                     {selectedLeaveDetails.duration || 'Full Day'}
                   </div>
                 </div>
                 <div>
-                  <div style={{ fontSize: '0.78rem', color: '#64748b', fontWeight: 700 }}>DATE RANGE</div>
-                  <div style={{ fontSize: '0.9rem', fontWeight: 600, color: '#1e293b', marginTop: '2px' }}>
+                  <div style={{ fontSize: '0.78rem', color: '#5e7263', fontWeight: 800, textTransform: 'uppercase' }}>DATE RANGE</div>
+                  <div style={{ fontSize: '0.9rem', fontWeight: 700, color: '#1f2a21', marginTop: '3px' }}>
                     {new Date(selectedLeaveDetails.startDate).toLocaleDateString('en-IN', { day: '2-digit', month: 'short', year: 'numeric' })}
                     {' → '}
                     {new Date(selectedLeaveDetails.endDate).toLocaleDateString('en-IN', { day: '2-digit', month: 'short', year: 'numeric' })}
                   </div>
                 </div>
                 <div>
-                  <div style={{ fontSize: '0.78rem', color: '#64748b', fontWeight: 700 }}>STATUS</div>
-                  <div style={{ marginTop: '2px' }}>
+                  <div style={{ fontSize: '0.78rem', color: '#5e7263', fontWeight: 800, textTransform: 'uppercase' }}>STATUS</div>
+                  <div style={{ marginTop: '3px' }}>
                     <span 
-                      className="leave-status-tag"
+                      className="gov-leave-status-tag"
                       style={{ 
                         backgroundColor: (LEAVE_STATUS_COLORS[selectedLeaveDetails.status] || LEAVE_STATUS_COLORS.Pending).bg,
                         color: (LEAVE_STATUS_COLORS[selectedLeaveDetails.status] || LEAVE_STATUS_COLORS.Pending).text
@@ -578,16 +578,16 @@ export default function GovLeaveManagement({ official }) {
               </div>
 
               <div>
-                <div style={{ fontSize: '0.8rem', color: '#64748b', fontWeight: 700, marginBottom: '4px' }}>REASON FOR LEAVE</div>
-                <div style={{ background: '#ffffff', border: '1px solid #e2e8f0', borderRadius: '8px', padding: '0.75rem', fontSize: '0.9rem', color: '#334155' }}>
+                <div style={{ fontSize: '0.8rem', color: '#5e7263', fontWeight: 800, marginBottom: '6px' }}>REASON FOR LEAVE</div>
+                <div style={{ background: '#ffffff', border: '1.5px solid #d8e2da', borderRadius: '10px', padding: '0.85rem 1rem', fontSize: '0.9rem', color: '#1f2a21', lineHeight: '1.5' }}>
                   {selectedLeaveDetails.reason}
                 </div>
               </div>
 
               {selectedLeaveDetails.handoverNotes && (
                 <div>
-                  <div style={{ fontSize: '0.8rem', color: '#64748b', fontWeight: 700, marginBottom: '4px' }}>HANDOVER NOTES</div>
-                  <div style={{ background: '#f0fdf4', border: '1px solid #bbf7d0', borderRadius: '8px', padding: '0.75rem', fontSize: '0.88rem', color: '#166534' }}>
+                  <div style={{ fontSize: '0.8rem', color: '#5e7263', fontWeight: 800, marginBottom: '6px' }}>HANDOVER NOTES</div>
+                  <div style={{ background: '#edf2ee', border: '1px solid #cbd7cd', borderRadius: '10px', padding: '0.85rem 1rem', fontSize: '0.88rem', color: '#28372b', lineHeight: '1.5' }}>
                     {selectedLeaveDetails.handoverNotes}
                   </div>
                 </div>
@@ -595,27 +595,27 @@ export default function GovLeaveManagement({ official }) {
 
               {selectedLeaveDetails.supportingDocument && (
                 <div>
-                  <div style={{ fontSize: '0.8rem', color: '#64748b', fontWeight: 700, marginBottom: '4px' }}>SUPPORTING DOCUMENT</div>
+                  <div style={{ fontSize: '0.8rem', color: '#5e7263', fontWeight: 800, marginBottom: '6px' }}>SUPPORTING DOCUMENT</div>
                   <a 
                     href={selectedLeaveDetails.supportingDocument} 
                     target="_blank" 
                     rel="noopener noreferrer"
-                    className="uploaded-file-pill"
+                    className="gov-uploaded-file-pill"
                     style={{ textDecoration: 'none' }}
                   >
-                    <div className="file-info">
+                    <div className="gov-file-info">
                       <Paperclip size={16} />
                       <span>{selectedLeaveDetails.supportingDocumentOriginalName || 'View Attached Supporting Document'}</span>
                     </div>
-                    <ExternalLink size={15} color="#15803d" />
+                    <ExternalLink size={15} color="#4f6d54" />
                   </a>
                 </div>
               )}
 
               {selectedLeaveDetails.adminRemarks && (
                 <div>
-                  <div style={{ fontSize: '0.8rem', color: '#64748b', fontWeight: 700, marginBottom: '4px' }}>ADMINISTRATOR REMARKS</div>
-                  <div style={{ background: '#f8fafc', border: '1px solid #cbd5e1', borderRadius: '8px', padding: '0.75rem', fontSize: '0.88rem', color: '#1e293b' }}>
+                  <div style={{ fontSize: '0.8rem', color: '#5e7263', fontWeight: 800, marginBottom: '6px' }}>ADMINISTRATOR REMARKS</div>
+                  <div style={{ background: '#f8faf8', border: '1px solid #cbd7cd', borderRadius: '10px', padding: '0.85rem 1rem', fontSize: '0.88rem', color: '#1f2a21' }}>
                     {selectedLeaveDetails.adminRemarks}
                   </div>
                 </div>
@@ -623,7 +623,7 @@ export default function GovLeaveManagement({ official }) {
 
               <div style={{ display: 'flex', justifyContent: 'flex-end', marginTop: '0.5rem' }}>
                 <button 
-                  className="btn-modal-cancel" 
+                  className="gov-btn-modal-cancel" 
                   onClick={() => setSelectedLeaveDetails(null)}
                 >
                   Close

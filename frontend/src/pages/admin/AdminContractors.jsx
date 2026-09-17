@@ -2,6 +2,7 @@ import { useState, useEffect } from 'react';
 import { Plus, Edit2, Trash2, Briefcase } from 'lucide-react';
 import { Link, useNavigate } from 'react-router-dom';
 import axios from 'axios';
+import Swal from 'sweetalert2';
 
 const AdminContractors = () => {
   const [contractors, setContractors] = useState([]);
@@ -27,16 +28,37 @@ const AdminContractors = () => {
   }, []);
 
   const handleDelete = async (id) => {
-    if (!window.confirm("Are you sure you want to delete this contractor?")) return;
+    const result = await Swal.fire({
+      title: 'Delete Contractor?',
+      text: 'Are you sure you want to delete this contractor? This action cannot be undone.',
+      icon: 'warning',
+      showCancelButton: true,
+      confirmButtonColor: '#ef4444',
+      cancelButtonColor: '#64748b',
+      confirmButtonText: 'Yes, delete it!'
+    });
+    if (!result.isConfirmed) return;
+
     try {
       const token = JSON.parse(localStorage.getItem('adminUser'))?.token;
       await axios.delete(`/api/contractors/${id}`, {
         headers: { Authorization: `Bearer ${token}` }
       });
+      Swal.fire({
+        title: 'Deleted!',
+        text: 'Contractor has been removed successfully.',
+        icon: 'success',
+        timer: 1800,
+        showConfirmButton: false
+      });
       fetchContractors();
     } catch (error) {
       console.error("Error deleting contractor:", error);
-      alert("Failed to delete contractor.");
+      Swal.fire({
+        title: 'Error!',
+        text: error.response?.data?.message || 'Failed to delete contractor.',
+        icon: 'error'
+      });
     }
   };
 

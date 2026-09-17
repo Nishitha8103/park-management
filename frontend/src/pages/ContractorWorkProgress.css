@@ -16,10 +16,10 @@
   gap: 1rem;
   margin-bottom: 1.75rem;
   padding: 1.5rem;
-  background: linear-gradient(135deg, #0f172a 0%, #1e293b 65%, #15312a 100%);
+  background: linear-gradient(135deg, #0b3d2c 0%, #06402B 65%, #042e1f 100%);
   border-radius: 16px;
-  border: 1px solid rgba(22,163,74,0.2);
-  box-shadow: 0 8px 24px rgba(15,23,42,0.2);
+  border: 1px solid rgba(74, 222, 128, 0.25);
+  box-shadow: 0 8px 24px rgba(6, 64, 43, 0.2);
 }
 
 .btn-back-details {

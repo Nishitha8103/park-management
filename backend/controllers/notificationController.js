@@ -65,23 +65,14 @@ const getNotifications = async (req, res) => {
     if (role === 'citizen') {
       query.$or.push({ recipientUserId: { $in: [...new Set(citizenIds)] } });
       query.$or.push({ recipientUserId: 'CITIZEN_ALL' });
-      query.$or.push({ recipientUserId: 'all' });
-      query.$or.push({ recipientRole: 'citizen' });
-      query.$or.push({ recipientRole: 'all' });
     } else if (role === 'contractor') {
       query.$or.push({ recipientUserId: { $in: [...new Set(contractorIds)] } });
       query.$or.push({ recipientUserId: 'CONTRACTOR_ALL' });
-      query.$or.push({ recipientUserId: 'all' });
-      query.$or.push({ recipientRole: 'contractor' });
     } else if (isOfficial) {
       query.$or.push({ recipientUserId: userId });
-      query.$or.push({ recipientRole: 'official' });
-      query.$or.push({ recipientRole: 'Government Official' });
-      query.$or.push({ recipientRole: 'government_official' });
+      query.$or.push({ recipientUserId: 'OFFICIAL_ALL' });
     } else if (role === 'admin') {
       query.$or.push({ recipientUserId: 'ADMIN_ALL' });
-      query.$or.push({ recipientUserId: 'CITIZEN_ALL' });
-      query.$or.push({ recipientRole: 'admin' });
       query.$or.push({ recipientUserId: userId });
     } else {
       query.$or.push({ recipientUserId: userId });
@@ -91,29 +82,39 @@ const getNotifications = async (req, res) => {
     if (isOfficial) {
       const assignedComplaints = await Complaint.find({
         assignedOfficial: userId
-      }).sort({ updatedAt: -1 });
+      }).select('_id parkName complaintNumber priority updatedAt createdAt').sort({ updatedAt: -1 }).limit(10).lean();
 
-      for (const complaint of assignedComplaints) {
-        const exists = await Notification.findOne({
+      if (assignedComplaints.length > 0) {
+        const cIds = assignedComplaints.map(c => c._id.toString());
+        const existingNotifs = await Notification.find({
           recipientUserId: userId,
           type: 'Inspection Assigned',
-          relatedEntityId: complaint._id.toString()
-        });
+          relatedEntityId: { $in: cIds }
+        }).select('relatedEntityId').lean();
+        
+        const existingSet = new Set(existingNotifs.map(n => n.relatedEntityId));
+        const newNotifs = [];
 
-        if (!exists) {
-          await Notification.create({
-            recipientUserId: userId,
-            recipientRole: 'official',
-            title: `🔔 New Task Assigned`,
-            message: `New inspection assigned for ${complaint.parkName || 'Park'} (${complaint.complaintNumber || 'Ticket'}).`,
-            type: 'Inspection Assigned',
-            category: 'Inspection',
-            priority: complaint.priority === 'Urgent' || complaint.priority === 'High' ? 'URGENT' : 'NORMAL',
-            relatedEntityType: 'COMPLAINT',
-            relatedEntityId: complaint._id.toString(),
-            actionRoute: `/gov-dashboard/inspections/${complaint._id}`,
-            createdAt: complaint.updatedAt || complaint.createdAt || new Date()
-          });
+        for (const complaint of assignedComplaints) {
+          if (!existingSet.has(complaint._id.toString())) {
+            newNotifs.push({
+              recipientUserId: userId,
+              recipientRole: 'official',
+              title: `🔔 New Task Assigned`,
+              message: `New inspection assigned for ${complaint.parkName || 'Park'} (${complaint.complaintNumber || 'Ticket'}).`,
+              type: 'Inspection Assigned',
+              category: 'Inspection',
+              priority: complaint.priority === 'Urgent' || complaint.priority === 'High' ? 'URGENT' : 'NORMAL',
+              relatedEntityType: 'COMPLAINT',
+              relatedEntityId: complaint._id.toString(),
+              actionRoute: `/gov-dashboard/inspections/${complaint._id}`,
+              createdAt: complaint.updatedAt || complaint.createdAt || new Date()
+            });
+          }
+        }
+
+        if (newNotifs.length > 0) {
+          await Notification.insertMany(newNotifs, { ordered: false }).catch(() => {});
         }
       }
 
@@ -160,7 +161,7 @@ const getNotifications = async (req, res) => {
           }
         ];
 
-        await Notification.insertMany(sampleNotifs);
+        await Notification.insertMany(sampleNotifs, { ordered: false }).catch(() => {});
       }
     }
 
@@ -171,90 +172,61 @@ const getNotifications = async (req, res) => {
         $or: [
           { assignedContractor: { $in: contractorSearchIds.filter(id => mongoose.Types.ObjectId.isValid(id) && id.length === 24) } }
         ]
-      }).sort({ createdAt: -1 });
+      }).select('_id category parkName complaintNumber priority createdAt assignedAt').sort({ createdAt: -1 }).limit(15).lean();
 
-      for (const task of assignedTasks) {
-        const taskIdStr = task._id.toString();
-
-        // Check if Maintenance Alert exists
-        const existsMaintenanceAlert = await Notification.findOne({
+      if (assignedTasks.length > 0) {
+        const taskIds = assignedTasks.map(t => t._id.toString());
+        const existingContractorNotifs = await Notification.find({
           recipientUserId: { $in: contractorSearchIds },
-          type: 'Maintenance Alert',
-          relatedEntityId: taskIdStr
-        });
+          type: { $in: ['Maintenance Alert', 'Task Assigned', 'New Task Assigned'] },
+          relatedEntityId: { $in: taskIds }
+        }).select('type relatedEntityId').lean();
 
-        if (!existsMaintenanceAlert) {
-          await Notification.create({
-            recipientUserId: userId,
-            recipientRole: 'contractor',
-            title: '🔔 Maintenance Alert',
-            message: `${task.category || 'Asset'} at ${task.parkName || 'Park'} requires repair. Ticket #${task.complaintNumber}.`,
-            type: 'Maintenance Alert',
-            category: 'Maintenance',
-            priority: task.priority === 'Urgent' || task.priority === 'High' ? 'URGENT' : 'HIGH',
-            relatedEntityType: 'TASK',
-            relatedEntityId: taskIdStr,
-            actionRoute: '/contractor/tasks',
-            createdAt: task.createdAt || new Date()
-          });
-        }
+        const maintSet = new Set(existingContractorNotifs.filter(n => n.type === 'Maintenance Alert').map(n => n.relatedEntityId));
+        const assignSet = new Set(existingContractorNotifs.filter(n => n.type !== 'Maintenance Alert').map(n => n.relatedEntityId));
+        const newContractorNotifs = [];
 
-        // Check if New Task Assigned exists
-        const existsTaskAssigned = await Notification.findOne({
-          recipientUserId: { $in: contractorSearchIds },
-          type: { $in: ['Task Assigned', 'New Task Assigned'] },
-          relatedEntityId: taskIdStr
-        });
-
-        if (!existsTaskAssigned) {
-          await Notification.create({
-            recipientUserId: userId,
-            recipientRole: 'contractor',
-            title: '🔔 New Task Assigned',
-            message: `New maintenance task assigned to you: ${task.category || 'Maintenance'} at ${task.parkName || 'Park'} (Ticket #${task.complaintNumber}).`,
-            type: 'New Task Assigned',
-            category: 'Assigned Tasks',
-            priority: 'HIGH',
-            relatedEntityType: 'TASK',
-            relatedEntityId: taskIdStr,
-            actionRoute: '/contractor/tasks',
-            createdAt: task.assignedAt || task.createdAt || new Date()
-          });
-        }
-      }
-
-      // Check daily inspection reminder for assigned parks
-      if (contractorDoc && contractorDoc.assignedParks && contractorDoc.assignedParks.length > 0) {
-        const assignedParksList = await Park.find({ _id: { $in: contractorDoc.assignedParks } }).select('name').lean();
-        const startOfDay = new Date();
-        startOfDay.setHours(0, 0, 0, 0);
-
-        for (const park of assignedParksList) {
-          const existsInsp = await Notification.findOne({
-            recipientUserId: { $in: contractorSearchIds },
-            type: 'Inspection Reminder',
-            relatedEntityId: park._id.toString(),
-            createdAt: { $gte: startOfDay }
-          });
-
-          if (!existsInsp) {
-            await Notification.create({
+        for (const task of assignedTasks) {
+          const taskIdStr = task._id.toString();
+          if (!maintSet.has(taskIdStr)) {
+            newContractorNotifs.push({
               recipientUserId: userId,
               recipientRole: 'contractor',
-              title: '🔔 Inspection Reminder',
-              message: `Daily inspection for ${park.name} is due today.`,
-              type: 'Inspection Reminder',
-              category: 'Inspection',
-              priority: 'NORMAL',
-              relatedEntityType: 'PARK',
-              relatedEntityId: park._id.toString(),
-              actionRoute: '/contractor/tasks'
+              title: '🔔 Maintenance Alert',
+              message: `${task.category || 'Asset'} at ${task.parkName || 'Park'} requires repair. Ticket #${task.complaintNumber || 'N/A'}.`,
+              type: 'Maintenance Alert',
+              category: 'Maintenance',
+              priority: task.priority === 'Urgent' || task.priority === 'High' ? 'URGENT' : 'HIGH',
+              relatedEntityType: 'TASK',
+              relatedEntityId: taskIdStr,
+              actionRoute: '/contractor/tasks',
+              createdAt: task.createdAt || new Date()
+            });
+          }
+
+          if (!assignSet.has(taskIdStr)) {
+            newContractorNotifs.push({
+              recipientUserId: userId,
+              recipientRole: 'contractor',
+              title: '🔔 New Task Assigned',
+              message: `New maintenance task assigned to you: ${task.category || 'Maintenance'} at ${task.parkName || 'Park'} (Ticket #${task.complaintNumber || 'N/A'}).`,
+              type: 'New Task Assigned',
+              category: 'Assigned Tasks',
+              priority: 'HIGH',
+              relatedEntityType: 'TASK',
+              relatedEntityId: taskIdStr,
+              actionRoute: '/contractor/tasks',
+              createdAt: task.assignedAt || task.createdAt || new Date()
             });
           }
         }
+
+        if (newContractorNotifs.length > 0) {
+          await Notification.insertMany(newContractorNotifs, { ordered: false }).catch(() => {});
+        }
       }
 
-      // If contractor still has 0 notifications, add sample maintenance alerts & inspection reminders
+      // Check count of notifications for contractor
       const contractorNotifCount = await Notification.countDocuments(query);
       if (contractorNotifCount === 0) {
         const contractorSamples = [
@@ -295,7 +267,7 @@ const getNotifications = async (req, res) => {
             createdAt: new Date(Date.now() - 5 * 3600 * 1000)
           }
         ];
-        await Notification.insertMany(contractorSamples);
+        await Notification.insertMany(contractorSamples, { ordered: false }).catch(() => {});
       }
     }
 
@@ -315,47 +287,43 @@ const getNotifications = async (req, res) => {
       if (isObjectId) complaintQuery.$or.push({ user: userId });
 
       if (complaintQuery.$or.length > 0) {
-        const userComplaints = await Complaint.find(complaintQuery).sort({ createdAt: -1 });
+        const userComplaints = await Complaint.find(complaintQuery).select('_id status category parkName complaintNumber createdAt updatedAt').sort({ createdAt: -1 }).limit(15).lean();
 
-        for (const complaint of userComplaints) {
-          const complaintIdStr = complaint._id.toString();
-          const isResolved = resolvedStatuses.includes(complaint.status);
-          const isInProgress = complaint.status === 'In Progress' || complaint.status === 'in-progress';
-          const isAssigned = complaint.status === 'Assigned';
-
-          // A. Initial Submission
-          const existsSubmit = await Notification.findOne({
+        if (userComplaints.length > 0) {
+          const complaintIds = userComplaints.map(c => c._id.toString());
+          const existingCitizenNotifs = await Notification.find({
             recipientUserId: { $in: [...new Set(citizenIds)] },
-            type: 'Complaint Submitted',
-            relatedEntityId: complaintIdStr
-          });
+            relatedEntityId: { $in: complaintIds }
+          }).select('type relatedEntityId').lean();
 
-          if (!existsSubmit) {
-            await Notification.create({
-              recipientUserId: userId,
-              recipientRole: 'citizen',
-              title: '🔔 Complaint Submitted',
-              message: `Your complaint for ${(complaint.category || 'park maintenance').toLowerCase()} at ${complaint.parkName || 'the park'} was submitted. Ticket #${complaint.complaintNumber || 'N/A'}.`,
-              type: 'Complaint Submitted',
-              category: 'Complaint',
-              priority: 'NORMAL',
-              relatedEntityType: 'COMPLAINT',
-              relatedEntityId: complaintIdStr,
-              actionRoute: '/track-complaint',
-              createdAt: complaint.createdAt || new Date()
-            });
-          }
+          const existingTypeMap = new Set(existingCitizenNotifs.map(n => `${n.relatedEntityId}_${n.type}`));
+          const newCitizenNotifs = [];
 
-          // B. In Progress Status Update
-          if (isInProgress || isResolved) {
-            const existsInProgress = await Notification.findOne({
-              recipientUserId: { $in: [...new Set(citizenIds)] },
-              message: /In Progress/i,
-              relatedEntityId: complaintIdStr
-            });
+          for (const complaint of userComplaints) {
+            const complaintIdStr = complaint._id.toString();
+            const isResolved = resolvedStatuses.includes(complaint.status);
+            const isInProgress = complaint.status === 'In Progress' || complaint.status === 'in-progress';
 
-            if (!existsInProgress) {
-              await Notification.create({
+            // A. Initial Submission
+            if (!existingTypeMap.has(`${complaintIdStr}_Complaint Submitted`)) {
+              newCitizenNotifs.push({
+                recipientUserId: userId,
+                recipientRole: 'citizen',
+                title: '🔔 Complaint Submitted',
+                message: `Your complaint for ${(complaint.category || 'park maintenance').toLowerCase()} at ${complaint.parkName || 'the park'} was submitted. Ticket #${complaint.complaintNumber || 'N/A'}.`,
+                type: 'Complaint Submitted',
+                category: 'Complaint',
+                priority: 'NORMAL',
+                relatedEntityType: 'COMPLAINT',
+                relatedEntityId: complaintIdStr,
+                actionRoute: '/track-complaint',
+                createdAt: complaint.createdAt || new Date()
+              });
+            }
+
+            // B. In Progress Status Update
+            if ((isInProgress || isResolved) && !existingTypeMap.has(`${complaintIdStr}_Complaint Status Updated`)) {
+              newCitizenNotifs.push({
                 recipientUserId: userId,
                 recipientRole: 'citizen',
                 title: '🔔 Complaint Status Updated',
@@ -369,18 +337,10 @@ const getNotifications = async (req, res) => {
                 createdAt: complaint.updatedAt || new Date()
               });
             }
-          }
 
-          // C. Resolved Status Update
-          if (isResolved) {
-            const existsResolved = await Notification.findOne({
-              recipientUserId: { $in: [...new Set(citizenIds)] },
-              type: 'Complaint Resolved',
-              relatedEntityId: complaintIdStr
-            });
-
-            if (!existsResolved) {
-              await Notification.create({
+            // C. Resolved Status Update
+            if (isResolved && !existingTypeMap.has(`${complaintIdStr}_Complaint Resolved`)) {
+              newCitizenNotifs.push({
                 recipientUserId: userId,
                 recipientRole: 'citizen',
                 title: '✅ Complaint Resolved',
@@ -395,74 +355,14 @@ const getNotifications = async (req, res) => {
               });
             }
           }
-        }
-      }
 
-      // B. Event registrations & payments auto-sync
-      const regQuery = { $or: [] };
-      if (isObjectId) regQuery.$or.push({ userId: userId });
-      if (citizenEmail) regQuery.$or.push({ email: new RegExp(`^${citizenEmail.trim()}$`, 'i') });
-      if (citizenPhone) regQuery.$or.push({ phone: citizenPhone });
-
-      if (regQuery.$or.length > 0) {
-        const userRegs = await EventRegistration.find(regQuery).populate('event').sort({ createdAt: -1 });
-
-        for (const reg of userRegs) {
-          const eventTitle = reg.event?.title || reg.eventSnapshot?.title || 'Event';
-          const parkName = reg.event?.parkName || reg.event?.location || reg.eventSnapshot?.parkName || 'Park';
-          const regIdStr = reg.registrationId || `REG-2026-${reg._id.toString().slice(-5).toUpperCase()}`;
-
-          // Event Registration Confirmed notification
-          const existsRegNotif = await Notification.findOne({
-            recipientUserId: userId,
-            type: 'Event Registration Confirmed',
-            relatedEntityId: reg._id.toString()
-          });
-
-          if (!existsRegNotif) {
-            await Notification.create({
-              recipientUserId: userId,
-              recipientRole: 'citizen',
-              title: 'Event Registration Confirmed 🎟️',
-              message: `Your registration for "${eventTitle}" at ${parkName} has been confirmed successfully. Registration ID: ${regIdStr}`,
-              type: 'Event Registration Confirmed',
-              category: 'Event',
-              priority: 'NORMAL',
-              relatedEntityType: 'EVENT',
-              relatedEntityId: reg._id.toString(),
-              actionRoute: '/my-registrations',
-              createdAt: reg.createdAt || new Date()
-            });
-          }
-
-          // Payment Successful notification if paid
-          if (reg.totalAmount > 0 && reg.paymentStatus === 'Successful') {
-            const existsPayNotif = await Notification.findOne({
-              recipientUserId: userId,
-              type: 'Payment Successful',
-              relatedEntityId: reg._id.toString()
-            });
-
-            if (!existsPayNotif) {
-              await Notification.create({
-                recipientUserId: userId,
-                recipientRole: 'citizen',
-                title: 'Payment Successful 💳',
-                message: `Your payment of ₹${reg.totalAmount} for the ${eventTitle} event was successful. Transaction ID: ${reg.razorpayPaymentId || 'TXN-' + regIdStr}`,
-                type: 'Payment Successful',
-                category: 'Payment',
-                priority: 'NORMAL',
-                relatedEntityType: 'PAYMENT',
-                relatedEntityId: reg._id.toString(),
-                actionRoute: '/my-registrations',
-                createdAt: reg.paymentDate || reg.createdAt || new Date()
-              });
-            }
+          if (newCitizenNotifs.length > 0) {
+            await Notification.insertMany(newCitizenNotifs, { ordered: false }).catch(() => {});
           }
         }
       }
 
-      // If no notifications exist yet for citizen, ensure essential park broadcasts exist
+      // Check citizen broadcasts count
       const citizenNotifCount = await Notification.countDocuments({
         $or: [
           { recipientUserId: userId },
@@ -497,34 +397,20 @@ const getNotifications = async (req, res) => {
             createdAt: new Date(Date.now() - 60 * 60 * 1000)
           }
         ];
-        await Notification.insertMany(publicBroadcasts);
+        await Notification.insertMany(publicBroadcasts, { ordered: false }).catch(() => {});
       }
     }
 
-    const notifications = await Notification.find(query).sort({ createdAt: -1 }).limit(100);
-
-    // Normalize category & actionRoute for any legacy database records
-    for (const notif of notifications) {
-      const titleLower = (notif.title || '').toLowerCase();
-      if (
-        titleLower.includes('event') ||
-        titleLower.includes('registration confirmed')
-      ) {
-        if (notif.category !== 'Event' || notif.actionRoute !== '/my-registrations') {
-          notif.category = 'Event';
-          notif.actionRoute = '/my-registrations';
-          await notif.save().catch(() => {});
-        }
-      } else if (titleLower.includes('payment')) {
-        if (notif.category !== 'Payment' || notif.actionRoute !== '/my-registrations') {
-          notif.category = 'Payment';
-          notif.actionRoute = '/my-registrations';
-          await notif.save().catch(() => {});
-        }
-      }
+    if (role === 'citizen') {
+      query.title = { $not: /emergency|sos/i };
+      query.category = { $not: /emergency|sos/i };
+      query.type = { $not: /emergency|sos/i };
     }
 
-    const unreadCount = await Notification.countDocuments({ ...query, isRead: false });
+    const [notifications, unreadCount] = await Promise.all([
+      Notification.find(query).sort({ createdAt: -1 }).limit(100).lean(),
+      Notification.countDocuments({ ...query, isRead: false })
+    ]);
 
     res.json({ notifications, unreadCount });
   } catch (error) {

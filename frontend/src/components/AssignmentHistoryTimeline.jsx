@@ -76,7 +76,7 @@ const getActionConfig = (actionType) => {
   }
 };
 
-export default function AssignmentHistoryTimeline({ history = [], currentAssignee, currentRole, initialAssignedDate }) {
+export default function AssignmentHistoryTimeline({ history = [], currentAssignee, currentRole, initialAssignedDate, dueDate }) {
   // If no explicit history array yet, synthesize initial entry from current task
   let displayList = Array.isArray(history) && history.length > 0 ? [...history] : [];
 
@@ -88,7 +88,7 @@ export default function AssignmentHistoryTimeline({ history = [], currentAssigne
       assignedBy: 'Administrator',
       assignedAt: initialAssignedDate || new Date(),
       actionType: 'Initial Assignment',
-      reason: 'Task assigned by Admin upon ticket triage'
+      dueDate: dueDate
     });
   }
 
@@ -121,6 +121,7 @@ export default function AssignmentHistoryTimeline({ history = [], currentAssigne
             }) : 'Date not recorded';
 
             const isContractor = ['contractor', 'Contractor'].includes(item.assignedToRole || item.previousAssigneeRole);
+            const taskDueDate = item.dueDate || item.newDeadline || dueDate;
 
             return (
               <div key={item.historyId || idx} className="timeline-event-item">
@@ -161,8 +162,18 @@ export default function AssignmentHistoryTimeline({ history = [], currentAssigne
                     )}
                   </div>
 
-                  {/* Reason & Explanation */}
-                  {item.reason && (
+                  {/* Due Date for Inspection Task */}
+                  {taskDueDate && (
+                    <div className="timeline-deadline-alert" style={{ background: '#fffbeb', borderColor: '#fde68a', color: '#92400e', marginBottom: '0.5rem' }}>
+                      <Calendar size={14} color="#d97706" />
+                      <span>
+                        Inspection Task Due Date: <strong>{new Date(taskDueDate).toLocaleString('en-IN', { day: '2-digit', month: 'short', year: 'numeric', hour: '2-digit', minute: '2-digit' })}</strong>
+                      </span>
+                    </div>
+                  )}
+
+                  {/* Reason & Explanation (if custom and not boilerplate) */}
+                  {item.reason && item.reason !== 'Task assigned by Admin upon ticket triage' && (
                     <div className="timeline-detail-row">
                       <span className="detail-label">Reason:</span>
                       <span className="detail-value reason-highlight">{item.reason}</span>
@@ -177,7 +188,7 @@ export default function AssignmentHistoryTimeline({ history = [], currentAssigne
                   )}
 
                   {/* Deadline Changes */}
-                  {item.newDeadline && (
+                  {item.newDeadline && !taskDueDate && (
                     <div className="timeline-deadline-alert">
                       <Calendar size={13} />
                       <span>

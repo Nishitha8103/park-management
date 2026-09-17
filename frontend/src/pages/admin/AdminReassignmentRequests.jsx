@@ -507,8 +507,19 @@ export default function AdminReassignmentRequests() {
 
                 {viewingRequest.explanation && (
                   <div className="view-col full-span">
-                    <label>Additional Explanation / Bottlenecks</label>
+                    <label>Additional Explanation / Details</label>
                     <div className="explanation-box">{viewingRequest.explanation}</div>
+                  </div>
+                )}
+
+                {viewingRequest.preferredReplacementName && (
+                  <div className="view-col full-span" style={{ background: '#f0fdf4', padding: '10px 14px', borderRadius: '8px', border: '1px solid #bbf7d0' }}>
+                    <label style={{ color: '#166534', fontWeight: 'bold', display: 'flex', alignItems: 'center', gap: '6px' }}>
+                      <User size={14} /> Contractor's Preferred Replacement:
+                    </label>
+                    <p style={{ margin: '2px 0 0', color: '#15803d', fontWeight: '600' }}>
+                      {viewingRequest.preferredReplacementName}
+                    </p>
                   </div>
                 )}
 

@@ -34,6 +34,7 @@ const reassignmentRequestSchema = new mongoose.Schema({
       'Not Available',
       'Emergency',
       'Already Assigned to an Urgent Task',
+      'Already Assigned to Urgent Task',
       'Insufficient Manpower',
       'Equipment/Material Unavailable',
       'Outside My Responsibility',
@@ -42,6 +43,9 @@ const reassignmentRequestSchema = new mongoose.Schema({
     required: true
   },
   explanation: { type: String, default: '' },
+  wantsReassignment: { type: Boolean, default: true },
+  preferredReplacementContractor: { type: mongoose.Schema.Types.ObjectId, ref: 'Contractor' },
+  preferredReplacementName: { type: String, default: '' },
   attachmentUrl: { type: String, default: null },
 
   // Request Status: Pending -> Approved | Rejected | Escalated | Cancelled

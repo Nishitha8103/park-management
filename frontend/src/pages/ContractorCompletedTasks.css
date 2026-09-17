@@ -22,10 +22,11 @@
   gap: 1rem;
   margin-bottom: 1.75rem;
   padding: 1.5rem;
-  background: linear-gradient(135deg, #0f172a 0%, #1e293b 65%, #15312a 100%);
+  background: #84cc16;
+  background: linear-gradient(135deg, #65a30d 0%, #84cc16 65%, #a3e635 100%);
   border-radius: 16px;
-  border: 1px solid rgba(22,163,74,0.2);
-  box-shadow: 0 8px 24px rgba(15,23,42,0.2);
+  border: 1px solid #bef264;
+  box-shadow: 0 10px 25px -5px rgba(101, 163, 13, 0.3);
 }
 
 .completed-tasks-header h2 {

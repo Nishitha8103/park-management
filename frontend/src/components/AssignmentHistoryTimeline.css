@@ -1,58 +1,59 @@
 .reassignment-history-widget {
   background: #ffffff;
   border-radius: 12px;
-  border: 1px solid #e2e8f0;
-  padding: 1.25rem 1.5rem;
-  margin-top: 1.5rem;
-  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.02);
+  border: 1px solid #e2ebd8;
+  padding: 0.85rem 1.25rem;
+  margin-top: 0.5rem;
+  box-shadow: 0 2px 8px rgba(101, 163, 13, 0.04);
 }
 
 .history-widget-header {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  margin-bottom: 1.25rem;
-  padding-bottom: 0.75rem;
+  margin-bottom: 0.75rem;
+  padding-bottom: 0.45rem;
   border-bottom: 1px solid #f1f5f9;
 }
 
 .history-header-left {
   display: flex;
   align-items: center;
-  gap: 0.5rem;
+  gap: 0.45rem;
 }
 
 .history-header-left h4 {
   margin: 0;
-  font-size: 1.05rem;
-  font-weight: 700;
-  color: #0f172a;
+  font-size: 0.92rem;
+  font-weight: 800;
+  color: #365314;
 }
 
 .history-count-badge {
-  background: #f1f5f9;
-  color: #475569;
-  padding: 3px 10px;
+  background: #f7fee7;
+  color: #4d7c0f;
+  padding: 2px 8px;
   border-radius: 20px;
-  font-size: 0.75rem;
+  font-size: 0.7rem;
   font-weight: 700;
+  border: 1px solid #d9f99d;
 }
 
 .history-empty-state {
   display: flex;
   flex-direction: column;
   align-items: center;
-  padding: 2rem;
+  padding: 1rem;
   text-align: center;
   color: #64748b;
-  gap: 0.5rem;
+  gap: 0.35rem;
 }
 
 .history-timeline-track {
   position: relative;
   display: flex;
   flex-direction: column;
-  gap: 1.25rem;
+  gap: 0.75rem;
   padding-left: 1.5rem;
 }
 

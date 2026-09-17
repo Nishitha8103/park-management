@@ -172,10 +172,6 @@ const Sidebar = ({ isOpen = false, toggleSidebar = () => {} }) => {
           <Bell size={20} />
           <span>Notifications</span>
         </NavLink>
-        <NavLink to="/scan" onClick={toggleSidebar} className={({isActive}) => isActive ? 'nav-item active' : 'nav-item'}>
-          <ScanLine size={20} />
-          <span>QR Scanner</span>
-        </NavLink>
         <NavLink to="/profile" onClick={toggleSidebar} className={({isActive}) => isActive ? 'nav-item active' : 'nav-item'}>
           <User size={20} />
           <span>Profile</span>

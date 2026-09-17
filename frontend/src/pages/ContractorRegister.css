@@ -10,12 +10,13 @@
 
 .contractor-register-card {
   background: white;
-  border-radius: 12px;
-  box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.08), 0 8px 10px -6px rgba(0, 0, 0, 0.08);
+  border-radius: 16px;
+  box-shadow: 0 15px 35px -5px rgba(6, 64, 43, 0.15), 0 8px 10px -6px rgba(0, 0, 0, 0.05);
   width: 100%;
   max-width: 600px;
   padding: 2.5rem;
-  border-top: 6px solid #d97706;
+  border-top: 6px solid #16a34a;
+  border: 1px solid rgba(74, 222, 128, 0.2);
 }
 
 .contractor-register-header {
@@ -29,7 +30,7 @@
   align-items: center;
   width: 64px;
   height: 64px;
-  background-color: #fef3c7;
+  background-color: #dcfce7;
   border-radius: 50%;
   margin-bottom: 1rem;
 }
@@ -37,16 +38,17 @@
 .contractor-register-header h2 {
   font-size: 1.5rem;
   font-weight: 800;
-  color: #78350f;
+  color: #064e3b;
   letter-spacing: 1px;
   margin: 0;
 }
 
 .contractor-register-brand {
   font-size: 0.85rem;
-  color: #64748b;
+  color: #059669;
   letter-spacing: 2px;
   margin-top: 0.25rem;
+  font-weight: 600;
 }
 
 .contractor-form-row {

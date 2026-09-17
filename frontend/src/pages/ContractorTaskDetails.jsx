@@ -249,7 +249,7 @@ const ContractorTaskDetails = () => {
             {/* Main Container Card */}
             <div className="task-container-card">
               
-              {/* Left Column: Image & Reporter Info */}
+              {/* Left Column: Image, Reporter Info & Description */}
               <div className="task-left-col">
                 <div className="task-image-card">
                   <div className="image-wrapper" onClick={() => setShowImageModal(true)}>
@@ -267,7 +267,7 @@ const ContractorTaskDetails = () => {
                 <div className="task-meta-stack">
                   <div className="meta-card">
                     <div className="meta-card-icon-box user-icon-box">
-                      <User size={20} />
+                      <User size={18} />
                     </div>
                     <div className="meta-card-content">
                       <span className="meta-card-label">Issue Reported By</span>
@@ -280,7 +280,7 @@ const ContractorTaskDetails = () => {
                   
                   <div className="meta-card">
                     <div className="meta-card-icon-box calendar-icon-box">
-                      <Calendar size={20} />
+                      <Calendar size={18} />
                     </div>
                     <div className="meta-card-content">
                       <span className="meta-card-label">Reported Date & Time</span>
@@ -290,7 +290,7 @@ const ContractorTaskDetails = () => {
                   
                   <div className="meta-card">
                     <div className="meta-card-icon-box location-icon-box">
-                      <MapPin size={20} />
+                      <MapPin size={18} />
                     </div>
                     <div className="meta-card-content">
                       <span className="meta-card-label">Exact Location</span>
@@ -298,11 +298,11 @@ const ContractorTaskDetails = () => {
                       <span className="meta-card-sub park-sub">{task.parkName}</span>
                     </div>
                   </div>
-                  
+
                   {task.allImages.length > 0 && (
                     <div className="meta-card attachments-card">
                       <div className="meta-card-icon-box attachment-icon-box">
-                        <Paperclip size={20} />
+                        <Paperclip size={18} />
                       </div>
                       <div className="meta-card-content">
                         <span className="meta-card-label">Media Attachments</span>
@@ -324,13 +324,13 @@ const ContractorTaskDetails = () => {
                 </div>
               </div>
 
-              {/* Right Column: Ticket Overview & Controls */}
+              {/* Right Column: Ticket Overview, Parameters, Description, Controls & Timeline */}
               <div className="task-right-col">
                 
                 {/* Header Pills Row */}
                 <div className="task-pills-row">
                   <div className={`task-status-pill status-${task.status?.toLowerCase().replace(/\s+/g, '-')}`}>
-                    <Hourglass size={14} /> 
+                    <Hourglass size={13} /> 
                     {['Returned by Admin', 'Rework Required'].includes(task.status) 
                       ? 'Rework Required' 
                       : task.status === 'Rejected by Contractor' 
@@ -339,25 +339,27 @@ const ContractorTaskDetails = () => {
                   </div>
 
                   <div className={`task-priority-pill priority-${task.priority.toLowerCase()}`}>
-                    <ShieldAlert size={14} /> Priority: {task.priority}
+                    <ShieldAlert size={13} /> Priority: {task.priority}
                   </div>
 
                   <div className="task-category-pill">
-                    <Tag size={13} /> {task.issueTitle}
+                    <Tag size={12} /> {task.issueTitle}
                   </div>
                 </div>
 
                 {/* ID & Park Info */}
                 <div className="task-title-group">
-                  <h1 className="task-id">{task.id}</h1>
-                  <h2 className="task-park-zone">{task.parkName}</h2>
-                  <p className="task-location-sub"><MapPin size={14} /> Zone: {task.zone} | Ward: {task.ward}</p>
+                  <div className="task-id-row">
+                    <h1 className="task-id">{task.id}</h1>
+                    <span className="task-park-zone">{task.parkName}</span>
+                  </div>
+                  <p className="task-location-sub"><MapPin size={13} /> Zone: {task.zone} | Ward: {task.ward}</p>
                 </div>
 
                 {/* Info Cards Grid */}
                 <div className="task-params-grid">
                   <div className="param-card">
-                    <div className="param-card-icon"><Calendar size={18} /></div>
+                    <div className="param-card-icon"><Calendar size={16} /></div>
                     <div className="param-card-info">
                       <span className="param-card-label">Assigned On</span>
                       <span className="param-card-val">{task.assignedOn}</span>
@@ -365,7 +367,7 @@ const ContractorTaskDetails = () => {
                   </div>
 
                   <div className="param-card highlight-due">
-                    <div className="param-card-icon"><Clock size={18} /></div>
+                    <div className="param-card-icon"><Clock size={16} /></div>
                     <div className="param-card-info">
                       <span className="param-card-label">Target Due Date</span>
                       <span className="param-card-val">{task.dueDate.split(',')[0]}</span>
@@ -373,7 +375,7 @@ const ContractorTaskDetails = () => {
                   </div>
 
                   <div className="param-card">
-                    <div className="param-card-icon"><ShieldAlert size={18} /></div>
+                    <div className="param-card-icon"><ShieldAlert size={16} /></div>
                     <div className="param-card-info">
                       <span className="param-card-label">Priority Level</span>
                       <span className={`priority-tag-inline ${task.priority.toLowerCase()}`}>{task.priority}</span>
@@ -381,7 +383,7 @@ const ContractorTaskDetails = () => {
                   </div>
 
                   <div className="param-card">
-                    <div className="param-card-icon"><User size={18} /></div>
+                    <div className="param-card-icon"><User size={16} /></div>
                     <div className="param-card-info">
                       <span className="param-card-label">Assigned By</span>
                       <span className="param-card-val">{task.assignedBy}</span>
@@ -392,7 +394,7 @@ const ContractorTaskDetails = () => {
                 {/* Description Card */}
                 <div className="task-desc-card">
                   <div className="desc-card-header">
-                    <FileText size={18} />
+                    <FileText size={15} />
                     <span>Issue Description</span>
                   </div>
                   <p className="desc-card-body">{task.description || "No detailed description was provided by the reporter."}</p>
@@ -400,17 +402,15 @@ const ContractorTaskDetails = () => {
 
                 {/* Reassignment Pending Banner */}
                 {(task.status === 'Reassignment Requested' || task.reassignmentStatus === 'Reassignment Requested') && (
-                  <div style={{ background: '#fffbeb', border: '1px solid #fde68a', borderRadius: '10px', padding: '1rem 1.25rem', marginBottom: '1.25rem', display: 'flex', alignItems: 'flex-start', gap: '12px' }}>
-                    <RotateCcw size={24} color="#d97706" style={{ marginTop: '2px', flexShrink: 0 }} />
+                  <div style={{ background: '#fffbeb', border: '1px solid #fde68a', borderRadius: '8px', padding: '0.65rem 0.9rem', display: 'flex', alignItems: 'flex-start', gap: '10px' }}>
+                    <RotateCcw size={20} color="#d97706" style={{ marginTop: '2px', flexShrink: 0 }} />
                     <div style={{ flex: 1 }}>
-                      <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '4px' }}>
-                        <span style={{ fontWeight: 'bold', color: '#92400e', fontSize: '0.95rem' }}>Reassignment Request Pending Review</span>
-                        <span style={{ backgroundColor: '#d97706', color: 'white', fontSize: '0.7rem', padding: '2px 6px', borderRadius: '10px', fontWeight: 'bold' }}>PENDING ADMIN</span>
+                      <div style={{ display: 'flex', alignItems: 'center', gap: '6px', marginBottom: '2px' }}>
+                        <span style={{ fontWeight: 'bold', color: '#92400e', fontSize: '0.86rem' }}>Reassignment Request Pending Review</span>
+                        <span style={{ backgroundColor: '#d97706', color: 'white', fontSize: '0.65rem', padding: '1px 5px', borderRadius: '10px', fontWeight: 'bold' }}>PENDING ADMIN</span>
                       </div>
-                      <p style={{ margin: 0, fontSize: '0.85rem', color: '#78350f' }}>
-                        You submitted a request to reassign this task. <strong>Reason:</strong> {task.reassignmentReason || 'On Leave / Unavailable'}.
-                        {task.reassignmentExplanation && ` Note: "${task.reassignmentExplanation}"`}. 
-                        Administrator review is in progress.
+                      <p style={{ margin: 0, fontSize: '0.78rem', color: '#78350f' }}>
+                        <strong>Reason:</strong> {task.reassignmentReason || 'On Leave / Unavailable'}. {task.reassignmentExplanation && ` Note: "${task.reassignmentExplanation}"`}.
                       </p>
                     </div>
                   </div>
@@ -431,86 +431,82 @@ const ContractorTaskDetails = () => {
                   
                   <div className="action-buttons-row">
                     {['Assigned', 'Reassigned to Contractor', 'assigned', 'reassigned to contractor'].includes(task.status) ? (
-                      <div style={{ display: 'flex', flexDirection: 'column', gap: '10px', width: '100%' }}>
-                        <div style={{ display: 'flex', gap: '10px', width: '100%' }}>
-                          <button className="btn-action-primary accept" onClick={acceptTask} style={{ flex: 1 }}>
-                            <Play size={18} /> Accept Task
-                          </button>
-                          <button 
-                            type="button"
-                            className="btn-action-secondary"
-                            onClick={() => setShowReassignModal(true)}
-                            style={{ flex: 1, backgroundColor: '#fffbeb', color: '#b45309', border: '1px solid #fde68a', cursor: 'pointer', borderRadius: '8px', padding: '12px', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '8px', fontWeight: 'bold' }}
-                          >
-                            <RotateCcw size={18} /> Cannot Complete Task
-                          </button>
-                        </div>
+                      <div style={{ display: 'flex', gap: '10px', width: '100%' }}>
+                        <button className="btn-action-primary accept" onClick={acceptTask} style={{ flex: 1 }}>
+                          <Play size={16} /> Accept Task
+                        </button>
+                        <button 
+                          type="button"
+                          className="btn-action-secondary"
+                          onClick={() => setShowReassignModal(true)}
+                          style={{ flex: 1, backgroundColor: '#fffbeb', color: '#b45309', border: '1px solid #fde68a', cursor: 'pointer', borderRadius: '20px', padding: '0.65rem 1rem', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '6px', fontWeight: '700', fontSize: '0.85rem' }}
+                        >
+                          <RotateCcw size={16} /> Cannot Complete Task
+                        </button>
                       </div>
                     ) : ['In Progress', 'Returned by Admin', 'Rework Required'].includes(task.status) ? (
-                      <div style={{ display: 'flex', flexDirection: 'column', gap: '10px', width: '100%' }}>
-                        <div style={{ display: 'flex', gap: '10px', width: '100%' }}>
-                          <Link to={`/contractor/progress/${task.id}`} className="btn-action-primary progress-btn" style={{ flex: 2 }}>
-                            <Edit size={18} /> Update Work Progress
-                          </Link>
-                          <button 
-                            type="button"
-                            className="btn-action-secondary"
-                            onClick={() => setShowReassignModal(true)}
-                            style={{ flex: 1, backgroundColor: '#fffbeb', color: '#b45309', border: '1px solid #fde68a', cursor: 'pointer', borderRadius: '8px', padding: '12px', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '8px', fontWeight: 'bold' }}
-                          >
-                            <RotateCcw size={18} /> Cannot Complete
-                          </button>
-                        </div>
+                      <div style={{ display: 'flex', gap: '10px', width: '100%' }}>
+                        <Link to={`/contractor/progress/${task.id}`} className="btn-action-primary progress-btn" style={{ flex: 2 }}>
+                          <Edit size={16} /> Update Work Progress
+                        </Link>
+                        <button 
+                          type="button"
+                          className="btn-action-secondary"
+                          onClick={() => setShowReassignModal(true)}
+                          style={{ flex: 1, backgroundColor: '#fffbeb', color: '#b45309', border: '1px solid #fde68a', cursor: 'pointer', borderRadius: '20px', padding: '0.65rem 1rem', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '6px', fontWeight: '700', fontSize: '0.85rem' }}
+                        >
+                          <RotateCcw size={16} /> Cannot Complete
+                        </button>
                       </div>
                     ) : task.status === 'Reassignment Requested' ? (
                       <div style={{ width: '100%' }}>
-                        <div className="completion-badge-full" style={{ backgroundColor: '#fffbeb', color: '#b45309', border: '1px solid #fde68a' }}>
-                          <RotateCcw size={20} />
+                        <div className="completion-badge-full" style={{ backgroundColor: '#fffbeb', color: '#b45309', border: '1px solid #fde68a', padding: '0.65rem' }}>
+                          <RotateCcw size={18} />
                           <span>Reassignment Requested — Awaiting Admin</span>
                         </div>
                       </div>
                     ) : task.status === 'Rejected by Contractor' ? (
                       <div style={{ width: '100%' }}>
-                        <div className="completion-badge-full" style={{ backgroundColor: '#fef2f2', color: '#dc2626', border: '1px solid #fecaca' }}>
-                          <X size={20} />
+                        <div className="completion-badge-full" style={{ backgroundColor: '#fef2f2', color: '#dc2626', border: '1px solid #fecaca', padding: '0.65rem' }}>
+                          <X size={18} />
                           <span>Task Declined by You</span>
                         </div>
                         {task.rejectionReason && (
-                          <div style={{ marginTop: '0.75rem', padding: '0.75rem 1rem', background: '#fff5f5', borderRadius: '8px', border: '1px solid #fed7d7', color: '#991b1b', fontSize: '0.88rem' }}>
-                            <strong>Reason for Declining:</strong> {task.rejectionReason}
+                          <div style={{ marginTop: '0.5rem', padding: '0.5rem 0.75rem', background: '#fff5f5', borderRadius: '6px', border: '1px solid #fed7d7', color: '#991b1b', fontSize: '0.8rem' }}>
+                            <strong>Reason:</strong> {task.rejectionReason}
                           </div>
                         )}
                       </div>
                     ) : task.status === 'Closed' ? (
                       <div className="completion-action-group">
-                        <div className="completion-badge-full">
-                          <CheckCircle size={20} />
+                        <div className="completion-badge-full" style={{ padding: '0.65rem' }}>
+                          <CheckCircle size={18} />
                           <span>Task Closed & Verified</span>
                         </div>
-                        <Link to={`/contractor/reports/${task._id}`} className="btn-action-secondary">
-                          <FileText size={18} /> Download Work Completion Report
+                        <Link to={`/contractor/reports/${task._id}`} className="btn-action-secondary" style={{ padding: '0.55rem 1rem' }}>
+                          <FileText size={16} /> Download Report
                         </Link>
                       </div>
                     ) : (
-                      <div className="completion-badge-full">
-                        <CheckCircle size={20} />
+                      <div className="completion-badge-full" style={{ padding: '0.65rem' }}>
+                        <CheckCircle size={18} />
                         <span>Completion Submitted - Pending Review</span>
                       </div>
                     )}
                   </div>
                 </div>
 
+                {/* Integrated Assignment & Reassignment Audit Trail Timeline */}
+                <AssignmentHistoryTimeline 
+                  history={task.assignmentHistory} 
+                  currentAssignee={contractor?.name} 
+                  currentRole="contractor" 
+                  initialAssignedDate={task.assignedOn} 
+                />
+
               </div>
 
             </div>
-
-            {/* Assignment & Reassignment Audit Trail Timeline */}
-            <AssignmentHistoryTimeline 
-              history={task.assignmentHistory} 
-              currentAssignee={contractor?.name} 
-              currentRole="contractor" 
-              initialAssignedDate={task.assignedOn} 
-            />
 
           </div>
         </div>

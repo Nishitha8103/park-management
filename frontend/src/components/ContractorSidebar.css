@@ -6,15 +6,16 @@
   width: 280px;
   max-width: 85vw;
   transform: translateX(-100%);
-  background-color: #06402B;
-  color: white;
+  background: #ffffff;
+  color: #1a3320;
   display: flex;
   flex-direction: column;
   z-index: 1000;
   transition: transform 0.3s cubic-bezier(0.16, 1, 0.3, 1);
-  box-shadow: 4px 0 24px rgba(0, 0, 0, 0.25);
+  box-shadow: 4px 0 24px rgba(101, 163, 13, 0.15);
   overflow-y: auto;
   -webkit-overflow-scrolling: touch;
+  border-right: 1.5px solid #e2ebd8;
 }
 
 .contractor-sidebar.open {
@@ -26,44 +27,56 @@
   display: flex;
   align-items: center;
   gap: 1rem;
-  border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+  border-bottom: 1.5px solid #e2ebd8;
+  background: #84cc16;
+  background: linear-gradient(135deg, #65a30d 0%, #84cc16 100%);
+  color: white;
 }
 
 .contractor-sidebar-header h2 {
-  font-size: 1.1rem;
+  font-size: 1.15rem;
   margin: 0;
-  font-weight: 600;
+  font-weight: 800;
   line-height: 1.2;
+  color: #ffffff;
+  letter-spacing: 0.3px;
 }
 
 .contractor-sidebar-user {
-  padding: 1.5rem;
+  padding: 1.25rem 1.5rem;
   display: flex;
   align-items: center;
   gap: 1rem;
-  border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+  border-bottom: 1.5px solid #e2ebd8;
+  background: #f7fee7;
 }
 
 .contractor-sidebar-avatar {
-  background-color: #64748b;
-  width: 40px;
-  height: 40px;
+  background: #84cc16;
+  color: #ffffff;
+  width: 44px;
+  height: 44px;
   border-radius: 50%;
   display: flex;
   align-items: center;
   justify-content: center;
+  box-shadow: 0 4px 10px rgba(132, 204, 22, 0.3);
+  border: 2px solid #bef264;
+  font-weight: 800;
 }
 
 .contractor-sidebar-user-info .name {
   margin: 0;
-  font-weight: 600;
+  font-weight: 800;
   font-size: 1rem;
+  color: #365314;
 }
 
 .contractor-sidebar-user-info .role {
   margin: 0;
   font-size: 0.8rem;
-  color: #cbd5e1;
+  color: #65a30d;
+  font-weight: 600;
 }
 
 .contractor-nav {
@@ -75,38 +88,45 @@
 .contractor-nav-item {
   display: flex;
   align-items: center;
-  padding: 0.75rem 1.5rem;
-  color: white;
+  padding: 0.85rem 1.5rem;
+  color: #4d7c0f;
   text-decoration: none;
   gap: 1rem;
-  transition: all 0.2s;
+  transition: all 0.2s ease;
   position: relative;
+  font-weight: 700;
+  font-size: 0.95rem;
 }
 
 .contractor-nav-item:hover {
-  background-color: rgba(255, 255, 255, 0.1);
+  background-color: #f7fee7;
+  color: #365314;
 }
 
 .contractor-nav-item.active {
-  background-color: #10b981; /* Lighter green for active */
-  font-weight: 500;
+  background: #84cc16;
+  background: linear-gradient(90deg, #84cc16 0%, #a3e635 100%);
+  color: #ffffff;
+  font-weight: 800;
   border-radius: 0 25px 25px 0;
   margin-right: 1rem;
+  box-shadow: 0 4px 14px rgba(132, 204, 22, 0.4);
 }
 
 .nav-badge {
   background-color: #ef4444;
   color: white;
   font-size: 0.7rem;
-  padding: 0.1rem 0.4rem;
+  padding: 0.15rem 0.5rem;
   border-radius: 10px;
   margin-left: auto;
-  font-weight: bold;
+  font-weight: 700;
 }
 
 .contractor-sidebar-footer {
   padding: 1rem;
-  border-top: 1px solid rgba(255, 255, 255, 0.1);
+  border-top: 1px solid rgba(74, 222, 128, 0.15);
+  background: rgba(0, 0, 0, 0.15);
 }
 
 .contractor-logout-btn {
@@ -114,19 +134,22 @@
   align-items: center;
   gap: 0.75rem;
   width: 100%;
-  padding: 0.75rem;
-  background: none;
-  border: none;
-  color: white;
+  padding: 0.75rem 1rem;
+  background: rgba(239, 68, 68, 0.1);
+  border: 1px solid rgba(239, 68, 68, 0.2);
+  color: #fca5a5;
   cursor: pointer;
   border-radius: 8px;
-  transition: background-color 0.2s;
-  font-size: 1rem;
+  transition: all 0.2s;
+  font-size: 0.95rem;
+  font-weight: 600;
   justify-content: flex-start;
 }
 
 .contractor-logout-btn:hover {
-  background-color: rgba(255, 255, 255, 0.1);
+  background-color: #ef4444;
+  color: #ffffff;
+  border-color: #ef4444;
 }
 
 /* Sidebar overlay and mobile states */
@@ -134,10 +157,12 @@
   display: none;
   position: fixed;
   inset: 0;
-  background-color: rgba(0, 0, 0, 0.5);
+  background-color: rgba(6, 64, 43, 0.6);
+  backdrop-filter: blur(2px);
   z-index: 999;
 }
 
 .contractor-sidebar-overlay.show {
   display: block;
 }
+

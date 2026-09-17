@@ -180,6 +180,12 @@ const GovInspectionDetails = () => {
                 <span className="info-value">{inspection.status || '—'}</span>
               </div>
               <div className="info-row">
+                <span className="info-label">Inspection Due Date</span>
+                <span className="info-value" style={{ fontWeight: 700, color: '#b45309' }}>
+                  {inspection.slaDeadline ? formatDate(inspection.slaDeadline) : formatDate(new Date(new Date(inspection.createdAt).getTime() + 48 * 3600 * 1000))}
+                </span>
+              </div>
+              <div className="info-row">
                 <span className="info-label">Submitted On</span>
                 <span className="info-value">{formatDate(inspection.createdAt)}</span>
               </div>
@@ -356,6 +362,7 @@ const GovInspectionDetails = () => {
         currentAssignee={govUser?.name || 'Government Official'} 
         currentRole="government_official" 
         initialAssignedDate={inspection.assignedAt || inspection.createdAt} 
+        dueDate={inspection.slaDeadline || (inspection.createdAt ? new Date(new Date(inspection.createdAt).getTime() + 48 * 3600 * 1000) : null)}
       />
 
       {/* Full Image Overlay Modal */}

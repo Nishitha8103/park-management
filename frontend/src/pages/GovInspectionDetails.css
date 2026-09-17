@@ -13,23 +13,28 @@
 
 .page-title {
   flex-shrink: 0;
-  margin-bottom: var(--spacing-xs);
-  font-size: 1.5rem;
+  margin-bottom: var(--spacing-sm);
+  font-size: 1.55rem;
+  font-weight: 800;
+  color: #1f2a21 !important;
+  letter-spacing: -0.015em;
 }
 
 .btn-back {
   display: flex;
   align-items: center;
   gap: 8px;
-  color: var(--primary);
-  font-weight: 600;
+  color: #2d3e30 !important;
+  font-weight: 700;
   font-size: 0.95rem;
   background: none;
   border: none;
   cursor: pointer;
+  padding: 4px 0;
 }
 
 .btn-back:hover {
+  color: #4f6d54 !important;
   text-decoration: underline;
 }
 

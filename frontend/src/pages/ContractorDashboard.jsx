@@ -330,62 +330,13 @@ const ContractorDashboard = () => {
           
           {/* Welcome Hero Banner */}
           <div className="contractor-hero-banner">
-            <div className="hero-banner-main">
+            <div className="hero-banner-main" style={{ marginBottom: 0 }}>
               <div className="hero-greeting">
                 <div className="hero-badge">
                   <Sparkles size={14} /> Contractor Operational Dashboard
                 </div>
                 <h2>Welcome back, <span className="highlight">{contractor.name}!</span></h2>
                 <p>Overview of assigned parks, active maintenance tasks, and material requests.</p>
-              </div>
-
-              <div className="hero-quick-actions">
-                <Link to="/contractor/tasks" className="hero-action-btn primary">
-                  <ClipboardList size={18} />
-                  <span>My Tasks ({stats.pending})</span>
-                </Link>
-                <Link to="/contractor/materials" className="hero-action-btn secondary">
-                  <Package size={18} />
-                  <span>Request Materials</span>
-                </Link>
-                <Link to="/contractor/schedule" className="hero-action-btn secondary">
-                  <Calendar size={18} />
-                  <span>Work Schedule</span>
-                </Link>
-                <Link to="/contractor/reports" className="hero-action-btn secondary">
-                  <FileText size={18} />
-                  <span>Submit Report</span>
-                </Link>
-              </div>
-            </div>
-
-            <div className="hero-banner-metrics">
-              <div className="hero-metric-item">
-                <span className="metric-val">{validParks.length}</span>
-                <span className="metric-lbl">Assigned Parks</span>
-              </div>
-              <div className="hero-metric-divider"></div>
-              <div className="hero-metric-item">
-                <span className="metric-val">{stats.pending}</span>
-                <span className="metric-lbl">Active Tasks</span>
-              </div>
-              <div className="hero-metric-divider"></div>
-              <div className="hero-metric-item">
-                <span className="metric-val">{materials.filter(m => m.status === 'Pending').length}</span>
-                <span className="metric-lbl">Pending Materials</span>
-              </div>
-              <div className="hero-metric-divider"></div>
-              <div className="hero-metric-item">
-                <span className="metric-val text-emerald">{completionRate}%</span>
-                <span className="metric-lbl">Completion Rate</span>
-              </div>
-              <div className="hero-metric-divider"></div>
-              <div className="hero-date-badge">
-                <CalendarDays size={20} className="date-icon" />
-                <div>
-                  <div className="date-num">{String(dayNum).padStart(2, '0')} {monthYear}</div>
-                  <div className="date-day">{weekday}</div>
-                </div>
               </div>
             </div>
           </div>

@@ -1,5 +1,5 @@
 /* ============================================================
-   CONTRACTOR SCHEDULE — Professional Park Theme
+   CONTRACTOR SCHEDULE — Green Nature-Inspired Park Theme
    ============================================================ */
 
 /* ---- Page Layout ---- */
@@ -15,11 +15,11 @@
   flex-wrap: wrap;
   gap: 1rem;
   margin-bottom: 1.75rem;
-  padding: 1.5rem;
-  background: linear-gradient(135deg, #0f172a 0%, #1e293b 65%, #1a2e4a 100%);
-  border-radius: 16px;
-  border: 1px solid rgba(99,102,241,0.2);
-  box-shadow: 0 8px 24px rgba(15,23,42,0.2);
+  padding: 1.5rem 2rem;
+  background: linear-gradient(135deg, #0b3d2c 0%, #06402B 65%, #042e1f 100%);
+  border-radius: 18px;
+  border: 1px solid rgba(74, 222, 128, 0.25);
+  box-shadow: 0 8px 24px rgba(6, 64, 43, 0.25);
 }
 
 .schedule-title {
@@ -29,35 +29,37 @@
 }
 
 .schedule-title-icon {
-  color: #818cf8;
+  color: #4ade80;
 }
 
 .schedule-title h2 {
-  font-size: 1.35rem;
+  font-size: 1.4rem;
   font-weight: 800;
   color: #fff;
   margin: 0 0 3px;
+  letter-spacing: -0.01em;
 }
 
 .schedule-title p {
-  font-size: 0.82rem;
-  color: #94a3b8;
+  font-size: 0.85rem;
+  color: #bbf7d0;
   margin: 0;
 }
 
 .schedule-view-toggle {
   display: flex;
   gap: 0.4rem;
-  background: rgba(255,255,255,0.06);
+  background: rgba(0, 0, 0, 0.2);
+  border: 1px solid rgba(74, 222, 128, 0.2);
   border-radius: 10px;
-  padding: 0.3rem;
+  padding: 0.35rem;
 }
 
 .schedule-view-toggle button {
   background: transparent;
   border: none;
-  color: #94a3b8;
-  padding: 0.4rem 0.9rem;
+  color: #e2e8f0;
+  padding: 0.45rem 1rem;
   border-radius: 7px;
   font-size: 0.82rem;
   font-weight: 600;
@@ -66,9 +68,10 @@
 }
 
 .schedule-view-toggle button.active {
-  background: #d97706;
+  background: #16a34a;
   color: #fff;
-  box-shadow: 0 2px 8px rgba(217,119,6,0.3);
+  font-weight: 700;
+  box-shadow: 0 2px 8px rgba(22, 163, 74, 0.4);
 }
 
 /* ---- Stats Row ---- */

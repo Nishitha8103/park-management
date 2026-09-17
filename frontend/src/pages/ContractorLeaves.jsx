@@ -33,7 +33,7 @@ const ContractorLeaves = () => {
   if (!contractor) return null;
 
   return (
-    <div className="contractor-dashboard">
+    <div className="contractor-dashboard-page">
       <ContractorSidebar
         isOpen={isSidebarOpen}
         toggleSidebar={() => setIsSidebarOpen(!isSidebarOpen)}
@@ -41,28 +41,35 @@ const ContractorLeaves = () => {
         contractor={contractor}
       />
 
-      <div className="contractor-main">
-        {/* Top Bar */}
-        <header className="contractor-topbar">
-          <div className="contractor-topbar-left">
-            <button className="contractor-menu-toggle" onClick={() => setIsSidebarOpen(!isSidebarOpen)}>
-              <Menu size={24} />
-            </button>
-            <HardHat size={24} color="#16a34a" />
-            <h1 className="contractor-topbar-title">Leave & Availability</h1>
-          </div>
-          <div className="contractor-topbar-right">
-            <NotificationDropdown userId={contractor._id || contractor.id} role="contractor" />
-            <button className="contractor-logout-topbar" onClick={handleLogout}>
-              <LogOut size={18} />
-            </button>
+      <div className={`contractor-main-wrapper ${isSidebarOpen ? 'sidebar-open' : ''}`}>
+        {/* Top Header Navigation */}
+        <header className="contractor-header">
+          <div className="container contractor-header-content">
+            <div className="contractor-brand">
+              <button className="contractor-menu-toggle" onClick={() => setIsSidebarOpen(!isSidebarOpen)}>
+                <Menu size={24} />
+              </button>
+              <HardHat size={28} className="contractor-text-primary" />
+              <h1>PARK MAINTENANCE</h1>
+              <span>Portal</span>
+            </div>
+            <div className="contractor-user-info">
+              <NotificationDropdown userId={contractor._id || contractor.id} role="contractor" />
+              <div className="contractor-user-details">
+                <h4 className="contractor-user-name">{contractor.name}</h4>
+                <p className="contractor-user-role">{contractor.department || 'Park Maintenance'} Specialist</p>
+              </div>
+              <button className="btn-contractor-logout" onClick={handleLogout}>
+                <LogOut size={16} /> Logout
+              </button>
+            </div>
           </div>
         </header>
 
-        {/* Content */}
-        <div style={{ padding: '1.5rem', maxWidth: '1100px', margin: '0 auto' }}>
+        {/* Content Container */}
+        <main className="container contractor-dashboard-container" style={{ paddingTop: '1.25rem' }}>
           <ContractorLeaveManagement contractor={contractor} />
-        </div>
+        </main>
       </div>
     </div>
   );

@@ -16,10 +16,10 @@
   flex-wrap: wrap;
   gap: 1.2rem;
   padding: 1.75rem 2rem;
-  background: linear-gradient(135deg, #0f172a 0%, #1e293b 60%, #064e3b 100%);
+  background: linear-gradient(135deg, #28372b 0%, #384e3c 60%, #4f6d54 100%);
   border-radius: 20px;
-  border: 1px solid rgba(16, 185, 129, 0.25);
-  box-shadow: 0 10px 30px rgba(15, 23, 42, 0.25);
+  border: 1px solid rgba(168, 203, 176, 0.35);
+  box-shadow: 0 10px 30px rgba(40, 55, 43, 0.25);
   margin-bottom: 1.5rem;
 }
 
@@ -37,12 +37,12 @@
   font-weight: 800;
   letter-spacing: 0.08em;
   text-transform: uppercase;
-  color: #34d399;
-  background: rgba(16, 185, 129, 0.15);
+  color: #e5ede7;
+  background: rgba(255, 255, 255, 0.15);
   padding: 0.25rem 0.65rem;
   border-radius: 6px;
   width: fit-content;
-  border: 1px solid rgba(52, 211, 153, 0.3);
+  border: 1px solid rgba(255, 255, 255, 0.3);
 }
 
 .gov-header-title-box h2 {
@@ -54,7 +54,7 @@
 }
 
 .gov-header-title-box p {
-  color: #94a3b8;
+  color: #d8e4db;
   font-size: 0.86rem;
   margin: 0;
 }
@@ -78,9 +78,9 @@
 }
 
 .gov-alert-banner.success {
-  background: #ecfdf5;
-  color: #065f46;
-  border: 1px solid #a7f3d0;
+  background: #edf2ee;
+  color: #28372b;
+  border: 1px solid #cbd7cd;
 }
 
 .gov-alert-banner.error {
@@ -127,8 +127,8 @@
   height: 140px;
   border-radius: 50%;
   padding: 4px;
-  background: linear-gradient(135deg, #10b981, #3b82f6);
-  box-shadow: 0 8px 24px rgba(16, 185, 129, 0.25);
+  background: linear-gradient(135deg, #4f6d54, #628768);
+  box-shadow: 0 8px 24px rgba(79, 109, 84, 0.25);
   cursor: pointer;
   margin-bottom: 1.25rem;
 }
@@ -161,7 +161,7 @@
   right: 4px;
   bottom: 4px;
   border-radius: 50%;
-  background: rgba(15, 23, 42, 0.7);
+  background: rgba(40, 55, 43, 0.75);
   backdrop-filter: blur(4px);
   display: flex;
   flex-direction: column;
@@ -203,9 +203,9 @@
   gap: 0.3rem;
   font-size: 0.72rem;
   font-weight: 800;
-  color: #059669;
-  background: #ecfdf5;
-  border: 1px solid #a7f3d0;
+  color: #28372b;
+  background: #edf2ee;
+  border: 1px solid #cbd7cd;
   padding: 0.2rem 0.6rem;
   border-radius: 20px;
 }
@@ -235,9 +235,9 @@
 }
 
 .btn-upload-photo:hover {
-  background: #10b981;
+  background: #4f6d54;
   color: #ffffff;
-  border-color: #10b981;
+  border-color: #4f6d54;
 }
 
 .profile-summary-box {
@@ -268,8 +268,9 @@
 }
 
 .status-active-tag {
-  color: #16a34a;
-  background: #dcfce7;
+  color: #28372b;
+  background: #edf2ee;
+  border: 1px solid #cbd7cd;
   padding: 1px 7px;
   border-radius: 6px;
   font-weight: 800;
@@ -307,13 +308,13 @@
 }
 
 .section-icon-box.text-emerald {
-  background: #ecfdf5;
-  color: #059669;
+  background: #edf2ee;
+  color: #4f6d54;
 }
 
 .section-icon-box.text-purple {
-  background: #f3e8ff;
-  color: #7c3aed;
+  background: #edf2ee;
+  color: #4f6d54;
 }
 
 .card-section-header h3 {
@@ -391,8 +392,8 @@
 }
 
 .styled-input:focus {
-  border-color: #10b981;
-  box-shadow: 0 0 0 3px rgba(16, 185, 129, 0.2);
+  border-color: #4f6d54;
+  box-shadow: 0 0 0 3px rgba(79, 109, 84, 0.2);
 }
 
 .styled-input.readonly {
@@ -424,19 +425,19 @@
   gap: 0.5rem;
   padding: 0.7rem 1.5rem;
   border-radius: 10px;
-  background: linear-gradient(135deg, #10b981 0%, #059669 100%);
+  background: linear-gradient(135deg, #4f6d54 0%, #384e3c 100%);
   color: #ffffff;
   border: none;
   font-size: 0.88rem;
   font-weight: 700;
   cursor: pointer;
   transition: all 0.2s ease;
-  box-shadow: 0 4px 14px rgba(16, 185, 129, 0.3);
+  box-shadow: 0 4px 14px rgba(79, 109, 84, 0.3);
 }
 
 .btn-save-primary:hover:not(:disabled) {
   transform: translateY(-1px);
-  box-shadow: 0 6px 18px rgba(16, 185, 129, 0.4);
+  box-shadow: 0 6px 18px rgba(79, 109, 84, 0.4);
 }
 
 .btn-save-secondary {
@@ -445,20 +446,20 @@
   gap: 0.5rem;
   padding: 0.7rem 1.5rem;
   border-radius: 10px;
-  background: #0f172a;
+  background: #28372b;
   color: #ffffff;
   border: none;
   font-size: 0.88rem;
   font-weight: 700;
   cursor: pointer;
   transition: all 0.2s ease;
-  box-shadow: 0 4px 14px rgba(15, 23, 42, 0.25);
+  box-shadow: 0 4px 14px rgba(40, 55, 43, 0.25);
 }
 
 .btn-save-secondary:hover:not(:disabled) {
-  background: #1e293b;
+  background: #384e3c;
   transform: translateY(-1px);
-  box-shadow: 0 6px 18px rgba(15, 23, 42, 0.35);
+  box-shadow: 0 6px 18px rgba(40, 55, 43, 0.35);
 }
 
 .btn-save-primary:disabled,

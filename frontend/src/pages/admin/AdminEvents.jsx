@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import axios from 'axios';
 import { useNavigate } from 'react-router-dom';
 import { Calendar, MapPin, Edit, Trash2, Plus, X, Image as ImageIcon, Users, IndianRupee } from 'lucide-react';
+import Swal from 'sweetalert2';
 
 const AdminEvents = () => {
   const [events, setEvents] = useState([]);
@@ -129,16 +130,36 @@ const AdminEvents = () => {
   };
 
   const handleDelete = async (id) => {
-    if (window.confirm('Are you sure you want to delete this event?')) {
-      try {
-        const token = JSON.parse(localStorage.getItem('adminUser'))?.token;
-        await axios.delete(`/api/events/${id}`, {
-          headers: { Authorization: `Bearer ${token}` }
-        });
-        fetchEvents();
-      } catch (err) {
-        alert(err.response?.data?.message || 'Error deleting event');
-      }
+    const result = await Swal.fire({
+      title: 'Delete Event?',
+      text: 'Are you sure you want to delete this event? This action cannot be undone.',
+      icon: 'warning',
+      showCancelButton: true,
+      confirmButtonColor: '#ef4444',
+      cancelButtonColor: '#64748b',
+      confirmButtonText: 'Yes, delete it!'
+    });
+    if (!result.isConfirmed) return;
+
+    try {
+      const token = JSON.parse(localStorage.getItem('adminUser'))?.token;
+      await axios.delete(`/api/events/${id}`, {
+        headers: { Authorization: `Bearer ${token}` }
+      });
+      Swal.fire({
+        title: 'Deleted!',
+        text: 'Event has been removed.',
+        icon: 'success',
+        timer: 1800,
+        showConfirmButton: false
+      });
+      fetchEvents();
+    } catch (err) {
+      Swal.fire({
+        title: 'Error!',
+        text: err.response?.data?.message || 'Error deleting event',
+        icon: 'error'
+      });
     }
   };
 

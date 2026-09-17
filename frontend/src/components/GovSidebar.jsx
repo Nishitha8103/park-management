@@ -65,7 +65,7 @@ const GovSidebar = ({ isOpen = false, toggleSidebar = () => {} }) => {
   return (
     <>
       <div className={`sidebar-overlay ${isOpen ? 'show' : ''}`} onClick={toggleSidebar}></div>
-      <aside className={`sidebar ${isOpen ? 'open' : ''}`}>
+      <aside className={`sidebar gov-sidebar ${isOpen ? 'open' : ''}`}>
         <div className="user-profile">
           <div className="avatar" style={{ overflow: 'hidden', borderRadius: '50%', backgroundColor: '#f3f4f6' }}>
             {userData.profilePic ? (

@@ -3,7 +3,7 @@
   display: flex;
   justify-content: center;
   align-items: center;
-  background-color: #f0f9ff;
+  background-color: #f4f7f4;
   padding: 2rem;
 }
 
@@ -14,7 +14,7 @@
   width: 100%;
   max-width: 600px;
   padding: 2.5rem;
-  border-top: 6px solid #1e40af;
+  border-top: 6px solid #4f6d54;
 }
 
 .gov-register-header {
@@ -28,7 +28,7 @@
   align-items: center;
   width: 64px;
   height: 64px;
-  background-color: #dbeafe;
+  background-color: #edf2ee;
   border-radius: 50%;
   margin-bottom: 1rem;
 }
@@ -36,13 +36,13 @@
 .gov-register-header h2 {
   font-size: 1.5rem;
   font-weight: 700;
-  color: #1e3a8a;
+  color: #28372b;
   letter-spacing: 1px;
 }
 
 .gov-register-brand {
   font-size: 0.85rem;
-  color: #64748b;
+  color: #5e7263;
   letter-spacing: 2px;
 }
 
@@ -79,7 +79,7 @@
 .gov-input-field.has-icon {
   width: 100%;
   padding: 0.75rem 1rem 0.75rem 2.5rem;
-  border: 1px solid #cbd5e1;
+  border: 1px solid #cbd7cd;
   border-radius: 8px;
   font-size: 0.95rem;
   outline: none;
@@ -87,13 +87,13 @@
 }
 
 .gov-input-field.has-icon:focus {
-  border-color: #3b82f6;
-  box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
+  border-color: #4f6d54;
+  box-shadow: 0 0 0 3px rgba(79, 109, 84, 0.15);
 }
 
 .gov-btn-primary {
   width: 100%;
-  background-color: #1e40af;
+  background-color: #4f6d54;
   color: white;
   border: none;
   padding: 0.85rem;
@@ -110,7 +110,7 @@
 }
 
 .gov-btn-primary:hover {
-  background-color: #1e3a8a;
+  background-color: #384e3c;
 }
 
 .gov-register-footer {

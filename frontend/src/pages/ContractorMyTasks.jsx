@@ -1,9 +1,10 @@
 import { useEffect, useState } from 'react';
 import { useNavigate, useSearchParams } from 'react-router-dom';
-import { Menu, HardHat, LogOut, CheckCircle, Wrench, Clock, FileText, AlertTriangle, Eye, Bell, XCircle } from 'lucide-react';
+import { Menu, HardHat, LogOut, CheckCircle, Wrench, Clock, FileText, AlertTriangle, Eye, Bell, XCircle, RotateCcw } from 'lucide-react';
 import './ContractorDashboard.css';
 
 import ContractorSidebar from '../components/ContractorSidebar';
+import RequestReassignmentModal from '../components/RequestReassignmentModal';
 
 const ContractorMyTasks = () => {
   const navigate = useNavigate();
@@ -101,48 +102,21 @@ const ContractorMyTasks = () => {
 
   const openRejectModal = (job) => {
     setRejectingJob(job);
-    setRejectionReason('');
     setShowRejectModal(true);
   };
 
-  const submitRejection = async () => {
-    if (!rejectionReason.trim()) {
-      alert("Please provide a reason for declining/rejecting this task.");
-      return;
+  const handleReassignmentSuccess = () => {
+    if (rejectingJob) {
+      setJobs(prevJobs =>
+        prevJobs.map(job =>
+          job.id === rejectingJob.id
+            ? { ...job, status: 'reassignment-requested' }
+            : job
+        )
+      );
     }
-
-    setIsSubmittingReject(true);
-    try {
-      const res = await fetch(`/api/complaints/${rejectingJob._id}`, {
-        method: 'PUT',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          status: 'Rejected by Contractor',
-          rejectionReason: rejectionReason.trim()
-        })
-      });
-
-      if (res.ok) {
-        setJobs(prevJobs =>
-          prevJobs.map(job =>
-            job.id === rejectingJob.id
-              ? { ...job, status: 'rejected-by-contractor', rejectionReason: rejectionReason.trim() }
-              : job
-          )
-        );
-        setShowRejectModal(false);
-        setRejectingJob(null);
-        alert('Task has been declined/rejected successfully. Admin will be notified.');
-      } else {
-        const data = await res.json().catch(() => ({}));
-        alert(data.message || 'Failed to decline task.');
-      }
-    } catch (error) {
-      console.error('Error declining task:', error);
-      alert('Error declining task.');
-    } finally {
-      setIsSubmittingReject(false);
-    }
+    setShowRejectModal(false);
+    setRejectingJob(null);
   };
 
   const openCompletionModal = (job) => {
@@ -299,15 +273,29 @@ const ContractorMyTasks = () => {
                         <span 
                           className={`job-status-badge ${job.status}`}
                           style={{
-                            background: ['returned-by-admin', 'rework-required', 'rejected-by-contractor'].includes(job.status) ? '#fee2e2' : undefined,
-                            color: ['returned-by-admin', 'rework-required', 'rejected-by-contractor'].includes(job.status) ? '#ef4444' : undefined,
-                            border: ['returned-by-admin', 'rework-required', 'rejected-by-contractor'].includes(job.status) ? '1px solid #fca5a5' : undefined
+                            background: ['returned-by-admin', 'rework-required', 'rejected-by-contractor'].includes(job.status) 
+                              ? '#fee2e2' 
+                              : job.status === 'reassignment-requested'
+                              ? '#fffbeb'
+                              : undefined,
+                            color: ['returned-by-admin', 'rework-required', 'rejected-by-contractor'].includes(job.status) 
+                              ? '#ef4444' 
+                              : job.status === 'reassignment-requested'
+                              ? '#d97706'
+                              : undefined,
+                            border: ['returned-by-admin', 'rework-required', 'rejected-by-contractor'].includes(job.status) 
+                              ? '1px solid #fca5a5' 
+                              : job.status === 'reassignment-requested'
+                              ? '1px solid #fde68a'
+                              : undefined
                           }}
                         >
                           {['returned-by-admin', 'rework-required'].includes(job.status) 
                             ? 'Rework' 
                             : job.status === 'rejected-by-contractor'
                             ? 'Declined'
+                            : job.status === 'reassignment-requested'
+                            ? 'Reassignment Requested'
                             : job.status.replace(/-/g, ' ')}
                         </span>
                       </td>
@@ -333,6 +321,11 @@ const ContractorMyTasks = () => {
                         {['completed', 'completed-waiting-for-admin-review', 'inspection-pending', 'inspection-approved', 'closed'].includes(job.status) && (
                           <span style={{ fontSize: '0.85rem', color: '#16a34a', fontStyle: 'italic', display: 'flex', alignItems: 'center', fontWeight: 600 }}>
                             Report Submitted
+                          </span>
+                        )}
+                        {job.status === 'reassignment-requested' && (
+                          <span style={{ fontSize: '0.85rem', color: '#d97706', fontStyle: 'italic', display: 'flex', alignItems: 'center', gap: '4px', fontWeight: 600 }}>
+                            <RotateCcw size={13} /> Reassignment Pending
                           </span>
                         )}
                         {job.status === 'rejected-by-contractor' && (
@@ -385,52 +378,15 @@ const ContractorMyTasks = () => {
         </div>
       )}
 
-      {/* Reject / Decline Modal */}
-      {showRejectModal && (
-        <div className="contractor-modal-overlay" onClick={() => setShowRejectModal(false)}>
-          <div className="contractor-modal" onClick={(e) => e.stopPropagation()}>
-            <h4 style={{ color: '#dc2626', display: 'flex', alignItems: 'center', gap: '8px' }}>
-              <AlertTriangle size={20} color="#dc2626" /> Decline / Reject Task
-            </h4>
-            <div className="contractor-modal-body">
-              <p style={{ fontSize: '0.9rem', color: '#64748b', marginBottom: '0.5rem' }}>
-                Job <strong>{rejectingJob?.id}</strong> at <strong>{rejectingJob?.park}</strong>
-              </p>
-              <p style={{ fontSize: '0.85rem', color: '#475569', marginBottom: '1rem', lineHeight: '1.4' }}>
-                Are you sure you want to decline this task? Please provide a reason so the administrator can reassign it appropriately.
-              </p>
-              <div className="contractor-form-group">
-                <label className="contractor-input-label">Reason for Rejection *</label>
-                <textarea 
-                  className="contractor-input-field" 
-                  rows={4} 
-                  placeholder="e.g., Specialized tools unavailable, schedule conflict, outside service capacity..."
-                  value={rejectionReason}
-                  onChange={(e) => setRejectionReason(e.target.value)}
-                  style={{ resize: 'none', padding: '0.75rem' }}
-                  autoFocus
-                />
-              </div>
-            </div>
-            <div className="contractor-modal-actions">
-              <button 
-                className="btn-modal-cancel" 
-                onClick={() => { setShowRejectModal(false); setRejectingJob(null); }}
-              >
-                Cancel
-              </button>
-              <button 
-                className="btn-job-action" 
-                style={{ background: '#dc2626', color: '#ffffff', borderColor: '#dc2626', padding: '0.5rem 1.25rem', fontSize: '0.88rem' }}
-                onClick={submitRejection}
-                disabled={isSubmittingReject}
-              >
-                {isSubmittingReject ? 'Declining...' : 'Confirm Rejection'}
-              </button>
-            </div>
-          </div>
-        </div>
-      )}
+      {/* Decline / Reassignment Modal */}
+      <RequestReassignmentModal
+        isOpen={showRejectModal}
+        onClose={() => { setShowRejectModal(false); setRejectingJob(null); }}
+        task={rejectingJob}
+        user={contractor}
+        userRole="contractor"
+        onSuccess={handleReassignmentSuccess}
+      />
 
       
       </div>

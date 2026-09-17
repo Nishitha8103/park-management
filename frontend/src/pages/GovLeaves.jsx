@@ -14,14 +14,11 @@ const GovLeaves = () => {
   }, []);
 
   return (
-    <div style={{ padding: '1.5rem', maxWidth: '1100px', margin: '0 auto' }}>
-      <h2 style={{ marginBottom: '1.25rem', color: '#0f172a', fontWeight: 700, fontSize: '1.4rem' }}>
-        🏛️ Leave &amp; Availability Management
-      </h2>
+    <div style={{ width: '100%', boxSizing: 'border-box' }}>
       {official ? (
         <GovLeaveManagement official={official} />
       ) : (
-        <div style={{ textAlign: 'center', color: '#94a3b8', padding: '3rem' }}>
+        <div style={{ textAlign: 'center', color: '#5e7263', padding: '4rem 1rem' }}>
           Loading your profile...
         </div>
       )}

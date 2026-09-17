@@ -277,7 +277,7 @@ const AdminOfficialsEdit = () => {
         <form onSubmit={handleSubmit}>
           {/* Section 1: Personal Details */}
           <div style={{ marginBottom: '2rem' }}>
-            <h3 style={{ fontSize: '0.9rem', color: '#16a34a', fontWeight: '700', marginBottom: '1.25rem', textTransform: 'uppercase', letterSpacing: '0.05em' }}>
+            <h3 style={{ fontSize: '0.9rem', color: '#4f6d54', fontWeight: '700', marginBottom: '1.25rem', textTransform: 'uppercase', letterSpacing: '0.05em' }}>
               Personal Details
             </h3>
 
@@ -341,7 +341,7 @@ const AdminOfficialsEdit = () => {
 
           {/* Section 2: Jurisdiction */}
           <div style={{ marginBottom: '2rem' }}>
-            <h3 style={{ fontSize: '0.9rem', color: '#16a34a', fontWeight: '700', marginBottom: '1.25rem', textTransform: 'uppercase', letterSpacing: '0.05em' }}>
+            <h3 style={{ fontSize: '0.9rem', color: '#4f6d54', fontWeight: '700', marginBottom: '1.25rem', textTransform: 'uppercase', letterSpacing: '0.05em' }}>
               Jurisdiction
             </h3>
 
@@ -443,7 +443,7 @@ const AdminOfficialsEdit = () => {
                       style={{
                         background: 'none',
                         border: 'none',
-                        color: '#16a34a',
+                        color: '#4f6d54',
                         fontWeight: '600',
                         fontSize: '0.85rem',
                         cursor: 'pointer',
@@ -492,7 +492,7 @@ const AdminOfficialsEdit = () => {
 
           {/* Section 3: Account Credentials */}
           <div style={{ marginBottom: '2rem' }}>
-            <h3 style={{ fontSize: '0.9rem', color: '#16a34a', fontWeight: '700', marginBottom: '1.25rem', textTransform: 'uppercase', letterSpacing: '0.05em' }}>
+            <h3 style={{ fontSize: '0.9rem', color: '#4f6d54', fontWeight: '700', marginBottom: '1.25rem', textTransform: 'uppercase', letterSpacing: '0.05em' }}>
               Account Credentials
             </h3>
 
@@ -541,7 +541,7 @@ const AdminOfficialsEdit = () => {
 
           {/* Section 4: Status & Media */}
           <div style={{ marginBottom: '2.5rem' }}>
-            <h3 style={{ fontSize: '0.9rem', color: '#16a34a', fontWeight: '700', marginBottom: '1.25rem', textTransform: 'uppercase', letterSpacing: '0.05em' }}>
+            <h3 style={{ fontSize: '0.9rem', color: '#4f6d54', fontWeight: '700', marginBottom: '1.25rem', textTransform: 'uppercase', letterSpacing: '0.05em' }}>
               Status & Media
             </h3>
 
@@ -600,7 +600,7 @@ const AdminOfficialsEdit = () => {
                 display: 'flex',
                 alignItems: 'center',
                 gap: '0.5rem',
-                backgroundColor: '#16a34a',
+                backgroundColor: '#4f6d54',
                 color: '#ffffff',
                 border: 'none',
                 padding: '0.65rem 1.25rem',

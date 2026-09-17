@@ -2,7 +2,7 @@ import { useState, useEffect } from 'react';
 import { Plus, Edit2, Trash2, ShieldCheck, Search, KeyRound, Eye, EyeOff } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import axios from 'axios';
-
+import Swal from 'sweetalert2';
 
 const AdminOfficials = () => {
   const navigate = useNavigate();
@@ -41,11 +41,25 @@ const AdminOfficials = () => {
     fetchOfficials();
   }, []);
 
-
-
-  const handleDelete = (id) => {
-    if (window.confirm("Are you sure you want to delete this Government Official?")) {
+  const handleDelete = async (id) => {
+    const result = await Swal.fire({
+      title: 'Delete Official?',
+      text: 'Are you sure you want to delete this Government Official?',
+      icon: 'warning',
+      showCancelButton: true,
+      confirmButtonColor: '#ef4444',
+      cancelButtonColor: '#64748b',
+      confirmButtonText: 'Yes, delete it!'
+    });
+    if (result.isConfirmed) {
       setOfficials(prev => prev.filter(o => o._id !== id));
+      Swal.fire({
+        title: 'Deleted!',
+        text: 'Government Official removed.',
+        icon: 'success',
+        timer: 1800,
+        showConfirmButton: false
+      });
     }
   };
 
@@ -63,7 +77,7 @@ const AdminOfficials = () => {
         <h3 style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
           <ShieldCheck size={24} /> Government Official List
         </h3>
-        <button onClick={() => navigate('/admin-dashboard/officials/add')} className="btn-admin-add" style={{ display: 'flex', alignItems: 'center', gap: '8px', padding: '0.5rem 1rem', backgroundColor: '#16A34A', color: 'white', border: 'none', borderRadius: '4px', cursor: 'pointer', textDecoration: 'none' }}>
+        <button onClick={() => navigate('/admin-dashboard/officials/add')} className="btn-admin-add" style={{ display: 'flex', alignItems: 'center', gap: '8px', padding: '0.5rem 1rem', backgroundColor: '#4f6d54', color: 'white', border: 'none', borderRadius: '6px', cursor: 'pointer', textDecoration: 'none', fontWeight: 600 }}>
           <Plus size={16} /> Add Official
         </button>
       </div>
@@ -97,8 +111,9 @@ const AdminOfficials = () => {
                     <td style={{ padding: '0.75rem' }}>
                       <span style={{ 
                         fontSize: '0.8rem', fontWeight: 'bold', padding: '0.2rem 0.5rem', borderRadius: '4px',
-                        color: official.status === 'Active' ? '#16A34A' : '#ef4444', 
-                        backgroundColor: official.status === 'Active' ? '#dcfce7' : '#fee2e2',
+                        color: official.status === 'Active' ? '#4f6d54' : '#ef4444', 
+                        backgroundColor: official.status === 'Active' ? '#edf2ee' : '#fee2e2',
+                        border: official.status === 'Active' ? '1px solid #cbd7cd' : '1px solid #fecaca',
                       }}>{official.status || 'Active'}</span>
                     </td>
                     <td style={{ padding: '0.75rem' }}>

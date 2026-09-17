@@ -102,7 +102,7 @@ const complaintSchema = new mongoose.Schema({
   slaDeadline: { type: Date },
   slaStatus: { 
     type: String, 
-    enum: ['On Time', 'Due Soon', 'Overdue', 'Resolved Within SLA', 'Resolved After SLA', 'Not Applicable'], 
+    enum: ['On Time', 'Due Soon', 'Due Today', 'Overdue', 'Resolved Within SLA', 'Resolved After SLA', 'Not Applicable'], 
     default: 'On Time' 
   },
   assignedAt: { type: Date },

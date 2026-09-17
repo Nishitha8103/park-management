@@ -9,31 +9,46 @@ import {
   Wrench, 
   AlertTriangle, 
   Clock, 
-  ClipboardCheck,
-  CheckCheck,
-  ArrowRight,
-  RefreshCw
+  ClipboardCheck, 
+  CheckCheck, 
+  ArrowRight, 
+  RefreshCw,
+  Sparkles
 } from 'lucide-react';
 import './ContractorNotifications.css';
 import ContractorSidebar from '../components/ContractorSidebar';
+import NotificationDropdown from '../components/NotificationDropdown';
 import axios from 'axios';
 
 const ContractorNotifications = () => {
   const navigate = useNavigate();
-  const [contractor, setContractor] = useState(null);
+  const [contractor, setContractor] = useState(() => {
+    try {
+      const storedUser = localStorage.getItem('contractorUser');
+      return storedUser ? JSON.parse(storedUser) : null;
+    } catch {
+      return null;
+    }
+  });
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
   const [notifications, setNotifications] = useState([]);
   const [loading, setLoading] = useState(true);
   const [filter, setFilter] = useState('All'); // All, Unread, Alerts, Inspections
 
   useEffect(() => {
-    const storedUser = localStorage.getItem('contractorUser');
-    if (!storedUser) {
-      navigate('/login');
-    } else {
-      setContractor(JSON.parse(storedUser));
+    if (!contractor) {
+      const storedUser = localStorage.getItem('contractorUser');
+      if (!storedUser) {
+        navigate('/login');
+        return;
+      }
+      try {
+        setContractor(JSON.parse(storedUser));
+      } catch {
+        navigate('/login');
+      }
     }
-  }, [navigate]);
+  }, [contractor, navigate]);
 
   const fetchNotifications = async () => {
     if (!contractor) return;
@@ -52,7 +67,9 @@ const ContractorNotifications = () => {
   };
 
   useEffect(() => {
-    fetchNotifications();
+    if (contractor) {
+      fetchNotifications();
+    }
   }, [contractor]);
 
   const toggleSidebar = () => setIsSidebarOpen(!isSidebarOpen);
@@ -151,56 +168,30 @@ const ContractorNotifications = () => {
               <span>Portal</span>
             </div>
             
-            <div className="contractor-user-info" style={{ display: 'flex', alignItems: 'center', gap: '1.5rem' }}>
-              <div 
-                className="header-notification-icon" 
-                onClick={() => navigate('/contractor/notifications')}
-                style={{ cursor: 'pointer', position: 'relative', display: 'flex', alignItems: 'center', justifyContent: 'center' }}
-              >
-                <Bell size={22} style={{ color: '#475569' }} />
-                {unreadCount > 0 && (
-                  <span style={{ position: 'absolute', top: '-6px', right: '-6px', background: '#ef4444', color: 'white', fontSize: '0.65rem', fontWeight: 'bold', padding: '2px 5px', borderRadius: '10px', minWidth: '16px', textAlign: 'center' }}>
-                    {unreadCount > 99 ? '99+' : unreadCount}
-                  </span>
-                )}
+            <div className="contractor-user-info">
+              <NotificationDropdown userId={contractor._id || contractor.id || contractor.contractorId} role="contractor" />
+              <div className="contractor-user-details">
+                <h4 className="contractor-user-name">{contractor.name}</h4>
+                <p className="contractor-user-role">{contractor.department || 'Maintenance Contractor'}</p>
               </div>
-              <div className="contractor-user-details" style={{ display: 'flex', flexDirection: 'column', alignItems: 'flex-end', marginLeft: '0.5rem' }}>
-                <h4 className="contractor-user-name" style={{ margin: 0 }}>{contractor.name}</h4>
-                <p className="contractor-user-role" style={{ margin: 0, fontSize: '0.8rem', color: '#64748b' }}>{contractor.department || 'Maintenance Contractor'}</p>
-              </div>
-              <button className="btn-contractor-logout" onClick={handleLogout} style={{ marginLeft: '0.5rem' }}>
+              <button className="btn-contractor-logout" onClick={handleLogout}>
                 <LogOut size={16} /> Logout
               </button>
             </div>
           </div>
         </header>
 
-        <div className="contractor-notifications-page container">
-          <div className="notifications-header-row" style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: '1rem', marginBottom: '1.5rem' }}>
-            <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem' }}>
-              <div style={{ background: '#ecfdf5', padding: '10px', borderRadius: '12px', color: '#059669', display: 'flex' }}>
-                <Bell size={24} />
-              </div>
+        <main className="contractor-dashboard-container container">
+          <div className="contractor-notifications-page">
+            <div className="notifications-header">
               <div>
-                <h2 style={{ margin: 0, fontSize: '1.5rem', fontWeight: 'bold', color: '#1e293b' }}>Maintenance & Task Alerts</h2>
-                <p style={{ margin: 0, color: '#64748b', fontSize: '0.9rem' }}>Real-time alerts, scheduled reminders, and task status updates</p>
+                <h2>Maintenance & Task Alerts</h2>
+                <p style={{ color: '#ecfdf5', margin: '4px 0 0 0', fontSize: '0.9rem' }}>Real-time alerts, scheduled reminders, and task status updates</p>
               </div>
             </div>
 
-            <div style={{ display: 'flex', gap: '0.75rem', alignItems: 'center' }}>
-              {unreadCount > 0 && (
-                <button 
-                  onClick={markAllAsRead}
-                  style={{ display: 'flex', alignItems: 'center', gap: '0.4rem', padding: '8px 14px', background: '#f1f5f9', border: '1px solid #cbd5e1', borderRadius: '8px', cursor: 'pointer', fontWeight: 600, color: '#334155' }}
-                >
-                  <CheckCheck size={16} /> Mark all as read
-                </button>
-              )}
-            </div>
-          </div>
-
-          {/* Filter Tabs */}
-          <div style={{ display: 'flex', gap: '0.5rem', marginBottom: '1.5rem', borderBottom: '1px solid #e2e8f0', paddingBottom: '0.5rem' }}>
+            {/* Filter Tabs */}
+            <div style={{ display: 'flex', gap: '0.5rem', marginBottom: '1.5rem', borderBottom: '1px solid #e2e8f0', paddingBottom: '0.5rem' }}>
             {['All', 'Unread', 'Alerts', 'Inspections'].map(t => (
               <button
                 key={t}
@@ -307,7 +298,7 @@ const ContractorNotifications = () => {
             )}
           </div>
         </div>
-        
+      </main>
       </div>
     </div>
   );

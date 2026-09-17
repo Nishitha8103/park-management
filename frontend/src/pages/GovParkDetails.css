@@ -9,9 +9,9 @@
   display: inline-flex;
   align-items: center;
   gap: 0.5rem;
-  color: #064e3b !important;
+  color: #28372b !important;
   background-color: #ffffff !important;
-  border: 1.5px solid #059669 !important;
+  border: 1.5px solid #4f6d54 !important;
   padding: 0.5rem 1rem;
   border-radius: 20px;
   font-weight: 700;
@@ -23,7 +23,7 @@
 
 .gov-back-btn:hover,
 .gov-back-link:hover {
-  background-color: #059669 !important;
+  background-color: #4f6d54 !important;
   color: #ffffff !important;
 }
 
@@ -87,8 +87,9 @@
 }
 
 .gov-badge-active {
-  background-color: #dcfce7;
-  color: #16a34a;
+  background-color: #edf2ee;
+  color: #28372b;
+  border: 1px solid #cbd7cd;
   padding: 0.25rem 0.75rem;
   border-radius: 9999px;
   font-size: 0.75rem;
@@ -114,7 +115,7 @@
 }
 
 .gov-stat-item-icon {
-  color: #059669;
+  color: #4f6d54;
   display: flex;
   justify-content: center;
   align-items: flex-start;
@@ -148,12 +149,12 @@
 }
 
 .gov-facility-icon {
-  color: #10b981;
+  color: #4f6d54;
 }
 
 .gov-btn-full {
   width: 100%;
-  background-color: #06402b;
+  background-color: #4f6d54;
   color: white;
   border: none;
   padding: 1rem;
@@ -169,7 +170,7 @@
 }
 
 .gov-btn-full:hover {
-  background-color: #042a1c;
+  background-color: #384e3c;
 }
 
 @media (max-width: 1024px) {

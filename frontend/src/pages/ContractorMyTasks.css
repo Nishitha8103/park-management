@@ -23,12 +23,13 @@
   flex-wrap: wrap;
   gap: 1rem;
   padding: 1.5rem 1.75rem;
-  background: linear-gradient(135deg, #0f172a 0%, #1e293b 100%);
-  border-bottom: 1px solid rgba(255,255,255,0.06);
+  background: #84cc16;
+  background: linear-gradient(135deg, #65a30d 0%, #84cc16 65%, #a3e635 100%);
+  border-bottom: 1px solid #bef264;
 }
 
 .contractor-panel-header h3 {
-  font-size: 1.15rem;
+  font-size: 1.25rem;
   font-weight: 800;
   color: #ffffff;
   margin: 0;
@@ -43,28 +44,27 @@
 }
 
 .contractor-filter-btn {
-  background: rgba(255,255,255,0.07);
-  color: #94a3b8;
-  border: 1.5px solid rgba(255,255,255,0.1);
-  padding: 0.4rem 1rem;
-  border-radius: 8px;
+  background: rgba(255, 255, 255, 0.2);
+  color: #ffffff;
+  border: 1.5px solid rgba(255, 255, 255, 0.35);
+  padding: 0.45rem 1.1rem;
+  border-radius: 20px;
   font-size: 0.82rem;
-  font-weight: 600;
+  font-weight: 700;
   cursor: pointer;
   transition: all 0.2s ease;
 }
 
 .contractor-filter-btn:hover {
-  background: rgba(255,255,255,0.14);
-  color: #e2e8f0;
-  border-color: rgba(255,255,255,0.2);
+  background: rgba(255, 255, 255, 0.35);
+  color: #ffffff;
 }
 
 .contractor-filter-btn.active {
-  background: #d97706;
-  color: #fff;
-  border-color: #d97706;
-  box-shadow: 0 3px 10px rgba(217,119,6,0.3);
+  background: #ffffff;
+  color: #4d7c0f;
+  border-color: #ffffff;
+  box-shadow: 0 3px 10px rgba(0, 0, 0, 0.15);
 }
 
 /* ---- Table Container ---- */

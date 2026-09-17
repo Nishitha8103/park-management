@@ -92,11 +92,20 @@ import GovLayout from './layouts/GovLayout';
 import SplashScreen from './components/SplashScreen';
 
 function App() {
-  const [showSplash, setShowSplash] = useState(true);
+  const [showSplash, setShowSplash] = useState(() => {
+    // Only show splash screen once per browser session (when project is launched/opened)
+    const hasSeenSplash = sessionStorage.getItem('hasSeenSplashScreen');
+    return !hasSeenSplash;
+  });
+
+  const handleSplashFinish = () => {
+    sessionStorage.setItem('hasSeenSplashScreen', 'true');
+    setShowSplash(false);
+  };
 
   return (
     <Router>
-      {showSplash && <SplashScreen onFinish={() => setShowSplash(false)} duration={3000} />}
+      {showSplash && <SplashScreen onFinish={handleSplashFinish} duration={2000} />}
       <CustomPopupModal />
       <Routes>
         <Route path="/" element={<Home />} />

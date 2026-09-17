@@ -1,0 +1,655 @@
+/* ==========================================================================
+   Government Official Module - Leave & Availability Management
+   Color Scheme: Deep Olive / Sage Green (#28372b, #384e3c, #4f6d54, #edf2ee)
+   ========================================================================== */
+
+.gov-leave-mgmt-container {
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
+  width: 100%;
+  box-sizing: border-box;
+}
+
+/* Status Banner matching Government Official Sage / Olive Theme */
+.gov-leave-status-banner {
+  background: linear-gradient(135deg, #28372b 0%, #384e3c 60%, #4f6d54 100%);
+  border: 1px solid rgba(168, 203, 176, 0.35);
+  border-radius: 18px;
+  padding: 1.85rem 2.2rem;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 1.5rem;
+  box-shadow: 0 10px 30px rgba(40, 55, 43, 0.25);
+  color: #ffffff;
+  width: 100%;
+  box-sizing: border-box;
+}
+
+@media (max-width: 768px) {
+  .gov-leave-status-banner {
+    flex-direction: column;
+    align-items: flex-start;
+    padding: 1.5rem;
+  }
+}
+
+.gov-status-banner-info {
+  display: flex;
+  flex-direction: column;
+  gap: 0.65rem;
+  flex: 1;
+}
+
+.gov-status-badge-wrap {
+  display: flex;
+  align-items: center;
+}
+
+.gov-status-pill {
+  font-size: 0.8rem;
+  font-weight: 800;
+  padding: 5px 14px;
+  border-radius: 20px;
+  letter-spacing: 0.4px;
+  display: inline-flex;
+  align-items: center;
+  backdrop-filter: blur(4px);
+}
+
+.gov-status-pill.available {
+  background: #edf2ee;
+  color: #28372b;
+  border: 1px solid #cbd7cd;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+}
+
+.gov-status-pill.on-leave {
+  background: #fef3c7;
+  color: #b45309;
+  border: 1px solid #fde68a;
+}
+
+.gov-status-pill.unavailable {
+  background: #fee2e2;
+  color: #b91c1c;
+  border: 1px solid #fca5a5;
+}
+
+.gov-status-banner-title {
+  font-size: 1.5rem;
+  font-weight: 800;
+  color: #ffffff;
+  margin: 0;
+  letter-spacing: -0.015em;
+}
+
+.gov-status-banner-desc {
+  font-size: 0.92rem;
+  color: #e5ede7;
+  line-height: 1.55;
+  margin: 0;
+  max-width: 760px;
+  font-weight: 400;
+}
+
+.gov-status-banner-desc strong {
+  color: #ffffff;
+  font-weight: 700;
+}
+
+.gov-btn-apply-leave {
+  background: #ffffff;
+  color: #2d3e30;
+  border: 1px solid rgba(255, 255, 255, 0.8);
+  padding: 0.85rem 1.65rem;
+  border-radius: 12px;
+  font-weight: 800;
+  font-size: 0.95rem;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  box-shadow: 0 6px 18px rgba(0, 0, 0, 0.18);
+  transition: all 0.2s ease;
+  white-space: nowrap;
+}
+
+.gov-btn-apply-leave:hover {
+  background: #edf2ee;
+  color: #1f2a21;
+  transform: translateY(-2px);
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.24);
+}
+
+/* Alert Boxes */
+.gov-leave-alert {
+  padding: 1rem 1.4rem;
+  border-radius: 12px;
+  font-size: 0.92rem;
+  font-weight: 600;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.gov-leave-alert.success {
+  background: #edf2ee;
+  color: #2d3e30;
+  border: 1px solid #cbd7cd;
+}
+
+.gov-leave-alert.error {
+  background: #fef2f2;
+  color: #991b1b;
+  border: 1px solid #fecaca;
+}
+
+/* History Card */
+.gov-leave-history-card {
+  background: #ffffff;
+  border-radius: 18px;
+  border: 1px solid #d8e2da;
+  overflow: hidden;
+  box-shadow: 0 4px 18px rgba(45, 62, 48, 0.05);
+  width: 100%;
+  min-height: 480px;
+  display: flex;
+  flex-direction: column;
+}
+
+.gov-history-card-header {
+  padding: 1.25rem 1.75rem;
+  background: #ffffff;
+  border-bottom: 1px solid #edf2ee;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.gov-history-card-header h4 {
+  margin: 0;
+  font-size: 1.15rem;
+  font-weight: 800;
+  color: #1f2a21;
+}
+
+.gov-btn-refresh-leaves {
+  background: #f4f7f4;
+  border: 1px solid #cbd7cd;
+  color: #384e3c;
+  padding: 6px 14px;
+  border-radius: 8px;
+  font-size: 0.82rem;
+  font-weight: 700;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  transition: all 0.2s ease;
+}
+
+.gov-btn-refresh-leaves:hover {
+  background: #edf2ee;
+  color: #1f2a21;
+  border-color: #4f6d54;
+}
+
+/* Loading & Empty States */
+.gov-leave-loading {
+  padding: 5rem 2rem;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 12px;
+  color: #5e7263;
+  font-size: 0.95rem;
+  flex: 1;
+}
+
+.gov-spin-icon {
+  animation: govSpin 1s linear infinite;
+  color: #4f6d54;
+}
+
+@keyframes govSpin {
+  from { transform: rotate(0deg); }
+  to { transform: rotate(360deg); }
+}
+
+.gov-leave-empty-state {
+  padding: 6rem 2rem;
+  text-align: center;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  flex: 1;
+}
+
+.gov-empty-title {
+  font-size: 1.1rem;
+  font-weight: 800;
+  color: #1f2a21;
+  margin: 1rem 0 0.4rem 0;
+}
+
+.gov-empty-sub {
+  font-size: 0.88rem;
+  color: #5e7263;
+  max-width: 500px;
+  line-height: 1.5;
+  margin: 0;
+}
+
+/* Table */
+.gov-leave-table-wrapper {
+  overflow-x: auto;
+  width: 100%;
+  flex: 1;
+}
+
+.gov-leave-table {
+  width: 100%;
+  border-collapse: collapse;
+  text-align: left;
+  font-size: 0.9rem;
+}
+
+.gov-leave-table th {
+  background: #f8faf8;
+  padding: 1rem 1.4rem;
+  font-size: 0.8rem;
+  text-transform: uppercase;
+  letter-spacing: 0.6px;
+  font-weight: 800;
+  color: #5e7263;
+  border-bottom: 2px solid #e2e8e3;
+}
+
+.gov-leave-table td {
+  padding: 1.1rem 1.4rem;
+  border-bottom: 1px solid #f0f4f1;
+  vertical-align: middle;
+}
+
+.gov-leave-table tbody tr:hover {
+  background-color: #fbfdfb;
+}
+
+.gov-duration-pill {
+  background: #edf2ee;
+  color: #2d3e30;
+  font-size: 0.78rem;
+  font-weight: 700;
+  padding: 4px 10px;
+  border-radius: 12px;
+  border: 1px solid #d8e2da;
+}
+
+.gov-leave-status-tag {
+  font-size: 0.78rem;
+  font-weight: 800;
+  padding: 4px 12px;
+  border-radius: 6px;
+  border: 1px solid transparent;
+  display: inline-block;
+  letter-spacing: 0.2px;
+}
+
+.gov-btn-cancel-leave {
+  background: #fee2e2;
+  color: #b91c1c;
+  border: 1px solid #fecaca;
+  padding: 5px 12px;
+  border-radius: 8px;
+  font-size: 0.78rem;
+  font-weight: 700;
+  cursor: pointer;
+  transition: background 0.2s;
+}
+
+.gov-btn-cancel-leave:hover {
+  background: #fecaca;
+}
+
+/* Modal Styling */
+.gov-leave-modal-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(31, 42, 33, 0.65);
+  backdrop-filter: blur(5px);
+  z-index: 9999;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 1rem;
+}
+
+.gov-leave-modal-dialog {
+  background: #ffffff;
+  border-radius: 20px;
+  width: 100%;
+  max-width: 600px;
+  max-height: 90vh;
+  overflow-y: auto;
+  box-shadow: 0 25px 50px -12px rgba(31, 42, 33, 0.35);
+  border: 1px solid #d8e2da;
+  animation: govModalPop 0.22s ease-out;
+}
+
+@keyframes govModalPop {
+  from { transform: scale(0.96); opacity: 0; }
+  to { transform: scale(1); opacity: 1; }
+}
+
+.gov-leave-modal-header {
+  padding: 1.4rem 1.75rem;
+  background: #f8faf8;
+  border-bottom: 1px solid #edf2ee;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  position: sticky;
+  top: 0;
+  z-index: 10;
+}
+
+.gov-leave-modal-header h3 {
+  margin: 0;
+  font-size: 1.2rem;
+  font-weight: 800;
+  color: #1f2a21;
+}
+
+.gov-btn-modal-close {
+  background: transparent;
+  border: none;
+  color: #5e7263;
+  cursor: pointer;
+  padding: 5px;
+  border-radius: 8px;
+  transition: all 0.15s;
+}
+
+.gov-btn-modal-close:hover {
+  background: #edf2ee;
+  color: #1f2a21;
+}
+
+.gov-leave-modal-form {
+  padding: 1.75rem;
+  display: flex;
+  flex-direction: column;
+  gap: 1.25rem;
+}
+
+.gov-form-info-notice {
+  background: #f4f7f4;
+  border: 1px solid #cbd7cd;
+  border-radius: 10px;
+  padding: 0.85rem 1.1rem;
+  font-size: 0.85rem;
+  color: #2d3e30;
+  display: flex;
+  gap: 10px;
+  line-height: 1.45;
+  align-items: flex-start;
+}
+
+.gov-form-row-dates {
+  display: flex;
+  align-items: flex-end;
+  gap: 0.75rem;
+}
+
+.gov-form-date-separator {
+  padding-bottom: 0.75rem;
+  font-weight: 800;
+  color: #5e7263;
+  font-size: 1.1rem;
+}
+
+.gov-form-field {
+  display: flex;
+  flex-direction: column;
+  gap: 0.45rem;
+  flex: 1;
+}
+
+.gov-form-field label {
+  font-size: 0.82rem;
+  font-weight: 800;
+  color: #2d3e30;
+  letter-spacing: 0.2px;
+}
+
+.gov-form-field input,
+.gov-form-field select,
+.gov-form-field textarea {
+  border: 1.5px solid #cbd7cd;
+  border-radius: 10px;
+  padding: 0.7rem 0.95rem;
+  font-size: 0.92rem;
+  font-family: inherit;
+  color: #1f2a21;
+  background-color: #ffffff;
+  outline: none;
+  transition: all 0.2s;
+}
+
+.gov-form-field select {
+  cursor: pointer;
+}
+
+.gov-form-field input:focus,
+.gov-form-field select:focus,
+.gov-form-field textarea:focus {
+  border-color: #4f6d54;
+  box-shadow: 0 0 0 3px rgba(79, 109, 84, 0.2);
+}
+
+/* Duration Radio Group */
+.gov-duration-radio-group {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.65rem;
+  margin-top: 0.2rem;
+}
+
+.gov-duration-radio-label {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 0.6rem 1rem;
+  border: 1.5px solid #d8e2da;
+  border-radius: 10px;
+  font-size: 0.86rem;
+  font-weight: 600;
+  color: #384e3c;
+  cursor: pointer;
+  background: #f8faf8;
+  transition: all 0.15s ease;
+  user-select: none;
+}
+
+.gov-duration-radio-label:hover {
+  background: #edf2ee;
+  border-color: #cbd7cd;
+}
+
+.gov-duration-radio-label.active {
+  background: #edf2ee;
+  border-color: #4f6d54;
+  color: #1f2a21;
+  font-weight: 800;
+  box-shadow: 0 2px 8px rgba(79, 109, 84, 0.18);
+}
+
+.gov-duration-radio-label input[type="radio"] {
+  accent-color: #4f6d54;
+  cursor: pointer;
+  margin: 0;
+}
+
+/* Supporting Document Upload */
+.gov-upload-dropzone {
+  border: 2px dashed #cbd7cd;
+  border-radius: 12px;
+  padding: 1.25rem;
+  text-align: center;
+  background: #fbfdfb;
+  cursor: pointer;
+  transition: all 0.2s;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 8px;
+}
+
+.gov-upload-dropzone:hover {
+  border-color: #4f6d54;
+  background: #edf2ee;
+}
+
+.gov-upload-btn-label {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  background: white;
+  border: 1px solid #cbd7cd;
+  color: #384e3c;
+  font-weight: 800;
+  font-size: 0.88rem;
+  padding: 0.55rem 1.1rem;
+  border-radius: 8px;
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.04);
+}
+
+.gov-upload-hint {
+  font-size: 0.78rem;
+  color: #5e7263;
+}
+
+.gov-uploaded-file-pill {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  background: #edf2ee;
+  border: 1px solid #cbd7cd;
+  border-radius: 10px;
+  padding: 0.7rem 1rem;
+  gap: 10px;
+}
+
+.gov-file-info {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 0.88rem;
+  font-weight: 700;
+  color: #28372b;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.gov-btn-remove-file {
+  background: transparent;
+  border: none;
+  color: #ef4444;
+  cursor: pointer;
+  padding: 4px;
+  border-radius: 6px;
+}
+
+.gov-btn-remove-file:hover {
+  background: #fee2e2;
+}
+
+.gov-leave-modal-actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 0.85rem;
+  margin-top: 0.35rem;
+  padding-top: 1.25rem;
+  border-top: 1px solid #edf2ee;
+}
+
+.gov-btn-modal-cancel {
+  background: #f4f7f4;
+  color: #384e3c;
+  border: 1px solid #cbd7cd;
+  padding: 0.7rem 1.3rem;
+  border-radius: 10px;
+  font-weight: 700;
+  font-size: 0.9rem;
+  cursor: pointer;
+  transition: all 0.15s;
+}
+
+.gov-btn-modal-cancel:hover {
+  background: #edf2ee;
+  color: #1f2a21;
+}
+
+.gov-btn-modal-submit {
+  background: linear-gradient(135deg, #3d5542 0%, #4f6d54 100%);
+  color: white;
+  border: none;
+  padding: 0.7rem 1.5rem;
+  border-radius: 10px;
+  font-weight: 800;
+  font-size: 0.9rem;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  transition: all 0.2s;
+  box-shadow: 0 4px 14px rgba(45, 62, 48, 0.25);
+}
+
+.gov-btn-modal-submit:hover {
+  background: linear-gradient(135deg, #28372b 0%, #384e3c 100%);
+  transform: translateY(-1px);
+}
+
+/* Badge for leave type in table */
+.gov-badge-leave-type {
+  display: inline-block;
+  background: #edf2ee;
+  color: #28372b;
+  font-size: 0.76rem;
+  font-weight: 800;
+  padding: 3px 9px;
+  border-radius: 6px;
+  margin-bottom: 3px;
+  border: 1px solid #cbd7cd;
+}
+
+.gov-badge-duration {
+  display: inline-block;
+  background: #f1f5f9;
+  color: #475569;
+  font-size: 0.72rem;
+  font-weight: 600;
+  padding: 2px 6px;
+  border-radius: 4px;
+}
+
+.gov-link-doc {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  font-size: 0.8rem;
+  font-weight: 700;
+  color: #4f6d54;
+  text-decoration: underline;
+  cursor: pointer;
+}
+
+.gov-link-doc:hover {
+  color: #28372b;
+}
