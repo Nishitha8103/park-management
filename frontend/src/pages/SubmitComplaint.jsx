@@ -166,9 +166,7 @@ const SubmitComplaint = () => {
         submitData.append('images', selectedFile);
       }
 
-      const res = await axios.post('/api/complaints', submitData, {
-        headers: { 'Content-Type': 'multipart/form-data' }
-      });
+      const res = await axios.post('/api/complaints', submitData);
 
       const newId = res.data.complaintNumber || ('CMP' + Math.floor(100000000 + Math.random() * 900000000));
       setComplaintId(newId);
