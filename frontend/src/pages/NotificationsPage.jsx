@@ -118,11 +118,12 @@ const NotificationsPage = () => {
     const meta = getCategoryMeta(notif);
 
     if (user.role === 'citizen') {
-      if (meta.badgeText === 'Complaint' && notif.relatedEntityId) {
-        navigate('/track-complaint', { state: { id: notif.relatedEntityId } });
+      const targetRoute = notif.actionRoute || meta.defaultRoute;
+      if (targetRoute && targetRoute.includes('/track-complaint') && notif.relatedEntityId) {
+        navigate(targetRoute, { state: { id: notif.relatedEntityId } });
         return;
       }
-      navigate(notif.actionRoute || meta.defaultRoute);
+      navigate(targetRoute);
     } else if (user.role === 'contractor') {
       if (meta.badgeText === 'Complaint') {
         navigate(notif.relatedEntityId ? `/contractor/task/${notif.relatedEntityId}` : '/contractor/tasks');

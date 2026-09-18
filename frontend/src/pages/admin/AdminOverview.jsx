@@ -315,19 +315,41 @@ const AdminOverview = () => {
         marginBottom: '1.75rem'
       }}>
         <h3 style={{ color: DARK.textPrimary, marginTop: 0, marginBottom: '1rem', fontSize: '1.05rem', fontWeight: 700 }}>Park Health & Live Issues Map</h3>
+        <style>{`
+          .dark-map-tiles {
+            filter: invert(100%) hue-rotate(180deg) brightness(95%) contrast(90%);
+          }
+        `}</style>
         <div style={{ height: '400px', width: '100%', borderRadius: '10px', overflow: 'hidden', border: `1px solid ${DARK.border}` }}>
           {loading ? (
             <div style={{ height: '100%', display: 'flex', alignItems: 'center', justifyContent: 'center', color: DARK.textMuted, background: DARK.bg }}>Loading Map Data...</div>
           ) : (
             <MapContainer center={[12.9716, 77.5946]} zoom={11} style={{ height: '100%', width: '100%' }}>
               <TileLayer
-                url="https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png"
-                attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors &copy; <a href="https://carto.com/">CARTO</a>'
+                className="dark-map-tiles"
+                url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
+                attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
               />
-              {parksData.map((park) => (
+              {parksData.map((park, index) => {
+                let lat = park.lat;
+                let lng = park.lng;
+                
+                // Calculate offset for overlapping markers
+                const sameCoordIndex = parksData.slice(0, index).filter(p => 
+                  p.lat === lat && p.lng === lng
+                ).length;
+                
+                if (sameCoordIndex > 0) {
+                  const angle = (sameCoordIndex * 137.5) * (Math.PI / 180);
+                  const radius = 0.003 * Math.ceil(sameCoordIndex / 3);
+                  lat += Math.sin(angle) * radius;
+                  lng += Math.cos(angle) * radius;
+                }
+
+                return (
                 <Marker 
                   key={park._id} 
-                  position={[park.lat, park.lng]}
+                  position={[lat, lng]}
                   icon={park.hasIssues ? redIcon : DefaultIcon}
                 >
                   <Popup>
@@ -346,7 +368,8 @@ const AdminOverview = () => {
                     </div>
                   </Popup>
                 </Marker>
-              ))}
+                );
+              })}
             </MapContainer>
           )}
         </div>

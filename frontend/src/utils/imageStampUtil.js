@@ -303,20 +303,43 @@ export const stampImageWithGeoAndTimestamp = async (
     fileName = `gps_map_${Date.now()}.jpg`
   } = options;
 
-  // 1. Resolve GPS Coordinates
+  // 1. Resolve GPS Coordinates synchronously or from provided options
   let geo = location;
-  if (!geo || !geo.latitude || !geo.longitude) {
-    geo = await getLiveGeoLocation();
+  if (!geo || (geo.latitude === undefined && geo.longitude === undefined)) {
+    try {
+      geo = await getLiveGeoLocation();
+    } catch (err) {
+      console.warn('Live geolocation resolution fallback:', err);
+      geo = { latitude: 0, longitude: 0 };
+    }
   }
 
   const lat = geo?.latitude ?? 0;
   const lon = geo?.longitude ?? 0;
 
   // 2. Resolve Geocoding Address Details
-  const addrDetails = (lat !== 0 || lon !== 0) ? await reverseGeocodeDetails(lat, lon) : {
-    cityStateCountry: 'GPS Location Unavailable',
-    fullAddress: 'Please enable GPS permissions in browser'
-  };
+  // If placeName or fullAddress is already provided, use it directly without making network requests
+  let addrDetails;
+  if (geo && (geo.placeName || geo.fullAddress)) {
+    addrDetails = {
+      cityStateCountry: geo.placeName || geo.fullAddress || 'Live Verified Location',
+      fullAddress: geo.fullAddress || geo.placeName || 'Live Verified Location'
+    };
+  } else if (lat !== 0 || lon !== 0) {
+    try {
+      addrDetails = await reverseGeocodeDetails(lat, lon);
+    } catch (e) {
+      addrDetails = {
+        cityStateCountry: `Lat ${Number(lat).toFixed(5)}°, Lon ${Number(lon).toFixed(5)}°`,
+        fullAddress: `GPS: ${lat}, ${lon}`
+      };
+    }
+  } else {
+    addrDetails = {
+      cityStateCountry: 'GPS Location Unavailable',
+      fullAddress: 'Please enable GPS permissions in browser'
+    };
+  }
 
   // 3. Render Canvas
   return new Promise((resolve, reject) => {

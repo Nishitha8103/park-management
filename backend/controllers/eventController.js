@@ -106,7 +106,7 @@ exports.registerForEvent = async (req, res) => {
     const event = await Event.findById(id);
     if (!event) return res.status(404).json({ message: 'Event not found' });
 
-    const attendees = numberOfAttendees || 1;
+    const attendees = Number(numberOfAttendees) || 1;
 
     // Check capacity
     if (event.capacity > 0) {
@@ -114,7 +114,7 @@ exports.registerForEvent = async (req, res) => {
         event: id,
         registrationStatus: { $in: ['Confirmed', 'Completed'] }
       });
-      const totalRegistered = confirmed.reduce((acc, reg) => acc + reg.numberOfAttendees, 0);
+      const totalRegistered = confirmed.reduce((acc, reg) => acc + (Number(reg.numberOfAttendees) || 1), 0);
       if (totalRegistered + attendees > event.capacity) {
         return res.status(400).json({ message: `Only ${Math.max(0, event.capacity - totalRegistered)} spots left for this event.` });
       }
@@ -183,7 +183,7 @@ exports.createRazorpayOrder = async (req, res) => {
       return res.status(400).json({ message: 'Invalid event or event is not paid' });
     }
 
-    const attendees = numberOfAttendees || 1;
+    const attendees = Number(numberOfAttendees) || 1;
 
     // Check capacity using only CONFIRMED registrations
     if (event.capacity > 0) {
@@ -191,7 +191,7 @@ exports.createRazorpayOrder = async (req, res) => {
         event: id,
         registrationStatus: { $in: ['Confirmed', 'Completed'] }
       });
-      const totalRegistered = confirmed.reduce((acc, reg) => acc + reg.numberOfAttendees, 0);
+      const totalRegistered = confirmed.reduce((acc, reg) => acc + (Number(reg.numberOfAttendees) || 1), 0);
       if (totalRegistered + attendees > event.capacity) {
         return res.status(400).json({ message: `Only ${Math.max(0, event.capacity - totalRegistered)} spots left for this event.` });
       }

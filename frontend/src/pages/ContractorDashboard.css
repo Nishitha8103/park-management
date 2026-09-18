@@ -12,15 +12,15 @@
 
 /* Header Navbar */
 .contractor-header {
-  background: #84cc16; /* Bright Spring / Leaf Lime-Green from reference image */
-  background: linear-gradient(90deg, #65a30d 0%, #84cc16 50%, #84cc16 100%);
+  background: #9cd938; /* Lighter Spring Green */
+  background: linear-gradient(90deg, #8fd127 0%, #9cd938 50%, #aae449 100%);
   color: white;
   padding: 1rem 0;
-  box-shadow: 0 4px 18px -2px rgba(101, 163, 13, 0.3);
+  box-shadow: 0 4px 18px -2px rgba(101, 163, 13, 0.2);
   position: sticky;
   top: 0;
   z-index: 100;
-  border-bottom: 2px solid #4d7c0f;
+  border-bottom: 2px solid #7bc210;
 }
 
 .contractor-header-content {
@@ -125,14 +125,14 @@
 
 /* Hero Banner matching Reference Image Lime-Green Top Banner */
 .contractor-hero-banner {
-  background: #84cc16; /* Bright leaf green base */
-  background: linear-gradient(135deg, #65a30d 0%, #84cc16 65%, #a3e635 100%);
-  border: 1px solid #a3e635;
+  background: #9cd938; /* Lighter spring green base */
+  background: linear-gradient(135deg, #8fd127 0%, #9cd938 65%, #aae449 100%);
+  border: 1px solid #bef264;
   border-radius: 16px;
   padding: 2rem 2.5rem;
   margin-bottom: 2rem;
   color: white;
-  box-shadow: 0 10px 25px -5px rgba(101, 163, 13, 0.35);
+  box-shadow: 0 10px 25px -5px rgba(101, 163, 13, 0.25);
   position: relative;
   overflow: hidden;
 }
@@ -334,12 +334,12 @@
 }
 
 .contractor-stat-card {
-  background: #84cc16; /* Lime/spring green from reference image */
-  background: linear-gradient(180deg, #84cc16 0%, #65a30d 100%);
+  background: #9cd938; /* Lighter spring green */
+  background: linear-gradient(180deg, #9cd938 0%, #8fd127 100%);
   border-radius: 14px;
   padding: 1.5rem;
-  border: 1px solid #a3e635;
-  box-shadow: 0 4px 15px rgba(101, 163, 13, 0.25);
+  border: 1px solid #bef264;
+  box-shadow: 0 4px 15px rgba(101, 163, 13, 0.2);
   cursor: pointer;
   transition: all 0.25s ease;
   display: flex;

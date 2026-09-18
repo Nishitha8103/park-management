@@ -3,7 +3,6 @@ import { useParams, useNavigate } from 'react-router-dom';
 import { ArrowLeft, X, Download, RotateCcw, AlertTriangle } from 'lucide-react';
 import './GovInspectionDetails.css';
 import RequestReassignmentModal from '../components/RequestReassignmentModal';
-import AssignmentHistoryTimeline from '../components/AssignmentHistoryTimeline';
 
 const API_BASE = '/api';
 
@@ -355,15 +354,6 @@ const GovInspectionDetails = () => {
           </div>
         </div>
       </div>
-
-      {/* Assignment & Reassignment Audit History Timeline */}
-      <AssignmentHistoryTimeline 
-        history={inspection.assignmentHistory} 
-        currentAssignee={govUser?.name || 'Government Official'} 
-        currentRole="government_official" 
-        initialAssignedDate={inspection.assignedAt || inspection.createdAt} 
-        dueDate={inspection.slaDeadline || (inspection.createdAt ? new Date(new Date(inspection.createdAt).getTime() + 48 * 3600 * 1000) : null)}
-      />
 
       {/* Full Image Overlay Modal */}
       {activeImage && (

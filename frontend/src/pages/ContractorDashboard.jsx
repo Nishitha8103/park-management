@@ -448,10 +448,28 @@ const ContractorDashboard = () => {
                       attribution='&copy; <a href="https://www.openstreetmap.org/">OpenStreetMap</a> contributors'
                       url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
                     />
-                    {filteredParks.map(park => (
+                    {filteredParks.map((park, index) => {
+                      // Apply slight jitter for overlapping markers (many parks share the exact same DB coords)
+                      let lat = parseFloat(park.latitude);
+                      let lng = parseFloat(park.longitude);
+                      
+                      // Calculate offset based on how many previous parks have the exact same coords
+                      const sameCoordIndex = filteredParks.slice(0, index).filter(p => 
+                        parseFloat(p.latitude) === lat && parseFloat(p.longitude) === lng
+                      ).length;
+                      
+                      if (sameCoordIndex > 0) {
+                        // Spread out in a small circle
+                        const angle = (sameCoordIndex * 137.5) * (Math.PI / 180);
+                        const radius = 0.003 * Math.ceil(sameCoordIndex / 3); // ~300 meters
+                        lat += Math.sin(angle) * radius;
+                        lng += Math.cos(angle) * radius;
+                      }
+                      
+                      return (
                       <Marker
                         key={park._id}
-                        position={[parseFloat(park.latitude), parseFloat(park.longitude)]}
+                        position={[lat, lng]}
                         icon={createColorIcon(statusColors[park.status] || '#6b7280')}
                       >
                         <Popup>
@@ -477,7 +495,8 @@ const ContractorDashboard = () => {
                           </div>
                         </Popup>
                       </Marker>
-                    ))}
+                      );
+                    })}
                   </MapContainer>
                 </div>
 

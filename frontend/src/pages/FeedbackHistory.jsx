@@ -57,12 +57,6 @@ const FeedbackHistory = () => {
                 <div className="history-item-header">
                   <div className="history-item-title-group">
                     <h3>{fb.parkName}</h3>
-                    <span 
-                      className="status-badge"
-                      style={{ backgroundColor: `${getStatusColor(fb.status)}15`, color: getStatusColor(fb.status) }}
-                    >
-                      {fb.status}
-                    </span>
                   </div>
                   <span className="history-date">{fb.date}</span>
                 </div>

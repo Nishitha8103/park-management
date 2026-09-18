@@ -23,6 +23,7 @@ export default function LiveCameraCaptureModal({
   const [cameraError, setCameraError] = useState('');
   const [processing, setProcessing] = useState(false);
   const [currentTime, setCurrentTime] = useState(new Date());
+  const [rawPhotoBlob, setRawPhotoBlob] = useState(null);
 
   // Location Search & Manual Edit State
   const [showSearch, setShowSearch] = useState(false);
@@ -236,10 +237,11 @@ export default function LiveCameraCaptureModal({
     setIsSearching(true);
     await applyCustomLocation(searchQuery.trim());
     setIsSearching(false);
-  };  const [rawPhotoBlob, setRawPhotoBlob] = useState(null);
+  };
 
-  const handleTakeSnapshot = async () => {
-    if (!videoRef.current || cameraError) return;
+  const handleTakeSnapshot = async (e) => {
+    if (e && e.preventDefault) e.preventDefault();
+    if (processing || !videoRef.current || cameraError) return;
     setProcessing(true);
 
     try {
@@ -251,20 +253,21 @@ export default function LiveCameraCaptureModal({
       ctx.drawImage(video, 0, 0, canvas.width, canvas.height);
 
       const blob = await new Promise((resolve) => canvas.toBlob(resolve, 'image/jpeg', 0.95));
+      if (!blob) throw new Error('Failed to create image blob');
       setRawPhotoBlob(blob);
       const rawFile = new File([blob], `live_capture_${Date.now()}.jpg`, { type: 'image/jpeg' });
 
       // Resolve live GPS or currently selected coordinates
-      const finalLat = location?.latitude;
-      const finalLon = location?.longitude;
+      const finalLat = location?.latitude ?? 0;
+      const finalLon = location?.longitude ?? 0;
       const finalPlaceName = placeName || fullAddress || 'Live Verified Location';
       const finalFullAddr = fullAddress || placeName || 'Live Verified Location';
 
-      // Apply watermark stamp with verified live location and timestamp
+      // Apply watermark stamp with verified live location and timestamp immediately
       const stamped = await stampImageWithGeoAndTimestamp(rawFile, {
         location: {
-          latitude: finalLat || 0,
-          longitude: finalLon || 0,
+          latitude: finalLat,
+          longitude: finalLon,
           placeName: finalPlaceName,
           fullAddress: finalFullAddr
         },
@@ -454,14 +457,19 @@ export default function LiveCameraCaptureModal({
           ) : (
             <div className="camera-trigger-group">
               <button
-                className="btn-camera-snap"
+                type="button"
+                className={`btn-camera-snap ${processing ? 'capturing' : ''}`}
                 onClick={handleTakeSnapshot}
                 disabled={processing || !!cameraError}
                 aria-label="Capture photo"
               >
-                <div className="btn-camera-snap-inner"></div>
+                <div className="btn-camera-snap-inner">
+                  {processing && <RefreshCw size={24} className="cam-spin-icon" />}
+                </div>
               </button>
-              <span className="camera-snap-hint">Tap to capture with live GPS location & date-time</span>
+              <span className="camera-snap-hint">
+                {processing ? 'Processing verified photo...' : 'Tap once to capture photo'}
+              </span>
             </div>
           )}
         </div>

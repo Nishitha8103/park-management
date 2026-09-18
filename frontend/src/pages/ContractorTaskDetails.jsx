@@ -1,10 +1,33 @@
 import { useEffect, useState } from 'react';
 import { useParams, Link, useNavigate } from 'react-router-dom';
-import { Menu, LogOut, ArrowLeft, User, Calendar, MapPin, Paperclip, Hourglass, Edit, Play, HardHat, FileText, Bell, Phone, Clock, AlertTriangle, CheckCircle, Tag, ExternalLink, Eye, ShieldAlert, Wrench, X, RotateCcw } from 'lucide-react';
+import { 
+  CheckCircle, 
+  Clock, 
+  MapPin, 
+  AlertTriangle, 
+  ArrowLeft,
+  FileText,
+  User,
+  Calendar,
+  ShieldAlert,
+  RotateCcw,
+  Wrench,
+  Tag,
+  Phone,
+  Paperclip,
+  Eye,
+  Menu,
+  HardHat,
+  Bell,
+  LogOut,
+  Play,
+  Edit,
+  Hourglass,
+  Send
+} from 'lucide-react';
 import './ContractorTaskDetails.css';
 import ContractorSidebar from '../components/ContractorSidebar';
 import RequestReassignmentModal from '../components/RequestReassignmentModal';
-import AssignmentHistoryTimeline from '../components/AssignmentHistoryTimeline';
 import { getSlaStatusAndRemaining } from '../utils/slaUtils';
 
 const ContractorTaskDetails = () => {
@@ -495,14 +518,6 @@ const ContractorTaskDetails = () => {
                     )}
                   </div>
                 </div>
-
-                {/* Integrated Assignment & Reassignment Audit Trail Timeline */}
-                <AssignmentHistoryTimeline 
-                  history={task.assignmentHistory} 
-                  currentAssignee={contractor?.name} 
-                  currentRole="contractor" 
-                  initialAssignedDate={task.assignedOn} 
-                />
 
               </div>
 

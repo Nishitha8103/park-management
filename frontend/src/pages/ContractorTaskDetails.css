@@ -1,17 +1,18 @@
 /* Contractor Task Details Page Styling - Compact Single Page View */
 .contractor-task-details-page {
   padding: 0.5rem 1.25rem 1.5rem 1.25rem;
-  background-color: transparent;
-  min-height: auto;
+  background-color: #ffffff;
+  min-height: calc(100vh - 70px);
 }
 
 .contractor-task-details-container {
-  max-width: 1400px;
+  max-width: 100%;
   width: 100%;
   margin: 0 auto;
   display: flex;
   flex-direction: column;
   gap: 0.85rem;
+  min-height: calc(100vh - 120px);
 }
 
 /* Loading & Error Screens */
@@ -48,11 +49,11 @@
   flex-wrap: wrap;
   gap: 0.75rem;
   padding: 0.85rem 1.5rem;
-  background: #84cc16;
-  background: linear-gradient(135deg, #65a30d 0%, #84cc16 65%, #a3e635 100%);
+  background: #9cd938;
+  background: linear-gradient(135deg, #8fd127 0%, #9cd938 65%, #aae449 100%);
   border-radius: 12px;
   border: 1px solid #bef264;
-  box-shadow: 0 4px 15px -3px rgba(101, 163, 13, 0.25);
+  box-shadow: 0 4px 15px -3px rgba(101, 163, 13, 0.15);
   position: relative;
   overflow: hidden;
 }

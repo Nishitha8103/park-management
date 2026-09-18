@@ -224,7 +224,7 @@ const AdminComplaints = () => {
                       <td style={{ padding: '12px 10px', color: '#475569' }}>{districtName}</td>
                       <td style={{ padding: '12px 10px', color: '#475569' }}>{zoneName}</td>
                       <td style={{ padding: '12px 10px', color: '#475569' }}>{wardName}</td>
-                      <td style={{ padding: '12px 10px' }}>{c.category}</td>
+                      <td style={{ padding: '12px 10px', color: '#475569', fontWeight: 500 }}>{c.category}</td>
                       <td style={{ padding: '12px 10px' }}>
                         <span style={{
                           padding: '2px 8px', borderRadius: '12px', fontSize: '0.75rem', fontWeight: 600,
@@ -270,29 +270,47 @@ const AdminComplaints = () => {
                           );
                         })()}
                       </td>
-                      <td style={{ padding: '12px 10px' }}>
-                        {c.assignedContractor?.name || <span style={{ color: '#94a3b8', fontStyle: 'italic' }}>Unassigned</span>}
+                      <td style={{ padding: '12px 10px', color: '#0f172a', fontWeight: 600 }}>
+                        {c.assignedContractor?.name || <span style={{ color: '#94a3b8', fontStyle: 'italic', fontWeight: 'normal' }}>Unassigned</span>}
                       </td>
                       <td style={{ padding: '12px 10px' }}>
-                        {['Completed', 'Completed - Waiting for Admin Review', 'Returned by Admin', 'Inspection Pending', 'Inspection Approved', 'Rework Required', 'Reassigned to Contractor', 'Closed'].includes(c.status) && c.contractorRemarks ? (
-                          <button
-                            onClick={() => setReportComplaint(c)}
-                            style={{
-                              display: 'flex', alignItems: 'center', gap: '5px',
-                              background: 'linear-gradient(135deg, #059669, #16a34a)',
-                              color: '#fff', border: 'none', padding: '5px 12px',
-                              borderRadius: '6px', cursor: 'pointer', fontSize: '0.78rem',
-                              fontWeight: 700, whiteSpace: 'nowrap',
-                              boxShadow: '0 1px 4px rgba(5,150,105,0.3)'
-                            }}
-                          >
-                            <FileText size={13} /> View Report
-                          </button>
-                        ) : ['Completed', 'Inspection Pending', 'Verified', 'Closed'].includes(c.status) ? (
-                          <span style={{ fontSize: '0.78rem', color: '#94a3b8', fontStyle: 'italic' }}>No report yet</span>
-                        ) : (
-                          <span style={{ fontSize: '0.78rem', color: '#cbd5e1' }}>—</span>
-                        )}
+                        <div style={{ display: 'flex', flexDirection: 'column', gap: '6px' }}>
+                          {['Completed', 'Completed - Waiting for Admin Review', 'Returned by Admin', 'Inspection Pending', 'Inspection Approved', 'Rework Required', 'Reassigned to Contractor', 'Closed'].includes(c.status) && c.contractorRemarks ? (
+                            <button
+                              onClick={() => setReportComplaint(c)}
+                              style={{
+                                display: 'flex', alignItems: 'center', gap: '5px',
+                                background: 'linear-gradient(135deg, #059669, #16a34a)',
+                                color: '#fff', border: 'none', padding: '5px 12px',
+                                borderRadius: '6px', cursor: 'pointer', fontSize: '0.78rem',
+                                fontWeight: 700, whiteSpace: 'nowrap',
+                                boxShadow: '0 1px 4px rgba(5,150,105,0.3)'
+                              }}
+                            >
+                              <FileText size={13} /> View Report
+                            </button>
+                          ) : ['Completed', 'Inspection Pending', 'Verified', 'Closed'].includes(c.status) ? (
+                            <span style={{ fontSize: '0.78rem', color: '#94a3b8', fontStyle: 'italic' }}>No report yet</span>
+                          ) : null}
+
+                          {c.images && c.images.length > 0 ? (
+                            <button
+                              onClick={() => setReportComplaint(c)}
+                              style={{
+                                display: 'flex', alignItems: 'center', gap: '5px',
+                                background: 'linear-gradient(135deg, #3b82f6, #2563eb)',
+                                color: '#fff', border: 'none', padding: '5px 12px',
+                                borderRadius: '6px', cursor: 'pointer', fontSize: '0.78rem',
+                                fontWeight: 700, whiteSpace: 'nowrap',
+                                boxShadow: '0 1px 4px rgba(37,99,235,0.3)'
+                              }}
+                            >
+                              <Image size={13} /> Public Issue
+                            </button>
+                          ) : (
+                            !['Completed', 'Completed - Waiting for Admin Review', 'Returned by Admin', 'Inspection Pending', 'Inspection Approved', 'Rework Required', 'Reassigned to Contractor', 'Closed'].includes(c.status) && <span style={{ fontSize: '0.78rem', color: '#cbd5e1' }}>—</span>
+                          )}
+                        </div>
                       </td>
                       <td style={{ padding: '12px 10px' }}>
                         <div style={{ display: 'flex', gap: '6px', flexWrap: 'wrap' }}>
@@ -372,6 +390,23 @@ const AdminComplaints = () => {
                   <div><strong>Current Status:</strong> <span style={{ background: '#dcfce7', color: '#15803d', padding: '2px 8px', borderRadius: '4px', fontWeight: 600 }}>{selectedComplaint.status}</span></div>
                 </div>
                 <p style={{ margin: '0.75rem 0 0 0', fontSize: '0.875rem', color: '#475569' }}><strong>Description:</strong> {selectedComplaint.description}</p>
+                {selectedComplaint.images && selectedComplaint.images.length > 0 && (
+                  <div style={{ marginTop: '1rem' }}>
+                    <strong style={{ fontSize: '0.875rem', color: '#475569' }}>Public Complaint Images:</strong>
+                    <div style={{ display: 'flex', gap: '10px', marginTop: '0.5rem', flexWrap: 'wrap' }}>
+                      {selectedComplaint.images.map((img, i) => (
+                        <a key={i} href={`${img}`} target="_blank" rel="noreferrer" style={{ display: 'block' }}>
+                          <img 
+                            src={`${img}`} 
+                            alt={`Complaint Image ${i + 1}`} 
+                            style={{ width: '100px', height: '100px', objectFit: 'cover', borderRadius: '8px', border: '1px solid #cbd5e1' }} 
+                            onError={(e) => { e.target.style.display = 'none'; }}
+                          />
+                        </a>
+                      ))}
+                    </div>
+                  </div>
+                )}
               </div>
 
               <h4 style={{ margin: '0 0 1rem 0', color: '#0f2d52', fontSize: '1rem', fontWeight: 700 }}>
@@ -548,6 +583,36 @@ const AdminComplaints = () => {
                     <div style={{ fontSize: '1rem', color: '#0f172a', fontWeight: 700 }}>{value}</div>
                   </div>
                 ))}
+              </div>
+
+              {/* Public Complaint Info (Description & Images) */}
+              <div style={{ background: '#ffffff', padding: '1.5rem', borderRadius: '12px', border: '1px solid #e2e8f0', marginBottom: '2rem', boxShadow: '0 4px 6px -1px rgba(0,0,0,0.02)' }}>
+                <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '12px', color: '#334155' }}>
+                  <div style={{ background: '#f1f5f9', padding: '6px', borderRadius: '8px' }}>
+                    <AlertCircle size={18} color="#475569" />
+                  </div>
+                  <h4 style={{ margin: 0, fontSize: '1.1rem', fontWeight: 800, textTransform: 'uppercase', letterSpacing: '0.05em', color: '#334155' }}>Public Complaint Issue</h4>
+                </div>
+                <p style={{ margin: '0 0 1rem 0', color: '#475569', fontSize: '0.95rem', lineHeight: '1.6' }}>
+                  <strong>Description: </strong>{reportComplaint.description}
+                </p>
+                {reportComplaint.images && reportComplaint.images.length > 0 && (
+                  <div>
+                    <strong style={{ fontSize: '0.85rem', color: '#64748b', textTransform: 'uppercase', letterSpacing: '0.05em', display: 'block', marginBottom: '8px' }}>Original Images:</strong>
+                    <div style={{ display: 'flex', gap: '12px', flexWrap: 'wrap' }}>
+                      {reportComplaint.images.map((img, i) => (
+                        <a key={i} href={`${img}`} target="_blank" rel="noreferrer" style={{ display: 'block', borderRadius: '12px', overflow: 'hidden', border: '2px solid #e2e8f0', boxShadow: '0 4px 6px -1px rgba(0,0,0,0.05)' }}>
+                          <img 
+                            src={`${img}`} 
+                            alt={`Public Image ${i + 1}`} 
+                            style={{ width: '130px', height: '130px', objectFit: 'cover', display: 'block' }} 
+                            onError={(e) => { e.target.style.display = 'none'; }}
+                          />
+                        </a>
+                      ))}
+                    </div>
+                  </div>
+                )}
               </div>
 
               {/* 2-Column Layout: Contractor (left) | Official Verification (right) */}
