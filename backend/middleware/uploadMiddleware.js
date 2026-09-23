@@ -15,13 +15,25 @@ const storage = multer.diskStorage({
   },
   filename: function (req, file, cb) {
     const uniqueSuffix = Date.now() + '-' + Math.round(Math.random() * 1E9);
-    cb(null, 'park-' + uniqueSuffix + path.extname(file.originalname));
+    let ext = path.extname(file.originalname || '');
+    if (!ext) {
+      if (file.mimetype === 'image/jpeg' || file.mimetype === 'image/jpg') ext = '.jpg';
+      else if (file.mimetype === 'image/png') ext = '.png';
+      else if (file.mimetype === 'image/webp') ext = '.webp';
+      else if (file.mimetype === 'application/pdf') ext = '.pdf';
+      else ext = '.jpg';
+    }
+    cb(null, 'park-' + uniqueSuffix + ext);
   }
 });
 
-// File filter for images and documents (PDF, JPG, PNG, WEBP)
+// File filter for images and documents (PDF, JPG, PNG, WEBP, HEIC/HEIF)
 const fileFilter = (req, file, cb) => {
-  if (file.mimetype.startsWith('image/') || file.mimetype === 'application/pdf') {
+  if (
+    file.mimetype.startsWith('image/') || 
+    file.mimetype === 'application/pdf' ||
+    file.mimetype === 'application/octet-stream'
+  ) {
     cb(null, true);
   } else {
     cb(new Error('Only images and PDF documents are allowed'), false);
@@ -31,7 +43,7 @@ const fileFilter = (req, file, cb) => {
 const upload = multer({ 
   storage: storage,
   fileFilter: fileFilter,
-  limits: { fileSize: 5 * 1024 * 1024 } // 5MB limit
+  limits: { fileSize: 15 * 1024 * 1024 } // 15MB limit for mobile high-res photos
 });
 
 module.exports = upload;

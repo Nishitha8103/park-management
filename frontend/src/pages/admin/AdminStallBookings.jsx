@@ -34,6 +34,26 @@ const resolveMediaUrl = (path) => {
   return `${backendBase}${clean}`;
 };
 
+const getAdminToken = () => {
+  try {
+    const adminUser = localStorage.getItem('adminUser');
+    if (adminUser) {
+      const parsed = JSON.parse(adminUser);
+      if (parsed?.token) return parsed.token;
+    }
+    const genericUser = localStorage.getItem('user');
+    if (genericUser) {
+      const parsed = JSON.parse(genericUser);
+      if (parsed?.token) return parsed.token;
+    }
+    const token = localStorage.getItem('token');
+    if (token) return token;
+  } catch (e) {
+    console.error('Error getting admin token:', e);
+  }
+  return '';
+};
+
 const AdminStallBookings = () => {
   const [bookings, setBookings] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -61,7 +81,7 @@ const AdminStallBookings = () => {
 
     try {
       setActionLoading(true);
-      const token = JSON.parse(localStorage.getItem('adminUser'))?.token;
+      const token = getAdminToken();
       await axios.delete(`/api/stall-bookings/${id}`, {
         headers: { Authorization: `Bearer ${token}` }
       });
@@ -102,7 +122,7 @@ const AdminStallBookings = () => {
 
     try {
       setActionLoading(true);
-      const token = JSON.parse(localStorage.getItem('adminUser'))?.token;
+      const token = getAdminToken();
       await axios.delete('/api/stall-bookings', {
         headers: { Authorization: `Bearer ${token}` }
       });
@@ -133,17 +153,19 @@ const AdminStallBookings = () => {
   const fetchBookings = async (showLoading = false) => {
     try {
       if (showLoading) setRefreshing(true);
-      const token = JSON.parse(localStorage.getItem('adminUser'))?.token;
+      const token = getAdminToken();
       const res = await axios.get('/api/stall-bookings', {
         headers: { Authorization: `Bearer ${token}` }
       });
-      setBookings(res.data);
+      const data = Array.isArray(res.data) ? res.data : (res.data?.bookings || []);
+      setBookings(data);
       if (selectedBooking) {
-        const updated = res.data.find(b => b._id === selectedBooking._id);
+        const updated = data.find(b => b._id === selectedBooking._id);
         if (updated) setSelectedBooking(updated);
       }
     } catch (error) {
       console.error('Error fetching stall bookings:', error);
+      setBookings([]);
     } finally {
       setLoading(false);
       setRefreshing(false);
@@ -178,7 +200,7 @@ const AdminStallBookings = () => {
   const handleVerifyAddress = async (id, status = 'Verified') => {
     try {
       setActionLoading(true);
-      const token = JSON.parse(localStorage.getItem('adminUser'))?.token;
+      const token = getAdminToken();
       await axios.put(`/api/stall-bookings/${id}/verify-address`, { status }, {
         headers: { Authorization: `Bearer ${token}` }
       });
@@ -217,7 +239,7 @@ const AdminStallBookings = () => {
 
     try {
       setActionLoading(true);
-      const token = JSON.parse(localStorage.getItem('adminUser'))?.token;
+      const token = getAdminToken();
       await axios.put(`/api/stall-bookings/${id}/approve`, {}, {
         headers: { Authorization: `Bearer ${token}` }
       });
@@ -253,7 +275,7 @@ const AdminStallBookings = () => {
     }
     setInfoModal(prev => ({ ...prev, loading: true }));
     try {
-      const token = JSON.parse(localStorage.getItem('adminUser'))?.token;
+      const token = getAdminToken();
       await axios.put(`/api/stall-bookings/${infoModal.bookingId}/request-info`, { message: infoModal.message }, {
         headers: { Authorization: `Bearer ${token}` }
       });
@@ -289,7 +311,7 @@ const AdminStallBookings = () => {
     }
     setRejectModal(prev => ({ ...prev, loading: true }));
     try {
-      const token = JSON.parse(localStorage.getItem('adminUser'))?.token;
+      const token = getAdminToken();
       await axios.put(`/api/stall-bookings/${rejectModal.bookingId}/reject`, { reason: rejectModal.reason }, {
         headers: { Authorization: `Bearer ${token}` }
       });
@@ -381,7 +403,6 @@ const AdminStallBookings = () => {
                 <th style={{ padding: '1rem', color: '#8F9CAE', fontWeight: '700', fontSize: '0.8rem', textTransform: 'uppercase', letterSpacing: '0.05em' }}>Stall & Park</th>
                 <th style={{ padding: '1rem', color: '#8F9CAE', fontWeight: '700', fontSize: '0.8rem', textTransform: 'uppercase', letterSpacing: '0.05em' }}>Current Residential Address</th>
                 <th style={{ padding: '1rem', color: '#8F9CAE', fontWeight: '700', fontSize: '0.8rem', textTransform: 'uppercase', letterSpacing: '0.05em' }}>Documents</th>
-                <th style={{ padding: '1rem', color: '#8F9CAE', fontWeight: '700', fontSize: '0.8rem', textTransform: 'uppercase', letterSpacing: '0.05em' }}>Address Status</th>
                 <th style={{ padding: '1rem', color: '#8F9CAE', fontWeight: '700', fontSize: '0.8rem', textTransform: 'uppercase', letterSpacing: '0.05em' }}>Status</th>
                 <th style={{ padding: '1rem', color: '#8F9CAE', fontWeight: '700', fontSize: '0.8rem', textTransform: 'uppercase', letterSpacing: '0.05em' }}>Actions</th>
               </tr>
@@ -389,7 +410,7 @@ const AdminStallBookings = () => {
             <tbody>
               {bookings.length === 0 ? (
                 <tr>
-                  <td colSpan="7" style={{ padding: '3.5rem', textAlign: 'center', color: '#666E85', fontSize: '0.95rem' }}>
+                  <td colSpan="6" style={{ padding: '3.5rem', textAlign: 'center', color: '#666E85', fontSize: '0.95rem' }}>
                     No stall booking applications found.
                   </td>
                 </tr>
@@ -468,23 +489,6 @@ const AdminStallBookings = () => {
                             </a>
                           )}
                         </div>
-                      </td>
-
-                      {/* Address Verification Badge */}
-                      <td style={{ padding: '1rem' }}>
-                        {isSameAddr ? (
-                          <span style={{ display: 'inline-flex', alignItems: 'center', gap: '5px', padding: '4px 10px', borderRadius: '20px', background: 'rgba(34, 197, 94, 0.15)', color: '#4ade80', fontSize: '0.82rem', fontWeight: 700, border: '1px solid rgba(34, 197, 94, 0.3)' }}>
-                            <CheckCircle2 size={13} /> Same as Aadhaar
-                          </span>
-                        ) : b.currentAddressProofUrl ? (
-                          <span style={{ display: 'inline-flex', alignItems: 'center', gap: '5px', padding: '4px 10px', borderRadius: '20px', background: 'rgba(245, 158, 11, 0.15)', color: '#fbbf24', fontSize: '0.82rem', fontWeight: 700, border: '1px solid rgba(245, 158, 11, 0.3)' }}>
-                            <AlertTriangle size={13} /> Proof Uploaded
-                          </span>
-                        ) : (
-                          <span style={{ display: 'inline-flex', alignItems: 'center', gap: '5px', padding: '4px 10px', borderRadius: '20px', background: 'rgba(239, 68, 68, 0.15)', color: '#f87171', fontSize: '0.82rem', fontWeight: 700, border: '1px solid rgba(239, 68, 68, 0.3)' }}>
-                            <XCircle size={13} /> Proof Missing
-                          </span>
-                        )}
                       </td>
 
                       {/* Overall Stall Status */}

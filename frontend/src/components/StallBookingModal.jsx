@@ -378,7 +378,7 @@ const StallBookingModal = ({ parkId, parkName, slot, onClose, onBookingSuccess }
                   type="file" 
                   onChange={handlePhotoChange} 
                   required={!photoFile}
-                  accept=".jpg,.jpeg,.png"
+                  accept="image/*"
                   style={{ width: '100%', padding: '0.45rem', border: '1px solid #cbd5e1', borderRadius: '8px', fontSize: '0.85rem' }} 
                 />
                 <p style={{ margin: '3px 0 0', fontSize: '0.75rem', color: '#64748b' }}>Clear face photo for stall license ID badge.</p>
@@ -435,7 +435,7 @@ const StallBookingModal = ({ parkId, parkName, slot, onClose, onBookingSuccess }
               type="file" 
               onChange={(e) => setAadhaarDocFile(e.target.files[0])} 
               required={!aadhaarDocFile}
-              accept=".pdf,.jpg,.jpeg,.png"
+              accept="image/*,application/pdf,.pdf"
               style={{ width: '100%', padding: '0.55rem', border: '1px solid #cbd5e1', borderRadius: '8px', fontSize: '0.85rem', backgroundColor: 'white', boxSizing: 'border-box' }} 
             />
             <p style={{ margin: '3px 0 0', fontSize: '0.75rem', color: '#64748b' }}>

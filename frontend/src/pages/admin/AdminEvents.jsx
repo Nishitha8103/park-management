@@ -1,13 +1,35 @@
 import React, { useState, useEffect } from 'react';
 import axios from 'axios';
 import { useNavigate } from 'react-router-dom';
-import { Calendar, MapPin, Edit, Trash2, Plus, X, Image as ImageIcon, Users, IndianRupee } from 'lucide-react';
+import { Calendar, MapPin, Edit, Trash2, Plus, X, Image as ImageIcon, Users, IndianRupee, AlertCircle } from 'lucide-react';
 import Swal from 'sweetalert2';
+
+const getAdminToken = () => {
+  try {
+    const adminUser = localStorage.getItem('adminUser');
+    if (adminUser) {
+      const parsed = JSON.parse(adminUser);
+      if (parsed?.token) return parsed.token;
+    }
+    const genericUser = localStorage.getItem('user');
+    if (genericUser) {
+      const parsed = JSON.parse(genericUser);
+      if (parsed?.token) return parsed.token;
+    }
+    const token = localStorage.getItem('token');
+    if (token) return token;
+  } catch (e) {
+    console.error('Error getting admin token:', e);
+  }
+  return '';
+};
 
 const AdminEvents = () => {
   const [events, setEvents] = useState([]);
+  const [parks, setParks] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
+  const [conflictWarning, setConflictWarning] = useState('');
   const navigate = useNavigate();
   
   // Modal states
@@ -19,6 +41,7 @@ const AdminEvents = () => {
   const [formData, setFormData] = useState({
     title: '',
     description: '',
+    eventDate: '',
     location: '',
     parkName: '',
     image: '',
@@ -31,7 +54,7 @@ const AdminEvents = () => {
   const fetchEvents = async () => {
     try {
       setLoading(true);
-      const token = JSON.parse(localStorage.getItem('adminUser'))?.token;
+      const token = getAdminToken();
       const response = await axios.get('/api/events/all', {
         headers: { Authorization: `Bearer ${token}` }
       });
@@ -44,19 +67,67 @@ const AdminEvents = () => {
     }
   };
 
+  const fetchParks = async () => {
+    try {
+      const res = await axios.get('/api/parks');
+      if (Array.isArray(res.data)) {
+        setParks(res.data);
+      }
+    } catch (err) {
+      console.error('Error fetching parks list:', err);
+    }
+  };
+
   useEffect(() => {
     fetchEvents();
+    fetchParks();
   }, []);
+
+  // Client-side quick conflict detector as the user inputs park and time
+  useEffect(() => {
+    if (!formData.eventDate || (!formData.parkName && !formData.location)) {
+      setConflictWarning('');
+      return;
+    }
+
+    const inputTime = new Date(formData.eventDate).getTime();
+    if (isNaN(inputTime)) {
+      setConflictWarning('');
+      return;
+    }
+
+    const selectedVenue = (formData.parkName || formData.location || '').toLowerCase().trim();
+
+    const existingConflict = events.find(ev => {
+      if (isEditing && ev._id === currentEventId) return false;
+      const evTime = new Date(ev.eventDate).getTime();
+      const timeDiffHours = Math.abs(evTime - inputTime) / (1000 * 60 * 60);
+      const evVenue = (ev.parkName || ev.location || '').toLowerCase().trim();
+      
+      const venueMatches = evVenue && (evVenue.includes(selectedVenue) || selectedVenue.includes(evVenue));
+      return venueMatches && timeDiffHours <= 2.5;
+    });
+
+    if (existingConflict) {
+      const conflictFormatted = new Date(existingConflict.eventDate).toLocaleString('en-IN', {
+        dateStyle: 'medium',
+        timeStyle: 'short'
+      });
+      setConflictWarning(`⚠️ Conflict Alert: "${existingConflict.title}" is already scheduled at ${existingConflict.parkName || existingConflict.location || 'this park'} around this time (${conflictFormatted}).`);
+    } else {
+      setConflictWarning('');
+    }
+  }, [formData.eventDate, formData.parkName, formData.location, events, isEditing, currentEventId]);
 
   const handleInputChange = (e) => {
     let { name, value, type, checked } = e.target;
-    if (name === 'parkName' || name === 'location') {
+    if (name === 'location') {
       value = value.replace(/[^a-zA-Z0-9\s,.-/#]/g, '');
     }
-    setFormData({
-      ...formData,
+    setFormData(prev => ({
+      ...prev,
       [name]: type === 'checkbox' ? checked : value
-    });
+    }));
   };
 
   const openAddModal = () => {
@@ -116,7 +187,7 @@ const AdminEvents = () => {
     }
 
     try {
-      const token = JSON.parse(localStorage.getItem('adminUser'))?.token;
+      const token = getAdminToken();
       const config = { headers: { Authorization: `Bearer ${token}` } };
       
       if (isEditing) {
@@ -126,9 +197,22 @@ const AdminEvents = () => {
       }
       
       setIsModalOpen(false);
+      Swal.fire({
+        title: 'Success!',
+        text: isEditing ? 'Event updated successfully.' : 'Event created successfully.',
+        icon: 'success',
+        timer: 1800,
+        showConfirmButton: false
+      });
       fetchEvents();
     } catch (err) {
-      alert(err.response?.data?.message || 'Error saving event');
+      const errorMsg = err.response?.data?.message || 'Error saving event';
+      Swal.fire({
+        title: 'Scheduling Conflict',
+        text: errorMsg,
+        icon: 'error',
+        confirmButtonColor: '#2563eb'
+      });
     }
   };
 
@@ -145,7 +229,7 @@ const AdminEvents = () => {
     if (!result.isConfirmed) return;
 
     try {
-      const token = JSON.parse(localStorage.getItem('adminUser'))?.token;
+      const token = getAdminToken();
       await axios.delete(`/api/events/${id}`, {
         headers: { Authorization: `Bearer ${token}` }
       });
@@ -327,6 +411,13 @@ const AdminEvents = () => {
             </div>
             
             <form onSubmit={handleSubmit} style={{ display: 'flex', flexDirection: 'column', gap: '1.1rem' }}>
+              {conflictWarning && (
+                <div style={{ padding: '12px 14px', background: '#fef2f2', border: '1px solid #fecaca', borderRadius: '8px', color: '#b91c1c', fontSize: '0.86rem', fontWeight: 600, display: 'flex', alignItems: 'flex-start', gap: '8px' }}>
+                  <AlertCircle size={18} style={{ flexShrink: 0, marginTop: '2px' }} />
+                  <div>{conflictWarning}</div>
+                </div>
+              )}
+
               <div>
                 <label style={{ display: 'block', marginBottom: '6px', fontWeight: 700, fontSize: '0.88rem', color: '#1e293b' }}>Event Title *</label>
                 <input 
@@ -355,18 +446,41 @@ const AdminEvents = () => {
               </div>
               
               <div>
-                <label style={{ display: 'block', marginBottom: '6px', fontWeight: 700, fontSize: '0.88rem', color: '#1e293b' }}>Park Name</label>
-                <input 
-                  type="text" name="parkName" placeholder="e.g., Cubbon Park"
-                  value={formData.parkName} onChange={handleInputChange}
+                <label style={{ display: 'block', marginBottom: '6px', fontWeight: 700, fontSize: '0.88rem', color: '#1e293b' }}>Select Park / Venue</label>
+                <select
+                  name="parkName"
+                  value={formData.parkName}
+                  onChange={(e) => {
+                    const selected = e.target.value;
+                    const foundPark = parks.find(p => p.name === selected);
+                    setFormData(prev => ({
+                      ...prev,
+                      parkName: selected,
+                      location: prev.location || (foundPark?.address || foundPark?.location || selected)
+                    }));
+                  }}
                   style={{ width: '100%', padding: '10px 12px', borderRadius: '8px', border: '1px solid #cbd5e1', background: '#f8fafc', color: '#0f172a', fontSize: '0.92rem', boxSizing: 'border-box' }}
-                />
+                >
+                  <option value="">-- Choose Park from System --</option>
+                  {parks.map(p => (
+                    <option key={p._id} value={p.name}>{p.name} {p.district ? `(${p.district?.name || p.district})` : ''}</option>
+                  ))}
+                  <option value="custom">-- Or enter custom venue name below --</option>
+                </select>
+                {formData.parkName === 'custom' && (
+                  <input 
+                    type="text"
+                    placeholder="Enter Park or Facility Name"
+                    onChange={(e) => setFormData(prev => ({ ...prev, parkName: e.target.value }))}
+                    style={{ width: '100%', marginTop: '6px', padding: '10px 12px', borderRadius: '8px', border: '1px solid #cbd5e1', background: '#f8fafc', color: '#0f172a', fontSize: '0.92rem', boxSizing: 'border-box' }}
+                  />
+                )}
               </div>
               
               <div>
-                <label style={{ display: 'block', marginBottom: '6px', fontWeight: 700, fontSize: '0.88rem', color: '#1e293b' }}>Location / Venue</label>
+                <label style={{ display: 'block', marginBottom: '6px', fontWeight: 700, fontSize: '0.88rem', color: '#1e293b' }}>Specific Location / Zone inside Park</label>
                 <input 
-                  type="text" name="location" placeholder="e.g., Central Park Pavilion"
+                  type="text" name="location" placeholder="e.g., Main Lawn / Amphitheatre / Central Gazebo"
                   value={formData.location} onChange={handleInputChange}
                   style={{ width: '100%', padding: '10px 12px', borderRadius: '8px', border: '1px solid #cbd5e1', background: '#f8fafc', color: '#0f172a', fontSize: '0.92rem', boxSizing: 'border-box' }}
                 />
