@@ -19,12 +19,12 @@ const storage = multer.diskStorage({
   }
 });
 
-// File filter for images
+// File filter for images and documents (PDF, JPG, PNG, WEBP)
 const fileFilter = (req, file, cb) => {
-  if (file.mimetype.startsWith('image/')) {
+  if (file.mimetype.startsWith('image/') || file.mimetype === 'application/pdf') {
     cb(null, true);
   } else {
-    cb(new Error('Only images are allowed'), false);
+    cb(new Error('Only images and PDF documents are allowed'), false);
   }
 };
 

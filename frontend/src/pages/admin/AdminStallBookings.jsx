@@ -15,7 +15,8 @@ import {
   ShieldCheck,
   Trash2,
   RefreshCw,
-  Sparkles
+  Sparkles,
+  ExternalLink
 } from 'lucide-react';
 
 import Swal from 'sweetalert2';
@@ -390,7 +391,15 @@ const AdminStallBookings = () => {
                       <td style={{ padding: '1rem' }}>
                         <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
                           {b.photoUrl ? (
-                            <img src={b.photoUrl} alt="Applicant" style={{ width: '42px', height: '42px', borderRadius: '8px', objectFit: 'cover', border: '1px solid rgba(255,255,255,0.15)' }} />
+                            <img 
+                              src={b.photoUrl} 
+                              alt="Applicant" 
+                              onError={(e) => {
+                                e.target.onerror = null;
+                                e.target.src = 'https://ui-avatars.com/api/?name=' + encodeURIComponent(b.applicantName || 'Applicant') + '&background=059669&color=fff&size=128';
+                              }}
+                              style={{ width: '42px', height: '42px', borderRadius: '8px', objectFit: 'cover', border: '1px solid rgba(255,255,255,0.15)' }} 
+                            />
                           ) : (
                             <div style={{ width: '42px', height: '42px', borderRadius: '8px', backgroundColor: '#2A334E', display: 'flex', alignItems: 'center', justifyContent: 'center', color: '#F0F4FF', fontWeight: 'bold' }}>
                               {(b.applicantName || 'U')[0].toUpperCase()}
@@ -423,15 +432,17 @@ const AdminStallBookings = () => {
                       {/* Documents */}
                       <td style={{ padding: '1rem' }}>
                         <div style={{ display: 'flex', flexDirection: 'column', gap: '5px' }}>
-                          {b.documentUrl && (
+                          {b.documentUrl ? (
                             <a 
                               href={b.documentUrl} 
                               target="_blank" 
                               rel="noopener noreferrer"
                               style={{ display: 'inline-flex', alignItems: 'center', gap: '4px', background: 'rgba(59, 130, 246, 0.15)', color: '#60a5fa', padding: '4px 8px', borderRadius: '4px', textDecoration: 'none', fontSize: '0.78rem', fontWeight: 600, border: '1px solid rgba(59, 130, 246, 0.3)' }}
                             >
-                              <FileText size={13} /> Aadhaar Card
+                              <FileText size={13} /> Aadhaar Card <ExternalLink size={11} />
                             </a>
+                          ) : (
+                            <span style={{ fontSize: '0.76rem', color: '#94a3b8' }}>No doc attached</span>
                           )}
                           {b.currentAddressProofUrl && (
                             <a 
@@ -440,7 +451,7 @@ const AdminStallBookings = () => {
                               rel="noopener noreferrer"
                               style={{ display: 'inline-flex', alignItems: 'center', gap: '4px', background: 'rgba(245, 158, 11, 0.15)', color: '#fbbf24', padding: '4px 8px', borderRadius: '4px', textDecoration: 'none', fontSize: '0.78rem', fontWeight: 600, border: '1px solid rgba(245, 158, 11, 0.3)' }}
                             >
-                              <FileText size={13} /> Address Proof
+                              <FileText size={13} /> Address Proof <ExternalLink size={11} />
                             </a>
                           )}
                         </div>
@@ -479,17 +490,26 @@ const AdminStallBookings = () => {
                       <td style={{ padding: '1rem' }}>
                         <div style={{ display: 'flex', alignItems: 'center', gap: '8px', flexWrap: 'wrap' }}>
                           {b.status === 'Pending Approval' && (
-                            <button
-                              onClick={() => handleApproveStall(b._id)}
-                              style={{ display: 'inline-flex', alignItems: 'center', gap: '5px', background: 'linear-gradient(135deg, #059669 0%, #047857 100%)', color: 'white', border: 'none', padding: '7px 14px', borderRadius: '6px', fontSize: '0.82rem', fontWeight: 700, cursor: 'pointer', boxShadow: '0 2px 6px rgba(5,150,105,0.3)' }}
-                              title="Directly approve this booking and notify applicant"
-                            >
-                              <Check size={14} /> Approve
-                            </button>
+                            <>
+                              <button
+                                onClick={() => handleApproveStall(b._id)}
+                                style={{ display: 'inline-flex', alignItems: 'center', gap: '5px', background: 'linear-gradient(135deg, #059669 0%, #047857 100%)', color: 'white', border: 'none', padding: '7px 12px', borderRadius: '6px', fontSize: '0.82rem', fontWeight: 700, cursor: 'pointer', boxShadow: '0 2px 6px rgba(5,150,105,0.3)' }}
+                                title="Approve stall and request fee payment"
+                              >
+                                <Check size={14} /> Approve
+                              </button>
+                              <button
+                                onClick={() => setRejectModal({ isOpen: true, bookingId: b._id, reason: '', loading: false })}
+                                style={{ display: 'inline-flex', alignItems: 'center', gap: '5px', background: 'linear-gradient(135deg, #ef4444 0%, #dc2626 100%)', color: 'white', border: 'none', padding: '7px 12px', borderRadius: '6px', fontSize: '0.82rem', fontWeight: 700, cursor: 'pointer', boxShadow: '0 2px 6px rgba(239,68,68,0.3)' }}
+                                title="Reject stall application"
+                              >
+                                <XCircle size={14} /> Reject
+                              </button>
+                            </>
                           )}
                           <button
                             onClick={() => setSelectedBooking(b)}
-                            style={{ display: 'inline-flex', alignItems: 'center', gap: '6px', background: '#3b82f6', color: 'white', border: 'none', padding: '7px 14px', borderRadius: '6px', fontSize: '0.82rem', fontWeight: 600, cursor: 'pointer', boxShadow: '0 2px 6px rgba(59,130,246,0.3)' }}
+                            style={{ display: 'inline-flex', alignItems: 'center', gap: '6px', background: '#3b82f6', color: 'white', border: 'none', padding: '7px 12px', borderRadius: '6px', fontSize: '0.82rem', fontWeight: 600, cursor: 'pointer', boxShadow: '0 2px 6px rgba(59,130,246,0.3)' }}
                           >
                             <Eye size={14} /> Review & Verify
                           </button>
@@ -562,7 +582,15 @@ const AdminStallBookings = () => {
                 <h4 style={{ margin: '0 0 10px 0', fontSize: '0.9rem', color: '#1e293b', fontWeight: 700 }}>Applicant & Stall Information</h4>
                 <div style={{ display: 'flex', gap: '14px', alignItems: 'center', marginBottom: '12px' }}>
                   {selectedBooking.photoUrl ? (
-                    <img src={selectedBooking.photoUrl} alt="Photo" style={{ width: '64px', height: '64px', borderRadius: '8px', objectFit: 'cover', border: '2px solid #059669' }} />
+                    <img 
+                      src={selectedBooking.photoUrl} 
+                      alt="Applicant Photo" 
+                      onError={(e) => {
+                        e.target.onerror = null;
+                        e.target.src = 'https://ui-avatars.com/api/?name=' + encodeURIComponent(selectedBooking.applicantName || 'Applicant') + '&background=059669&color=fff&size=128';
+                      }}
+                      style={{ width: '64px', height: '64px', borderRadius: '8px', objectFit: 'cover', border: '2px solid #059669' }} 
+                    />
                   ) : (
                     <div style={{ width: '64px', height: '64px', borderRadius: '8px', background: '#e2e8f0', display: 'flex', alignItems: 'center', justifyContent: 'center', color: '#94a3b8' }}>
                       No Photo
@@ -582,30 +610,98 @@ const AdminStallBookings = () => {
                   <Home size={17} color="#059669" /> Address & Document Verification
                 </h4>
 
-                <div style={{ background: 'white', padding: '1.15rem', borderRadius: '8px', border: '1px solid #cbd5e1' }}>
-                  <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '8px' }}>
-                    <div style={{ fontSize: '0.8rem', fontWeight: 700, color: '#64748b', textTransform: 'uppercase' }}>
-                      Registered Address
+                <div style={{ display: 'grid', gridTemplateColumns: selectedBooking.isAddressSameAsAadhaar ? '1fr' : '1fr 1fr', gap: '12px' }}>
+                  {/* Permanent / Aadhaar Address */}
+                  <div style={{ background: 'white', padding: '1.15rem', borderRadius: '8px', border: '1px solid #cbd5e1' }}>
+                    <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '8px', flexWrap: 'wrap', gap: '6px' }}>
+                      <div style={{ fontSize: '0.8rem', fontWeight: 700, color: '#64748b', textTransform: 'uppercase' }}>
+                        Aadhaar / Permanent Address
+                      </div>
+                      {selectedBooking.documentUrl && (
+                        <a 
+                          href={selectedBooking.documentUrl} 
+                          target="_blank" 
+                          rel="noopener noreferrer"
+                          style={{ display: 'inline-flex', alignItems: 'center', gap: '5px', background: '#eff6ff', color: '#2563eb', padding: '4px 10px', borderRadius: '6px', textDecoration: 'none', fontSize: '0.8rem', fontWeight: 600, border: '1px solid #bfdbfe' }}
+                        >
+                          <FileText size={14} /> View Aadhaar Card <ExternalLink size={12} />
+                        </a>
+                      )}
                     </div>
+                    <div style={{ fontSize: '0.92rem', color: '#0f172a', fontWeight: 600, lineHeight: 1.5 }}>
+                      {selectedBooking.nativeAddress || selectedBooking.currentAddress || 'Not provided'}
+                    </div>
+
+                    {/* Aadhaar Document Preview */}
                     {selectedBooking.documentUrl && (
-                      <a 
-                        href={selectedBooking.documentUrl} 
-                        target="_blank" 
-                        rel="noopener noreferrer"
-                        style={{ display: 'inline-flex', alignItems: 'center', gap: '5px', background: '#eff6ff', color: '#2563eb', padding: '4px 10px', borderRadius: '6px', textDecoration: 'none', fontSize: '0.8rem', fontWeight: 600, border: '1px solid #bfdbfe' }}
-                      >
-                        <FileText size={14} /> View Aadhaar Card Document
-                      </a>
+                      <div style={{ marginTop: '10px', border: '1px dashed #cbd5e1', borderRadius: '6px', padding: '8px', textAlign: 'center', background: '#f8fafc' }}>
+                        {selectedBooking.documentUrl.toLowerCase().endsWith('.pdf') ? (
+                          <iframe src={selectedBooking.documentUrl} title="Aadhaar Preview" style={{ width: '100%', height: '220px', border: 'none' }} />
+                        ) : (
+                          <img 
+                            src={selectedBooking.documentUrl} 
+                            alt="Aadhaar Document Preview"
+                            onError={(e) => {
+                              e.target.style.display = 'none';
+                            }}
+                            style={{ maxWidth: '100%', maxHeight: '200px', objectFit: 'contain', borderRadius: '4px' }} 
+                          />
+                        )}
+                      </div>
                     )}
                   </div>
-                  <div style={{ fontSize: '0.95rem', color: '#0f172a', fontWeight: 600, lineHeight: 1.5 }}>
-                    {selectedBooking.nativeAddress || selectedBooking.currentAddress || 'Not provided'}
-                  </div>
+
+                  {/* Current Residential Address (if different) */}
+                  {!selectedBooking.isAddressSameAsAadhaar && (
+                    <div style={{ background: 'white', padding: '1.15rem', borderRadius: '8px', border: '1px solid #cbd5e1' }}>
+                      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '8px', flexWrap: 'wrap', gap: '6px' }}>
+                        <div style={{ fontSize: '0.8rem', fontWeight: 700, color: '#64748b', textTransform: 'uppercase' }}>
+                          Current Residential Address
+                        </div>
+                        {selectedBooking.currentAddressProofUrl && (
+                          <a 
+                            href={selectedBooking.currentAddressProofUrl} 
+                            target="_blank" 
+                            rel="noopener noreferrer"
+                            style={{ display: 'inline-flex', alignItems: 'center', gap: '5px', background: '#fef3c7', color: '#b45309', padding: '4px 10px', borderRadius: '6px', textDecoration: 'none', fontSize: '0.8rem', fontWeight: 600, border: '1px solid #fde68a' }}
+                          >
+                            <FileText size={14} /> View Address Proof <ExternalLink size={12} />
+                          </a>
+                        )}
+                      </div>
+                      <div style={{ fontSize: '0.92rem', color: '#0f172a', fontWeight: 600, lineHeight: 1.5 }}>
+                        {selectedBooking.currentAddress || 'Not provided'}
+                      </div>
+                      {selectedBooking.differentAddressReason && (
+                        <div style={{ marginTop: '6px', fontSize: '0.78rem', color: '#b45309', background: '#fffbeb', padding: '4px 8px', borderRadius: '4px' }}>
+                          Reason: {selectedBooking.differentAddressReason} {selectedBooking.differentAddressOtherReason ? `(${selectedBooking.differentAddressOtherReason})` : ''}
+                        </div>
+                      )}
+
+                      {/* Current Address Proof Preview */}
+                      {selectedBooking.currentAddressProofUrl && (
+                        <div style={{ marginTop: '10px', border: '1px dashed #cbd5e1', borderRadius: '6px', padding: '8px', textAlign: 'center', background: '#f8fafc' }}>
+                          {selectedBooking.currentAddressProofUrl.toLowerCase().endsWith('.pdf') ? (
+                            <iframe src={selectedBooking.currentAddressProofUrl} title="Address Proof Preview" style={{ width: '100%', height: '220px', border: 'none' }} />
+                          ) : (
+                            <img 
+                              src={selectedBooking.currentAddressProofUrl} 
+                              alt="Address Proof Preview"
+                              onError={(e) => {
+                                e.target.style.display = 'none';
+                              }}
+                              style={{ maxWidth: '100%', maxHeight: '200px', objectFit: 'contain', borderRadius: '4px' }} 
+                            />
+                          )}
+                        </div>
+                      )}
+                    </div>
+                  )}
                 </div>
               </div>
 
               {/* Actions Footer */}
-              <div style={{ borderTop: '1px solid #e2e8f0', paddingTop: '1.25rem', display: 'flex', justifyContent: 'space-between', alignItems: 'center', gap: '1rem' }}>
+              <div style={{ borderTop: '1px solid #e2e8f0', paddingTop: '1.25rem', display: 'flex', justifyContent: 'space-between', alignItems: 'center', gap: '1rem', flexWrap: 'wrap' }}>
                 <button
                   type="button"
                   onClick={() => setInfoModal({ isOpen: true, bookingId: selectedBooking._id, message: '', loading: false })}
