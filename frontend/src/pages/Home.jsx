@@ -1,5 +1,6 @@
 import { Link } from 'react-router-dom';
 import { LogIn, ArrowRight } from 'lucide-react';
+import forestBg from '../assets/forest_landing_bg.jpg';
 import './Home.css';
 
 // Exact custom icons matching Image 2
@@ -39,7 +40,16 @@ const BookStallIcon = ({ size = 22 }) => (
 
 const Home = () => {
   return (
-    <div className="landing-dark-page">
+    <div 
+      className="landing-dark-page"
+      style={{
+        backgroundImage: `url(${forestBg})`,
+        backgroundSize: 'cover',
+        backgroundPosition: 'center center',
+        backgroundRepeat: 'no-repeat',
+        backgroundAttachment: 'fixed'
+      }}
+    >
       <div className="landing-dark-overlay"></div>
 
       <div className="landing-dark-container">

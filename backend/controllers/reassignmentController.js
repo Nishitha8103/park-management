@@ -4,6 +4,7 @@ const Contractor = require('../models/Contractor');
 const User = require('../models/User');
 const Notification = require('../models/Notification');
 const ReassignmentRequest = require('../models/ReassignmentRequest');
+const Setting = require('../models/Setting');
 
 // Helper to generate Unique Reassignment Request ID
 const generateRequestId = async () => {
@@ -50,11 +51,29 @@ const submitReassignmentRequest = async (req, res) => {
 
     // Verify task assignment ownership
     if (isContractor) {
+      // Check if Admin has allowed contractor reassignment requests
+      const contractorSetting = await Setting.findOne({ key: 'contractorModule' });
+      const isAllowed = contractorSetting?.value?.allowTaskReassignmentRequests ?? true;
+      if (!isAllowed) {
+        return res.status(403).json({ 
+          message: 'Task reassignment requests by contractors are currently disabled by the Administrator.' 
+        });
+      }
+
       const assignedContractorId = task.assignedContractor ? task.assignedContractor.toString() : '';
       if (assignedContractorId !== String(requesterId)) {
         return res.status(403).json({ message: 'You are not the currently assigned contractor for this task.' });
       }
     } else if (isOfficial) {
+      // Check if Admin has allowed government official reassignment requests
+      const officialSetting = await Setting.findOne({ key: 'officialModule' });
+      const isAllowed = officialSetting?.value?.allowInspectionReassignment ?? true;
+      if (!isAllowed) {
+        return res.status(403).json({ 
+          message: 'Inspection reassignment requests by Government Officials are currently disabled by the Administrator.' 
+        });
+      }
+
       const assignedOfficialId = task.assignedOfficial ? task.assignedOfficial.toString() : '';
       if (assignedOfficialId !== String(requesterId)) {
         return res.status(403).json({ message: 'You are not the currently assigned government official for this task.' });

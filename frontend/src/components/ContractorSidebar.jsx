@@ -13,8 +13,17 @@ const ContractorSidebar = ({ isOpen, toggleSidebar, handleLogout, contractor }) 
         </div>
 
         <div className="contractor-sidebar-user">
-          <div className="contractor-sidebar-avatar">
-            <User size={24} />
+          <div className="contractor-sidebar-avatar" style={{ overflow: 'hidden', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+            {(contractor?.profilePhoto || contractor?.profilePic) ? (
+              <img 
+                src={contractor.profilePhoto || contractor.profilePic} 
+                alt="Contractor Profile" 
+                style={{ width: '100%', height: '100%', objectFit: 'cover', borderRadius: '50%' }}
+                onError={(e) => { e.currentTarget.style.display = 'none'; }}
+              />
+            ) : (
+              <User size={24} />
+            )}
           </div>
           <div className="contractor-sidebar-user-info">
             <p className="name">{contractor?.name || 'ABC Maintenance'}</p>

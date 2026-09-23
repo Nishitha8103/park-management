@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react';
 import { useParams, Link, useNavigate } from 'react-router-dom';
-import { Menu, LogOut, ArrowLeft, HardHat, Check, X, Plus, Save, Bell, Camera, Upload } from 'lucide-react';
+import { Menu, LogOut, ArrowLeft, TreePine, HardHat, Check, X, Plus, Save, Bell, Camera, Upload } from 'lucide-react';
 import './ContractorWorkProgress.css';
 import ContractorSidebar from '../components/ContractorSidebar';
 import LiveCameraCaptureModal from '../components/LiveCameraCaptureModal';
@@ -74,6 +74,21 @@ const ContractorWorkProgress = () => {
       if (!description.trim()) {
         alert("Completion Remarks are mandatory for completion.");
         return;
+      }
+
+      // Check if photo proof is required per Admin settings
+      try {
+        const setRes = await fetch('/api/settings/contractorModule');
+        if (setRes.ok) {
+          const settingData = await setRes.json();
+          const requirePhotos = settingData?.requireBeforeAfterPhotos ?? true;
+          if (requirePhotos && afterPhotos.length === 0) {
+            alert("Photo proof is mandatory per Administrator policy. Please capture or upload after-work photos before completing.");
+            return;
+          }
+        }
+      } catch (err) {
+        console.warn('Could not verify photo setting:', err);
       }
     }
 
@@ -208,9 +223,8 @@ const ContractorWorkProgress = () => {
               <button className="contractor-menu-toggle" onClick={toggleSidebar}>
                 <Menu size={24} />
               </button>
-              <HardHat size={28} className="contractor-text-primary" />
-              <h1>PARK MAINTENANCE</h1>
-              <span>Portal</span>
+              <TreePine size={28} color="#e5ede7" />
+              <h1>Parks Monitoring System</h1>
             </div>
             
             <div className="contractor-user-info" style={{ display: 'flex', alignItems: 'center', gap: '1.5rem' }}>
@@ -310,7 +324,7 @@ const ContractorWorkProgress = () => {
                 <textarea 
                   className="update-textarea" 
                   value={description}
-                  onChange={(e) => setDescription(e.target.value)}
+                  onChange={(e) => setDescription(e.target.value.replace(/[0-9]/g, ''))}
                   placeholder={status === 'Completed' ? "Provide detailed completion remarks..." : "Describe the progress..."}
                 ></textarea>
               </div>

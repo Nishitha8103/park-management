@@ -2,16 +2,19 @@
   display: flex;
   flex-direction: column;
   min-height: 100vh;
-  background: url('/user_public_bg.png?v=12') no-repeat center center fixed !important;
-  background-size: cover !important;
-  background-color: #f8fafc !important;
   width: 100%;
   max-width: 100vw;
   overflow-x: hidden;
 }
 
+.public-portal-layout {
+  background: url('/user_public_bg.png?v=12') no-repeat center center fixed !important;
+  background-size: cover !important;
+  background-color: #f8fafc !important;
+}
+
 @media screen and (max-width: 768px) {
-  .app-layout {
+  .public-portal-layout {
     background-size: 100% 100% !important;
     background-attachment: scroll !important;
   }
@@ -123,6 +126,7 @@
    ==================================================== */
 .admin-portal-layout {
   background: #151A2B !important;
+  background-image: none !important;
 }
 
 .admin-portal-layout .adm-topbar {

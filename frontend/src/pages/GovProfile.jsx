@@ -50,7 +50,12 @@ const GovProfile = () => {
   };
 
   const handleInputChange = (e) => {
-    const { name, value } = e.target;
+    let { name, value } = e.target;
+    if (name === 'name') {
+      value = value.replace(/[^a-zA-Z\s]/g, '');
+    } else if (name === 'phone') {
+      value = value.replace(/\D/g, '').slice(0, 10);
+    }
     setProfileData(prev => ({ ...prev, [name]: value }));
   };
 
@@ -339,9 +344,10 @@ const GovProfile = () => {
                       type="tel" 
                       className="styled-input" 
                       name="phone"
-                      placeholder="+91 9876543210"
+                      placeholder="9876543210"
                       value={profileData.phone}
                       onChange={handleInputChange}
+                      maxLength="10"
                     />
                   </div>
                 </div>

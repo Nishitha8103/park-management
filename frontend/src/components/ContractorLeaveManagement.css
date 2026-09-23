@@ -608,3 +608,181 @@
   color: #4d7c0f;
 }
 
+/* Leave Quota Summary Stat Chips in Banner */
+.leave-quota-summary {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 0.75rem;
+  margin-top: 0.5rem;
+}
+
+.quota-chip {
+  display: flex;
+  flex-direction: column;
+  background: rgba(255, 255, 255, 0.18);
+  backdrop-filter: blur(8px);
+  border: 1px solid rgba(255, 255, 255, 0.35);
+  padding: 0.4rem 0.85rem;
+  border-radius: 10px;
+  min-width: 110px;
+}
+
+.quota-chip.highlight {
+  background: rgba(255, 255, 255, 0.3);
+  border-color: rgba(255, 255, 255, 0.6);
+}
+
+.quota-chip.remaining {
+  background: #ffffff;
+  border-color: #ffffff;
+}
+
+.quota-chip.remaining .quota-label {
+  color: #3f6212;
+}
+
+.quota-chip.remaining .quota-val {
+  color: #15803d;
+}
+
+.quota-chip .quota-label {
+  font-size: 0.68rem;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  font-weight: 700;
+  color: #f7fee7;
+}
+
+.quota-chip .quota-val {
+  font-size: 0.92rem;
+  font-weight: 800;
+  color: #ffffff;
+  margin-top: 1px;
+}
+
+.quota-chip.pending {
+  background: rgba(254, 243, 199, 0.25);
+  border-color: rgba(253, 230, 138, 0.5);
+}
+
+/* Table Header Quota Badge */
+.table-header-quota-badge {
+  background: #ecfccb;
+  color: #3f6212;
+  border: 1px solid #d9f99d;
+  font-size: 0.8rem;
+  font-weight: 700;
+  padding: 4px 12px;
+  border-radius: 20px;
+  white-space: nowrap;
+}
+
+/* Table Leave Balance Badge */
+.leave-balance-badge {
+  display: inline-flex;
+  align-items: center;
+  background: #f0fdf4;
+  color: #15803d;
+  border: 1px solid #bbf7d0;
+  font-size: 0.78rem;
+  font-weight: 700;
+  padding: 3px 9px;
+  border-radius: 6px;
+  white-space: nowrap;
+}
+
+.leave-balance-badge.low {
+  background: #fef3c7;
+  color: #b45309;
+  border-color: #fde68a;
+}
+
+/* Custom Cancel Confirmation Popup Modal */
+.leave-cancel-popup-dialog {
+  background: #ffffff;
+  width: 100%;
+  max-width: 440px;
+  border-radius: 16px;
+  box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.15), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
+  padding: 1.75rem;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+  animation: modalScaleIn 0.2s ease-out;
+}
+
+.cancel-popup-icon-circle {
+  width: 56px;
+  height: 56px;
+  border-radius: 50%;
+  background: #fee2e2;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-bottom: 1rem;
+}
+
+.cancel-popup-title {
+  font-size: 1.2rem;
+  font-weight: 800;
+  color: #0f172a;
+  margin: 0 0 0.5rem 0;
+}
+
+.cancel-popup-message {
+  font-size: 0.9rem;
+  color: #475569;
+  line-height: 1.5;
+  margin: 0 0 1.5rem 0;
+}
+
+.cancel-popup-actions {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  width: 100%;
+}
+
+.btn-popup-keep {
+  flex: 1;
+  background: #f1f5f9;
+  border: 1px solid #cbd5e1;
+  color: #475569;
+  padding: 0.7rem 1rem;
+  border-radius: 10px;
+  font-size: 0.88rem;
+  font-weight: 700;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.btn-popup-keep:hover {
+  background: #e2e8f0;
+  color: #0f172a;
+}
+
+.btn-popup-confirm-cancel {
+  flex: 1.2;
+  background: #dc2626;
+  border: none;
+  color: #ffffff;
+  padding: 0.7rem 1rem;
+  border-radius: 10px;
+  font-size: 0.88rem;
+  font-weight: 700;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  box-shadow: 0 2px 8px rgba(220, 38, 38, 0.3);
+  transition: all 0.2s;
+}
+
+.btn-popup-confirm-cancel:hover {
+  background: #b91c1c;
+  transform: translateY(-1px);
+}
+

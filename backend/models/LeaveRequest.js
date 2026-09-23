@@ -49,7 +49,20 @@ const leaveRequestSchema = new mongoose.Schema({
   
   adminRemarks: { type: String, default: '' },
   reviewedBy: { type: String },
-  reviewedAt: { type: Date }
+  reviewedAt: { type: Date },
+
+  // Leave Policy & Balance tracking
+  annualAllowance: { type: Number, default: 12 },
+  requestedDays: { type: Number, default: 1 },
+  paidLeaveDays: { type: Number, default: 1 },
+  unpaidLeaveDays: { type: Number, default: 0 },
+  dailyDeductionRate: { type: Number, default: 1000 },
+  salaryDeductionAmount: { type: Number, default: 0 },
+  salaryDeductionStatus: { 
+    type: String, 
+    enum: ['Not Applicable', 'Pending', 'Calculated'], 
+    default: 'Not Applicable' 
+  }
 }, { timestamps: true });
 
 leaveRequestSchema.index({ applicantId: 1, status: 1 });

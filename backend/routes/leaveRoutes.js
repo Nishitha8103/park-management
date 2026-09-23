@@ -7,7 +7,9 @@ const {
   approveLeave,
   rejectLeave,
   cancelLeave,
-  getActiveStaffOnLeave
+  getActiveStaffOnLeave,
+  getReplacementStaff,
+  reassignLeaveTask
 } = require('../controllers/leaveController');
 
 const upload = require('../middleware/leaveUploadMiddleware');
@@ -20,6 +22,8 @@ router.post('/cancel', cancelLeave);
 // Admin routes
 router.get('/', getAllLeaves);
 router.get('/active-on-leave', getActiveStaffOnLeave);
+router.get('/replacement-staff', getReplacementStaff);
+router.post('/reassign-task', reassignLeaveTask);
 router.post('/approve', approveLeave);
 router.post('/reject', rejectLeave);
 

@@ -9,8 +9,8 @@
   display: flex;
   align-items: center;
   justify-content: center;
-  background-color: #03140a;
-  background-image: url('/landing_bg_leaves.jpg');
+  background-color: #0d2818;
+  background-image: url('/images/park-background.jpg');
   background-repeat: no-repeat;
   background-position: center center;
   background-size: cover;
@@ -18,12 +18,13 @@
   padding: 2.5rem 1.25rem 2rem;
   overflow-y: auto;
   overflow-x: hidden;
+  box-sizing: border-box;
 }
 
 .register-dark-overlay {
-  position: absolute;
+  position: fixed;
   inset: 0;
-  background: radial-gradient(circle at center, rgba(3, 22, 12, 0.12) 0%, rgba(2, 14, 8, 0.4) 100%);
+  background: radial-gradient(circle at center, rgba(10, 30, 18, 0.15) 0%, rgba(5, 20, 12, 0.35) 100%);
   pointer-events: none;
   z-index: 1;
 }
@@ -393,3 +394,69 @@
 .skyline-divider {
   color: rgba(52, 211, 153, 0.45);
 }
+
+/* ==========================================================================
+   2. Password Requirements Box
+   ========================================================================== */
+.register-password-requirements {
+  background: rgba(4, 30, 18, 0.7);
+  border: 1px solid rgba(52, 211, 153, 0.28);
+  border-radius: 12px;
+  padding: 0.75rem 0.9rem;
+  margin-top: 0.4rem;
+  text-align: left;
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
+}
+
+.pwd-req-header {
+  display: flex;
+  align-items: center;
+  gap: 0.45rem;
+  font-size: 0.76rem;
+  font-weight: 700;
+  color: #34d399;
+  margin-bottom: 0.45rem;
+  text-transform: uppercase;
+  letter-spacing: 0.4px;
+}
+
+.pwd-req-icon {
+  color: #34d399;
+}
+
+.pwd-req-list {
+  display: flex;
+  flex-direction: column;
+  gap: 0.35rem;
+}
+
+.pwd-req-item {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  font-size: 0.76rem;
+  color: #94a3b8;
+  transition: all 0.2s ease;
+}
+
+.pwd-req-item.valid {
+  color: #4ade80;
+  font-weight: 600;
+}
+
+.req-dot {
+  width: 5px;
+  height: 5px;
+  border-radius: 50%;
+  background: #64748b;
+  margin-left: 4px;
+  margin-right: 4px;
+  flex-shrink: 0;
+}
+
+.req-check-icon {
+  color: #4ade80;
+  flex-shrink: 0;
+}
+

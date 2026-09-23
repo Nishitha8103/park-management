@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { Search, Download, FileText, ClipboardCheck, Wrench, Clock, Eye, Menu, HardHat, LogOut, ChevronDown, Bell } from 'lucide-react';
+import { Search, Download, FileText, ClipboardCheck, Wrench, Clock, Eye, Menu, TreePine, HardHat, LogOut, ChevronDown, Bell } from 'lucide-react';
 import ContractorSidebar from '../components/ContractorSidebar';
 
 import './ContractorReports.css';
@@ -101,9 +101,8 @@ const ContractorReports = () => {
               <button className="contractor-menu-toggle" onClick={toggleSidebar}>
                 <Menu size={24} />
               </button>
-              <HardHat size={28} className="contractor-text-primary" />
-              <h1>PARK MAINTENANCE</h1>
-              <span>Portal</span>
+              <TreePine size={28} color="#e5ede7" />
+              <h1>Parks Monitoring System</h1>
             </div>
             
             <div className="contractor-user-info" style={{ display: 'flex', alignItems: 'center', gap: '1.5rem' }}>

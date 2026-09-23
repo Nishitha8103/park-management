@@ -34,6 +34,7 @@ app.use(express.json());
 
 // Serve static files from uploads folder
 app.use('/uploads', express.static(path.join(__dirname, 'uploads')));
+app.use('/uploads', express.static(path.join(__dirname, 'uploads/parks')));
 
 // Routes
 app.use('/api/auth', require('./routes/authRoutes'));
@@ -51,6 +52,8 @@ app.use('/api/emergencies', require('./routes/emergencyRoutes'));
 app.use('/api/reassignments', require('./routes/reassignmentRoutes'));
 app.use('/api/leaves', require('./routes/leaveRoutes'));
 app.use('/api/kyc', require('./routes/kycRoutes'));
+app.use('/api/settings', require('./routes/settingRoutes'));
+app.use('/api/feedback', require('./routes/feedbackRoutes'));
 
 
 // Basic health check endpoint

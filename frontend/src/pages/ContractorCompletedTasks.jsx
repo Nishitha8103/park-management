@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
-import { Menu, LogOut, HardHat, Search, ChevronLeft, ChevronRight, Bell } from 'lucide-react';
+import { Menu, LogOut, TreePine, HardHat, Search, ChevronLeft, ChevronRight, Bell } from 'lucide-react';
 import './ContractorCompletedTasks.css';
 import ContractorSidebar from '../components/ContractorSidebar';
 
@@ -80,9 +80,8 @@ const ContractorCompletedTasks = () => {
               <button className="contractor-menu-toggle" onClick={toggleSidebar}>
                 <Menu size={24} />
               </button>
-              <HardHat size={28} className="contractor-text-primary" />
-              <h1>PARK MAINTENANCE</h1>
-              <span>Portal</span>
+              <TreePine size={28} color="#e5ede7" />
+              <h1>Parks Monitoring System</h1>
             </div>
             
             <div className="contractor-user-info" style={{ display: 'flex', alignItems: 'center', gap: '1.5rem' }}>

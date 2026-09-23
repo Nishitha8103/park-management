@@ -1,5 +1,5 @@
 /* ============================================================
-   CONTRACTOR PROFILE — Green Nature-Inspired Park Theme
+   CONTRACTOR PROFILE — #94c559 Theme
    ============================================================ */
 
 /* ---- Page ---- */
@@ -16,19 +16,20 @@
   gap: 1rem;
   margin-bottom: 1.75rem;
   padding: 1.5rem 2rem;
-  background: linear-gradient(135deg, #0b3d2c 0%, #06402B 65%, #042e1f 100%);
+  background: #94c559;
+  background: linear-gradient(135deg, #7cae40 0%, #94c559 65%, #a8d76f 100%);
   border-radius: 18px;
-  border: 1px solid rgba(74, 222, 128, 0.25);
-  box-shadow: 0 8px 24px rgba(6, 64, 43, 0.25);
+  border: 1px solid #d4ebba;
+  box-shadow: 0 8px 24px rgba(148, 197, 89, 0.25);
 }
 
 .header-icon-wrapper {
   width: 44px;
   height: 44px;
   border-radius: 12px;
-  background: rgba(74, 222, 128, 0.15);
-  color: #4ade80;
-  border: 1px solid rgba(74, 222, 128, 0.3);
+  background: rgba(255, 255, 255, 0.2);
+  color: #ffffff;
+  border: 1px solid rgba(255, 255, 255, 0.35);
   display: flex;
   align-items: center;
   justify-content: center;
@@ -45,7 +46,7 @@
 
 .profile-subtitle {
   font-size: 0.85rem;
-  color: #bbf7d0;
+  color: #f4f9ef;
   margin: 0;
 }
 
@@ -65,9 +66,9 @@
 }
 
 .profile-message.success {
-  background: #dcfce7;
-  color: #15803d;
-  border: 1px solid #86efac;
+  background: #edf6e4;
+  color: #324f11;
+  border: 1px solid #d4ebba;
 }
 
 .profile-message.error {
@@ -83,8 +84,8 @@
   gap: 1.5rem;
   background: #ffffff;
   border-radius: 18px;
-  border: 1px solid #dcfce7;
-  box-shadow: 0 4px 18px rgba(6, 64, 43, 0.05);
+  border: 1px solid #e0eed1;
+  box-shadow: 0 4px 18px rgba(148, 197, 89, 0.06);
   overflow: hidden;
 }
 
@@ -100,10 +101,10 @@
   flex-direction: column;
   align-items: center;
   padding: 2rem 1.5rem;
-  background: linear-gradient(180deg, #0b3d2c 0%, #06402B 100%);
+  background: linear-gradient(180deg, #7cae40 0%, #94c559 100%);
   text-align: center;
   gap: 0.75rem;
-  border-right: 1px solid rgba(74, 222, 128, 0.15);
+  border-right: 1px solid #d4ebba;
 }
 
 .avatar-wrapper {
@@ -114,7 +115,7 @@
   width: 110px;
   height: 110px;
   flex-shrink: 0;
-  box-shadow: 0 0 0 4px rgba(74, 222, 128, 0.35), 0 8px 24px rgba(0,0,0,0.3);
+  box-shadow: 0 0 0 4px rgba(255, 255, 255, 0.4), 0 8px 24px rgba(0,0,0,0.15);
 }
 
 .avatar-image {
@@ -126,8 +127,8 @@
 .avatar-circle {
   width: 100%;
   height: 100%;
-  background: linear-gradient(135deg, #14532d, #166534);
-  color: #86efac;
+  background: #66942f;
+  color: #ffffff;
   display: flex;
   align-items: center;
   justify-content: center;
@@ -136,7 +137,7 @@
 .avatar-overlay {
   position: absolute;
   inset: 0;
-  background: rgba(6, 64, 43, 0.65);
+  background: rgba(40, 65, 14, 0.65);
   display: flex;
   flex-direction: column;
   align-items: center;
@@ -164,18 +165,18 @@
   display: inline-block;
   font-size: 0.72rem;
   font-weight: 700;
-  color: #fef08a;
-  background: rgba(254, 240, 138, 0.18);
-  border: 1px solid rgba(254, 240, 138, 0.35);
+  color: #ffffff;
+  background: rgba(255, 255, 255, 0.25);
+  border: 1px solid rgba(255, 255, 255, 0.4);
   padding: 0.25rem 0.8rem;
   border-radius: 20px;
   letter-spacing: 0.3px;
 }
 
 .btn-toggle-edit {
-  background: rgba(255,255,255,0.1);
-  color: #e2e8f0;
-  border: 1.5px solid rgba(255,255,255,0.2);
+  background: rgba(255,255,255,0.2);
+  color: #ffffff;
+  border: 1.5px solid rgba(255,255,255,0.4);
   padding: 0.5rem 1.2rem;
   border-radius: 9px;
   font-size: 0.82rem;
@@ -186,9 +187,9 @@
 }
 
 .btn-toggle-edit:hover, .btn-toggle-edit.active {
-  background: #16a34a;
-  color: #fff;
-  border-color: #16a34a;
+  background: #ffffff;
+  color: #28410e;
+  border-color: #ffffff;
 }
 
 /* ---- Forms Section ---- */
@@ -210,14 +211,14 @@
   gap: 0.5rem;
   font-size: 1.05rem;
   font-weight: 800;
-  color: #064e3b;
+  color: #28410e;
   margin: 0 0 1.1rem;
   padding-bottom: 0.65rem;
-  border-bottom: 2px solid #ecfdf5;
+  border-bottom: 2px solid #edf6e4;
 }
 
 .section-title.security {
-  color: #064e3b;
+  color: #28410e;
 }
 
 .section-desc {
@@ -254,7 +255,7 @@
 .profile-form-group label {
   font-size: 0.78rem;
   font-weight: 700;
-  color: #166534;
+  color: #4d741e;
   text-transform: uppercase;
   letter-spacing: 0.4px;
 }
@@ -264,7 +265,7 @@
   display: flex;
   align-items: center;
   gap: 0.5rem;
-  border: 1.5px solid #d1fae5;
+  border: 1.5px solid #d4ebba;
   border-radius: 8px;
   padding: 0 0.85rem;
   background: #f8fafc;
@@ -272,13 +273,13 @@
 }
 
 .profile-input-wrapper:focus-within {
-  border-color: #16a34a;
+  border-color: #94c559;
   background: #fff;
-  box-shadow: 0 0 0 3px rgba(22, 163, 74, 0.15);
+  box-shadow: 0 0 0 3px rgba(148, 197, 89, 0.2);
 }
 
 .profile-input-icon {
-  color: #059669;
+  color: #66942f;
   flex-shrink: 0;
 }
 
@@ -305,7 +306,7 @@
 .password-toggle-btn {
   background: transparent;
   border: none;
-  color: #059669;
+  color: #66942f;
   cursor: pointer;
   padding: 0.2rem;
   display: flex;
@@ -314,7 +315,7 @@
 }
 
 .password-toggle-btn:hover {
-  color: #15803d;
+  color: #28410e;
 }
 
 /* ---- Form Actions ---- */
@@ -329,7 +330,7 @@
   display: inline-flex;
   align-items: center;
   gap: 0.4rem;
-  background: linear-gradient(135deg, #16a34a, #15803d);
+  background: linear-gradient(135deg, #94c559, #7cae40);
   color: #fff;
   border: none;
   padding: 0.65rem 1.5rem;
@@ -338,17 +339,17 @@
   font-weight: 700;
   cursor: pointer;
   transition: all 0.2s;
-  box-shadow: 0 4px 12px rgba(22,163,74,0.3);
+  box-shadow: 0 4px 12px rgba(148, 197, 89, 0.35);
 }
 
 .btn-save-profile:hover {
   transform: translateY(-1px);
-  background: linear-gradient(135deg, #15803d, #14532d);
-  box-shadow: 0 6px 18px rgba(22,163,74,0.4);
+  background: linear-gradient(135deg, #7cae40, #66942f);
+  box-shadow: 0 6px 18px rgba(148, 197, 89, 0.45);
 }
 
 .btn-save-password {
-  background: linear-gradient(135deg, #16a34a, #15803d);
+  background: linear-gradient(135deg, #94c559, #7cae40);
   color: #fff;
   border: none;
   padding: 0.65rem 1.5rem;
@@ -357,12 +358,11 @@
   font-weight: 700;
   cursor: pointer;
   transition: all 0.2s;
-  box-shadow: 0 4px 12px rgba(22,163,74,0.3);
+  box-shadow: 0 4px 12px rgba(148, 197, 89, 0.35);
 }
 
 .btn-save-password:hover {
   transform: translateY(-1px);
-  background: linear-gradient(135deg, #15803d, #14532d);
-  box-shadow: 0 6px 18px rgba(22,163,74,0.4);
+  background: linear-gradient(135deg, #7cae40, #66942f);
+  box-shadow: 0 6px 18px rgba(148, 197, 89, 0.45);
 }
-

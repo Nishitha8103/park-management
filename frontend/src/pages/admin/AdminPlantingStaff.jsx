@@ -536,7 +536,7 @@ const AdminPlantingStaff = () => {
             <form onSubmit={handleCreateStaff}>
               <div style={{ marginBottom: '1rem' }}>
                 <label style={{ display: 'block', fontSize: '0.875rem', fontWeight: '600', marginBottom: '0.25rem' }}>Full Name</label>
-                <input type="text" required value={staffForm.name} onChange={(e) => setStaffForm({...staffForm, name: e.target.value})} placeholder="e.g. Ramesh Kumar" style={{ width: '100%', padding: '0.625rem', borderRadius: '8px', border: '1px solid #d1d5db' }} />
+                <input type="text" required value={staffForm.name} onChange={(e) => setStaffForm({...staffForm, name: e.target.value.replace(/[^a-zA-Z\s]/g, '')})} placeholder="e.g. Ramesh Kumar" style={{ width: '100%', padding: '0.625rem', borderRadius: '8px', border: '1px solid #d1d5db' }} />
               </div>
               <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '1rem', marginBottom: '1rem' }}>
                 <div>

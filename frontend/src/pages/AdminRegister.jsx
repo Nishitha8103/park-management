@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
-import { UserPlus, User, Mail, Phone, Lock, ShieldAlert, Eye, EyeOff, FolderKey } from 'lucide-react';
+import { UserPlus, User, Mail, Phone, Lock, TreePine, Eye, EyeOff, FolderKey } from 'lucide-react';
 import './AdminRegister.css';
 
 const AdminRegister = () => {
@@ -61,10 +61,10 @@ const AdminRegister = () => {
       <div className="admin-register-card">
         <div className="admin-register-header">
           <div className="admin-register-logo">
-            <ShieldAlert size={36} className="admin-text-primary" />
+            <TreePine size={36} className="admin-text-primary" />
           </div>
           <h2>ADMIN PORTAL</h2>
-          <p className="admin-register-brand">OFFICIAL REGISTRATION</p>
+          <p className="admin-register-brand">PARKS MONITORING SYSTEM</p>
         </div>
 
         <form onSubmit={handleRegister}>
@@ -78,7 +78,7 @@ const AdminRegister = () => {
                   className="admin-input-field has-icon" 
                   placeholder="Enter full name" 
                   value={name}
-                  onChange={(e) => setName(e.target.value)}
+                  onChange={(e) => setName(e.target.value.replace(/[^a-zA-Z\s]/g, ''))}
                   required 
                 />
               </div>
@@ -111,7 +111,8 @@ const AdminRegister = () => {
                   className="admin-input-field has-icon" 
                   placeholder="Enter phone number" 
                   value={phone}
-                  onChange={(e) => setPhone(e.target.value)}
+                  onChange={(e) => setPhone(e.target.value.replace(/\D/g, '').slice(0, 10))}
+                  maxLength={10}
                   required 
                 />
               </div>

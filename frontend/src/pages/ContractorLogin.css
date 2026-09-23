@@ -12,12 +12,12 @@
 .contractor-login-card {
   background: white;
   border-radius: 16px;
-  box-shadow: 0 15px 35px -5px rgba(6, 64, 43, 0.15), 0 8px 10px -6px rgba(0, 0, 0, 0.05);
+  box-shadow: 0 15px 35px -5px rgba(40, 65, 14, 0.15), 0 8px 10px -6px rgba(0, 0, 0, 0.05);
   width: 100%;
   max-width: 450px;
   padding: 2.5rem;
-  border-top: 6px solid #16a34a;
-  border: 1px solid rgba(74, 222, 128, 0.2);
+  border-top: 6px solid #94c559;
+  border: 1px solid #d4ebba;
 }
 
 .contractor-login-header {
@@ -31,26 +31,26 @@
   align-items: center;
   width: 64px;
   height: 64px;
-  background-color: #dcfce7;
+  background-color: #edf6e4;
   border-radius: 50%;
   margin-bottom: 1rem;
 }
 
 .contractor-text-primary {
-  color: #16a34a;
+  color: #66942f;
 }
 
 .contractor-login-header h2 {
   font-size: 1.5rem;
   font-weight: 800;
-  color: #064e3b;
+  color: #28410e;
   letter-spacing: 1px;
   margin: 0;
 }
 
 .contractor-login-brand {
   font-size: 0.85rem;
-  color: #059669;
+  color: #66942f;
   letter-spacing: 2px;
   margin-top: 0.25rem;
   font-weight: 600;
@@ -99,8 +99,8 @@
 }
 
 .contractor-input-field:focus {
-  border-color: #16a34a;
-  box-shadow: 0 0 0 3px rgba(22, 163, 74, 0.15);
+  border-color: #94c559;
+  box-shadow: 0 0 0 3px rgba(148, 197, 89, 0.2);
 }
 
 .contractor-password-input-wrapper {
@@ -138,7 +138,7 @@
 
 .contractor-btn-primary {
   width: 100%;
-  background: linear-gradient(135deg, #22c55e 0%, #16a34a 100%);
+  background: linear-gradient(135deg, #94c559 0%, #7cae40 100%);
   color: white;
   border: none;
   padding: 0.75rem;
@@ -150,12 +150,12 @@
   display: flex;
   align-items: center;
   justify-content: center;
-  box-shadow: 0 4px 12px rgba(22, 163, 74, 0.3);
+  box-shadow: 0 4px 12px rgba(148, 197, 89, 0.35);
 }
 
 .contractor-btn-primary:hover {
-  background: linear-gradient(135deg, #16a34a 0%, #15803d 100%);
-  box-shadow: 0 6px 18px rgba(22, 163, 74, 0.4);
+  background: linear-gradient(135deg, #7cae40 0%, #66942f 100%);
+  box-shadow: 0 6px 18px rgba(148, 197, 89, 0.45);
   transform: translateY(-1px);
 }
 

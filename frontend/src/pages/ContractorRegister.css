@@ -3,7 +3,7 @@
   display: flex;
   justify-content: center;
   align-items: center;
-  background-color: #fefaf0;
+  background-color: #f7fbf8;
   padding: 2rem;
   font-family: 'Inter', sans-serif;
 }
@@ -11,12 +11,12 @@
 .contractor-register-card {
   background: white;
   border-radius: 16px;
-  box-shadow: 0 15px 35px -5px rgba(6, 64, 43, 0.15), 0 8px 10px -6px rgba(0, 0, 0, 0.05);
+  box-shadow: 0 15px 35px -5px rgba(40, 65, 14, 0.15), 0 8px 10px -6px rgba(0, 0, 0, 0.05);
   width: 100%;
   max-width: 600px;
   padding: 2.5rem;
-  border-top: 6px solid #16a34a;
-  border: 1px solid rgba(74, 222, 128, 0.2);
+  border-top: 6px solid #94c559;
+  border: 1px solid #d4ebba;
 }
 
 .contractor-register-header {
@@ -30,7 +30,7 @@
   align-items: center;
   width: 64px;
   height: 64px;
-  background-color: #dcfce7;
+  background-color: #edf6e4;
   border-radius: 50%;
   margin-bottom: 1rem;
 }
@@ -38,14 +38,14 @@
 .contractor-register-header h2 {
   font-size: 1.5rem;
   font-weight: 800;
-  color: #064e3b;
+  color: #28410e;
   letter-spacing: 1px;
   margin: 0;
 }
 
 .contractor-register-brand {
   font-size: 0.85rem;
-  color: #059669;
+  color: #66942f;
   letter-spacing: 2px;
   margin-top: 0.25rem;
   font-weight: 600;
@@ -83,6 +83,11 @@
 
 .contractor-input-field.has-icon {
   padding-left: 2.75rem;
+}
+
+.contractor-input-field:focus {
+  border-color: #94c559;
+  box-shadow: 0 0 0 3px rgba(148, 197, 89, 0.2);
 }
 
 .contractor-register-footer {

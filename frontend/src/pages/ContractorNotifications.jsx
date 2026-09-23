@@ -2,6 +2,7 @@ import { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { 
   Menu, 
+  TreePine,
   LogOut, 
   HardHat, 
   Bell, 
@@ -163,9 +164,8 @@ const ContractorNotifications = () => {
               <button className="contractor-menu-toggle" onClick={toggleSidebar}>
                 <Menu size={24} />
               </button>
-              <HardHat size={28} className="contractor-text-primary" />
-              <h1>PARK MAINTENANCE</h1>
-              <span>Portal</span>
+              <TreePine size={28} color="#e5ede7" />
+              <h1>Parks Monitoring System</h1>
             </div>
             
             <div className="contractor-user-info">
@@ -258,25 +258,6 @@ const ContractorNotifications = () => {
                   </div>
 
                   <div style={{ display: 'flex', alignItems: 'center', gap: '0.6rem', marginLeft: '1rem' }}>
-                    <button 
-                      className="btn-action-task" 
-                      onClick={() => handleActionClick(notif)}
-                      style={{
-                        display: 'flex',
-                        alignItems: 'center',
-                        gap: '4px',
-                        padding: '8px 14px',
-                        borderRadius: '8px',
-                        background: '#10b981',
-                        color: 'white',
-                        border: 'none',
-                        fontWeight: 600,
-                        fontSize: '0.85rem',
-                        cursor: 'pointer'
-                      }}
-                    >
-                      Take Action <ArrowRight size={14} />
-                    </button>
                     {!notif.isRead && (
                       <button 
                         onClick={() => markAsRead(notif._id)}

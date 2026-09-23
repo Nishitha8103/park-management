@@ -280,22 +280,23 @@ export default function SOSModal({ isOpen, onClose, initialParkId = null }) {
                 <div className="sos-contact-grid">
                   <div>
                     <input 
-                      type="text"
-                      className="sos-text-input"
-                      placeholder="Your Full Name"
-                      value={citizenName}
-                      onChange={(e) => setCitizenName(e.target.value)}
-                      required
+                      type="text" 
+                      className="sos-text-input" 
+                      placeholder="Your Full Name" 
+                      value={citizenName} 
+                      onChange={(e) => setCitizenName(e.target.value.replace(/[^a-zA-Z\s]/g, ''))} 
+                      required 
                     />
                   </div>
                   <div>
                     <input 
-                      type="tel"
-                      className="sos-text-input"
-                      placeholder="Phone Number for Gardener / Staff to Call"
-                      value={citizenPhone}
-                      onChange={(e) => setCitizenPhone(e.target.value)}
-                      required
+                      type="tel" 
+                      className="sos-text-input" 
+                      placeholder="Phone Number for Gardener / Staff to Call" 
+                      value={citizenPhone} 
+                      maxLength="10"
+                      onChange={(e) => setCitizenPhone(e.target.value.replace(/\D/g, '').slice(0, 10))} 
+                      required 
                     />
                   </div>
                 </div>

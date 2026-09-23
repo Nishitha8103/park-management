@@ -26,32 +26,65 @@ const DEFAULT_PROOF_TYPES = [
 ];
 
 const StallBookingModal = ({ parkId, parkName, slot, onClose, onBookingSuccess }) => {
+  const getStoredUserData = () => {
+    try {
+      const userStr = localStorage.getItem('public_user') || localStorage.getItem('user');
+      if (userStr) {
+        const u = JSON.parse(userStr);
+        const userObj = u.user || u;
+        const role = (userObj.role || '').toLowerCase();
+        if (role === 'admin' || role === 'government official' || role === 'government_official' || role === 'official' || role === 'contractor') {
+          return { name: '', phone: '', address: '' };
+        }
+        return {
+          name: userObj.name || userObj.fullName || userObj.firstName || '',
+          phone: (userObj.phone || userObj.mobile || userObj.phoneNumber || '').replace(/\D/g, '').slice(0, 10),
+          address: userObj.address || ''
+        };
+      }
+    } catch (e) {
+      console.error('Error reading stored user data:', e);
+    }
+    return { name: '', phone: '', address: '' };
+  };
+
+  const initialUser = getStoredUserData();
+
   const [formData, setFormData] = useState({
-    applicantName: '',
-    applicantPhone: '',
+    applicantName: initialUser.name,
+    applicantPhone: initialUser.phone,
     stallName: '',
     productsType: '',
-    nativeAddress: '',
-    currentAddress: '',
-    isAddressSameAsAadhaar: 'yes', // 'yes' | 'no'
-    differentAddressReason: 'Studying in another city',
-    differentAddressOtherReason: '',
+    nativeAddress: initialUser.address
   });
 
   const [photoFile, setPhotoFile] = useState(null);
   const [photoPreview, setPhotoPreview] = useState('');
   const [aadhaarDocFile, setAadhaarDocFile] = useState(null);
-  const [currentAddressProofFile, setCurrentAddressProofFile] = useState(null);
 
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
   const [paymentSuccess, setPaymentSuccess] = useState(false);
 
-  // Do not auto-populate user data from localStorage to prevent showing wrong/stale info
-  // Inputs remain clean and allow the user to type their correct name and phone number.
+  useEffect(() => {
+    const user = getStoredUserData();
+    setFormData(prev => ({
+      ...prev,
+      applicantName: prev.applicantName || user.name,
+      applicantPhone: prev.applicantPhone || user.phone,
+      nativeAddress: prev.nativeAddress || user.address
+    }));
+  }, []);
 
   const handleInputChange = (e) => {
-    const { name, value } = e.target;
+    let { name, value } = e.target;
+    if (name === 'applicantName' || name === 'stallName') {
+      value = value.replace(/[^a-zA-Z\s]/g, '');
+    } else if (name === 'productsType') {
+      value = value.replace(/[0-9]/g, '');
+    } else if (name === 'applicantPhone') {
+      value = value.replace(/\D/g, '').slice(0, 10);
+    }
     setFormData(prev => ({ ...prev, [name]: value }));
   };
 
@@ -89,8 +122,8 @@ const StallBookingModal = ({ parkId, parkName, slot, onClose, onBookingSuccess }
       return;
     }
 
-    if (formData.isAddressSameAsAadhaar === 'no' && !currentAddressProofFile) {
-      setError('Current address proof document is required when current address differs from Aadhaar.');
+    if (formData.applicantPhone && formData.applicantPhone.length !== 10) {
+      setError('Please enter a valid 10-digit phone number.');
       setLoading(false);
       return;
     }
@@ -136,18 +169,8 @@ const StallBookingModal = ({ parkId, parkName, slot, onClose, onBookingSuccess }
       submitData.append('productsType', formData.productsType);
       submitData.append('amountPaid', slot.price || 0);
 
-      // Address Information
-      submitData.append('nativeAddress', formData.nativeAddress);
-      submitData.append('currentAddress', formData.currentAddress);
-      submitData.append('isAddressSameAsAadhaar', formData.isAddressSameAsAadhaar === 'yes');
-
-      if (formData.isAddressSameAsAadhaar === 'no') {
-        submitData.append('differentAddressReason', formData.differentAddressReason);
-        submitData.append('differentAddressOtherReason', formData.differentAddressOtherReason);
-        if (currentAddressProofFile) {
-          submitData.append('currentAddressProof', currentAddressProofFile);
-        }
-      }
+      // Address & Identification Information
+      if (formData.nativeAddress) submitData.append('nativeAddress', formData.nativeAddress);
 
       if (photoFile) submitData.append('photo', photoFile);
       if (aadhaarDocFile) submitData.append('document', aadhaarDocFile);
@@ -326,6 +349,7 @@ const StallBookingModal = ({ parkId, parkName, slot, onClose, onBookingSuccess }
                 name="applicantPhone" 
                 value={formData.applicantPhone} 
                 onChange={handleInputChange} 
+                maxLength="10"
                 required 
                 autoComplete="off"
                 placeholder="10-digit mobile number"
@@ -394,30 +418,14 @@ const StallBookingModal = ({ parkId, parkName, slot, onClose, onBookingSuccess }
           </div>
         </div>
 
-        {/* Section 3: Address Details */}
+        {/* Section 3: Identity Verification */}
         <div style={{ background: '#f8fafc', padding: '1.1rem', borderRadius: '12px', border: '1px solid #e2e8f0' }}>
           <h4 style={{ margin: '0 0 12px 0', fontSize: '0.92rem', color: '#1e293b', fontWeight: 700, display: 'flex', alignItems: 'center', gap: '7px' }}>
-            <Home size={16} color="#059669" /> 3. Address Details
+            <FileText size={16} color="#059669" /> 3. Identity Verification
           </h4>
 
-          {/* Current Residential Address */}
-          <div style={{ marginBottom: '1rem' }}>
-            <label style={{ display: 'block', marginBottom: '0.35rem', fontWeight: '600', color: '#374151', fontSize: '0.84rem' }}>
-              Current Residential Address *
-            </label>
-            <textarea 
-              name="currentAddress" 
-              value={formData.currentAddress} 
-              onChange={handleInputChange} 
-              required 
-              rows="2"
-              placeholder="Enter the address where you currently live"
-              style={{ width: '100%', padding: '0.65rem 0.8rem', border: '1px solid #cbd5e1', borderRadius: '8px', fontSize: '0.9rem', boxSizing: 'border-box' }} 
-            />
-          </div>
-
           {/* Aadhaar Card Document Upload */}
-          <div style={{ marginBottom: '1rem' }}>
+          <div>
             <label style={{ display: 'block', marginBottom: '0.35rem', fontWeight: '600', color: '#374151', fontSize: '0.84rem' }}>
               Aadhaar Card Upload (Front / Back / PDF) *
             </label>
@@ -431,99 +439,6 @@ const StallBookingModal = ({ parkId, parkName, slot, onClose, onBookingSuccess }
             <p style={{ margin: '3px 0 0', fontSize: '0.75rem', color: '#64748b' }}>
               Upload your official Aadhaar card copy (PDF or Image).
             </p>
-          </div>
-
-          {/* Is your current address the same as Aadhaar? */}
-          <div style={{ marginBottom: '0.5rem', background: '#ffffff', padding: '0.9rem', borderRadius: '8px', border: '1px solid #cbd5e1' }}>
-            <label style={{ display: 'block', marginBottom: '0.5rem', fontWeight: '700', color: '#1e293b', fontSize: '0.86rem' }}>
-              Is your current address the same as Aadhaar? *
-            </label>
-            
-            <div style={{ display: 'flex', gap: '1.5rem', marginBottom: '0.5rem' }}>
-              <label style={{ display: 'inline-flex', alignItems: 'center', gap: '6px', cursor: 'pointer', fontSize: '0.9rem', color: '#334155', fontWeight: 600 }}>
-                <input 
-                  type="radio" 
-                  name="isAddressSameAsAadhaar" 
-                  value="yes" 
-                  checked={formData.isAddressSameAsAadhaar === 'yes'} 
-                  onChange={handleInputChange} 
-                />
-                Yes
-              </label>
-              <label style={{ display: 'inline-flex', alignItems: 'center', gap: '6px', cursor: 'pointer', fontSize: '0.9rem', color: '#334155', fontWeight: 600 }}>
-                <input 
-                  type="radio" 
-                  name="isAddressSameAsAadhaar" 
-                  value="no" 
-                  checked={formData.isAddressSameAsAadhaar === 'no'} 
-                  onChange={handleInputChange} 
-                />
-                No
-              </label>
-            </div>
-
-            {/* Conditional Display for YES */}
-            {formData.isAddressSameAsAadhaar === 'yes' ? (
-              <div style={{ padding: '8px 12px', background: '#ecfdf5', color: '#065f46', borderRadius: '6px', fontSize: '0.82rem', fontWeight: 600, display: 'flex', alignItems: 'center', gap: '6px', border: '1px solid #a7f3d0' }}>
-                <CheckCircle2 size={14} /> ✓ Current address matches Aadhaar address.
-              </div>
-            ) : (
-              /* Conditional Display for NO */
-              <div style={{ marginTop: '0.8rem', padding: '1rem', background: '#fffbeb', borderRadius: '8px', border: '1px solid #fde68a', display: 'flex', flexDirection: 'column', gap: '0.9rem' }}>
-                
-                <div>
-                  <label style={{ display: 'block', marginBottom: '0.35rem', fontWeight: '600', color: '#92400e', fontSize: '0.82rem' }}>
-                    Reason for different address *
-                  </label>
-                  <select 
-                    name="differentAddressReason" 
-                    value={formData.differentAddressReason} 
-                    onChange={handleInputChange} 
-                    required 
-                    style={{ width: '100%', padding: '0.6rem', border: '1px solid #f59e0b', borderRadius: '6px', fontSize: '0.88rem', backgroundColor: 'white' }}
-                  >
-                    <option value="Studying in another city">Studying in another city</option>
-                    <option value="Working in another city">Working in another city</option>
-                    <option value="Rented accommodation">Rented accommodation</option>
-                    <option value="Staying with relatives/friends">Staying with relatives/friends</option>
-                    <option value="Other">Other</option>
-                  </select>
-                </div>
-
-                {formData.differentAddressReason === 'Other' && (
-                  <div>
-                    <label style={{ display: 'block', marginBottom: '0.35rem', fontWeight: '600', color: '#92400e', fontSize: '0.82rem' }}>
-                      Please specify reason *
-                    </label>
-                    <input 
-                      type="text" 
-                      name="differentAddressOtherReason" 
-                      value={formData.differentAddressOtherReason} 
-                      onChange={handleInputChange} 
-                      required 
-                      placeholder="State your reason..."
-                      style={{ width: '100%', padding: '0.55rem', border: '1px solid #f59e0b', borderRadius: '6px', fontSize: '0.88rem', boxSizing: 'border-box' }} 
-                    />
-                  </div>
-                )}
-
-                <div>
-                  <label style={{ display: 'block', marginBottom: '0.35rem', fontWeight: '600', color: '#92400e', fontSize: '0.82rem' }}>
-                    Current Address Proof *
-                  </label>
-                  <input 
-                    type="file" 
-                    onChange={(e) => setCurrentAddressProofFile(e.target.files[0])} 
-                    required={formData.isAddressSameAsAadhaar === 'no' && !currentAddressProofFile}
-                    accept=".pdf,.jpg,.jpeg,.png"
-                    style={{ width: '100%', padding: '0.45rem', border: '1px solid #f59e0b', borderRadius: '6px', fontSize: '0.82rem', backgroundColor: 'white' }} 
-                  />
-                  <p style={{ margin: '3px 0 0', fontSize: '0.74rem', color: '#92400e' }}>
-                    Upload rental agreement, college ID, utility bill, or employment proof.
-                  </p>
-                </div>
-              </div>
-            )}
           </div>
         </div>
 

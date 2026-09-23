@@ -245,9 +245,6 @@ const Profile = () => {
         <div className="profile-hero-info">
           <div className="user-name-row">
             <h2>{isEditing ? editForm.name : userData.name}</h2>
-            <span className="user-role-badge">
-              🟢 {userData.role === 'public_user' ? 'Public User' : userData.role || 'Public User'}
-            </span>
           </div>
           <div className="profile-meta-grid">
             <div className="profile-meta-item">
@@ -281,7 +278,7 @@ const Profile = () => {
                 <input 
                   type="text" 
                   value={editForm.name} 
-                  onChange={(e) => setEditForm({...editForm, name: e.target.value})}
+                  onChange={(e) => setEditForm({...editForm, name: e.target.value.replace(/[^a-zA-Z\s]/g, '')})}
                   className="profile-edit-input"
                 />
               ) : userData.name}
@@ -309,7 +306,8 @@ const Profile = () => {
                 <input 
                   type="text" 
                   value={editForm.phone} 
-                  onChange={(e) => setEditForm({...editForm, phone: e.target.value})}
+                  maxLength="10"
+                  onChange={(e) => setEditForm({...editForm, phone: e.target.value.replace(/\D/g, '').slice(0, 10)})}
                   className="profile-edit-input"
                   placeholder="e.g. 9876543210"
                 />
@@ -324,7 +322,7 @@ const Profile = () => {
                 <input 
                   type="text" 
                   value={editForm.address} 
-                  onChange={(e) => setEditForm({...editForm, address: e.target.value})}
+                  onChange={(e) => setEditForm({...editForm, address: e.target.value.replace(/[^a-zA-Z0-9\s,.-/#]/g, '')})}
                   className="profile-edit-input"
                   placeholder="e.g. JP Nagar, Bangalore"
                 />

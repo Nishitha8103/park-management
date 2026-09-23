@@ -430,7 +430,7 @@ const FloraInventory = () => {
                   <input 
                     type="text"
                     value={formData.locationInPark}
-                    onChange={(e) => setFormData({...formData, locationInPark: e.target.value})}
+                    onChange={(e) => setFormData({...formData, locationInPark: e.target.value.replace(/[^a-zA-Z0-9\s,.-/#]/g, '')})}
                     placeholder="e.g. North Gate Entrance"
                     style={{ width: '100%', padding: '0.625rem', borderRadius: '8px', border: '1px solid #d1d5db' }}
                   />

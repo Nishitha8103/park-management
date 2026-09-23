@@ -1,5 +1,5 @@
 /* ============================================================
-   CONTRACTOR COMPLETED TASKS — Professional Park Theme
+   CONTRACTOR COMPLETED TASKS — #94c559 Theme
    ============================================================ */
 
 /* Page wrapper — uses ContractorDashboard.css base */
@@ -22,11 +22,11 @@
   gap: 1rem;
   margin-bottom: 1.75rem;
   padding: 1.5rem;
-  background: #84cc16;
-  background: linear-gradient(135deg, #65a30d 0%, #84cc16 65%, #a3e635 100%);
+  background: #94c559;
+  background: linear-gradient(135deg, #7cae40 0%, #94c559 65%, #a8d76f 100%);
   border-radius: 16px;
-  border: 1px solid #bef264;
-  box-shadow: 0 10px 25px -5px rgba(101, 163, 13, 0.3);
+  border: 1px solid #d4ebba;
+  box-shadow: 0 10px 25px -5px rgba(148, 197, 89, 0.3);
 }
 
 .completed-tasks-header h2 {
@@ -40,8 +40,8 @@
 .completed-tasks-card {
   background: #fff;
   border-radius: 16px;
-  border: 1px solid #e2e8f0;
-  box-shadow: 0 2px 12px rgba(0,0,0,0.05);
+  border: 1px solid #e0eed1;
+  box-shadow: 0 2px 12px rgba(148, 197, 89, 0.06);
   overflow: hidden;
 }
 
@@ -96,8 +96,8 @@
 }
 
 .search-input:focus {
-  border-color: #16a34a;
-  box-shadow: 0 0 0 3px rgba(22,163,74,0.1);
+  border-color: #94c559;
+  box-shadow: 0 0 0 3px rgba(148, 197, 89, 0.2);
 }
 
 .filter-select {
@@ -120,7 +120,7 @@
 }
 
 .filter-select:focus {
-  border-color: #16a34a;
+  border-color: #94c559;
 }
 
 /* ---- Table ---- */
@@ -157,7 +157,7 @@
 }
 
 .completed-tasks-table tbody tr:hover {
-  background-color: #f0fdf4;
+  background-color: #f4f9ef;
 }
 
 .completed-tasks-table tbody td {
@@ -190,8 +190,9 @@
   border-radius: 20px;
   font-size: 0.72rem;
   font-weight: 700;
-  background: #dcfce7;
-  color: #15803d;
+  background: #edf6e4;
+  color: #324f11;
+  border: 1px solid #d4ebba;
 }
 
 /* ---- Action Button ---- */
@@ -200,9 +201,9 @@
   align-items: center;
   justify-content: center;
   padding: 0.38rem 0.9rem;
-  background: #f1f5f9;
-  border: 1.5px solid #e2e8f0;
-  color: #334155;
+  background: #f4f9ef;
+  border: 1.5px solid #d4ebba;
+  color: #28410e;
   border-radius: 7px;
   font-size: 0.78rem;
   font-weight: 700;
@@ -212,9 +213,9 @@
 }
 
 .btn-view-outline:hover {
-  background: #16a34a;
+  background: #94c559;
   color: #fff;
-  border-color: #16a34a;
+  border-color: #94c559;
 }
 
 /* ---- Footer Pagination ---- */
@@ -256,15 +257,15 @@
 }
 
 .page-btn:hover:not(:disabled) {
-  background: #f0fdf4;
-  border-color: #16a34a;
-  color: #16a34a;
+  background: #f4f9ef;
+  border-color: #94c559;
+  color: #28410e;
 }
 
 .page-btn.active {
-  background: #16a34a;
+  background: #94c559;
   color: white;
-  border-color: #16a34a;
+  border-color: #94c559;
 }
 
 .page-btn:disabled {

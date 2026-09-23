@@ -16,10 +16,11 @@
   gap: 1rem;
   margin-bottom: 1.75rem;
   padding: 1.5rem;
-  background: linear-gradient(135deg, #0b3d2c 0%, #06402B 65%, #042e1f 100%);
+  background: #94c559;
+  background: linear-gradient(135deg, #7cae40 0%, #94c559 65%, #a8d76f 100%);
   border-radius: 16px;
-  border: 1px solid rgba(74, 222, 128, 0.25);
-  box-shadow: 0 8px 24px rgba(6, 64, 43, 0.2);
+  border: 1px solid #d4ebba;
+  box-shadow: 0 8px 24px rgba(148, 197, 89, 0.25);
 }
 
 .btn-back-details {
@@ -27,10 +28,10 @@
   align-items: center;
   gap: 0.5rem;
   padding: 0.5rem 1.1rem;
-  background: rgba(255,255,255,0.07);
-  border: 1.5px solid rgba(255,255,255,0.12);
+  background: rgba(255,255,255,0.18);
+  border: 1.5px solid rgba(255,255,255,0.35);
   border-radius: 8px;
-  color: #94a3b8;
+  color: #ffffff;
   font-size: 0.85rem;
   font-weight: 600;
   cursor: pointer;
@@ -39,9 +40,9 @@
 }
 
 .btn-back-details:hover {
-  background: rgba(255,255,255,0.14);
-  color: #fff;
-  border-color: rgba(255,255,255,0.25);
+  background: #ffffff;
+  color: #28410e;
+  border-color: #ffffff;
 }
 
 .progress-title-section {
@@ -57,7 +58,7 @@
 
 .progress-title-section p {
   font-size: 0.8rem;
-  color: #94a3b8;
+  color: #f4f9ef;
   margin: 0;
 }
 
@@ -87,9 +88,9 @@
   position: absolute;
   top: 20px;
   left: 20px;
-  width: 50%; /* Reflects progress */
+  width: 50%;
   height: 2px;
-  background-color: #047857;
+  background-color: #94c559;
   z-index: 2;
 }
 
@@ -117,12 +118,12 @@
 }
 
 .timeline-step.completed .timeline-circle {
-  background-color: #047857;
+  background-color: #94c559;
   color: white;
 }
 
 .timeline-step.active .timeline-circle {
-  background-color: #047857;
+  background-color: #94c559;
   color: white;
 }
 
@@ -147,7 +148,7 @@
   border-radius: 12px;
   box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05), 0 2px 4px -1px rgba(0, 0, 0, 0.03);
   padding: 2.5rem;
-  border: 1px solid #e2e8f0;
+  border: 1px solid #e0eed1;
 }
 
 .update-progress-card h3 {
@@ -178,11 +179,6 @@
   font-size: 1rem;
   color: #1e293b;
   background-color: white;
-  appearance: none;
-  background-image: url("data:image/svg+xml;charset=US-ASCII,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20width%3D%22292.4%22%20height%3D%22292.4%22%3E%3Cpath%20fill%3D%22%2364748b%22%20d%3D%22M287%2069.4a17.6%2017.6%200%200%200-13-5.4H18.4c-5%200-9.3%201.8-12.9%205.4A17.6%2017.6%200%200%200%200%2082.2c0%205%201.8%209.3%205.4%2012.9l128%20127.9c3.6%203.6%207.8%205.4%2012.8%205.4s9.2-1.8%2012.8-5.4L287%2095c3.5-3.5%205.4-7.8%205.4-12.8%200-5-1.9-9.2-5.5-12.8z%22%2F%3E%3C%2Fsvg%3E");
-  background-repeat: no-repeat;
-  background-position: right 1rem top 50%;
-  background-size: 0.65rem auto;
 }
 
 .update-textarea {
@@ -242,20 +238,21 @@
 .add-photo-box {
   width: 180px;
   height: 130px;
-  border: 2px dashed #047857;
+  border: 2px dashed #94c559;
   border-radius: 8px;
   display: flex;
   flex-direction: column;
   align-items: center;
   justify-content: center;
-  color: #047857;
+  color: #66942f;
   cursor: pointer;
-  background-color: #f0fdf4;
+  background-color: #f4f9ef;
   transition: all 0.2s;
 }
 
 .add-photo-box:hover {
-  background-color: #dcfce3;
+  background-color: #edf6e4;
+  border-color: #7cae40;
 }
 
 .add-photo-box span {
@@ -276,18 +273,19 @@
   align-items: center;
   gap: 0.5rem;
   padding: 0.75rem 2.5rem;
-  background: #047857;
-  border: 1px solid #047857;
+  background: #94c559;
+  border: 1px solid #94c559;
   color: white;
   border-radius: 6px;
-  font-weight: 600;
+  font-weight: 700;
   font-size: 1rem;
   cursor: pointer;
   transition: all 0.2s;
 }
 
 .btn-save-update:hover {
-  background: #065f46;
+  background: #7cae40;
+  border-color: #7cae40;
 }
 
 .btn-cancel-update {
@@ -295,8 +293,8 @@
   align-items: center;
   padding: 0.75rem 2.5rem;
   background: white;
-  border: 1px solid #047857;
-  color: #047857;
+  border: 1px solid #94c559;
+  color: #66942f;
   border-radius: 6px;
   font-weight: 600;
   font-size: 1rem;
@@ -305,7 +303,7 @@
 }
 
 .btn-cancel-update:hover {
-  background: #f0fdf4;
+  background: #f4f9ef;
 }
 
 @media (max-width: 768px) {
@@ -341,7 +339,7 @@
 
 .upload-photos-section {
   background: #ffffff;
-  border: 1px solid #e2e8f0;
+  border: 1px solid #e0eed1;
   border-radius: 12px;
   padding: 1.5rem;
   margin-top: 0.5rem;
@@ -455,28 +453,27 @@
 .photo-add-box {
   width: 120px;
   height: 100px;
-  border: 2px dashed #047857;
+  border: 2px dashed #94c559;
   border-radius: 8px;
   display: flex;
   flex-direction: column;
   align-items: center;
   justify-content: center;
-  color: #047857;
+  color: #66942f;
   cursor: pointer;
-  background: #f0fdf4;
+  background: #f4f9ef;
   gap: 4px;
   flex-shrink: 0;
   transition: background 0.18s, border-color 0.18s;
 }
 
 .photo-add-box:hover {
-  background: #dcfce7;
-  border-color: #16a34a;
+  background: #edf6e4;
+  border-color: #7cae40;
 }
 
 .photo-add-box span {
   font-size: 0.82rem;
   font-weight: 700;
-  color: #047857;
+  color: #66942f;
 }
-

@@ -49,7 +49,10 @@ const AdminEvents = () => {
   }, []);
 
   const handleInputChange = (e) => {
-    const { name, value, type, checked } = e.target;
+    let { name, value, type, checked } = e.target;
+    if (name === 'parkName' || name === 'location') {
+      value = value.replace(/[^a-zA-Z0-9\s,.-/#]/g, '');
+    }
     setFormData({
       ...formData,
       [name]: type === 'checkbox' ? checked : value

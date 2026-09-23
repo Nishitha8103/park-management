@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
-import { ArrowLeft, FileText, Calendar, User, MessageSquare, CheckCircle, ShieldAlert, Clock, MapPin, Image as ImageIcon, Download, Eye, X, Award, FileCheck, Menu, LogOut, HardHat, Bell, CheckCircle2, ShieldCheck, Layers } from 'lucide-react';
+import { ArrowLeft, FileText, Calendar, User, MessageSquare, CheckCircle, ShieldAlert, Clock, MapPin, Image as ImageIcon, Download, Eye, X, Award, FileCheck, Menu, TreePine, LogOut, HardHat, Bell, CheckCircle2, ShieldCheck, Layers } from 'lucide-react';
 import './ContractorReportDetails.css';
 import ContractorSidebar from '../components/ContractorSidebar';
 
@@ -110,12 +110,11 @@ const ContractorReportDetails = () => {
               <button className="contractor-menu-toggle" onClick={toggleSidebar}>
                 <Menu size={24} />
               </button>
-              <HardHat size={28} className="contractor-text-primary" />
-              <h1>PARK MAINTENANCE</h1>
-              <span>Portal</span>
+              <TreePine size={28} color="#e5ede7" />
+              <h1>Parks Monitoring System</h1>
             </div>
             
-            <div className="contractor-user-info" style={{ display: 'flex', alignItems: 'center', gap: '1.5rem' }}>
+            <div className="contractor-user-info" style={{ display: 'flex', alignItems: 'center', gap: '1.25rem' }}>
               <div 
                 className="header-notification-icon" 
                 onClick={() => navigate('/contractor/notifications')}
@@ -124,13 +123,10 @@ const ContractorReportDetails = () => {
                 <Bell size={22} style={{ color: '#475569' }} />
                 <span style={{ position: 'absolute', top: '-6px', right: '-6px', background: '#ef4444', color: 'white', fontSize: '0.65rem', fontWeight: 'bold', padding: '2px 5px', borderRadius: '10px', minWidth: '16px', textAlign: 'center' }}>3</span>
               </div>
-              <div className="contractor-user-details" style={{ display: 'flex', flexDirection: 'column', alignItems: 'flex-end', marginLeft: '0.5rem' }}>
+              <div className="contractor-user-details" style={{ display: 'flex', flexDirection: 'column', alignItems: 'flex-end' }}>
                 <h4 className="contractor-user-name" style={{ margin: 0 }}>{contractor.name}</h4>
                 <p className="contractor-user-role" style={{ margin: 0, fontSize: '0.8rem', color: '#64748b' }}>{contractor.department || 'General Maintenance'} Specialist</p>
               </div>
-              <button className="btn-contractor-logout" onClick={handleLogout} style={{ marginLeft: '0.5rem' }}>
-                <LogOut size={16} /> Logout
-              </button>
             </div>
           </div>
         </header>

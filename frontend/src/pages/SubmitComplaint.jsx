@@ -26,25 +26,31 @@ const SubmitComplaint = () => {
   const location = useLocation();
   const parkState = location.state || {};
 
-  const getInitialCitizenName = () => {
+  const getStoredUserData = () => {
     try {
       const stored = localStorage.getItem('user');
       if (stored) {
         const u = JSON.parse(stored);
-        return u.name || u.firstName || '';
+        return {
+          fullName: u.name || u.fullName || u.firstName || '',
+          mobileNumber: (u.phone || u.mobile || u.phoneNumber || '').replace(/\D/g, '').slice(0, 10),
+          email: u.email || ''
+        };
       }
     } catch (e) {}
-    return '';
+    return { fullName: '', mobileNumber: '', email: '' };
   };
+
+  const initialUser = getStoredUserData();
 
   const [formData, setFormData] = useState({
     parkName: parkState.parkName || '',
     locationInPark: '',
     category: '',
-    fullName: getInitialCitizenName(),
-    mobileNumber: '',
+    fullName: initialUser.fullName,
+    mobileNumber: initialUser.mobileNumber,
     title: '',
-    email: '',
+    email: initialUser.email,
     description: '',
     priority: 'Medium'
   });
@@ -62,16 +68,27 @@ const SubmitComplaint = () => {
   const navigate = useNavigate();
 
   useEffect(() => {
-    if (parkState.parkName) {
-      setFormData(prev => ({
-        ...prev,
-        parkName: parkState.parkName
-      }));
-    }
+    const user = getStoredUserData();
+    setFormData(prev => ({
+      ...prev,
+      fullName: prev.fullName || user.fullName,
+      mobileNumber: prev.mobileNumber || user.mobileNumber,
+      email: prev.email || user.email,
+      parkName: parkState.parkName || prev.parkName
+    }));
   }, [location.state]);
 
   const handleInputChange = (e) => {
-    const { name, value } = e.target;
+    let { name, value } = e.target;
+    if (name === 'mobileNumber') {
+      value = value.replace(/\D/g, '').slice(0, 10);
+    }
+    if (name === 'fullName' || name === 'description') {
+      value = value.replace(/[^a-zA-Z\s]/g, '');
+    }
+    if (name === 'locationInPark' || name === 'parkName') {
+      value = value.replace(/[^a-zA-Z0-9\s,.-/#]/g, '');
+    }
     setFormData(prev => ({ ...prev, [name]: value }));
   };
 
@@ -286,40 +303,82 @@ const SubmitComplaint = () => {
       <div className="complaint-card">
         <form className="complaint-form" onSubmit={handleSubmit}>
           
-          {/* Section 1: Location & Park */}
+          {/* Section 1: Citizen Information */}
           <div className="form-section">
             <div className="section-title">
-              <MapPin size={18} color="#059669" />
-              <h3>1. Park & Location Information</h3>
+              <UserIcon size={18} color="#059669" />
+              <h3>1. Citizen Information</h3>
             </div>
 
             <div className="form-grid-2">
               <div className="form-group">
-                <label className="input-label">Park Name *</label>
-                <input 
-                  type="text" 
-                  name="parkName" 
-                  className="input-field" 
-                  placeholder="e.g. Coles Park / Central Park" 
-                  value={formData.parkName} 
-                  onChange={handleInputChange} 
-                  required 
-                  readOnly={!!parkState.parkName} 
-                />
+                <label className="input-label">Your Name / Complainant Name *</label>
+                <div className="input-with-icon">
+                  <UserIcon size={16} className="field-icon" />
+                  <input 
+                    type="text" 
+                    name="fullName" 
+                    className="input-field icon-padding" 
+                    placeholder="Enter your full name" 
+                    value={formData.fullName} 
+                    onChange={handleInputChange} 
+                    required 
+                  />
+                </div>
               </div>
 
               <div className="form-group">
-                <label className="input-label">Specific Location in Park *</label>
+                <label className="input-label">Mobile Number *</label>
+                <div className="input-with-icon">
+                  <Phone size={16} className="field-icon" />
+                  <input 
+                    type="tel" 
+                    name="mobileNumber" 
+                    className="input-field icon-padding" 
+                    placeholder="Enter 10-digit mobile number" 
+                    value={formData.mobileNumber} 
+                    onChange={handleInputChange} 
+                    required 
+                  />
+                </div>
+              </div>
+            </div>
+
+            <div className="form-group">
+              <label className="input-label">Email Address (Optional)</label>
+              <div className="input-with-icon">
+                <Mail size={16} className="field-icon" />
                 <input 
-                  type="text" 
-                  name="locationInPark" 
-                  className="input-field" 
-                  placeholder="e.g., Near North Gate / Children's Play Area" 
-                  value={formData.locationInPark} 
+                  type="email" 
+                  name="email" 
+                  className="input-field icon-padding" 
+                  placeholder="For status updates via email" 
+                  value={formData.email} 
                   onChange={handleInputChange} 
-                  required 
                 />
               </div>
+            </div>
+          </div>
+
+          {/* Section 2: Park & Location Information */}
+          <div className="form-section">
+            <div className="section-title">
+              <MapPin size={18} color="#059669" />
+              <h3>2. Park & Location Information</h3>
+            </div>
+
+            <div className="form-group">
+              <label className="input-label">Park Name *</label>
+              <input 
+                type="text" 
+                name="parkName" 
+                className="input-field" 
+                placeholder="e.g. Coles Park / Central Park" 
+                value={formData.parkName} 
+                onChange={handleInputChange} 
+                required 
+                readOnly={!!parkState.parkName} 
+              />
             </div>
 
             <div className="form-grid-3">
@@ -340,11 +399,11 @@ const SubmitComplaint = () => {
             </div>
           </div>
 
-          {/* Section 2: Category & Priority */}
+          {/* Section 3: Issue Details */}
           <div className="form-section">
             <div className="section-title">
               <AlertTriangle size={18} color="#059669" />
-              <h3>2. Issue Category & Priority Level</h3>
+              <h3>3. Issue Details</h3>
             </div>
 
             <div className="form-grid-2">
@@ -388,78 +447,20 @@ const SubmitComplaint = () => {
                 </div>
               </div>
             </div>
-          </div>
 
-          {/* Section 3: Contact Info & Description */}
-          <div className="form-section">
-            <div className="section-title">
-              <FileText size={18} color="#059669" />
-              <h3>3. Citizen Information & Grievance Details</h3>
-            </div>
-
-            <div className="form-grid-2">
-              <div className="form-group">
-                <label className="input-label">Your Name / Complainant Name *</label>
-                <div className="input-with-icon">
-                  <UserIcon size={16} className="field-icon" />
-                  <input 
-                    type="text" 
-                    name="fullName" 
-                    className="input-field icon-padding" 
-                    placeholder="Enter your full name" 
-                    value={formData.fullName} 
-                    onChange={handleInputChange} 
-                    required 
-                  />
-                </div>
-              </div>
-
-              <div className="form-group">
-                <label className="input-label">Mobile Number *</label>
-                <div className="input-with-icon">
-                  <Phone size={16} className="field-icon" />
-                  <input 
-                    type="tel" 
-                    name="mobileNumber" 
-                    className="input-field icon-padding" 
-                    placeholder="Enter 10-digit mobile number" 
-                    value={formData.mobileNumber} 
-                    onChange={handleInputChange} 
-                    required 
-                  />
-                </div>
-              </div>
-            </div>
-
-            <div className="form-grid-2">
-              <div className="form-group">
-                <label className="input-label">Email Address (Optional)</label>
-                <div className="input-with-icon">
-                  <Mail size={16} className="field-icon" />
-                  <input 
-                    type="email" 
-                    name="email" 
-                    className="input-field icon-padding" 
-                    placeholder="For status updates via email" 
-                    value={formData.email} 
-                    onChange={handleInputChange} 
-                  />
-                </div>
-              </div>
-
-              <div className="form-group">
-                <label className="input-label">Issue Headline / Title (Optional)</label>
-                <div className="input-with-icon">
-                  <Sparkles size={16} className="field-icon" />
-                  <input 
-                    type="text" 
-                    name="title" 
-                    className="input-field icon-padding" 
-                    placeholder="e.g., Broken bench near play area" 
-                    value={formData.title} 
-                    onChange={handleInputChange} 
-                  />
-                </div>
+            <div className="form-group">
+              <label className="input-label">Specific Location in Park *</label>
+              <div className="input-with-icon">
+                <MapPin size={16} className="field-icon" />
+                <input 
+                  type="text" 
+                  name="locationInPark" 
+                  className="input-field icon-padding" 
+                  placeholder="e.g., Near North Gate / Children's Play Area" 
+                  value={formData.locationInPark} 
+                  onChange={handleInputChange} 
+                  required 
+                />
               </div>
             </div>
 

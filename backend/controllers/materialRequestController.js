@@ -1,5 +1,6 @@
 const MaterialRequest = require('../models/MaterialRequest');
 const Contractor = require('../models/Contractor');
+const Setting = require('../models/Setting');
 
 // @desc   Contractor submits a material request
 // @route  POST /api/material-requests
@@ -15,6 +16,11 @@ const createMaterialRequest = async (req, res) => {
     const contractor = await Contractor.findById(req.user.id);
     if (!contractor) return res.status(404).json({ message: 'Contractor not found' });
 
+    // Check if Admin requires explicit approval
+    const contractorSetting = await Setting.findOne({ key: 'contractorModule' });
+    const requireApproval = contractorSetting?.value?.requireMaterialApproval ?? true;
+    const initialStatus = requireApproval ? 'Pending' : 'Approved';
+
     const request = await MaterialRequest.create({
       contractor: contractor._id,
       contractorName: contractor.name,
@@ -25,9 +31,14 @@ const createMaterialRequest = async (req, res) => {
       unit: unit || 'units',
       priority: priority || 'Medium',
       reason,
+      status: initialStatus,
+      adminNotes: requireApproval ? '' : 'Auto-approved per administrative contractor policy.'
     });
 
-    res.status(201).json({ message: 'Material request submitted successfully', request });
+    res.status(201).json({ 
+      message: requireApproval ? 'Material request submitted for Admin review.' : 'Material request auto-approved.',
+      request 
+    });
   } catch (err) {
     console.error(err);
     res.status(500).json({ message: 'Server error', error: err.message });

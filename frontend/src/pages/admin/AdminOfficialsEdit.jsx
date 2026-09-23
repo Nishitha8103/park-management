@@ -163,7 +163,14 @@ const AdminOfficialsEdit = () => {
   }, [id]);
 
   const handleInputChange = (e) => {
-    const { name, value } = e.target;
+    let { name, value } = e.target;
+    if (name === 'name') {
+      value = value.replace(/[^a-zA-Z\s]/g, '');
+    } else if (name === 'phone') {
+      value = value.replace(/\D/g, '').slice(0, 10);
+    } else if (name === 'address') {
+      value = value.replace(/[^a-zA-Z0-9\s,.-/#]/g, '');
+    }
     
     setFormData(prev => {
       const newData = { ...prev, [name]: value };
@@ -320,6 +327,7 @@ const AdminOfficialsEdit = () => {
                 name="phone"
                 value={formData.phone}
                 onChange={handleInputChange}
+                maxLength="10"
                 required
                 style={{ width: '96%', padding: '0.65rem 0.85rem', borderRadius: '6px', border: '1px solid #cbd5e1', outline: 'none', boxSizing: 'border-box' }}
               />

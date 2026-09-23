@@ -1,27 +1,37 @@
 import { useState, useEffect } from 'react';
-import { TreePine, Users, UserCheck, AlertTriangle, Clock, CheckCircle2, XCircle, ShieldAlert, TrendingUp, Activity } from 'lucide-react';
+import { useNavigate } from 'react-router-dom';
+import { 
+  TreePine, 
+  Users, 
+  UserCheck, 
+  AlertTriangle, 
+  Clock, 
+  CheckCircle2, 
+  XCircle, 
+  ShieldAlert, 
+  TrendingUp, 
+  Activity,
+  Star,
+  MessageSquareHeart,
+  ChevronRight,
+  ThumbsUp,
+  MapPin,
+  Sparkles,
+  User
+} from 'lucide-react';
 import axios from 'axios';
 import { PieChart, Pie, Cell, Tooltip as RechartsTooltip, Legend, ResponsiveContainer, BarChart, Bar, XAxis, YAxis, CartesianGrid } from 'recharts';
 import { MapContainer, TileLayer, Marker, Popup } from 'react-leaflet';
 import 'leaflet/dist/leaflet.css';
 import L from 'leaflet';
 
-// Fix leaflet default icon issue in React
-import icon from 'leaflet/dist/images/marker-icon.png';
-import iconShadow from 'leaflet/dist/images/marker-shadow.png';
-import iconRetina from 'leaflet/dist/images/marker-icon-2x.png';
-
-let DefaultIcon = L.icon({
-    iconUrl: icon,
-    iconRetinaUrl: iconRetina,
-    shadowUrl: iconShadow,
-    iconSize: [25, 41],
-    iconAnchor: [12, 41],
-    popupAnchor: [1, -34],
-    tooltipAnchor: [16, -28],
-    shadowSize: [41, 41]
+// Fix default marker icons (Leaflet webpack/vite issue)
+delete L.Icon.Default.prototype._getIconUrl;
+L.Icon.Default.mergeOptions({
+  iconRetinaUrl: 'https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/images/marker-icon-2x.png',
+  iconUrl: 'https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/images/marker-icon.png',
+  shadowUrl: 'https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/images/marker-shadow.png',
 });
-L.Marker.prototype.options.icon = DefaultIcon;
 
 // Custom Red Icon for Parks with issues
 const redIcon = new L.Icon({
@@ -32,6 +42,18 @@ const redIcon = new L.Icon({
   popupAnchor: [1, -34],
   shadowSize: [41, 41]
 });
+
+// Custom Green Icon for Healthy Parks
+const greenIcon = new L.Icon({
+  iconUrl: 'https://raw.githubusercontent.com/pointhi/leaflet-color-markers/master/img/marker-icon-2x-green.png',
+  shadowUrl: 'https://cdnjs.cloudflare.com/ajax/libs/leaflet/0.7.7/images/marker-shadow.png',
+  iconSize: [25, 41],
+  iconAnchor: [12, 41],
+  popupAnchor: [1, -34],
+  shadowSize: [41, 41]
+});
+
+const defaultIcon = new L.Icon.Default();
 
 // Dark theme color constants
 const DARK = {
@@ -73,6 +95,7 @@ const DarkTooltip = ({ active, payload, label }) => {
 };
 
 const AdminOverview = () => {
+  const navigate = useNavigate();
   const [stats, setStats] = useState({
     totalParks: 0,
     totalContractors: 0,
@@ -81,7 +104,9 @@ const AdminOverview = () => {
     pendingComplaints: 0,
     completedComplaints: 0,
     rejectedComplaints: 0,
-    closedComplaints: 0
+    closedComplaints: 0,
+    totalFeedback: 0,
+    avgFeedbackRating: '0.0'
   });
 
   const [slaStats, setSlaStats] = useState({
@@ -94,6 +119,7 @@ const AdminOverview = () => {
   });
 
   const [recentComplaints, setRecentComplaints] = useState([]);
+  const [recentFeedbacks, setRecentFeedbacks] = useState([]);
   const [parksData, setParksData] = useState([]);
   const [loading, setLoading] = useState(true);
   
@@ -119,17 +145,21 @@ const AdminOverview = () => {
         const token = JSON.parse(localStorage.getItem('adminUser'))?.token;
         const authConfig = { headers: { Authorization: `Bearer ${token}` } };
         
-        const [parksRes, contractorsRes, complaintsRes, officialsRes] = await Promise.all([
+        const [parksRes, contractorsRes, complaintsRes, officialsRes, feedbackRes, feedbackStatsRes] = await Promise.all([
           axios.get('/api/parks').catch(() => ({ data: [] })),
           axios.get('/api/contractors', authConfig).catch(() => ({ data: [] })),
           axios.get('/api/complaints').catch(() => ({ data: [] })),
-          axios.get('/api/auth/users?role=official').catch(() => ({ data: [] }))
+          axios.get('/api/auth/users?role=official').catch(() => ({ data: [] })),
+          axios.get('/api/feedback/all').catch(() => ({ data: [] })),
+          axios.get('/api/feedback/stats').catch(() => ({ data: null }))
         ]);
 
         const parks = parksRes.data || [];
         const contractors = contractorsRes.data || [];
         const complaints = complaintsRes.data || [];
         const officials = officialsRes.data || [];
+        const feedbacks = feedbackRes.data || [];
+        const fbStats = feedbackStatsRes.data || {};
 
         // Prepare Map Data
         const mappedParks = parks.map(p => {
@@ -170,6 +200,7 @@ const AdminOverview = () => {
         setStatusData(Object.keys(statusCounts).map(key => ({ name: key, value: statusCounts[key] })));
 
         setRecentComplaints(complaints.slice(0, 5));
+        setRecentFeedbacks(feedbacks.slice(0, 5));
 
         setStats({
           totalParks: parks.length,
@@ -179,7 +210,9 @@ const AdminOverview = () => {
           pendingComplaints: complaints.filter(c => ['New', 'Assigned', 'In Progress'].includes(c.status)).length,
           completedComplaints: complaints.filter(c => c.status === 'Completed').length,
           rejectedComplaints: complaints.filter(c => c.status === 'Rejected').length,
-          closedComplaints: complaints.filter(c => ['Closed', 'Verified'].includes(c.status)).length
+          closedComplaints: complaints.filter(c => ['Closed', 'Verified'].includes(c.status)).length,
+          totalFeedback: fbStats?.total || feedbacks.length,
+          avgFeedbackRating: fbStats?.averageOverall ? Number(fbStats.averageOverall).toFixed(1) : (feedbacks.length > 0 ? (feedbacks.reduce((acc, f) => acc + (f.overallRating || 0), 0) / feedbacks.length).toFixed(1) : '5.0')
         });
         // Calculate SLA Stats
         let onTime = 0, dueSoon = 0, overdue = 0, resolvedWithin = 0, resolvedAfter = 0;
@@ -206,10 +239,11 @@ const AdminOverview = () => {
   }, []);
 
   const kpiCards = [
-    { label: 'Total Parks', value: stats.totalParks, icon: <TreePine size={22} />, color: DARK.success, bgTint: 'rgba(50,196,141,0.12)' },
-    { label: 'Contractors', value: stats.totalContractors, icon: <Users size={22} />, color: DARK.accent, bgTint: 'rgba(79,111,245,0.12)' },
-    { label: 'Gov Officials', value: stats.totalOfficials, icon: <UserCheck size={22} />, color: DARK.purple, bgTint: 'rgba(139,92,246,0.12)' },
-    { label: 'Total Complaints', value: stats.totalComplaints, icon: <AlertTriangle size={22} />, color: DARK.warning, bgTint: 'rgba(245,185,66,0.12)' },
+    { label: 'Total Parks', value: stats.totalParks, icon: <TreePine size={22} />, color: DARK.success, bgTint: 'rgba(50,196,141,0.12)', path: '/admin-dashboard/parks' },
+    { label: 'Contractors', value: stats.totalContractors, icon: <Users size={22} />, color: DARK.accent, bgTint: 'rgba(79,111,245,0.12)', path: '/admin-dashboard/contractors' },
+    { label: 'Gov Officials', value: stats.totalOfficials, icon: <UserCheck size={22} />, color: DARK.purple, bgTint: 'rgba(139,92,246,0.12)', path: '/admin-dashboard/officials' },
+    { label: 'Complaints', value: stats.totalComplaints, icon: <AlertTriangle size={22} />, color: DARK.warning, bgTint: 'rgba(245,185,66,0.12)', path: '/admin-dashboard/complaints' },
+    { label: 'Citizen Reviews', value: `${stats.avgFeedbackRating} ★`, subValue: `${stats.totalFeedback} reviews`, icon: <Star size={22} fill="#F5B942" />, color: '#F5B942', bgTint: 'rgba(245,185,66,0.15)', path: '/admin-dashboard/feedback' },
   ];
 
   const slaCards = [
@@ -242,9 +276,11 @@ const AdminOverview = () => {
       </div>
 
       {/* KPI Cards Grid */}
-      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(220px, 1fr))', gap: '1rem', marginBottom: '1.75rem' }}>
+      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))', gap: '1rem', marginBottom: '1.75rem' }}>
         {kpiCards.map((card, i) => (
-          <div key={i} style={{
+          <div key={i} 
+          onClick={() => card.path && navigate(card.path)}
+          style={{
             background: DARK.card,
             borderRadius: '14px',
             padding: '1.25rem 1.35rem',
@@ -253,15 +289,16 @@ const AdminOverview = () => {
             display: 'flex',
             justifyContent: 'space-between',
             alignItems: 'center',
-            transition: 'transform 0.2s, box-shadow 0.2s',
-            cursor: 'default',
+            transition: 'all 0.2s ease',
+            cursor: card.path ? 'pointer' : 'default',
           }}
-          onMouseEnter={e => { e.currentTarget.style.transform = 'translateY(-2px)'; e.currentTarget.style.boxShadow = '0 8px 24px rgba(0,0,0,0.25)'; }}
-          onMouseLeave={e => { e.currentTarget.style.transform = 'translateY(0)'; e.currentTarget.style.boxShadow = '0 4px 16px rgba(0,0,0,0.15)'; }}
+          onMouseEnter={e => { e.currentTarget.style.transform = 'translateY(-2px)'; e.currentTarget.style.borderColor = card.color; e.currentTarget.style.boxShadow = '0 8px 24px rgba(0,0,0,0.25)'; }}
+          onMouseLeave={e => { e.currentTarget.style.transform = 'translateY(0)'; e.currentTarget.style.borderColor = DARK.border; e.currentTarget.style.boxShadow = '0 4px 16px rgba(0,0,0,0.15)'; }}
           >
             <div>
               <span style={{ fontSize: '0.8rem', color: DARK.textMuted, fontWeight: 600, textTransform: 'uppercase', letterSpacing: '0.04em' }}>{card.label}</span>
-              <h3 style={{ fontSize: '2rem', color: DARK.textPrimary, margin: '4px 0 0 0', fontWeight: 800 }}>{card.value}</h3>
+              <h3 style={{ fontSize: '1.85rem', color: DARK.textPrimary, margin: '4px 0 0 0', fontWeight: 800 }}>{card.value}</h3>
+              {card.subValue && <span style={{ fontSize: '0.75rem', color: DARK.textSec, marginTop: '2px', display: 'block' }}>{card.subValue}</span>}
             </div>
             <div style={{
               background: card.bgTint,
@@ -350,7 +387,7 @@ const AdminOverview = () => {
                 <Marker 
                   key={park._id} 
                   position={[lat, lng]}
-                  icon={park.hasIssues ? redIcon : DefaultIcon}
+                  icon={park.hasIssues ? redIcon : greenIcon}
                 >
                   <Popup>
                     <div style={{ minWidth: '150px' }}>
@@ -489,6 +526,202 @@ const AdminOverview = () => {
                       }}>
                         {c.status}
                       </span>
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
+        )}
+      </div>
+
+      {/* Citizen Feedback & Public Reviews Section */}
+      <div style={{
+        background: DARK.card,
+        borderRadius: '14px',
+        padding: '1.35rem',
+        border: `1px solid ${DARK.border}`,
+        boxShadow: '0 4px 16px rgba(0,0,0,0.12)',
+        marginTop: '1.75rem'
+      }}>
+        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '1.25rem' }}>
+          <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
+            <div style={{
+              background: 'rgba(245,185,66,0.15)',
+              padding: '8px',
+              borderRadius: '10px',
+              color: '#F5B942',
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center'
+            }}>
+              <Star size={20} fill="#F5B942" />
+            </div>
+            <div>
+              <h3 style={{ color: DARK.textPrimary, margin: 0, fontSize: '1.08rem', fontWeight: 700 }}>
+                Recent Citizen Feedback & Ratings
+              </h3>
+              <p style={{ color: DARK.textMuted, margin: '3px 0 0 0', fontSize: '0.82rem' }}>
+                Real-time public user reviews and satisfaction ratings submitted for parks
+              </p>
+            </div>
+          </div>
+          <button
+            onClick={() => navigate('/admin-dashboard/feedback')}
+            style={{
+              display: 'flex',
+              alignItems: 'center',
+              gap: '6px',
+              background: 'rgba(79,111,245,0.12)',
+              color: DARK.accent,
+              border: `1px solid rgba(79,111,245,0.3)`,
+              borderRadius: '8px',
+              padding: '7px 14px',
+              fontSize: '0.84rem',
+              fontWeight: 600,
+              cursor: 'pointer',
+              transition: 'all 0.2s ease'
+            }}
+            onMouseEnter={e => { e.currentTarget.style.background = DARK.accent; e.currentTarget.style.color = '#fff'; }}
+            onMouseLeave={e => { e.currentTarget.style.background = 'rgba(79,111,245,0.12)'; e.currentTarget.style.color = DARK.accent; }}
+          >
+            View All Feedback <ChevronRight size={15} />
+          </button>
+        </div>
+
+        {recentFeedbacks.length === 0 ? (
+          <div style={{ textAlign: 'center', padding: '2.5rem 1rem', color: DARK.textMuted }}>
+            <MessageSquareHeart size={36} color={DARK.textMuted} style={{ marginBottom: '8px', opacity: 0.7 }} />
+            <p style={{ margin: 0, fontSize: '0.9rem' }}>No public citizen feedback received yet.</p>
+          </div>
+        ) : (
+          <div style={{ overflowX: 'auto' }}>
+            <table style={{ width: '100%', borderCollapse: 'collapse', textAlign: 'left', fontSize: '0.86rem' }}>
+              <thead>
+                <tr style={{ borderBottom: `1px solid ${DARK.border}` }}>
+                  <th style={{ padding: '10px 12px', color: DARK.textMuted, fontWeight: 700, fontSize: '0.74rem', textTransform: 'uppercase', letterSpacing: '0.05em' }}>ID</th>
+                  <th style={{ padding: '10px 12px', color: DARK.textMuted, fontWeight: 700, fontSize: '0.74rem', textTransform: 'uppercase', letterSpacing: '0.05em' }}>Citizen</th>
+                  <th style={{ padding: '10px 12px', color: DARK.textMuted, fontWeight: 700, fontSize: '0.74rem', textTransform: 'uppercase', letterSpacing: '0.05em' }}>Park & Location</th>
+                  <th style={{ padding: '10px 12px', color: DARK.textMuted, fontWeight: 700, fontSize: '0.74rem', textTransform: 'uppercase', letterSpacing: '0.05em' }}>Overall Rating</th>
+                  <th style={{ padding: '10px 12px', color: DARK.textMuted, fontWeight: 700, fontSize: '0.74rem', textTransform: 'uppercase', letterSpacing: '0.05em' }}>Criteria</th>
+                  <th style={{ padding: '10px 12px', color: DARK.textMuted, fontWeight: 700, fontSize: '0.74rem', textTransform: 'uppercase', letterSpacing: '0.05em' }}>Comments & Tags</th>
+                  <th style={{ padding: '10px 12px', color: DARK.textMuted, fontWeight: 700, fontSize: '0.74rem', textTransform: 'uppercase', letterSpacing: '0.05em' }}>Date</th>
+                </tr>
+              </thead>
+              <tbody>
+                {recentFeedbacks.map((fb) => (
+                  <tr 
+                    key={fb._id || fb.feedbackId} 
+                    style={{ borderBottom: `1px solid rgba(255,255,255,0.03)`, transition: 'background 0.15s' }}
+                    onMouseEnter={e => e.currentTarget.style.background = 'rgba(245,185,66,0.04)'}
+                    onMouseLeave={e => e.currentTarget.style.background = 'transparent'}
+                  >
+                    <td style={{ padding: '12px' }}>
+                      <span style={{
+                        background: 'rgba(255,255,255,0.06)',
+                        color: DARK.textPrimary,
+                        padding: '3px 8px',
+                        borderRadius: '6px',
+                        fontSize: '0.76rem',
+                        fontWeight: 700,
+                        fontFamily: 'monospace'
+                      }}>
+                        {fb.feedbackId || ('FB' + String(fb._id).slice(-4))}
+                      </span>
+                    </td>
+                    <td style={{ padding: '12px' }}>
+                      <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+                        <div style={{
+                          width: '28px',
+                          height: '28px',
+                          borderRadius: '50%',
+                          background: 'rgba(79,111,245,0.2)',
+                          color: DARK.accent,
+                          display: 'flex',
+                          alignItems: 'center',
+                          justifyContent: 'center',
+                          fontWeight: 700,
+                          fontSize: '0.78rem'
+                        }}>
+                          {(fb.userName || 'P').charAt(0).toUpperCase()}
+                        </div>
+                        <div>
+                          <div style={{ fontWeight: 600, color: DARK.textPrimary }}>{fb.userName || 'Public User'}</div>
+                          {fb.userEmail && (
+                            <div style={{ fontSize: '0.72rem', color: DARK.textMuted }}>{fb.userEmail}</div>
+                          )}
+                        </div>
+                      </div>
+                    </td>
+                    <td style={{ padding: '12px' }}>
+                      <div style={{ fontWeight: 600, color: DARK.textPrimary }}>{fb.parkName || 'General Park'}</div>
+                      <div style={{ fontSize: '0.74rem', color: DARK.textMuted, display: 'flex', alignItems: 'center', gap: '4px', marginTop: '2px' }}>
+                        <MapPin size={11} /> {fb.zone || 'Zone N/A'} • {fb.ward || 'Ward N/A'}
+                      </div>
+                    </td>
+                    <td style={{ padding: '12px' }}>
+                      <div style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
+                        <div style={{ display: 'flex', gap: '2px' }}>
+                          {[1, 2, 3, 4, 5].map((s) => (
+                            <Star 
+                              key={s} 
+                              size={13} 
+                              fill={s <= (fb.overallRating || 5) ? '#F5B942' : 'none'} 
+                              color={s <= (fb.overallRating || 5) ? '#F5B942' : DARK.textMuted} 
+                            />
+                          ))}
+                        </div>
+                        <span style={{ fontWeight: 700, color: '#F5B942', fontSize: '0.84rem' }}>
+                          {fb.overallRating || 5}.0
+                        </span>
+                      </div>
+                    </td>
+                    <td style={{ padding: '12px' }}>
+                      <div style={{ display: 'flex', flexDirection: 'column', gap: '3px', fontSize: '0.72rem' }}>
+                        <div style={{ display: 'flex', justifyContent: 'space-between', gap: '8px', color: DARK.textSec }}>
+                          <span>Cleanliness:</span>
+                          <span style={{ fontWeight: 600, color: DARK.success }}>{fb.cleanlinessRating || 4}★</span>
+                        </div>
+                        <div style={{ display: 'flex', justifyContent: 'space-between', gap: '8px', color: DARK.textSec }}>
+                          <span>Maintenance:</span>
+                          <span style={{ fontWeight: 600, color: DARK.accent }}>{fb.maintenanceRating || 5}★</span>
+                        </div>
+                      </div>
+                    </td>
+                    <td style={{ padding: '12px', maxWidth: '280px' }}>
+                      <p style={{
+                        margin: 0,
+                        color: DARK.textSec,
+                        fontSize: '0.82rem',
+                        lineHeight: 1.35,
+                        overflow: 'hidden',
+                        textOverflow: 'ellipsis',
+                        whiteSpace: 'nowrap'
+                      }}>
+                        {fb.comments || 'No remarks provided'}
+                      </p>
+                      {fb.tags && fb.tags.length > 0 && (
+                        <div style={{ display: 'flex', flexWrap: 'wrap', gap: '4px', marginTop: '4px' }}>
+                          {fb.tags.slice(0, 2).map((t, idx) => (
+                            <span key={idx} style={{
+                              background: 'rgba(50,196,141,0.1)',
+                              color: DARK.success,
+                              fontSize: '0.68rem',
+                              padding: '1px 6px',
+                              borderRadius: '4px',
+                              fontWeight: 600
+                            }}>
+                              {t}
+                            </span>
+                          ))}
+                          {fb.tags.length > 2 && (
+                            <span style={{ fontSize: '0.68rem', color: DARK.textMuted }}>+{fb.tags.length - 2} more</span>
+                          )}
+                        </div>
+                      )}
+                    </td>
+                    <td style={{ padding: '12px', color: DARK.textMuted, fontSize: '0.76rem', whiteSpace: 'nowrap' }}>
+                      {fb.createdAt ? new Date(fb.createdAt).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' }) : 'Today'}
                     </td>
                   </tr>
                 ))}

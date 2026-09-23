@@ -47,6 +47,7 @@ import AdminEventPayments from './pages/admin/AdminEventPayments';
 import AdminReassignmentRequests from './pages/admin/AdminReassignmentRequests';
 import AdminLeaveManagement from './pages/admin/AdminLeaveManagement';
 import AdminKycReview from './pages/admin/AdminKycReview';
+import AdminFeedback from './pages/admin/AdminFeedback';
 import ContractorLeaves from './pages/ContractorLeaves';
 import GovLeaves from './pages/GovLeaves';
 
@@ -117,6 +118,7 @@ function App() {
         <Route path="/contractor/register" element={<ContractorRegister />} />
         <Route path="/admin/login" element={<AdminLogin />} />
         <Route path="/admin/register" element={<AdminRegister />} />
+        <Route path="/admin/settings" element={<Navigate to="/admin-dashboard/settings" replace />} />
         
         {/* Admin Portal Routes */}
         <Route path="/admin-dashboard" element={<AdminLayout />}>
@@ -146,6 +148,7 @@ function App() {
           <Route path="reassignments" element={<AdminReassignmentRequests />} />
           <Route path="leaves" element={<AdminLeaveManagement />} />
           <Route path="kyc-review" element={<AdminKycReview />} />
+          <Route path="feedback" element={<AdminFeedback />} />
 
           <Route path="settings" element={<AdminSettings />} />
           <Route path="logout" element={<AdminLogout />} />

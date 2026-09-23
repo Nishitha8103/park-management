@@ -53,12 +53,14 @@ const GovSidebar = ({ isOpen = false, toggleSidebar = () => {} }) => {
 
     loadUserData();
 
-    // Listen for localStorage updates (triggered when profile pic is saved)
+    // Listen for localStorage updates (triggered when profile pic is saved) and notification changes
     window.addEventListener('storage', loadUserData);
     window.addEventListener('user-updated', loadUserData);
+    window.addEventListener('notifications-updated', loadUserData);
     return () => {
       window.removeEventListener('storage', loadUserData);
       window.removeEventListener('user-updated', loadUserData);
+      window.removeEventListener('notifications-updated', loadUserData);
     };
   }, []);
 

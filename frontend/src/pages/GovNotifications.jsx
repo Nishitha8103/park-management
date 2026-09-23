@@ -200,6 +200,7 @@ const GovNotifications = () => {
       setNotifications(prev =>
         prev.map(n => ((n._id === id || n.id === id) ? { ...n, isRead: true } : n))
       );
+      window.dispatchEvent(new Event('notifications-updated'));
     } catch (err) {
       console.error('Failed to mark notification as read', err);
     }
@@ -213,6 +214,7 @@ const GovNotifications = () => {
       
       await axios.put('/api/notifications/mark-all-read', { userId, role: 'official' }).catch(() => {});
       setNotifications(prev => prev.map(n => ({ ...n, isRead: true })));
+      window.dispatchEvent(new Event('notifications-updated'));
     } catch (err) {
       console.error('Failed to mark all as read', err);
     }
@@ -287,18 +289,56 @@ const GovNotifications = () => {
     <div className="gov-notifications-page container">
       
       {/* Header Banner */}
-      <div className="notifications-header">
-        <div className="notifications-header-left">
-          <div className="header-icon-box">
-            <Bell size={26} className="header-bell-icon" />
+      <div 
+        className="notifications-header"
+        style={{
+          background: '#4f6d54',
+          borderRadius: '16px',
+          padding: '1.4rem 1.75rem',
+          border: '1px solid rgba(255, 255, 255, 0.15)',
+          boxShadow: '0 8px 24px rgba(45, 62, 48, 0.22)',
+          display: 'flex',
+          alignItems: 'center',
+          justifyContent: 'space-between',
+          flexWrap: 'wrap',
+          gap: '1.25rem',
+          marginBottom: '1.5rem',
+          color: '#ffffff'
+        }}
+      >
+        <div className="notifications-header-left" style={{ display: 'flex', alignItems: 'center', gap: '1.1rem' }}>
+          <div 
+            className="header-icon-box"
+            style={{
+              width: '48px',
+              height: '48px',
+              borderRadius: '12px',
+              background: 'rgba(255, 255, 255, 0.2)',
+              border: '1.5px solid rgba(255, 255, 255, 0.35)',
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center',
+              flexShrink: 0
+            }}
+          >
+            <Bell size={24} color="#ffffff" />
           </div>
           <div>
-            <h2>🔔 Notification Center</h2>
-            <p className="notifications-subtitle">
+            <h2 style={{ margin: 0, fontSize: '1.45rem', fontWeight: 800, color: '#ffffff' }}>
+              Notification Center
+            </h2>
+            <p className="notifications-subtitle" style={{ margin: '4px 0 0 0', fontSize: '0.85rem', color: '#edf2ee', lineHeight: 1.4 }}>
               Stay updated on assigned parks, inspections, complaints, contractor work, SLA deadlines, reports, and important park announcements.
             </p>
           </div>
         </div>
+
+        {unreadCount > 0 && (
+          <button className="btn-mark-all" onClick={handleMarkAllAsRead}>
+            <CheckCircle size={15} />
+            Mark All as Read
+          </button>
+        )}
       </div>
 
       {/* Filter Tabs */}

@@ -1,5 +1,5 @@
 /* ============================================================
-   CONTRACTOR NOTIFICATIONS — Green Nature-Inspired Park Theme
+   CONTRACTOR NOTIFICATIONS — #94c559 Theme
    ============================================================ */
 
 /* ---- Page wrapper ---- */
@@ -16,10 +16,11 @@
   gap: 1rem;
   margin-bottom: 1.75rem;
   padding: 1.5rem 2rem;
-  background: linear-gradient(135deg, #0b3d2c 0%, #06402B 65%, #042e1f 100%);
+  background: #94c559;
+  background: linear-gradient(135deg, #7cae40 0%, #94c559 65%, #a8d76f 100%);
   border-radius: 18px;
-  border: 1px solid rgba(74, 222, 128, 0.25);
-  box-shadow: 0 8px 24px rgba(6, 64, 43, 0.25);
+  border: 1px solid #d4ebba;
+  box-shadow: 0 8px 24px rgba(148, 197, 89, 0.25);
 }
 
 .notifications-header h2 {
@@ -40,21 +41,21 @@
   display: inline-flex;
   align-items: center;
   gap: 0.45rem;
-  background: linear-gradient(135deg, #16a34a 0%, #15803d 100%);
-  color: #ffffff;
-  border: 1px solid rgba(255, 255, 255, 0.2);
+  background: #ffffff;
+  color: #28410e;
+  border: none;
   padding: 0.55rem 1.2rem;
   border-radius: 9px;
   font-size: 0.82rem;
-  font-weight: 700;
+  font-weight: 800;
   cursor: pointer;
   transition: all 0.2s;
-  box-shadow: 0 2px 8px rgba(22, 163, 74, 0.3);
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
 }
 
 .btn-mark-all:hover {
-  background: linear-gradient(135deg, #15803d 0%, #14532d 100%);
-  color: #fff;
+  background: #f4f9ef;
+  color: #1a3320;
   transform: translateY(-1px);
 }
 
@@ -70,21 +71,21 @@
   align-items: flex-start;
   gap: 1rem;
   background: #fff;
-  border: 1.5px solid #e2e8f0;
+  border: 1.5px solid #e0eed1;
   border-radius: 14px;
   padding: 1.1rem 1.35rem;
-  box-shadow: 0 1px 4px rgba(0,0,0,0.04);
+  box-shadow: 0 1px 4px rgba(148, 197, 89, 0.04);
   transition: all 0.2s ease;
   position: relative;
 }
 
 .notification-card:hover {
   transform: translateX(3px);
-  box-shadow: 0 4px 16px rgba(0,0,0,0.08);
+  box-shadow: 0 4px 16px rgba(148, 197, 89, 0.12);
 }
 
 .notification-card.unread {
-  border-left: 4px solid #10b981;
+  border-left: 4px solid #94c559;
   background: #f8fafc;
 }
 
@@ -121,11 +122,11 @@
 }
 
 .notification-card.alert-success {
-  border-left: 4px solid #10b981 !important;
+  border-left: 4px solid #94c559 !important;
 }
 .notification-card.alert-success .notif-icon-circle {
-  background: #ecfdf5;
-  color: #059669;
+  background: #edf6e4;
+  color: #324f11;
 }
 
 .notification-card.alert-default .notif-icon-circle {
@@ -144,12 +145,12 @@
 }
 
 .btn-action-task:hover {
-  background: #059669 !important;
+  background: #94c559 !important;
   transform: translateY(-1px);
 }
 
 .notification-card.unread .notification-icon {
-  background: linear-gradient(135deg, #d97706, #f59e0b);
+  background: linear-gradient(135deg, #94c559, #7cae40);
   color: white;
 }
 
@@ -178,9 +179,9 @@
 }
 
 .btn-mark-read {
-  background: #f1f5f9;
-  color: #475569;
-  border: 1.5px solid #e2e8f0;
+  background: #f4f9ef;
+  color: #28410e;
+  border: 1.5px solid #d4ebba;
   padding: 0.38rem 0.85rem;
   border-radius: 7px;
   font-size: 0.76rem;
@@ -192,9 +193,9 @@
 }
 
 .btn-mark-read:hover {
-  background: #16a34a;
+  background: #94c559;
   color: #fff;
-  border-color: #16a34a;
+  border-color: #94c559;
 }
 
 /* ---- Empty State ---- */

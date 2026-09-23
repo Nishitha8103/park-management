@@ -1,9 +1,10 @@
 import { useState, useEffect } from 'react';
-import { Plus, Edit2, Trash2, X, Image as ImageIcon, Upload, Download, AlertTriangle, CheckCircle2, Store } from 'lucide-react';
+import { Plus, Edit2, Trash2, X, Image as ImageIcon, Upload, Download, AlertTriangle, CheckCircle2, Store, Search } from 'lucide-react';
 import axios from 'axios';
 
 const AdminParks = () => {
   const [parks, setParks] = useState([]);
+  const [searchQuery, setSearchQuery] = useState('');
   
   // Master Data States
   const [districts, setDistricts] = useState([]);
@@ -120,7 +121,10 @@ const AdminParks = () => {
   }, []);
 
   const handleInputChange = (e) => {
-    const { name, value, type, checked } = e.target;
+    let { name, value, type, checked } = e.target;
+    if (name === 'address') {
+      value = value.replace(/[^a-zA-Z0-9\s,.-/#]/g, '');
+    }
     const val = type === 'checkbox' ? checked : value;
     
     setFormData(prev => {
@@ -179,7 +183,10 @@ const AdminParks = () => {
   };
 
   const handleSlotInputChange = (e) => {
-    const { name, value } = e.target;
+    let { name, value } = e.target;
+    if (name === 'location') {
+      value = value.replace(/[^a-zA-Z0-9\s,.-/#]/g, '');
+    }
     setSlotFormData(prev => ({ ...prev, [name]: value }));
   };
 
@@ -481,11 +488,90 @@ const AdminParks = () => {
   };
 
 
+  const filteredParks = parks.filter(p => {
+    if (!searchQuery.trim()) return true;
+    const q = searchQuery.toLowerCase().trim();
+    const name = (p.name || '').toLowerCase();
+    const parkCode = (p.parkCode || '').toLowerCase();
+    const corp = (typeof p.corporation === 'object' ? p.corporation?.name : p.corporation || '').toLowerCase();
+    const zone = (typeof p.zone === 'object' ? p.zone?.name : p.zone || '').toLowerCase();
+    const ward = (typeof p.ward === 'object' ? p.ward?.name : p.ward || '').toLowerCase();
+    const dist = (typeof p.district === 'object' ? p.district?.name : p.district || '').toLowerCase();
+    const status = (p.status || '').toLowerCase();
+    const address = (p.address || '').toLowerCase();
+
+    return (
+      name.includes(q) ||
+      parkCode.includes(q) ||
+      corp.includes(q) ||
+      zone.includes(q) ||
+      ward.includes(q) ||
+      dist.includes(q) ||
+      status.includes(q) ||
+      address.includes(q)
+    );
+  });
+
   return (
     <div className="admin-panel">
-      <div className="admin-panel-header" style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-        <h3>Municipal Parks Listing</h3>
-        <div style={{ display: 'flex', gap: '10px' }}>
+      <div className="admin-panel-header" style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: '12px' }}>
+        <div style={{ display: 'flex', alignItems: 'center', gap: '16px', flexWrap: 'wrap', flex: '1 1 auto', minWidth: '280px' }}>
+          <h3 style={{ margin: 0, whiteSpace: 'nowrap' }}>Municipal Parks Listing</h3>
+          
+          {/* Park Search Bar */}
+          <div style={{ position: 'relative', display: 'flex', alignItems: 'center', width: '100%', maxWidth: '340px' }}>
+            <Search size={16} color="#94a3b8" style={{ position: 'absolute', left: '10px', pointerEvents: 'none' }} />
+            <input 
+              type="text"
+              placeholder="Search park by name, code, ward, zone..."
+              value={searchQuery}
+              onChange={(e) => setSearchQuery(e.target.value)}
+              style={{
+                width: '100%',
+                padding: '0.5rem 2rem 0.5rem 2.2rem',
+                backgroundColor: 'rgba(255, 255, 255, 0.05)',
+                border: '1px solid rgba(255, 255, 255, 0.15)',
+                borderRadius: '6px',
+                color: '#ffffff',
+                fontSize: '0.85rem',
+                outline: 'none',
+                transition: 'all 0.2s ease'
+              }}
+              onFocus={(e) => {
+                e.target.style.borderColor = '#10b981';
+                e.target.style.backgroundColor = 'rgba(255, 255, 255, 0.08)';
+                e.target.style.boxShadow = '0 0 0 2px rgba(16, 185, 129, 0.2)';
+              }}
+              onBlur={(e) => {
+                e.target.style.borderColor = 'rgba(255, 255, 255, 0.15)';
+                e.target.style.backgroundColor = 'rgba(255, 255, 255, 0.05)';
+                e.target.style.boxShadow = 'none';
+              }}
+            />
+            {searchQuery && (
+              <button
+                type="button"
+                onClick={() => setSearchQuery('')}
+                style={{
+                  position: 'absolute',
+                  right: '6px',
+                  background: 'none',
+                  border: 'none',
+                  color: '#94a3b8',
+                  cursor: 'pointer',
+                  padding: '2px',
+                  display: 'flex',
+                  alignItems: 'center'
+                }}
+                title="Clear Search"
+              >
+                <X size={15} />
+              </button>
+            )}
+          </div>
+        </div>
+
+        <div style={{ display: 'flex', gap: '10px', flexWrap: 'wrap', alignItems: 'center' }}>
           {selectedParks.length > 0 && (
             <button className="btn-admin-add" onClick={handleBulkDelete} disabled={loading} style={{ display: 'flex', alignItems: 'center', gap: '8px', padding: '0.5rem 1rem', backgroundColor: '#ef4444', color: 'white', border: 'none', borderRadius: '4px', cursor: 'pointer', fontWeight: 'bold' }}>
               <Trash2 size={16} /> Delete Selected ({selectedParks.length})
@@ -512,7 +598,7 @@ const AdminParks = () => {
               <th style={{ padding: '0.75rem', width: '40px' }}>
                 <input 
                   type="checkbox" 
-                  checked={parks.length > 0 && selectedParks.length === parks.length} 
+                  checked={filteredParks.length > 0 && selectedParks.length === filteredParks.length} 
                   onChange={handleSelectAll} 
                   style={{ cursor: 'pointer', width: '18px', height: '18px' }}
                 />
@@ -528,11 +614,13 @@ const AdminParks = () => {
             </tr>
           </thead>
           <tbody>
-            {parks.length === 0 ? (
-              <tr><td colSpan="9" style={{ textAlign: 'center', padding: '1.5rem', color: '#8F9CAE' }}>No parks added yet.</td></tr>
+            {filteredParks.length === 0 ? (
+              <tr><td colSpan="9" style={{ textAlign: 'center', padding: '1.5rem', color: '#8F9CAE' }}>
+                {searchQuery ? `No parks matching "${searchQuery}" found.` : 'No parks added yet.'}
+              </td></tr>
             ) : (
               <>
-                {parks.map(p => (
+                {filteredParks.map(p => (
                   <tr key={p._id}>
                   <td style={{ padding: '0.75rem' }}>
                     <input 

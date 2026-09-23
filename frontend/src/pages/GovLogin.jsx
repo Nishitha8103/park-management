@@ -16,7 +16,7 @@ const GovLogin = () => {
     e.preventDefault();
     setErrorMsg('');
     
-    if (!email.trim() || !/^\S+@\S+\.\S+$/.test(email)) return setErrorMsg('A valid Official Email Address is required');
+    if (!email.trim()) return setErrorMsg('Official Email or Official ID is required');
     if (!password) return setErrorMsg('Password is required');
     if (password.length < 6) return setErrorMsg('Password must be at least 6 characters');
 
@@ -26,7 +26,7 @@ const GovLogin = () => {
         headers: {
           'Content-Type': 'application/json',
         },
-        body: JSON.stringify({ email, password }),
+        body: JSON.stringify({ email: email.trim(), username: email.trim(), password }),
       });
 
       const data = await response.json();
@@ -39,7 +39,7 @@ const GovLogin = () => {
            setErrorMsg('Access denied. Not a government official.');
         }
       } else {
-        setErrorMsg(data.message || 'Invalid email or password.');
+        setErrorMsg(data.message || 'Invalid email/ID or password.');
       }
     } catch (error) {
       console.error("Login error:", error);
@@ -65,11 +65,11 @@ const GovLogin = () => {
 
         <form onSubmit={handleLogin}>
           <div className="gov-form-group">
-            <label className="gov-input-label">Official Email Address</label>
+            <label className="gov-input-label">Official Email or ID (e.g. GOV-001)</label>
             <input 
-              type="email" 
+              type="text" 
               className="gov-input-field" 
-              placeholder="Enter your official email" 
+              placeholder="Enter official email or ID" 
               value={email}
               onChange={(e) => setEmail(e.target.value)}
               autoComplete="off"

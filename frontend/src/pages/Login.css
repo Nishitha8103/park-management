@@ -9,8 +9,8 @@
   display: flex;
   align-items: center;
   justify-content: center;
-  background-color: #03140a;
-  background-image: url('/landing_bg_leaves.jpg');
+  background-color: #0d2818;
+  background-image: url('/images/park-background.jpg');
   background-repeat: no-repeat;
   background-position: center center;
   background-size: cover;
@@ -18,12 +18,13 @@
   padding: 2.5rem 1.25rem 2rem;
   overflow-y: auto;
   overflow-x: hidden;
+  box-sizing: border-box;
 }
 
 .login-dark-overlay {
-  position: absolute;
+  position: fixed;
   inset: 0;
-  background: radial-gradient(circle at center, rgba(3, 22, 12, 0.12) 0%, rgba(2, 14, 8, 0.4) 100%);
+  background: radial-gradient(circle at center, rgba(10, 30, 18, 0.15) 0%, rgba(5, 20, 12, 0.35) 100%);
   pointer-events: none;
   z-index: 1;
 }

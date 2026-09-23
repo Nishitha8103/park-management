@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
-import { UserPlus, User, Mail, Phone, Lock, HardHat, Eye, EyeOff, Wrench } from 'lucide-react';
+import { UserPlus, User, Mail, Phone, Lock, TreePine, Eye, EyeOff, Wrench } from 'lucide-react';
 import './ContractorRegister.css';
 
 const ContractorRegister = () => {
@@ -61,24 +61,24 @@ const ContractorRegister = () => {
       <div className="contractor-register-card">
         <div className="contractor-register-header">
           <div className="contractor-register-logo">
-            <HardHat size={36} className="contractor-text-primary" />
+            <TreePine size={36} className="contractor-text-primary" />
           </div>
           <h2>CONTRACTOR PORTAL</h2>
-          <p className="contractor-register-brand">OFFICIAL REGISTRATION</p>
+          <p className="contractor-register-brand">PARKS MONITORING SYSTEM</p>
         </div>
 
         <form onSubmit={handleRegister}>
           <div className="contractor-form-row">
             <div className="contractor-form-group">
-              <label className="contractor-input-label">Full Name / Company Name</label>
+              <label className="contractor-input-label">Full Name</label>
               <div className="contractor-input-with-icon">
                 <User size={18} className="contractor-input-icon" />
                 <input 
                   type="text" 
                   className="contractor-input-field has-icon" 
-                  placeholder="Enter name or company" 
+                  placeholder="Enter full name" 
                   value={name}
-                  onChange={(e) => setName(e.target.value)}
+                  onChange={(e) => setName(e.target.value.replace(/[^a-zA-Z\s]/g, ''))}
                   required 
                 />
               </div>
@@ -111,7 +111,8 @@ const ContractorRegister = () => {
                   className="contractor-input-field has-icon" 
                   placeholder="Enter phone number" 
                   value={phone}
-                  onChange={(e) => setPhone(e.target.value)}
+                  onChange={(e) => setPhone(e.target.value.replace(/\D/g, '').slice(0, 10))}
+                  maxLength={10}
                   required 
                 />
               </div>

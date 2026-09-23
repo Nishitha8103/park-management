@@ -415,7 +415,7 @@ exports.getAllRegistrations = async (req, res) => {
     if (paymentStatus) filter.paymentStatus = paymentStatus;
 
     const registrations = await EventRegistration.find(filter)
-      .populate('event', 'title parkName location eventDate price')
+      .populate('event', 'title parkName location eventDate price capacity description')
       .populate('userId', 'name email')
       .sort({ createdAt: -1 });
 

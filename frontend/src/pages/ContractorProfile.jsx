@@ -1,6 +1,6 @@
 import { useEffect, useState, useRef } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { Menu, LogOut, HardHat, User, Mail, Phone, Wrench, Save, Camera, Lock, Shield, Eye, EyeOff } from 'lucide-react';
+import { Menu, LogOut, TreePine, HardHat, User, Mail, Phone, Wrench, Save, Camera, Lock, Shield, Eye, EyeOff } from 'lucide-react';
 import './ContractorProfile.css';
 import ContractorSidebar from '../components/ContractorSidebar';
 
@@ -21,6 +21,7 @@ const ContractorProfile = () => {
 
   const [profilePic, setProfilePic] = useState(null);
   const [rawFile, setRawFile] = useState(null);
+  const [imgError, setImgError] = useState(false);
   const [message, setMessage] = useState({ type: '', text: '' });
 
   // Password fields
@@ -39,32 +40,45 @@ const ContractorProfile = () => {
     const storedUser = localStorage.getItem('contractorUser');
     if (!storedUser) {
       navigate('/login');
-    } else {
-      const user = JSON.parse(storedUser);
-      setContractor(user);
-      setFormData({
-        name: user.name || '',
-        email: user.email || '',
-        phone: user.phone || '',
-        department: user.department || ''
-      });
-      if (user.profilePic || user.profilePhoto) setProfilePic(user.profilePic || user.profilePhoto);
+      return;
+    }
+    
+    const user = JSON.parse(storedUser);
+    setContractor(user);
+    setFormData({
+      name: user.name || '',
+      email: user.email || '',
+      phone: user.phone || '',
+      department: user.department || ''
+    });
+    if (user.profilePhoto || user.profilePic) {
+      setProfilePic(user.profilePhoto || user.profilePic);
+    }
 
-      // If maintenanceSkills is missing (old session), fetch fresh data from backend
-      if (!user.maintenanceSkills || user.maintenanceSkills.length === 0) {
-        fetch(`/api/contractors/profile`, {
-          headers: { Authorization: `Bearer ${user.token}` }
-        })
-          .then(res => res.ok ? res.json() : null)
-          .then(data => {
-            if (data && data.maintenanceSkills) {
-              const refreshed = { ...user, maintenanceSkills: data.maintenanceSkills, phone: data.phone || user.phone };
-              localStorage.setItem('contractorUser', JSON.stringify(refreshed));
-              setContractor(refreshed);
+    const token = user.token || localStorage.getItem('token');
+    if (token) {
+      fetch('/api/contractors/profile', {
+        headers: { Authorization: `Bearer ${token}` }
+      })
+        .then(res => res.ok ? res.json() : null)
+        .then(data => {
+          if (data) {
+            const refreshed = { ...user, ...data, token };
+            localStorage.setItem('contractorUser', JSON.stringify(refreshed));
+            setContractor(refreshed);
+            setFormData({
+              name: data.name || user.name || '',
+              email: data.email || user.email || '',
+              phone: data.phone || user.phone || '',
+              department: data.department || user.department || ''
+            });
+            if (data.profilePhoto || data.profilePic) {
+              setProfilePic(data.profilePhoto || data.profilePic);
+              setImgError(false);
             }
-          })
-          .catch(() => {});
-      }
+          }
+        })
+        .catch(() => {});
     }
   }, [navigate]);
 
@@ -78,7 +92,12 @@ const ContractorProfile = () => {
   };
 
   const handleChange = (e) => {
-    const { name, value } = e.target;
+    let { name, value } = e.target;
+    if (name === 'name') {
+      value = value.replace(/[^a-zA-Z\s]/g, '');
+    } else if (name === 'phone') {
+      value = value.replace(/\D/g, '').slice(0, 10);
+    }
     setFormData(prev => ({ ...prev, [name]: value }));
   };
 
@@ -88,26 +107,42 @@ const ContractorProfile = () => {
   };
 
   const handleImageUpload = (e) => {
-    const file = e.target.files[0];
-    if (file) {
-      setRawFile(file);
-      const reader = new FileReader();
-      reader.onloadend = () => {
-        setProfilePic(reader.result);
-        
-        // Save to local storage immediately
-        if (contractor) {
-          const updatedUser = { ...contractor, profilePic: reader.result };
-          localStorage.setItem('contractorUser', JSON.stringify(updatedUser));
-          setContractor(updatedUser);
-        }
-      };
-      reader.readAsDataURL(file);
+    const file = e.target.files && e.target.files[0];
+    if (!file) return;
+
+    if (!file.type.startsWith('image/')) {
+      setMessage({ type: 'error', text: 'Please select a valid image file.' });
+      setTimeout(() => setMessage({ type: '', text: '' }), 4000);
+      return;
     }
+
+    setRawFile(file);
+    const reader = new FileReader();
+    reader.onloadend = () => {
+      setProfilePic(reader.result);
+      setImgError(false);
+      setIsEditing(true);
+      setMessage({ type: 'success', text: 'Photo selected! Click "Save Profile" to save your updates.' });
+      setTimeout(() => setMessage({ type: '', text: '' }), 5000);
+    };
+    reader.readAsDataURL(file);
+  };
+
+  const handleCancelEditing = () => {
+    setIsEditing(false);
+    setRawFile(null);
+    setFormData({
+      name: contractor?.name || '',
+      email: contractor?.email || '',
+      phone: contractor?.phone || '',
+      department: contractor?.department || ''
+    });
+    setProfilePic(contractor?.profilePhoto || contractor?.profilePic || null);
+    setImgError(false);
   };
 
   const triggerFileInput = () => {
-    fileInputRef.current.click();
+    fileInputRef.current?.click();
   };
 
   const togglePasswordVisibility = (field) => {
@@ -134,7 +169,7 @@ const ContractorProfile = () => {
     }
     
     try {
-      const token = contractor?.token;
+      const token = contractor?.token || localStorage.getItem('token');
       const submitData = new FormData();
       submitData.append('name', formData.name);
       submitData.append('email', formData.email);
@@ -153,10 +188,23 @@ const ContractorProfile = () => {
 
       const data = await response.json();
       if (response.ok) {
-        localStorage.setItem('contractorUser', JSON.stringify(data));
-        setContractor(data);
-        setMessage({ type: 'success', text: 'Profile updated successfully and email sent!' });
+        const updated = {
+          ...contractor,
+          ...data,
+          profilePhoto: data.profilePhoto || profilePic,
+          profilePic: data.profilePhoto || profilePic,
+          token
+        };
+        localStorage.setItem('contractorUser', JSON.stringify(updated));
+        setContractor(updated);
+        if (data.profilePhoto || data.profilePic) {
+          setProfilePic(data.profilePhoto || data.profilePic);
+          setImgError(false);
+        }
+        setRawFile(null);
+        setMessage({ type: 'success', text: 'Profile updated successfully!' });
         setIsEditing(false);
+        window.dispatchEvent(new Event('user-updated'));
       } else {
         setMessage({ type: 'error', text: data.message || 'Failed to update profile' });
       }
@@ -189,7 +237,7 @@ const ContractorProfile = () => {
     }
     
     try {
-      const token = contractor?.token;
+      const token = contractor?.token || localStorage.getItem('token');
       const submitData = new FormData();
       submitData.append('password', passwordData.newPassword);
 
@@ -236,9 +284,8 @@ const ContractorProfile = () => {
               <button className="contractor-menu-toggle" onClick={toggleSidebar}>
                 <Menu size={24} />
               </button>
-              <HardHat size={28} className="contractor-text-primary" />
-              <h1>PARK MAINTENANCE</h1>
-              <span>Portal</span>
+              <TreePine size={28} color="#e5ede7" />
+              <h1>Parks Monitoring System</h1>
             </div>
             
             <div className="contractor-user-info">
@@ -279,9 +326,14 @@ const ContractorProfile = () => {
           <div className="profile-card">
             {/* LEFT COLUMN - Avatar */}
             <div className="profile-avatar-section">
-              <div className="avatar-wrapper" onClick={triggerFileInput}>
-                {profilePic ? (
-                  <img src={profilePic} alt="Profile" className="avatar-image" />
+              <div className="avatar-wrapper" onClick={triggerFileInput} title="Click to upload profile photo">
+                {profilePic && !imgError ? (
+                  <img 
+                    src={profilePic} 
+                    alt="Profile" 
+                    className="avatar-image" 
+                    onError={() => setImgError(true)} 
+                  />
                 ) : (
                   <div className="avatar-circle">
                     <User size={48} />
@@ -289,7 +341,7 @@ const ContractorProfile = () => {
                 )}
                 <div className="avatar-overlay">
                   <Camera size={24} />
-                  <span>Upload</span>
+                  <span>{rawFile ? 'Selected' : (profilePic ? 'Change' : 'Upload')}</span>
                 </div>
                 <input 
                   type="file" 
@@ -308,16 +360,13 @@ const ContractorProfile = () => {
               </span>
               
               <button 
+                type="button"
                 className={`btn-toggle-edit ${isEditing ? 'active' : ''}`}
                 onClick={() => {
-                  setIsEditing(!isEditing);
                   if (isEditing) {
-                    setFormData({
-                      name: contractor.name || '',
-                      email: contractor.email || '',
-                      phone: contractor.phone || '',
-                      department: contractor.department || ''
-                    });
+                    handleCancelEditing();
+                  } else {
+                    setIsEditing(true);
                   }
                 }}
               >
@@ -335,7 +384,7 @@ const ContractorProfile = () => {
                 <form onSubmit={handleSaveProfile}>
                   <div className="profile-form-grid">
                     <div className="profile-form-group">
-                      <label>Full Name / Company Name</label>
+                      <label>Full Name</label>
                       <div className="profile-input-wrapper">
                         <User size={18} className="profile-input-icon" />
                         <input 
@@ -375,6 +424,7 @@ const ContractorProfile = () => {
                           name="phone"
                           value={formData.phone} 
                           onChange={handleChange}
+                          maxLength="10"
                           disabled={!isEditing}
                           required
                           className={isEditing ? 'editable' : ''}

@@ -91,7 +91,7 @@ const createContractor = async (req, res) => {
     // Handle image upload if provided (from multer)
     let profilePhoto = null;
     if (req.file) {
-      profilePhoto = `/uploads/${req.file.filename}`;
+      profilePhoto = `/uploads/parks/${req.file.filename}`;
     }
 
     const contractor = new Contractor({
@@ -171,7 +171,7 @@ const updateContractor = async (req, res) => {
       }
 
       if (req.file) {
-        contractor.profilePhoto = `/uploads/${req.file.filename}`;
+        contractor.profilePhoto = `/uploads/parks/${req.file.filename}`;
       }
 
       const updatedContractor = await contractor.save();
@@ -287,20 +287,25 @@ const getNextContractorId = async (req, res) => {
 // @access  Private/Contractor
 const updateContractorProfile = async (req, res) => {
   try {
-    const contractor = await Contractor.findById(req.user._id);
+    const contractorId = req.user?._id || req.user?.id;
+    const contractor = await Contractor.findById(contractorId);
 
     if (contractor) {
-      contractor.name = req.body.name || contractor.name;
-      contractor.email = req.body.email || contractor.email;
-      contractor.phone = req.body.phone || contractor.phone;
-      contractor.address = req.body.address || contractor.address;
+      if (req.body.name) contractor.name = req.body.name;
+      if (req.body.email) contractor.email = req.body.email;
+      if (req.body.phone) contractor.phone = req.body.phone;
+      if (req.body.address) contractor.address = req.body.address;
 
-      if (req.body.password) {
+      if (req.body.password && req.body.password.trim() !== '') {
         contractor.password = req.body.password;
       }
 
       if (req.file) {
-        contractor.profilePhoto = '/uploads/' + req.file.filename;
+        contractor.profilePhoto = `/uploads/parks/${req.file.filename}`;
+      } else if (req.body.profilePhoto) {
+        contractor.profilePhoto = req.body.profilePhoto;
+      } else if (req.body.profilePic) {
+        contractor.profilePhoto = req.body.profilePic;
       }
 
       const updatedContractor = await contractor.save();
@@ -313,21 +318,26 @@ const updateContractorProfile = async (req, res) => {
         parkNames = parksList.map(p => p.name);
       }
 
-      const { sendContractorUpdateEmail } = require('../config/sendEmail');
-      try {
-        await sendContractorUpdateEmail(
-          updatedContractor.email,
-          updatedContractor.name,
-          updatedContractor.username,
-          req.body.password || null,
-          parkNames
-        );
-      } catch (emailErr) {
-        console.error('Failed to send email on profile update:', emailErr);
+      if (req.body.password) {
+        const { sendContractorUpdateEmail } = require('../config/sendEmail');
+        try {
+          await sendContractorUpdateEmail(
+            updatedContractor.email,
+            updatedContractor.name,
+            updatedContractor.username,
+            req.body.password || null,
+            parkNames
+          );
+        } catch (emailErr) {
+          console.error('Failed to send email on profile update:', emailErr);
+        }
       }
+
+      const existingToken = (req.headers.authorization && req.headers.authorization.split(' ')[1]) || req.user?.token;
 
       res.json({
         id: updatedContractor._id,
+        _id: updatedContractor._id,
         contractorId: updatedContractor.contractorId,
         name: updatedContractor.name,
         username: updatedContractor.username,
@@ -341,14 +351,16 @@ const updateContractorProfile = async (req, res) => {
         ward: updatedContractor.ward,
         assignedParks: updatedContractor.assignedParks,
         profilePhoto: updatedContractor.profilePhoto,
+        profilePic: updatedContractor.profilePhoto,
         maintenanceSkills: updatedContractor.maintenanceSkills,
         status: updatedContractor.status,
-        token: req.headers.authorization.split(' ')[1] // keep existing token
+        token: existingToken
       });
     } else {
       res.status(404).json({ message: 'Contractor not found' });
     }
   } catch (error) {
+    console.error('Update contractor profile error:', error);
     res.status(500).json({ message: 'Server error', error: error.message });
   }
 };
@@ -358,22 +370,27 @@ const updateContractorProfile = async (req, res) => {
 // @access Contractor
 const getMyProfile = async (req, res) => {
   try {
-    const contractor = await Contractor.findById(req.user.id).lean();
+    const contractorId = req.user?._id || req.user?.id;
+    const contractor = await Contractor.findById(contractorId).lean();
     if (!contractor) return res.status(404).json({ message: 'Contractor not found' });
     res.json({
       id: contractor._id,
+      _id: contractor._id,
       contractorId: contractor.contractorId,
       name: contractor.name,
       username: contractor.username,
       email: contractor.email,
       phone: contractor.phone,
+      address: contractor.address,
       role: contractor.role,
       corporation: contractor.corporation,
       zone: contractor.zone,
       ward: contractor.ward,
+      assignedParks: contractor.assignedParks,
       profilePhoto: contractor.profilePhoto,
-      maintenanceSkills: contractor.maintenanceSkills || [],
-      status: contractor.status,
+      profilePic: contractor.profilePhoto,
+      maintenanceSkills: contractor.maintenanceSkills,
+      status: contractor.status
     });
   } catch (error) {
     res.status(500).json({ message: 'Server error', error: error.message });

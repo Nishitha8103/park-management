@@ -2,6 +2,7 @@ const Complaint = require('../models/Complaint');
 const Park = require('../models/Park');
 const Notification = require('../models/Notification');
 const User = require('../models/User');
+const Setting = require('../models/Setting');
 
 // Helper to resolve government official from an in-memory list of officials
 const resolveOfficialFromList = (park, parkName, officials) => {
@@ -53,6 +54,15 @@ const getResponsibleOfficial = async (park, parkName) => {
 // @route   POST /api/complaints
 const createComplaint = async (req, res) => {
   try {
+    // Check if Public Complaints are allowed by Admin
+    const publicSetting = await Setting.findOne({ key: 'publicModule' });
+    const isComplaintsAllowed = publicSetting?.value?.allowPublicComplaints ?? true;
+    if (!isComplaintsAllowed) {
+      return res.status(403).json({
+        message: 'Public complaint reporting is temporarily paused by the administration for portal maintenance.'
+      });
+    }
+
     const { parkId, parkName, locationInPark, category, priority, description, userName, userPhone, district, zone, ward, userId } = req.body;
 
     const complaintNumber = 'CMP' + Math.floor(100000000 + Math.random() * 900000000);
@@ -302,7 +312,7 @@ const updateComplaint = async (req, res) => {
       return res.status(404).json({ message: 'Complaint not found' });
     }
 
-    // Prevent assignment if the Contractor is On Leave / Unavailable
+    // Prevent assignment if the Contractor is On Leave / Unavailable or reached max concurrent tasks
     if (updateData.assignedContractor && String(updateData.assignedContractor) !== String(existingComplaint.assignedContractor || '')) {
       const Contractor = require('../models/Contractor');
       const targetContractor = await Contractor.findById(updateData.assignedContractor).lean();
@@ -311,14 +321,40 @@ const updateComplaint = async (req, res) => {
           message: `Cannot assign task to ${targetContractor.name}. Contractor is currently On Leave or Unavailable.`
         });
       }
+
+      // Check maxConcurrentTasks policy limit
+      const contractorSetting = await Setting.findOne({ key: 'contractorModule' });
+      const maxTasks = contractorSetting?.value?.maxConcurrentTasks || 5;
+      const activeTasksCount = await Complaint.countDocuments({
+        assignedContractor: updateData.assignedContractor,
+        status: { $in: ['Assigned', 'In Progress', 'in-progress', 'Pending Verification', 'Rework Required', 'Returned by Admin'] }
+      });
+      if (activeTasksCount >= maxTasks) {
+        return res.status(400).json({
+          message: `Cannot assign task to ${targetContractor?.name || 'Contractor'}. Contractor has reached the maximum workload capacity (${maxTasks} concurrent tasks).`
+        });
+      }
     }
 
-    // Prevent assignment if Government Official is On Leave / Unavailable
+    // Prevent assignment if Government Official is On Leave / Unavailable or reached max inspection capacity
     if (updateData.assignedOfficial && String(updateData.assignedOfficial) !== String(existingComplaint.assignedOfficial || '')) {
       const targetOfficial = await User.findById(updateData.assignedOfficial).lean();
       if (targetOfficial && (targetOfficial.availabilityStatus === 'On Leave' || targetOfficial.availabilityStatus === 'Unavailable')) {
         return res.status(400).json({
           message: `Cannot assign task to ${targetOfficial.name}. Government Official is currently On Leave or Unavailable.`
+        });
+      }
+
+      // Check maxConcurrentInspections policy limit
+      const officialSetting = await Setting.findOne({ key: 'officialModule' });
+      const maxInspections = officialSetting?.value?.maxConcurrentInspections || 10;
+      const activeInspectionsCount = await Complaint.countDocuments({
+        assignedOfficial: updateData.assignedOfficial,
+        status: { $in: ['Assigned', 'In Progress', 'in-progress', 'Completed', 'Completed - Waiting for Admin Review', 'Inspection Pending', 'Rework Required'] }
+      });
+      if (activeInspectionsCount >= maxInspections) {
+        return res.status(400).json({
+          message: `Cannot assign inspection to ${targetOfficial?.name || 'Official'}. Government Official has reached the maximum workload capacity (${maxInspections} active inspections).`
         });
       }
     }

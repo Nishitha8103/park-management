@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { HardHat, Menu, LogOut, Package, Plus, X, CheckCircle, Clock, XCircle, Trash2, AlertTriangle } from 'lucide-react';
+import { TreePine, HardHat, Menu, LogOut, Package, Plus, X, CheckCircle, Clock, XCircle, Trash2, AlertTriangle } from 'lucide-react';
 import ContractorSidebar from '../components/ContractorSidebar';
 import './ContractorMaterialRequests.css';
 
@@ -31,6 +31,7 @@ const defaultForm = {
   unit: 'units',
   priority: 'Medium',
   reason: '',
+  park: '',
   parkName: '',
 };
 
@@ -39,6 +40,7 @@ const ContractorMaterialRequests = () => {
   const [contractor, setContractor] = useState(null);
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
   const [requests, setRequests] = useState([]);
+  const [assignedParks, setAssignedParks] = useState([]);
   const [loading, setLoading] = useState(true);
   const [showForm, setShowForm] = useState(false);
   const [form, setForm] = useState(defaultForm);
@@ -65,7 +67,33 @@ const ContractorMaterialRequests = () => {
     const user = JSON.parse(stored);
     setContractor(user);
     fetchRequests(user);
+    fetchParks(user);
   }, [navigate]);
+
+  const fetchParks = async (user) => {
+    try {
+      const cId = user._id || user.id;
+      const res = await fetch(`/api/parks?contractorId=${cId}`, {
+        headers: { Authorization: `Bearer ${user.token || localStorage.getItem('token')}` }
+      });
+      if (res.ok) {
+        const data = await res.json();
+        const list = Array.isArray(data) ? data : (data.parks || []);
+        if (list.length > 0) {
+          setAssignedParks(list);
+        } else {
+          // If no specific filtered parks, fallback to all parks
+          const allRes = await fetch('/api/parks');
+          if (allRes.ok) {
+            const allData = await allRes.json();
+            setAssignedParks(Array.isArray(allData) ? allData : (allData.parks || []));
+          }
+        }
+      }
+    } catch (err) {
+      console.error('Error fetching assigned parks for material requests:', err);
+    }
+  };
 
   const fetchRequests = async (user) => {
     try {
@@ -85,6 +113,10 @@ const ContractorMaterialRequests = () => {
     e.preventDefault();
     if (!form.materialName.trim()) {
       showMsg('error', 'Material Name is required.');
+      return;
+    }
+    if (!form.park && !form.parkName) {
+      showMsg('error', 'Please select a park.');
       return;
     }
     if (!form.quantity || isNaN(form.quantity) || Number(form.quantity) <= 0) {
@@ -160,9 +192,8 @@ const ContractorMaterialRequests = () => {
           <div className="container contractor-header-content">
             <div className="contractor-brand">
               <button className="contractor-menu-toggle" onClick={toggleSidebar}><Menu size={24} /></button>
-              <HardHat size={28} className="contractor-text-primary" />
-              <h1>PARK MAINTENANCE</h1>
-              <span>Portal</span>
+              <TreePine size={28} color="#e5ede7" />
+              <h1>Parks Monitoring System</h1>
             </div>
             <div className="contractor-user-info">
               <div className="contractor-user-details">
@@ -230,13 +261,27 @@ const ContractorMaterialRequests = () => {
                       />
                     </div>
                     <div className="mr-form-group">
-                      <label>Park / Location</label>
-                      <input
-                        type="text"
-                        placeholder="e.g. J.P. Nagar 4th Phase Park"
-                        value={form.parkName}
-                        onChange={e => setForm(p => ({ ...p, parkName: e.target.value }))}
-                      />
+                      <label>Park / Location *</label>
+                      <select
+                        value={form.park}
+                        onChange={e => {
+                          const pId = e.target.value;
+                          const selected = assignedParks.find(p => String(p._id) === String(pId));
+                          setForm(prev => ({
+                            ...prev,
+                            park: pId,
+                            parkName: selected ? selected.name : ''
+                          }));
+                        }}
+                        required
+                      >
+                        <option value="">-- Select Assigned Park --</option>
+                        {assignedParks.map(p => (
+                          <option key={p._id} value={p._id}>
+                            {p.name} {p.ward?.name ? `(${p.ward.name})` : (p.zone?.name ? `(${p.zone.name})` : '')}
+                          </option>
+                        ))}
+                      </select>
                     </div>
                     <div className="mr-form-group">
                       <label>Quantity *</label>

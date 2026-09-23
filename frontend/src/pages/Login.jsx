@@ -3,6 +3,7 @@ import { Link, useNavigate, useSearchParams } from 'react-router-dom';
 import { Mail, Lock, Eye, EyeOff, LogIn, ArrowRight, Sprout } from 'lucide-react';
 import { useGoogleLogin } from '@react-oauth/google';
 import ForgotPasswordModal from '../components/ForgotPasswordModal';
+import parkBackground from '../assets/images/park-background.jpg';
 import './Login.css';
 
 const Login = () => {
@@ -125,7 +126,7 @@ const Login = () => {
   });
 
   return (
-    <div className="login-dark-page" style={{ backgroundImage: "url('/landing_dark_leaves.jpg?v=100')" }}>
+    <div className="login-dark-page" style={{ backgroundImage: `url(${parkBackground})` }}>
       <div className="login-dark-overlay"></div>
 
       <div className="login-main-wrapper">

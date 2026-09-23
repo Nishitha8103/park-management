@@ -23,7 +23,9 @@ import {
   MapPin,
   Building2,
   Grid3x3,
-  ShieldCheck
+  ShieldCheck,
+  Star,
+  MessageSquareHeart
 } from 'lucide-react';
 import './AdminSidebar.css';
 
@@ -100,6 +102,10 @@ const AdminSidebar = ({ isOpen = false, toggleSidebar = () => {}, closeSidebar =
 
           <div className="adm-nav-group-label">Communication</div>
 
+          <NavLink to="/admin-dashboard/feedback" className={({isActive}) => isActive ? 'nav-item active' : 'nav-item'} onClick={closeSidebar}>
+            <Star size={18} />
+            <span>Public Feedback</span>
+          </NavLink>
           <NavLink to="/admin-dashboard/notifications" className={({isActive}) => isActive ? 'nav-item active' : 'nav-item'} onClick={closeSidebar}>
             <Bell size={18} />
             <span>Notifications</span>

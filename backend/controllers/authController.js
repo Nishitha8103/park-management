@@ -1,4 +1,5 @@
 const User = require('../models/User');
+const Setting = require('../models/Setting');
 const jwt = require('jsonwebtoken');
 const crypto = require('crypto');
 const { sendOfficialCredentialsEmail, sendContractorCredentialsEmail, sendWelcomePublicEmail, sendPasswordResetOtpEmail } = require('../config/sendEmail');
@@ -16,6 +17,18 @@ const generateToken = (id) => {
 const registerUser = async (req, res) => {
   try {
     let { name, email, username, password, role, phone, department, zone, ward, district } = req.body;
+    
+    // Check if citizen registration is enabled
+    const userRole = role || 'Public';
+    if (['Public', 'citizen', 'user'].includes(userRole)) {
+      const publicSetting = await Setting.findOne({ key: 'publicModule' });
+      const isRegistrationAllowed = publicSetting?.value?.allowCitizenRegistration ?? true;
+      if (!isRegistrationAllowed) {
+        return res.status(403).json({
+          message: 'New citizen registration is currently disabled by the administrator.'
+        });
+      }
+    }
     
     // Auto generate username if missing
     let finalUsername = username ? username.trim() : '';
@@ -200,11 +213,20 @@ const getUserProfile = async (req, res) => {
   const user = await User.findById(req.user._id);
 
   if (user) {
+    let normalizedRole = user.role;
+    if (['official', 'government_official', 'Government Official'].includes(user.role)) {
+      normalizedRole = 'Government Official';
+    } else if (['contractor', 'Contractor'].includes(user.role)) {
+      normalizedRole = 'Contractor';
+    } else if (['public_user', 'Public', 'Public User'].includes(user.role)) {
+      normalizedRole = 'Public User';
+    }
+
     res.json({
       _id: user._id,
       name: user.name,
       email: user.email,
-      role: user.role,
+      role: normalizedRole,
       phone: user.phone || '',
       address: user.address || '',
       department: user.department,
@@ -255,6 +277,7 @@ const updateUser = async (req, res) => {
     let user = await User.findById(req.params.id);
 
     if (user) {
+      if (req.body.role !== undefined) user.role = req.body.role;
       if (name !== undefined)       user.name = name;
       if (email !== undefined)      user.email = email;
       if (username !== undefined)   user.username = username;
@@ -288,6 +311,15 @@ const updateUser = async (req, res) => {
         }
       }
 
+      let normalizedRole = updatedUser.role;
+      if (['official', 'government_official', 'Government Official'].includes(updatedUser.role)) {
+        normalizedRole = 'Government Official';
+      } else if (['contractor', 'Contractor'].includes(updatedUser.role)) {
+        normalizedRole = 'Contractor';
+      } else if (['public_user', 'Public', 'Public User'].includes(updatedUser.role)) {
+        normalizedRole = 'Public User';
+      }
+
       return res.json({
         message: 'User updated successfully',
         user: {
@@ -296,7 +328,7 @@ const updateUser = async (req, res) => {
           name: updatedUser.name,
           email: updatedUser.email,
           username: updatedUser.username,
-          role: updatedUser.role,
+          role: normalizedRole,
           phone: updatedUser.phone || '',
           address: updatedUser.address || '',
           department: updatedUser.department,

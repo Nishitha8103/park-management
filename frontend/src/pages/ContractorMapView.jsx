@@ -1,7 +1,7 @@
 import { useEffect, useState } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
 import { MapContainer, TileLayer, Marker, Popup } from 'react-leaflet';
-import { HardHat, Menu, LogOut, MapPin, ClipboardList, AlertCircle } from 'lucide-react';
+import { TreePine, HardHat, Menu, LogOut, MapPin, ClipboardList, AlertCircle } from 'lucide-react';
 import L from 'leaflet';
 import 'leaflet/dist/leaflet.css';
 import ContractorSidebar from '../components/ContractorSidebar';
@@ -120,9 +120,8 @@ const ContractorMapView = () => {
           <div className="container contractor-header-content">
             <div className="contractor-brand">
               <button className="contractor-menu-toggle" onClick={toggleSidebar}><Menu size={24} /></button>
-              <HardHat size={28} className="contractor-text-primary" />
-              <h1>PARK MAINTENANCE</h1>
-              <span>Portal</span>
+              <TreePine size={28} color="#e5ede7" />
+              <h1>Parks Monitoring System</h1>
             </div>
             <div className="contractor-user-info">
               <div className="contractor-user-details">

@@ -9,24 +9,63 @@ const FeedbackHistory = () => {
 
   useEffect(() => {
     const loadHistory = async () => {
+      let localFeedbacks = [];
       const stored = localStorage.getItem('my_feedbacks');
       if (stored) {
         try {
-          setHistory(JSON.parse(stored));
+          localFeedbacks = JSON.parse(stored);
         } catch (e) {
-          setHistory([]);
+          localFeedbacks = [];
         }
+      }
+
+      let user = null;
+      try {
+        user = JSON.parse(localStorage.getItem('user') || 'null');
+      } catch (e) {}
+
+      try {
+        const queryParams = new URLSearchParams();
+        if (user?._id || user?.id) queryParams.append('userId', user._id || user.id);
+        if (user?.email) queryParams.append('email', user.email);
+
+        const res = await fetch(`/api/feedback/my?${queryParams.toString()}`);
+        if (res.ok) {
+          const data = await res.json();
+          if (data && data.length > 0) {
+            const formatted = data.map(item => ({
+              id: item.feedbackId || item._id,
+              date: item.createdAt ? item.createdAt.split('T')[0] : new Date().toISOString().split('T')[0],
+              parkName: item.parkName || 'Park Feedback',
+              zoneWard: `${item.zone || 'N/A'} • ${item.ward || 'N/A'}`,
+              overallRating: item.overallRating,
+              cleanlinessRating: item.cleanlinessRating,
+              maintenanceRating: item.maintenanceRating,
+              comments: item.comments,
+              status: item.status || 'Sent to Admin'
+            }));
+            setHistory(formatted);
+            return;
+          }
+        }
+      } catch (err) {
+        console.warn("Could not fetch remote feedback, using local:", err);
+      }
+
+      if (localFeedbacks.length > 0) {
+        setHistory(localFeedbacks);
       } else {
         const defaults = [
           { id: 'FB8201', date: '2026-07-10', parkName: 'Madhavan Park', zoneWard: 'South Zone • Ward 4', overallRating: 5, comments: 'Clean and peaceful environment.', status: 'Sent to Admin' },
           { id: 'FB5102', date: '2026-06-20', parkName: 'Central Park', zoneWard: 'Zone 1 • Ward 10', overallRating: 4, comments: 'Good maintenance.', status: 'Sent to Admin' }
         ];
-        localStorage.setItem('my_feedbacks', JSON.stringify(defaults));
         setHistory(defaults);
       }
     };
 
     loadHistory();
+    window.addEventListener('feedbacks-updated', loadHistory);
+    return () => window.removeEventListener('feedbacks-updated', loadHistory);
   }, []);
 
   const getStatusColor = (status) => {

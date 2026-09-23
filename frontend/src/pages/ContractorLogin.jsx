@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
-import { HardHat, Eye, EyeOff, Wrench } from 'lucide-react';
+import { TreePine, Eye, EyeOff, Wrench } from 'lucide-react';
 import ForgotPasswordModal from '../components/ForgotPasswordModal';
 import './ContractorLogin.css';
 
@@ -52,10 +52,10 @@ const ContractorLogin = () => {
       <div className="contractor-login-card">
         <div className="contractor-login-header">
           <div className="contractor-login-logo">
-            <HardHat size={36} className="contractor-text-primary" />
+            <TreePine size={36} className="contractor-text-primary" />
           </div>
           <h2>CONTRACTOR PORTAL</h2>
-          <p className="contractor-login-brand">PARKS MAINTENANCE SYSTEM</p>
+          <p className="contractor-login-brand">PARKS MONITORING SYSTEM</p>
         </div>
         
         <div className="contractor-login-welcome">

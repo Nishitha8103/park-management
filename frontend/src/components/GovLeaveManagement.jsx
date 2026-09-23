@@ -169,33 +169,70 @@ export default function GovLeaveManagement({ official }) {
     }
   };
 
-  const handleCancel = async (leaveId) => {
-    if (!window.confirm('Are you sure you want to cancel this leave application?')) return;
+  const [cancelTargetLeave, setCancelTargetLeave] = useState(null);
+  const [cancelling, setCancelling] = useState(false);
+
+  const handleConfirmCancel = async () => {
+    if (!cancelTargetLeave) return;
+    setCancelling(true);
     try {
       const uId = official._id || official.id;
-      await axios.post('/api/leaves/cancel', { leaveId, applicantId: uId });
+      await axios.post('/api/leaves/cancel', { leaveId: cancelTargetLeave._id, applicantId: uId });
+      setSuccessMsg('Leave application cancelled successfully.');
+      setCancelTargetLeave(null);
       fetchLeaves();
     } catch (err) {
-      alert(err.response?.data?.message || 'Failed to cancel leave request.');
+      setErrorMsg(err.response?.data?.message || 'Failed to cancel leave request.');
+      setCancelTargetLeave(null);
+    } finally {
+      setCancelling(false);
     }
   };
 
-  const currentAvailability = official?.availabilityStatus || 'Available';
+  // 12 Annual Leaves Calculation
+  const TOTAL_LEAVE_QUOTA = 12;
+  const approvedDays = leaves
+    .filter(l => l.status === 'Approved')
+    .reduce((acc, l) => {
+      const s = new Date(l.startDate);
+      const e = new Date(l.endDate);
+      const diff = Math.ceil(Math.abs(e - s) / (1000 * 60 * 60 * 24)) + 1;
+      return acc + diff;
+    }, 0);
+  const remainingLeaves = Math.max(0, TOTAL_LEAVE_QUOTA - approvedDays);
+  const pendingCount = leaves.filter(l => l.status === 'Pending').length;
 
   return (
     <div className="gov-leave-mgmt-container">
       {/* Status Banner */}
       <div className="gov-leave-status-banner">
         <div className="gov-status-banner-info">
-          <div className="gov-status-badge-wrap">
-            <span className={`gov-status-pill ${currentAvailability.toLowerCase().replace(/\s+/g, '-')}`}>
-              {currentAvailability === 'Available' ? '🟢 Available For Inspections' : currentAvailability === 'On Leave' ? '🟡 Currently On Leave' : '🔴 Unavailable'}
-            </span>
-          </div>
           <h3 className="gov-status-banner-title">Official Leave & Availability Dashboard</h3>
           <p className="gov-status-banner-desc">
             Apply for planned leaves or time off. Once approved by the administrator, your profile will be marked <strong>On Leave</strong> and new inspection assignments will be held until your return.
           </p>
+
+          {/* Leave Quota Stat Chips */}
+          <div className="gov-leave-quota-summary">
+            <div className="gov-quota-chip highlight">
+              <span className="gov-quota-label">Annual Quota</span>
+              <span className="gov-quota-val">12 Days</span>
+            </div>
+            <div className="gov-quota-chip">
+              <span className="gov-quota-label">Used / Approved</span>
+              <span className="gov-quota-val">{approvedDays} Days</span>
+            </div>
+            <div className="gov-quota-chip remaining">
+              <span className="gov-quota-label">Leaves Left</span>
+              <span className="gov-quota-val"><strong>{remainingLeaves}</strong> / 12 Days</span>
+            </div>
+            {pendingCount > 0 && (
+              <div className="gov-quota-chip pending">
+                <span className="gov-quota-label">Pending Approval</span>
+                <span className="gov-quota-val">{pendingCount} Application{pendingCount > 1 ? 's' : ''}</span>
+              </div>
+            )}
+          </div>
         </div>
         <div className="gov-status-banner-action">
           <button
@@ -213,6 +250,12 @@ export default function GovLeaveManagement({ official }) {
         </div>
       )}
 
+      {errorMsg && (
+        <div className="gov-leave-alert error">
+          <AlertCircle size={18} /> {errorMsg}
+        </div>
+      )}
+
       {/* History Table */}
       <div className="gov-leave-history-card">
         <div className="gov-history-card-header">
@@ -220,9 +263,14 @@ export default function GovLeaveManagement({ official }) {
             <CalendarDays size={20} color="#4f6d54" />
             <h4>My Leave Applications & Status</h4>
           </div>
-          <button className="gov-btn-refresh-leaves" onClick={fetchLeaves} title="Refresh">
-            <RefreshCw size={15} /> Refresh
-          </button>
+          <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
+            <span className="gov-table-header-quota-badge">
+              Leave Balance: <strong>{remainingLeaves} / 12 Days</strong>
+            </span>
+            <button className="gov-btn-refresh-leaves" onClick={fetchLeaves} title="Refresh">
+              <RefreshCw size={15} /> Refresh
+            </button>
+          </div>
         </div>
 
         {loading ? (
@@ -245,6 +293,7 @@ export default function GovLeaveManagement({ official }) {
                   <th>Leave Type</th>
                   <th>Dates (From → To)</th>
                   <th>Duration</th>
+                  <th>Leave Balance</th>
                   <th>Reason</th>
                   <th>Document</th>
                   <th>Status</th>
@@ -286,6 +335,11 @@ export default function GovLeaveManagement({ official }) {
                           )}
                         </div>
                       </td>
+                      <td>
+                        <span className={`gov-leave-balance-badge ${remainingLeaves <= 3 ? 'low' : ''}`}>
+                          {remainingLeaves} / 12 Left
+                        </span>
+                      </td>
                       <td style={{ maxWidth: '200px', color: '#5e7263' }}>
                         <div style={{ textOverflow: 'ellipsis', overflow: 'hidden', whiteSpace: 'nowrap' }} title={l.reason}>
                           {l.reason}
@@ -321,7 +375,7 @@ export default function GovLeaveManagement({ official }) {
                         {l.status === 'Pending' ? (
                           <button
                             className="gov-btn-cancel-leave"
-                            onClick={() => handleCancel(l._id)}
+                            onClick={() => setCancelTargetLeave(l)}
                             title="Cancel Leave Application"
                           >
                             Cancel
@@ -446,7 +500,7 @@ export default function GovLeaveManagement({ official }) {
                   rows={3}
                   placeholder="Describe reason..."
                   value={reason}
-                  onChange={(e) => setReason(e.target.value)}
+                  onChange={(e) => setReason(e.target.value.replace(/[0-9]/g, ''))}
                   required
                 />
               </div>
@@ -496,7 +550,7 @@ export default function GovLeaveManagement({ official }) {
                   rows={2}
                   placeholder="Add any instructions for pending assignments..."
                   value={handoverNotes}
-                  onChange={(e) => setHandoverNotes(e.target.value)}
+                  onChange={(e) => setHandoverNotes(e.target.value.replace(/[0-9]/g, ''))}
                 />
               </div>
 
@@ -629,6 +683,40 @@ export default function GovLeaveManagement({ official }) {
                   Close
                 </button>
               </div>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Custom Cancel Confirmation Popup Modal */}
+      {cancelTargetLeave && (
+        <div className="gov-leave-modal-overlay" onClick={() => !cancelling && setCancelTargetLeave(null)}>
+          <div className="gov-leave-cancel-popup-dialog" onClick={(e) => e.stopPropagation()}>
+            <div className="gov-cancel-popup-icon-circle">
+              <AlertCircle size={32} color="#dc2626" />
+            </div>
+            <h3 className="gov-cancel-popup-title">Cancel Leave Application?</h3>
+            <p className="gov-cancel-popup-message">
+              Are you sure you want to cancel your leave application <strong>{cancelTargetLeave.leaveId}</strong> for <strong>{cancelTargetLeave.leaveType}</strong>? This action cannot be reversed.
+            </p>
+            <div className="gov-cancel-popup-actions">
+              <button 
+                type="button"
+                className="gov-btn-popup-keep" 
+                onClick={() => setCancelTargetLeave(null)}
+                disabled={cancelling}
+              >
+                No, Keep Application
+              </button>
+              <button 
+                type="button"
+                className="gov-btn-popup-confirm-cancel" 
+                onClick={handleConfirmCancel}
+                disabled={cancelling}
+              >
+                {cancelling ? <Loader2 className="gov-spin-icon" size={16} /> : <Trash2 size={16} />}
+                {cancelling ? 'Cancelling...' : 'Yes, Cancel Application'}
+              </button>
             </div>
           </div>
         </div>

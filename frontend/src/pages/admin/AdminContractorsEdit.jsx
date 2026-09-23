@@ -152,7 +152,16 @@ const AdminContractorsEdit = () => {
 
 
   const handleInputChange = (e) => {
-    const { name, value } = e.target;
+    let { name, value } = e.target;
+    if (name === 'name') {
+      value = value.replace(/[^a-zA-Z\s]/g, '');
+    }
+    if (name === 'phone') {
+      value = value.replace(/\D/g, '').slice(0, 10);
+    }
+    if (name === 'address') {
+      value = value.replace(/[^a-zA-Z0-9\s,.-/#]/g, '');
+    }
     
     setFormData(prev => {
       const newData = { ...prev, [name]: value };
@@ -309,7 +318,7 @@ const AdminContractorsEdit = () => {
             </div>
             <div>
               <label style={{ display: 'block', marginBottom: '0.5rem', fontWeight: '600', fontSize: '0.9rem', color: '#475569' }}>Phone Number *</label>
-              <input type="text" name="phone" value={formData.phone} onChange={handleInputChange} required style={{ width: '100%', padding: '0.75rem', border: '1px solid #cbd5e1', borderRadius: '6px' }} />
+              <input type="text" name="phone" value={formData.phone} onChange={handleInputChange} maxLength="10" required style={{ width: '100%', padding: '0.75rem', border: '1px solid #cbd5e1', borderRadius: '6px' }} />
             </div>
             <div style={{ gridColumn: '1 / -1' }}>
               <label style={{ display: 'block', marginBottom: '0.5rem', fontWeight: '600', fontSize: '0.9rem', color: '#475569' }}>Address *</label>

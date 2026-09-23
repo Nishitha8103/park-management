@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
-import { ShieldAlert, Eye, EyeOff, UserCheck } from 'lucide-react';
+import { TreePine, Eye, EyeOff, UserCheck } from 'lucide-react';
 import './AdminLogin.css';
 
 const AdminLogin = () => {
@@ -50,10 +50,10 @@ const AdminLogin = () => {
       <div className="admin-login-card">
         <div className="admin-login-header">
           <div className="admin-login-logo">
-            <ShieldAlert size={36} className="admin-text-primary" />
+            <TreePine size={36} className="admin-text-primary" />
           </div>
           <h2>ADMIN PORTAL</h2>
-          <p className="admin-login-brand">SYSTEM CONTROL CENTER</p>
+          <p className="admin-login-brand">PARKS MONITORING SYSTEM</p>
         </div>
         
         <div className="admin-login-welcome">

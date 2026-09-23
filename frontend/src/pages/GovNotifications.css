@@ -18,32 +18,34 @@
   gap: 1.25rem;
   margin-bottom: 1.5rem;
   padding: 1.5rem 1.75rem;
-  background: linear-gradient(135deg, #28372b 0%, #384e3c 60%, #4f6d54 100%);
+  background: #4f6d54;
+  background: linear-gradient(135deg, #445e48 0%, #4f6d54 50%, #5d7e63 100%);
   border-radius: 18px;
-  border: 1px solid rgba(168, 203, 176, 0.35);
-  box-shadow: 0 8px 24px rgba(40, 55, 43, 0.25);
+  border: 1px solid rgba(168, 203, 176, 0.4);
+  box-shadow: 0 8px 24px rgba(45, 62, 48, 0.22);
 }
 
 .notifications-header-left {
   display: flex;
   align-items: center;
-  gap: 1rem;
+  gap: 1.1rem;
 }
 
 .header-icon-box {
-  width: 48px;
-  height: 48px;
+  width: 50px;
+  height: 50px;
   border-radius: 14px;
-  background: rgba(255, 255, 255, 0.15);
-  border: 1px solid rgba(255, 255, 255, 0.3);
+  background: rgba(255, 255, 255, 0.18);
+  border: 1.5px solid rgba(255, 255, 255, 0.35);
   display: flex;
   align-items: center;
   justify-content: center;
   flex-shrink: 0;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
 }
 
 .header-bell-icon {
-  color: #e5ede7;
+  color: #ffffff;
 }
 
 .notifications-header h2 {

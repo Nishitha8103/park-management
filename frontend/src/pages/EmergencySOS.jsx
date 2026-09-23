@@ -330,7 +330,7 @@ export default function EmergencySOS() {
                     className="field-input"
                     placeholder="Enter your name"
                     value={citizenName}
-                    onChange={(e) => setCitizenName(e.target.value)}
+                    onChange={(e) => setCitizenName(e.target.value.replace(/[^a-zA-Z\s]/g, ''))}
                     required
                   />
                 </div>
@@ -341,7 +341,8 @@ export default function EmergencySOS() {
                     className="field-input"
                     placeholder="Phone number for responders to call"
                     value={citizenPhone}
-                    onChange={(e) => setCitizenPhone(e.target.value)}
+                    maxLength="10"
+                    onChange={(e) => setCitizenPhone(e.target.value.replace(/\D/g, '').slice(0, 10))}
                     required
                   />
                 </div>

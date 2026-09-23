@@ -30,15 +30,37 @@ const Events = () => {
   const [searchTerm, setSearchTerm] = useState('');
   const navigate = useNavigate();
 
+  const getStoredUserData = () => {
+    try {
+      const userStr = localStorage.getItem('public_user') || localStorage.getItem('user');
+      if (userStr) {
+        const u = JSON.parse(userStr);
+        const userObj = u.user || u;
+        return {
+          name: userObj.name || userObj.fullName || userObj.firstName || '',
+          email: userObj.email || '',
+          phone: (userObj.phone || userObj.mobile || userObj.phoneNumber || '').replace(/\D/g, '').slice(0, 10),
+          age: userObj.age || '',
+          gender: userObj.gender || ''
+        };
+      }
+    } catch (e) {
+      console.error('Error reading stored user data:', e);
+    }
+    return { name: '', email: '', phone: '', age: '', gender: '' };
+  };
+
+  const initialUser = getStoredUserData();
+
   // Registration states
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [selectedEvent, setSelectedEvent] = useState(null);
   const [formData, setFormData] = useState({
-    name: '',
-    email: '',
-    phone: '',
-    age: '',
-    gender: '',
+    name: initialUser.name,
+    email: initialUser.email,
+    phone: initialUser.phone,
+    age: initialUser.age,
+    gender: initialUser.gender,
     emergencyContactName: '',
     emergencyContactPhone: '',
     emergencyContactRelation: '',
@@ -86,12 +108,13 @@ const Events = () => {
 
   const handleOpenRegister = (event) => {
     setSelectedEvent(event);
+    const u = getStoredUserData();
     setFormData({
-      name: '',
-      email: '',
-      phone: '',
-      age: '',
-      gender: '',
+      name: u.name || '',
+      email: u.email || '',
+      phone: u.phone || '',
+      age: u.age || '',
+      gender: u.gender || '',
       emergencyContactName: '',
       emergencyContactPhone: '',
       emergencyContactRelation: '',
@@ -105,7 +128,13 @@ const Events = () => {
   };
 
   const handleInputChange = (e) => {
-    const { name, value, type, checked } = e.target;
+    let { name, value, type, checked } = e.target;
+    if (name === 'phone' || name === 'emergencyContactPhone') {
+      value = value.replace(/\D/g, '').slice(0, 10);
+    }
+    if (name === 'name' || name === 'emergencyContactName') {
+      value = value.replace(/[^a-zA-Z\s]/g, '');
+    }
     setFormData(prev => ({
       ...prev,
       [name]: type === 'checkbox' ? checked : value
@@ -133,8 +162,15 @@ const Events = () => {
     if (!/^\d{10}$/.test(formData.phone)) return setSubmitError('Mobile number must be exactly 10 digits');
     if (!/^\S+@\S+\.\S+$/.test(formData.email)) return setSubmitError('A valid Email Address is required');
     
-    if (formData.emergencyContactPhone && !/^\d{10}$/.test(formData.emergencyContactPhone)) {
-      return setSubmitError('Emergency Contact Number must be exactly 10 digits');
+    // Mandatory Emergency Contact validation
+    if (!formData.emergencyContactName.trim()) {
+      return setSubmitError('Emergency Contact Name is required');
+    }
+    if (!/^\d{10}$/.test(formData.emergencyContactPhone)) {
+      return setSubmitError('Emergency Contact Number is required and must be exactly 10 digits');
+    }
+    if (!formData.emergencyContactRelation) {
+      return setSubmitError('Emergency Contact Relationship is required');
     }
 
     if (selectedEvent.isPaid) {
@@ -599,14 +635,14 @@ const Events = () => {
                         <PhoneCall size={16} color="#059669" /> 2. Emergency Contact
                       </h4>
                       <p style={{ margin: 0, color: '#64748b', fontSize: '0.8rem', fontStyle: 'italic' }}>
-                        Especially useful for yoga, sports, fitness, and outdoor events.
+                        Required for participant safety during sports, yoga, fitness, and park events.
                       </p>
                     </div>
 
                     <div>
-                      <label style={{ display: 'block', marginBottom: '4px', fontWeight: 600, color: '#334155', fontSize: '0.85rem' }}>Emergency Contact Name</label>
+                      <label style={{ display: 'block', marginBottom: '4px', fontWeight: 600, color: '#334155', fontSize: '0.85rem' }}>Emergency Contact Name *</label>
                       <input
-                        type="text" name="emergencyContactName"
+                        type="text" name="emergencyContactName" required
                         value={formData.emergencyContactName} onChange={handleInputChange}
                         placeholder="Contact person's full name"
                         style={{ width: '100%', padding: '10px 12px', borderRadius: '8px', border: '1px solid #cbd5e1', outline: 'none', boxSizing: 'border-box', fontSize: '0.9rem', background: '#fff' }}
@@ -615,19 +651,19 @@ const Events = () => {
 
                     <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '0.85rem' }}>
                       <div>
-                        <label style={{ display: 'block', marginBottom: '4px', fontWeight: 600, color: '#334155', fontSize: '0.85rem' }}>Emergency Contact Number</label>
+                        <label style={{ display: 'block', marginBottom: '4px', fontWeight: 600, color: '#334155', fontSize: '0.85rem' }}>Emergency Contact Number *</label>
                         <input
-                          type="tel" name="emergencyContactPhone"
+                          type="tel" name="emergencyContactPhone" required
                           value={formData.emergencyContactPhone} onChange={handleInputChange}
-                          placeholder="Phone number"
+                          placeholder="10-digit phone number"
                           style={{ width: '100%', padding: '10px 12px', borderRadius: '8px', border: '1px solid #cbd5e1', outline: 'none', boxSizing: 'border-box', fontSize: '0.9rem', background: '#fff' }}
                         />
                       </div>
 
                       <div>
-                        <label style={{ display: 'block', marginBottom: '4px', fontWeight: 600, color: '#334155', fontSize: '0.85rem' }}>Relationship</label>
+                        <label style={{ display: 'block', marginBottom: '4px', fontWeight: 600, color: '#334155', fontSize: '0.85rem' }}>Relationship *</label>
                         <select
-                          name="emergencyContactRelation"
+                          name="emergencyContactRelation" required
                           value={formData.emergencyContactRelation} onChange={handleInputChange}
                           style={{ width: '100%', padding: '10px 12px', borderRadius: '8px', border: '1px solid #cbd5e1', outline: 'none', boxSizing: 'border-box', fontSize: '0.9rem', background: '#fff' }}
                         >

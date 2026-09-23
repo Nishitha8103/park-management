@@ -99,10 +99,38 @@ const Feedback = () => {
       setErrorMsg('If providing comments, they must be at least 5 characters');
       return;
     }
+
+    let user = null;
+    try {
+      user = JSON.parse(localStorage.getItem('user') || 'null');
+    } catch (e) {}
     
     try {
+      const payload = {
+        parkName: parkName.trim(),
+        corporation: corporation.trim(),
+        zone: zone.trim(),
+        ward: ward.trim(),
+        overallRating,
+        cleanlinessRating,
+        maintenanceRating,
+        comments: comments.trim() || 'No comments provided',
+        tags: selectedTags,
+        userName: user?.name || 'Public Citizen',
+        userEmail: user?.email || '',
+        userPhone: user?.phone || '',
+        userId: user?._id || user?.id || null
+      };
+
+      const res = await fetch('/api/feedback', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(payload)
+      });
+      const data = await res.json();
+
       const newFb = {
-        id: 'FB' + Math.floor(1000 + Math.random() * 9000),
+        id: data.feedback?.feedbackId || ('FB' + Math.floor(1000 + Math.random() * 9000)),
         date: new Date().toISOString().split('T')[0],
         parkName: parkName || 'General Feedback',
         zoneWard: `${zone || 'N/A'} • ${ward || 'N/A'}`,
@@ -117,7 +145,7 @@ const Feedback = () => {
       localStorage.setItem('my_feedbacks', JSON.stringify([newFb, ...existing]));
       window.dispatchEvent(new Event('feedbacks-updated'));
     } catch (err) {
-      console.error("Error saving local feedback:", err);
+      console.error("Error submitting feedback:", err);
     }
     
     setSubmitted(true);

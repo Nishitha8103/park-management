@@ -1,7 +1,7 @@
 import { useEffect, useState, useRef } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
 import { 
-  Menu, HardHat, LogOut, ClipboardList, Calendar, CheckCircle, RotateCcw,
+  Menu, TreePine, HardHat, LogOut, ClipboardList, Calendar, CheckCircle, RotateCcw,
   Bell, Activity, CalendarDays, Wrench, MapPin, AlertCircle, Package, Plus,
   ChevronRight, ArrowUpRight, ShieldCheck, Clock, Layers, Sparkles, FileText, Check
 } from 'lucide-react';
@@ -307,9 +307,8 @@ const ContractorDashboard = () => {
               <button className="contractor-menu-toggle" onClick={toggleSidebar} title="Toggle Sidebar Menu">
                 <Menu size={24} />
               </button>
-              <HardHat size={28} className="contractor-text-primary" />
-              <h1>PARK MAINTENANCE</h1>
-              <span>Contractor Portal</span>
+              <TreePine size={28} color="#e5ede7" />
+              <h1>Parks Monitoring System</h1>
             </div>
             
             <div className="contractor-user-info">

@@ -395,7 +395,7 @@ const AdminDashboard = () => {
               </div>
               <div className="admin-form-group">
                 <label className="admin-input-label">Location (Zone/Ward)</label>
-                <input type="text" className="admin-input-field" name="location" defaultValue={editingPark.location} required />
+                <input type="text" className="admin-input-field" name="location" defaultValue={editingPark.location} onInput={(e) => e.target.value = e.target.value.replace(/[^a-zA-Z0-9\s,.-/#]/g, '')} required />
               </div>
               <div className="admin-form-group">
                 <label className="admin-input-label">Park Operation Status</label>

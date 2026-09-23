@@ -1,5 +1,6 @@
 /* ==========================================================================
-   Park Monitoring System - Landing Page (Exact Match to Image 2)
+   Park Monitoring System - Forest Landing Page
+   Exact Match to Reference Design
    ========================================================================== */
 
 .landing-dark-page {
@@ -10,7 +11,7 @@
   align-items: center;
   justify-content: center;
   background-color: #03140a;
-  background-image: url('/landing_dark_leaves.jpg?v=100');
+  background-image: url('/landing_dark_leaves.jpg?v=202');
   background-repeat: no-repeat;
   background-position: center center;
   background-size: cover;
@@ -18,12 +19,13 @@
   padding: 3rem 1.25rem 2.5rem;
   overflow-y: auto;
   overflow-x: hidden;
+  box-sizing: border-box;
 }
 
 .landing-dark-overlay {
-  position: absolute;
+  position: fixed;
   inset: 0;
-  background: radial-gradient(circle at center, rgba(3, 22, 12, 0.4) 0%, rgba(2, 14, 8, 0.72) 100%);
+  background: radial-gradient(circle at center, rgba(3, 20, 10, 0.42) 0%, rgba(2, 14, 8, 0.76) 100%);
   pointer-events: none;
   z-index: 1;
 }
@@ -48,161 +50,97 @@
 /* Emblem Logo */
 .landing-logo-box {
   position: relative;
-  width: 130px;
-  height: 130px;
-  margin-bottom: 1.5rem;
+  width: 110px;
+  height: 110px;
+  margin-bottom: 1.25rem;
   display: flex;
   align-items: center;
   justify-content: center;
 }
 
 .landing-logo-img {
-  width: 120px;
-  height: 120px;
+  width: 96px;
+  height: 96px;
   border-radius: 50%;
   object-fit: contain;
   background: #ffffff;
-  padding: 2px;
-  border: 3px solid #34d399;
-  box-shadow: 0 0 35px rgba(52, 211, 153, 0.5), 0 0 15px rgba(52, 211, 153, 0.3);
+  padding: 3px;
+  border: 2.5px solid #34d399;
+  box-shadow: 0 0 28px rgba(52, 211, 153, 0.5), 0 0 12px rgba(52, 211, 153, 0.3);
 }
 
 .landing-logo-glow {
   position: absolute;
-  inset: -8px;
+  inset: -10px;
   border-radius: 50%;
-  background: radial-gradient(circle, rgba(52, 211, 153, 0.25) 0%, transparent 70%);
+  background: radial-gradient(circle, rgba(52, 211, 153, 0.3) 0%, transparent 70%);
   pointer-events: none;
 }
 
 /* Title & Subtitles */
 .landing-title-group {
-  margin-bottom: 1.75rem;
+  margin-bottom: 1.65rem;
 }
 
 .landing-main-title {
-  font-size: 2.35rem;
+  font-size: 2.15rem;
   font-weight: 800;
   color: #ffffff;
-  line-height: 1.15;
-  margin-bottom: 0.65rem;
-  letter-spacing: -0.5px;
-  text-shadow: 0 4px 18px rgba(0, 0, 0, 0.85);
+  line-height: 1.2;
+  margin-bottom: 0.5rem;
+  letter-spacing: -0.3px;
+  text-shadow: 0 4px 16px rgba(0, 0, 0, 0.85);
 }
 
 .landing-title-accent {
   color: #4ade80;
-  text-shadow: 0 0 20px rgba(74, 222, 128, 0.5);
+  text-shadow: 0 0 18px rgba(74, 222, 128, 0.5);
 }
 
 .landing-quote {
-  font-size: 1.15rem;
+  font-size: 1.05rem;
   font-weight: 600;
   color: #f1f5f9;
-  margin-bottom: 0.85rem;
-  letter-spacing: 0.3px;
+  margin-bottom: 0.65rem;
+  letter-spacing: 0.2px;
   text-shadow: 0 2px 8px rgba(0, 0, 0, 0.7);
 }
 
 .landing-subtitle {
-  font-size: 0.95rem;
-  color: #e2e8f0;
-  line-height: 1.55;
+  font-size: 0.88rem;
+  color: #cbd5e1;
+  line-height: 1.5;
   max-width: 440px;
   margin: 0 auto;
   text-shadow: 0 2px 6px rgba(0, 0, 0, 0.6);
-}
-
-/* High-Visibility SOS Banner */
-.landing-sos-banner {
-  width: 100%;
-  margin-bottom: 1.5rem;
-}
-
-.landing-btn-sos {
-  width: 100%;
-  background: linear-gradient(135deg, rgba(220, 38, 38, 0.95) 0%, rgba(185, 28, 28, 0.98) 100%);
-  border: 2px solid #f87171;
-  border-radius: 16px;
-  padding: 0.95rem 1.25rem;
-  display: flex;
-  align-items: center;
-  gap: 1rem;
-  cursor: pointer;
-  text-align: left;
-  box-shadow: 0 0 25px rgba(239, 68, 68, 0.55), 0 8px 20px rgba(0, 0, 0, 0.4);
-  transition: all 0.25s cubic-bezier(0.16, 1, 0.3, 1);
-  animation: sosBannerPulse 2s infinite alternate;
-}
-
-@keyframes sosBannerPulse {
-  0% { transform: scale(1); box-shadow: 0 0 15px rgba(239, 68, 68, 0.45); }
-  100% { transform: scale(1.02); box-shadow: 0 0 30px rgba(239, 68, 68, 0.75); }
-}
-
-.landing-btn-sos:hover {
-  background: linear-gradient(135deg, #ef4444 0%, #b91c1c 100%);
-  border-color: #ffffff;
-  transform: translateY(-2px) scale(1.03);
-}
-
-.sos-btn-icon-pulse {
-  width: 44px;
-  height: 44px;
-  border-radius: 50%;
-  background: rgba(255, 255, 255, 0.2);
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  flex-shrink: 0;
-  box-shadow: 0 0 10px rgba(255, 255, 255, 0.4);
-}
-
-.sos-btn-text {
-  display: flex;
-  flex-direction: column;
-}
-
-.sos-btn-title {
-  font-size: 1.05rem;
-  font-weight: 800;
-  color: #ffffff;
-  letter-spacing: 0.2px;
-}
-
-.sos-btn-sub {
-  font-size: 0.78rem;
-  color: #fecaca;
-  font-weight: 500;
-  margin-top: 1px;
 }
 
 /* 4 Feature Cards Grid */
 .landing-feature-grid {
   display: grid;
   grid-template-columns: repeat(2, 1fr);
-  gap: 1rem;
+  gap: 0.95rem;
   width: 100%;
-  margin-bottom: 2.2rem;
+  margin-bottom: 2rem;
 }
 
 @media screen and (max-width: 480px) {
   .landing-feature-grid {
     grid-template-columns: 1fr;
-    gap: 0.85rem;
+    gap: 0.75rem;
   }
 }
 
 .landing-card {
-  background: rgba(4, 28, 16, 0.78);
-  border: 1.5px solid rgba(52, 211, 153, 0.28);
-  backdrop-filter: blur(12px);
-  -webkit-backdrop-filter: blur(12px);
-  border-radius: 18px;
-  padding: 1.15rem 1rem;
+  background: rgba(4, 28, 16, 0.72);
+  border: 1px solid rgba(52, 211, 153, 0.22);
+  backdrop-filter: blur(14px);
+  -webkit-backdrop-filter: blur(14px);
+  border-radius: 16px;
+  padding: 1rem 0.9rem;
   display: flex;
   align-items: flex-start;
-  gap: 0.85rem;
+  gap: 0.75rem;
   text-align: left;
   text-decoration: none;
   cursor: default;
@@ -211,34 +149,35 @@
 }
 
 .landing-card:hover {
-  border-color: rgba(52, 211, 153, 0.5);
-  background: rgba(6, 38, 22, 0.85);
+  border-color: rgba(52, 211, 153, 0.45);
+  background: rgba(6, 38, 22, 0.82);
+  transform: translateY(-2px);
 }
 
 .landing-card-icon {
-  width: 44px;
-  height: 44px;
+  width: 38px;
+  height: 38px;
   border-radius: 50%;
   display: flex;
   align-items: center;
   justify-content: center;
   flex-shrink: 0;
-  background: rgba(16, 185, 129, 0.22);
-  border: 1px solid rgba(52, 211, 153, 0.35);
-  color: #4ade80;
-  box-shadow: 0 0 12px rgba(52, 211, 153, 0.2);
+  background: rgba(16, 185, 129, 0.18);
+  border: 1px solid rgba(52, 211, 153, 0.32);
+  color: #34d399;
+  box-shadow: 0 0 10px rgba(52, 211, 153, 0.15);
 }
 
 .landing-card-text h4 {
   color: #ffffff;
-  font-size: 0.95rem;
+  font-size: 0.9rem;
   font-weight: 700;
-  margin: 0 0 0.25rem 0;
+  margin: 0 0 0.2rem 0;
 }
 
 .landing-card-text p {
-  color: #cbd5e1;
-  font-size: 0.78rem;
+  color: #94a3b8;
+  font-size: 0.74rem;
   line-height: 1.35;
   margin: 0;
 }
@@ -248,32 +187,32 @@
   display: flex;
   flex-direction: column;
   align-items: center;
-  gap: 1.15rem;
+  gap: 1rem;
   width: 100%;
 }
 
 .landing-btn-signin {
   width: 100%;
   max-width: 440px;
-  background: linear-gradient(180deg, #10b981 0%, #047857 60%, #064e3b 100%);
+  background: linear-gradient(180deg, #10b981 0%, #059669 60%, #047857 100%);
   color: #ffffff;
   border: 1.5px solid rgba(110, 231, 183, 0.4);
-  padding: 0.95rem 1.5rem;
+  padding: 0.88rem 1.5rem;
   border-radius: 9999px;
-  font-size: 1.15rem;
+  font-size: 1.05rem;
   font-weight: 700;
   display: flex;
   align-items: center;
   justify-content: center;
-  gap: 0.65rem;
+  gap: 0.6rem;
   text-decoration: none;
-  box-shadow: 0 10px 25px -4px rgba(16, 185, 129, 0.5), inset 0 1px 1px rgba(255, 255, 255, 0.3);
+  box-shadow: 0 8px 24px -2px rgba(16, 185, 129, 0.55), inset 0 1px 1px rgba(255, 255, 255, 0.3);
   transition: all 0.25s ease;
 }
 
 .landing-btn-signin:hover {
   transform: translateY(-2px);
-  box-shadow: 0 14px 30px -4px rgba(16, 185, 129, 0.7), inset 0 1px 1px rgba(255, 255, 255, 0.4);
+  box-shadow: 0 12px 28px -2px rgba(16, 185, 129, 0.7), inset 0 1px 1px rgba(255, 255, 255, 0.4);
   background: linear-gradient(180deg, #34d399 0%, #059669 60%, #064e3b 100%);
 }
 
@@ -286,14 +225,14 @@
 }
 
 .landing-link-register {
-  color: #86efac;
-  font-size: 0.98rem;
+  color: #4ade80;
+  font-size: 0.92rem;
   font-weight: 600;
   text-decoration: none;
   transition: all 0.2s;
 }
 
 .landing-link-register:hover {
-  color: #bbf7d0;
+  color: #86efac;
   text-decoration: underline;
 }

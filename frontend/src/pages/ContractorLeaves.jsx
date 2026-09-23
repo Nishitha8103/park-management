@@ -3,7 +3,7 @@ import { useNavigate } from 'react-router-dom';
 import ContractorSidebar from '../components/ContractorSidebar';
 import ContractorLeaveManagement from '../components/ContractorLeaveManagement';
 import NotificationDropdown from '../components/NotificationDropdown';
-import { Menu, HardHat, LogOut } from 'lucide-react';
+import { Menu, TreePine, HardHat, LogOut } from 'lucide-react';
 import './ContractorDashboard.css';
 
 const ContractorLeaves = () => {
@@ -49,9 +49,8 @@ const ContractorLeaves = () => {
               <button className="contractor-menu-toggle" onClick={() => setIsSidebarOpen(!isSidebarOpen)}>
                 <Menu size={24} />
               </button>
-              <HardHat size={28} className="contractor-text-primary" />
-              <h1>PARK MAINTENANCE</h1>
-              <span>Portal</span>
+              <TreePine size={28} color="#e5ede7" />
+              <h1>Parks Monitoring System</h1>
             </div>
             <div className="contractor-user-info">
               <NotificationDropdown userId={contractor._id || contractor.id} role="contractor" />

@@ -171,33 +171,70 @@ export default function ContractorLeaveManagement({ contractor }) {
     }
   };
 
-  const handleCancel = async (leaveId) => {
-    if (!window.confirm('Are you sure you want to cancel this leave application?')) return;
+  const [cancelTargetLeave, setCancelTargetLeave] = useState(null);
+  const [cancelling, setCancelling] = useState(false);
+
+  const handleConfirmCancel = async () => {
+    if (!cancelTargetLeave) return;
+    setCancelling(true);
     try {
       const cId = contractor._id || contractor.id;
-      await axios.post('/api/leaves/cancel', { leaveId, applicantId: cId });
+      await axios.post('/api/leaves/cancel', { leaveId: cancelTargetLeave._id, applicantId: cId });
+      setSuccessMsg('Leave application cancelled successfully.');
+      setCancelTargetLeave(null);
       fetchLeaves();
     } catch (err) {
-      alert(err.response?.data?.message || 'Failed to cancel leave request.');
+      setErrorMsg(err.response?.data?.message || 'Failed to cancel leave request.');
+      setCancelTargetLeave(null);
+    } finally {
+      setCancelling(false);
     }
   };
 
-  const currentAvailability = contractor?.availabilityStatus || 'Available';
+  // 12 Annual Leaves Calculation
+  const TOTAL_LEAVE_QUOTA = 12;
+  const approvedDays = leaves
+    .filter(l => l.status === 'Approved')
+    .reduce((acc, l) => {
+      const s = new Date(l.startDate);
+      const e = new Date(l.endDate);
+      const diff = Math.ceil(Math.abs(e - s) / (1000 * 60 * 60 * 24)) + 1;
+      return acc + diff;
+    }, 0);
+  const remainingLeaves = Math.max(0, TOTAL_LEAVE_QUOTA - approvedDays);
+  const pendingCount = leaves.filter(l => l.status === 'Pending').length;
 
   return (
     <div className="leave-mgmt-container">
       {/* Availability Status Header Card */}
       <div className="leave-status-banner">
         <div className="status-banner-info">
-          <div className="status-badge-wrap">
-            <span className={`status-pill ${currentAvailability.toLowerCase().replace(/\s+/g, '-')}`}>
-              {currentAvailability === 'Available' ? '🟢 Available for Tasks' : currentAvailability === 'On Leave' ? '🟡 Currently On Leave' : '🔴 Unavailable'}
-            </span>
-          </div>
           <h3 className="status-banner-title">Leave & Availability Dashboard</h3>
           <p className="status-banner-desc">
             Apply for planned leaves or time off. Once approved by the administrator, your profile will be marked <strong>On Leave</strong> and new task assignments will be held until your return.
           </p>
+
+          {/* Leave Quota Stat Chips */}
+          <div className="leave-quota-summary">
+            <div className="quota-chip highlight">
+              <span className="quota-label">Annual Quota</span>
+              <span className="quota-val">12 Days</span>
+            </div>
+            <div className="quota-chip">
+              <span className="quota-label">Used / Approved</span>
+              <span className="quota-val">{approvedDays} Days</span>
+            </div>
+            <div className="quota-chip remaining">
+              <span className="quota-label">Leaves Left</span>
+              <span className="quota-val"><strong>{remainingLeaves}</strong> / 12 Days</span>
+            </div>
+            {pendingCount > 0 && (
+              <div className="quota-chip pending">
+                <span className="quota-label">Pending Approval</span>
+                <span className="quota-val">{pendingCount} Application{pendingCount > 1 ? 's' : ''}</span>
+              </div>
+            )}
+          </div>
         </div>
 
         <div className="status-banner-action">
@@ -216,6 +253,12 @@ export default function ContractorLeaveManagement({ contractor }) {
         </div>
       )}
 
+      {errorMsg && (
+        <div className="leave-alert error">
+          <AlertCircle size={18} /> {errorMsg}
+        </div>
+      )}
+
       {/* History Table */}
       <div className="leave-history-card">
         <div className="history-card-header">
@@ -223,9 +266,14 @@ export default function ContractorLeaveManagement({ contractor }) {
             <CalendarDays size={20} color="#65a30d" />
             <h4>My Leave Applications & Status</h4>
           </div>
-          <button className="btn-refresh-leaves" onClick={fetchLeaves} title="Refresh">
-            <RefreshCw size={15} /> Refresh
-          </button>
+          <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
+            <span className="table-header-quota-badge">
+              Leave Balance: <strong>{remainingLeaves} / 12 Days</strong>
+            </span>
+            <button className="btn-refresh-leaves" onClick={fetchLeaves} title="Refresh">
+              <RefreshCw size={15} /> Refresh
+            </button>
+          </div>
         </div>
 
         {loading ? (
@@ -248,6 +296,7 @@ export default function ContractorLeaveManagement({ contractor }) {
                   <th>Leave Type</th>
                   <th>Dates (From → To)</th>
                   <th>Duration</th>
+                  <th>Leave Balance</th>
                   <th>Reason</th>
                   <th>Document</th>
                   <th>Status</th>
@@ -290,6 +339,11 @@ export default function ContractorLeaveManagement({ contractor }) {
                           )}
                         </div>
                       </td>
+                      <td>
+                        <span className={`leave-balance-badge ${remainingLeaves <= 3 ? 'low' : ''}`}>
+                          {remainingLeaves} / 12 Left
+                        </span>
+                      </td>
                       <td style={{ maxWidth: '200px', color: '#475569' }}>
                         <div style={{ textOverflow: 'ellipsis', overflow: 'hidden', whiteSpace: 'nowrap' }} title={l.reason}>
                           {l.reason}
@@ -325,7 +379,7 @@ export default function ContractorLeaveManagement({ contractor }) {
                         {l.status === 'Pending' ? (
                           <button 
                             className="btn-cancel-leave" 
-                            onClick={() => handleCancel(l._id)}
+                            onClick={() => setCancelTargetLeave(l)}
                             title="Cancel Leave Application"
                           >
                             Cancel
@@ -450,7 +504,7 @@ export default function ContractorLeaveManagement({ contractor }) {
                   rows={3}
                   placeholder="Describe reason..."
                   value={reason}
-                  onChange={(e) => setReason(e.target.value)}
+                  onChange={(e) => setReason(e.target.value.replace(/[0-9]/g, ''))}
                   required
                 />
               </div>
@@ -500,7 +554,7 @@ export default function ContractorLeaveManagement({ contractor }) {
                   rows={2}
                   placeholder="Add any instructions for pending assignments..."
                   value={handoverNotes}
-                  onChange={(e) => setHandoverNotes(e.target.value)}
+                  onChange={(e) => setHandoverNotes(e.target.value.replace(/[0-9]/g, ''))}
                 />
               </div>
 
@@ -637,6 +691,40 @@ export default function ContractorLeaveManagement({ contractor }) {
                   Close
                 </button>
               </div>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Custom Cancel Confirmation Popup Modal */}
+      {cancelTargetLeave && (
+        <div className="leave-modal-overlay" onClick={() => !cancelling && setCancelTargetLeave(null)}>
+          <div className="leave-cancel-popup-dialog" onClick={(e) => e.stopPropagation()}>
+            <div className="cancel-popup-icon-circle">
+              <AlertCircle size={32} color="#dc2626" />
+            </div>
+            <h3 className="cancel-popup-title">Cancel Leave Application?</h3>
+            <p className="cancel-popup-message">
+              Are you sure you want to cancel your leave application <strong>{cancelTargetLeave.leaveId}</strong> for <strong>{cancelTargetLeave.leaveType}</strong>? This action cannot be reversed.
+            </p>
+            <div className="cancel-popup-actions">
+              <button 
+                type="button"
+                className="btn-popup-keep" 
+                onClick={() => setCancelTargetLeave(null)}
+                disabled={cancelling}
+              >
+                No, Keep Application
+              </button>
+              <button 
+                type="button"
+                className="btn-popup-confirm-cancel" 
+                onClick={handleConfirmCancel}
+                disabled={cancelling}
+              >
+                {cancelling ? <Loader2 className="spin-icon" size={16} /> : <Trash2 size={16} />}
+                {cancelling ? 'Cancelling...' : 'Yes, Cancel Application'}
+              </button>
             </div>
           </div>
         </div>

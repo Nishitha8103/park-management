@@ -36,15 +36,15 @@ const MainLayout = () => {
   }, []);
 
   return (
-    <div className="app-layout">
+    <div className="app-layout public-portal-layout">
       <header className="main-topbar">
         <div className="topbar-left">
           <button className="menu-toggle" onClick={toggleSidebar} aria-label="Toggle navigation menu">
             <Menu size={26} color="white" />
           </button>
           <Link to="/" className="topbar-logo" style={{ textDecoration: 'none', color: 'white' }}>
-            <TreePine size={24} color="white" />
-            <span className="logo-text">Parks Monitoring</span>
+            <TreePine size={28} color="#e5ede7" />
+            <span className="logo-text">Parks Monitoring System</span>
           </Link>
         </div>
 

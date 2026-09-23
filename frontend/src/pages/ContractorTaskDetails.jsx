@@ -5,25 +5,24 @@ import {
   Clock, 
   MapPin, 
   AlertTriangle, 
-  ArrowLeft,
-  FileText,
-  User,
-  Calendar,
-  ShieldAlert,
-  RotateCcw,
-  Wrench,
-  Tag,
-  Phone,
-  Paperclip,
-  Eye,
-  Menu,
-  HardHat,
-  Bell,
-  LogOut,
-  Play,
-  Edit,
-  Hourglass,
-  Send
+  ArrowLeft, 
+  FileText, 
+  User, 
+  Calendar, 
+  RotateCcw, 
+  Wrench, 
+  Phone, 
+  Paperclip, 
+  Eye, 
+  Menu, 
+  TreePine, 
+  Bell, 
+  LogOut, 
+  Play, 
+  Edit, 
+  Hourglass, 
+  X, 
+  Flag 
 } from 'lucide-react';
 import './ContractorTaskDetails.css';
 import ContractorSidebar from '../components/ContractorSidebar';
@@ -226,9 +225,8 @@ const ContractorTaskDetails = () => {
               <button className="contractor-menu-toggle" onClick={toggleSidebar}>
                 <Menu size={24} />
               </button>
-              <HardHat size={28} className="contractor-text-primary" />
-              <h1>PARK MAINTENANCE</h1>
-              <span>Portal</span>
+              <TreePine size={28} color="#e5ede7" />
+              <h1>Parks Monitoring System</h1>
             </div>
             
             <div className="contractor-user-info" style={{ display: 'flex', alignItems: 'center', gap: '1.5rem' }}>
@@ -251,278 +249,240 @@ const ContractorTaskDetails = () => {
           </div>
         </header>
 
-        <div className="contractor-task-details-page">
-          <div className="contractor-task-details-container">
-            
-            {/* Header Navigation Banner */}
-            <div className="task-details-header-row">
-              <div className="header-title-box">
-                <span className="task-portal-badge">
-                  <Wrench size={14} /> MAINTENANCE TASK DOSSIER
-                </span>
-                <h2 className="task-page-title">Task Specification & Execution Details</h2>
-                <p className="task-page-subtitle">Complete ticket instructions, location parameters, and progress actions.</p>
+        <div className="task-page-body">
+          {/* Top navigation row */}
+          <div className="task-top-nav">
+            <Link to="/contractor/tasks" className="task-back-btn">
+              <ArrowLeft size={16} /> Back to My Tasks
+            </Link>
+          </div>
+
+          {/* Reassignment Pending Banner if applicable */}
+          {(task.status === 'Reassignment Requested' || task.reassignmentStatus === 'Reassignment Requested') && (
+            <div className="reassign-alert-box">
+              <RotateCcw size={20} color="#d97706" style={{ marginTop: '2px', flexShrink: 0 }} />
+              <div>
+                <div style={{ display: 'flex', alignItems: 'center', gap: '6px', marginBottom: '2px' }}>
+                  <span style={{ fontWeight: 'bold', color: '#92400e', fontSize: '0.9rem' }}>Reassignment Request Pending Review</span>
+                  <span style={{ backgroundColor: '#d97706', color: 'white', fontSize: '0.68rem', padding: '1px 6px', borderRadius: '10px', fontWeight: 'bold' }}>PENDING ADMIN</span>
+                </div>
+                <p style={{ margin: 0, fontSize: '0.82rem', color: '#78350f' }}>
+                  <strong>Reason:</strong> {task.reassignmentReason || 'On Leave / Unavailable'}. {task.reassignmentExplanation && ` Note: "${task.reassignmentExplanation}"`}.
+                </p>
               </div>
-              <Link to="/contractor/tasks" className="btn-back-link">
-                <ArrowLeft size={16} />
-                Back to My Tasks
-              </Link>
+            </div>
+          )}
+
+          {/* Main Card Container (Matching 1st Image) */}
+          <div className="task-main-card">
+            
+            {/* Left Column */}
+            <div className="task-card-left">
+              {/* Main Image */}
+              <div className="task-img-container" onClick={() => setShowImageModal(true)}>
+                <img src={task.imageUrl} alt="Task Media" className="task-feature-img" />
+              </div>
+
+              {/* Meta items stack with green icons */}
+              <div className="task-meta-list">
+                <div className="task-meta-item">
+                  <div className="task-meta-icon"><User size={20} color="#15803d" /></div>
+                  <div className="task-meta-data">
+                    <span className="task-meta-heading">Issue Reported By</span>
+                    <span className="task-meta-content">{task.reportedBy}</span>
+                    {task.reportedPhone && task.reportedPhone !== 'N/A' && (
+                      <span className="task-meta-subtext"><Phone size={12} /> {task.reportedPhone}</span>
+                    )}
+                  </div>
+                </div>
+
+                <div className="task-meta-item">
+                  <div className="task-meta-icon"><Calendar size={20} color="#15803d" /></div>
+                  <div className="task-meta-data">
+                    <span className="task-meta-heading">Reported On</span>
+                    <span className="task-meta-content">{task.reportedOn}</span>
+                  </div>
+                </div>
+
+                <div className="task-meta-item">
+                  <div className="task-meta-icon"><MapPin size={20} color="#15803d" /></div>
+                  <div className="task-meta-data">
+                    <span className="task-meta-heading">Location</span>
+                    <span className="task-meta-content">{task.location}, {task.parkName}</span>
+                  </div>
+                </div>
+
+                {task.allImages && task.allImages.length > 0 && (
+                  <div className="task-meta-item">
+                    <div className="task-meta-icon"><Paperclip size={20} color="#15803d" /></div>
+                    <div className="task-meta-data">
+                      <span className="task-meta-heading">Attachments</span>
+                      <div className="task-attachments-row">
+                        <div className="task-attachment-thumb" onClick={() => setShowImageModal(true)}>
+                          <img src={task.allImages[0]} alt="attachment" />
+                        </div>
+                        {task.allImages.length > 1 && (
+                          <div className="task-attachment-more" onClick={() => setShowImageModal(true)}>
+                            +{task.allImages.length - 1}
+                          </div>
+                        )}
+                      </div>
+                    </div>
+                  </div>
+                )}
+              </div>
             </div>
 
-            {/* Main Container Card */}
-            <div className="task-container-card">
+            {/* Right Column */}
+            <div className="task-card-right">
               
-              {/* Left Column: Image, Reporter Info & Description */}
-              <div className="task-left-col">
-                <div className="task-image-card">
-                  <div className="image-wrapper" onClick={() => setShowImageModal(true)}>
-                    <img src={task.imageUrl} alt="Task Media" className="task-main-img" />
-                    <div className="image-hover-overlay">
-                      <Eye size={24} />
-                      <span>Click to view full photo</span>
-                    </div>
-                  </div>
-                  <div className="image-badge">
-                    <Paperclip size={13} /> {task.allImages.length} Photo{task.allImages.length > 1 ? 's' : ''} Attached
-                  </div>
-                </div>
-                
-                <div className="task-meta-stack">
-                  <div className="meta-card">
-                    <div className="meta-card-icon-box user-icon-box">
-                      <User size={18} />
-                    </div>
-                    <div className="meta-card-content">
-                      <span className="meta-card-label">Issue Reported By</span>
-                      <p className="meta-card-value">{task.reportedBy}</p>
-                      {task.reportedPhone !== 'N/A' && (
-                        <span className="meta-card-sub"><Phone size={12} /> {task.reportedPhone}</span>
-                      )}
-                    </div>
-                  </div>
-                  
-                  <div className="meta-card">
-                    <div className="meta-card-icon-box calendar-icon-box">
-                      <Calendar size={18} />
-                    </div>
-                    <div className="meta-card-content">
-                      <span className="meta-card-label">Reported Date & Time</span>
-                      <p className="meta-card-value">{task.reportedOn}</p>
-                    </div>
-                  </div>
-                  
-                  <div className="meta-card">
-                    <div className="meta-card-icon-box location-icon-box">
-                      <MapPin size={18} />
-                    </div>
-                    <div className="meta-card-content">
-                      <span className="meta-card-label">Exact Location</span>
-                      <p className="meta-card-value">{task.location}</p>
-                      <span className="meta-card-sub park-sub">{task.parkName}</span>
-                    </div>
-                  </div>
-
-                  {task.allImages.length > 0 && (
-                    <div className="meta-card attachments-card">
-                      <div className="meta-card-icon-box attachment-icon-box">
-                        <Paperclip size={18} />
-                      </div>
-                      <div className="meta-card-content">
-                        <span className="meta-card-label">Media Attachments</span>
-                        <div className="attachments-row">
-                          {task.allImages.slice(0, 3).map((img, idx) => (
-                            <div key={idx} className="attachment-thumb" onClick={() => setShowImageModal(true)}>
-                              <img src={img} alt={`thumb-${idx}`} />
-                            </div>
-                          ))}
-                          {task.allImages.length > 3 && (
-                            <div className="attachment-more" onClick={() => setShowImageModal(true)}>
-                              +{task.allImages.length - 3}
-                            </div>
-                          )}
-                        </div>
-                      </div>
-                    </div>
-                  )}
-                </div>
-              </div>
-
-              {/* Right Column: Ticket Overview, Parameters, Description, Controls & Timeline */}
-              <div className="task-right-col">
-                
-                {/* Header Pills Row */}
-                <div className="task-pills-row">
-                  <div className={`task-status-pill status-${task.status?.toLowerCase().replace(/\s+/g, '-')}`}>
-                    <Hourglass size={13} /> 
+              {/* Status Badge */}
+              <div className="task-status-badge-wrapper">
+                <div className={`ref-status-pill status-${task.status?.toLowerCase().replace(/\s+/g, '-')}`}>
+                  <Hourglass size={15} />
+                  <span>
                     {['Returned by Admin', 'Rework Required'].includes(task.status) 
                       ? 'Rework Required' 
                       : task.status === 'Rejected by Contractor' 
                       ? 'Declined by You' 
                       : task.status}
-                  </div>
+                  </span>
+                </div>
+              </div>
 
-                  <div className={`task-priority-pill priority-${task.priority.toLowerCase()}`}>
-                    <ShieldAlert size={13} /> Priority: {task.priority}
-                  </div>
+              {/* Titles */}
+              <div className="task-titles-block">
+                <h1 className="task-code-id">{task.id}</h1>
+                <h2 className="task-park-headline">{task.parkName} {task.zone && task.zone !== 'Not specified' ? `- ${task.zone}` : ''}</h2>
+                <h3 className="task-issue-category">{task.issueTitle}</h3>
+              </div>
 
-                  <div className="task-category-pill">
-                    <Tag size={12} /> {task.issueTitle}
+              {/* Key Value Details Table */}
+              <div className="task-info-table">
+                <div className="task-info-row">
+                  <div className="task-info-label">
+                    <Calendar size={18} />
+                    <span>Assigned On</span>
+                  </div>
+                  <div className="task-info-value">{task.assignedOn}</div>
+                </div>
+
+                <div className="task-info-row">
+                  <div className="task-info-label">
+                    <Calendar size={18} />
+                    <span>Due Date</span>
+                  </div>
+                  <div className="task-info-value">{task.dueDate ? task.dueDate.split(',')[0] : 'Not Applicable'}</div>
+                </div>
+
+                <div className="task-info-row">
+                  <div className="task-info-label">
+                    <Flag size={18} />
+                    <span>Priority</span>
+                  </div>
+                  <div className="task-info-value">
+                    <span className={`ref-priority-badge ${task.priority?.toLowerCase()}`}>
+                      {task.priority}
+                    </span>
                   </div>
                 </div>
 
-                {/* ID & Park Info */}
-                <div className="task-title-group">
-                  <div className="task-id-row">
-                    <h1 className="task-id">{task.id}</h1>
-                    <span className="task-park-zone">{task.parkName}</span>
+                <div className="task-info-row">
+                  <div className="task-info-label">
+                    <User size={18} />
+                    <span>Assigned By</span>
                   </div>
-                  <p className="task-location-sub"><MapPin size={13} /> Zone: {task.zone} | Ward: {task.ward}</p>
+                  <div className="task-info-value">{task.assignedBy}</div>
                 </div>
 
-                {/* Info Cards Grid */}
-                <div className="task-params-grid">
-                  <div className="param-card">
-                    <div className="param-card-icon"><Calendar size={16} /></div>
-                    <div className="param-card-info">
-                      <span className="param-card-label">Assigned On</span>
-                      <span className="param-card-val">{task.assignedOn}</span>
-                    </div>
+                <div className="task-info-desc-row">
+                  <div className="task-info-label">
+                    <FileText size={18} />
+                    <span>Description</span>
                   </div>
-
-                  <div className="param-card highlight-due">
-                    <div className="param-card-icon"><Clock size={16} /></div>
-                    <div className="param-card-info">
-                      <span className="param-card-label">Target Due Date</span>
-                      <span className="param-card-val">{task.dueDate.split(',')[0]}</span>
-                    </div>
+                  <div className="task-desc-paragraph">
+                    {task.description || "No detailed description was provided by the reporter."}
                   </div>
+                </div>
+              </div>
 
-                  <div className="param-card">
-                    <div className="param-card-icon"><ShieldAlert size={16} /></div>
-                    <div className="param-card-info">
-                      <span className="param-card-label">Priority Level</span>
-                      <span className={`priority-tag-inline ${task.priority.toLowerCase()}`}>{task.priority}</span>
+              {/* Work Progress & Action Card */}
+              <div className="ref-progress-box">
+                <div className="ref-progress-header">
+                  <span className="ref-progress-title">Work Progress</span>
+                  <div className="ref-progress-bar-wrap">
+                    <div className="ref-progress-track">
+                      <div className="ref-progress-fill" style={{ width: `${task.progress}%` }}></div>
                     </div>
-                  </div>
-
-                  <div className="param-card">
-                    <div className="param-card-icon"><User size={16} /></div>
-                    <div className="param-card-info">
-                      <span className="param-card-label">Assigned By</span>
-                      <span className="param-card-val">{task.assignedBy}</span>
-                    </div>
+                    <span className="ref-progress-num">{task.progress}%</span>
                   </div>
                 </div>
 
-                {/* Description Card */}
-                <div className="task-desc-card">
-                  <div className="desc-card-header">
-                    <FileText size={15} />
-                    <span>Issue Description</span>
-                  </div>
-                  <p className="desc-card-body">{task.description || "No detailed description was provided by the reporter."}</p>
-                </div>
-
-                {/* Reassignment Pending Banner */}
-                {(task.status === 'Reassignment Requested' || task.reassignmentStatus === 'Reassignment Requested') && (
-                  <div style={{ background: '#fffbeb', border: '1px solid #fde68a', borderRadius: '8px', padding: '0.65rem 0.9rem', display: 'flex', alignItems: 'flex-start', gap: '10px' }}>
-                    <RotateCcw size={20} color="#d97706" style={{ marginTop: '2px', flexShrink: 0 }} />
-                    <div style={{ flex: 1 }}>
-                      <div style={{ display: 'flex', alignItems: 'center', gap: '6px', marginBottom: '2px' }}>
-                        <span style={{ fontWeight: 'bold', color: '#92400e', fontSize: '0.86rem' }}>Reassignment Request Pending Review</span>
-                        <span style={{ backgroundColor: '#d97706', color: 'white', fontSize: '0.65rem', padding: '1px 5px', borderRadius: '10px', fontWeight: 'bold' }}>PENDING ADMIN</span>
+                {/* All Action Buttons preserved */}
+                <div className="ref-actions-container">
+                  {['Assigned', 'Reassigned to Contractor', 'assigned', 'reassigned to contractor'].includes(task.status) ? (
+                    <div className="ref-buttons-group">
+                      <button className="ref-btn-primary" onClick={acceptTask}>
+                        <Play size={16} /> Accept Task
+                      </button>
+                      <button 
+                        type="button"
+                        className="ref-btn-secondary"
+                        onClick={() => setShowReassignModal(true)}
+                      >
+                        <RotateCcw size={16} /> Cannot Complete
+                      </button>
+                    </div>
+                  ) : ['In Progress', 'Returned by Admin', 'Rework Required'].includes(task.status) ? (
+                    <div className="ref-buttons-group">
+                      <Link to={`/contractor/progress/${task.id}`} className="ref-btn-primary">
+                        <Edit size={16} /> Update Work Progress
+                      </Link>
+                      <button 
+                        type="button"
+                        className="ref-btn-secondary"
+                        onClick={() => setShowReassignModal(true)}
+                      >
+                        <RotateCcw size={16} /> Cannot Complete
+                      </button>
+                    </div>
+                  ) : task.status === 'Reassignment Requested' ? (
+                    <div className="ref-state-banner warn">
+                      <RotateCcw size={18} />
+                      <span>Reassignment Requested — Awaiting Admin</span>
+                    </div>
+                  ) : task.status === 'Rejected by Contractor' ? (
+                    <div>
+                      <div className="ref-state-banner danger">
+                        <X size={18} />
+                        <span>Task Declined by You</span>
                       </div>
-                      <p style={{ margin: 0, fontSize: '0.78rem', color: '#78350f' }}>
-                        <strong>Reason:</strong> {task.reassignmentReason || 'On Leave / Unavailable'}. {task.reassignmentExplanation && ` Note: "${task.reassignmentExplanation}"`}.
-                      </p>
-                    </div>
-                  </div>
-                )}
-
-                {/* Progress & Action Container */}
-                <div className="task-action-card">
-                  <div className="action-card-header">
-                    <h4>Work Execution Progress</h4>
-                    <span className="progress-percentage">{task.progress}%</span>
-                  </div>
-
-                  <div className="progress-bar-container">
-                    <div className="progress-bar-fill" style={{ width: `${task.progress}%` }}>
-                      <div className="progress-glow"></div>
-                    </div>
-                  </div>
-                  
-                  <div className="action-buttons-row">
-                    {['Assigned', 'Reassigned to Contractor', 'assigned', 'reassigned to contractor'].includes(task.status) ? (
-                      <div style={{ display: 'flex', gap: '10px', width: '100%' }}>
-                        <button className="btn-action-primary accept" onClick={acceptTask} style={{ flex: 1 }}>
-                          <Play size={16} /> Accept Task
-                        </button>
-                        <button 
-                          type="button"
-                          className="btn-action-secondary"
-                          onClick={() => setShowReassignModal(true)}
-                          style={{ flex: 1, backgroundColor: '#fffbeb', color: '#b45309', border: '1px solid #fde68a', cursor: 'pointer', borderRadius: '20px', padding: '0.65rem 1rem', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '6px', fontWeight: '700', fontSize: '0.85rem' }}
-                        >
-                          <RotateCcw size={16} /> Cannot Complete Task
-                        </button>
-                      </div>
-                    ) : ['In Progress', 'Returned by Admin', 'Rework Required'].includes(task.status) ? (
-                      <div style={{ display: 'flex', gap: '10px', width: '100%' }}>
-                        <Link to={`/contractor/progress/${task.id}`} className="btn-action-primary progress-btn" style={{ flex: 2 }}>
-                          <Edit size={16} /> Update Work Progress
-                        </Link>
-                        <button 
-                          type="button"
-                          className="btn-action-secondary"
-                          onClick={() => setShowReassignModal(true)}
-                          style={{ flex: 1, backgroundColor: '#fffbeb', color: '#b45309', border: '1px solid #fde68a', cursor: 'pointer', borderRadius: '20px', padding: '0.65rem 1rem', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '6px', fontWeight: '700', fontSize: '0.85rem' }}
-                        >
-                          <RotateCcw size={16} /> Cannot Complete
-                        </button>
-                      </div>
-                    ) : task.status === 'Reassignment Requested' ? (
-                      <div style={{ width: '100%' }}>
-                        <div className="completion-badge-full" style={{ backgroundColor: '#fffbeb', color: '#b45309', border: '1px solid #fde68a', padding: '0.65rem' }}>
-                          <RotateCcw size={18} />
-                          <span>Reassignment Requested — Awaiting Admin</span>
+                      {task.rejectionReason && (
+                        <div className="ref-reason-box">
+                          <strong>Reason:</strong> {task.rejectionReason}
                         </div>
-                      </div>
-                    ) : task.status === 'Rejected by Contractor' ? (
-                      <div style={{ width: '100%' }}>
-                        <div className="completion-badge-full" style={{ backgroundColor: '#fef2f2', color: '#dc2626', border: '1px solid #fecaca', padding: '0.65rem' }}>
-                          <X size={18} />
-                          <span>Task Declined by You</span>
-                        </div>
-                        {task.rejectionReason && (
-                          <div style={{ marginTop: '0.5rem', padding: '0.5rem 0.75rem', background: '#fff5f5', borderRadius: '6px', border: '1px solid #fed7d7', color: '#991b1b', fontSize: '0.8rem' }}>
-                            <strong>Reason:</strong> {task.rejectionReason}
-                          </div>
-                        )}
-                      </div>
-                    ) : task.status === 'Closed' ? (
-                      <div className="completion-action-group">
-                        <div className="completion-badge-full" style={{ padding: '0.65rem' }}>
-                          <CheckCircle size={18} />
-                          <span>Task Closed & Verified</span>
-                        </div>
-                        <Link to={`/contractor/reports/${task._id}`} className="btn-action-secondary" style={{ padding: '0.55rem 1rem' }}>
-                          <FileText size={16} /> Download Report
-                        </Link>
-                      </div>
-                    ) : (
-                      <div className="completion-badge-full" style={{ padding: '0.65rem' }}>
+                      )}
+                    </div>
+                  ) : task.status === 'Closed' ? (
+                    <div className="ref-closed-group">
+                      <div className="ref-state-banner success">
                         <CheckCircle size={18} />
-                        <span>Completion Submitted - Pending Review</span>
+                        <span>Task Closed & Verified</span>
                       </div>
-                    )}
-                  </div>
+                      <Link to={`/contractor/reports/${task._id}`} className="ref-btn-secondary">
+                        <FileText size={16} /> Download Report
+                      </Link>
+                    </div>
+                  ) : (
+                    <div className="ref-state-banner success">
+                      <CheckCircle size={18} />
+                      <span>Completion Submitted - Pending Review</span>
+                    </div>
+                  )}
                 </div>
-
               </div>
 
             </div>
-
           </div>
         </div>
       </div>
