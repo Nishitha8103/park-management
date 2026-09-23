@@ -21,6 +21,19 @@ import {
 
 import Swal from 'sweetalert2';
 
+const resolveMediaUrl = (path) => {
+  if (!path) return '';
+  if (path.startsWith('http://') || path.startsWith('https://') || path.startsWith('blob:') || path.startsWith('data:')) {
+    return path;
+  }
+  const clean = path.startsWith('/') ? path : `/${path}`;
+  // If running on custom client port or production, ensure direct backend port 5000 fallback if proxy is bypassed
+  const backendBase = (typeof window !== 'undefined' && window.location.hostname === 'localhost') 
+    ? 'http://localhost:5000' 
+    : '';
+  return `${backendBase}${clean}`;
+};
+
 const AdminStallBookings = () => {
   const [bookings, setBookings] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -392,7 +405,7 @@ const AdminStallBookings = () => {
                         <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
                           {b.photoUrl ? (
                             <img 
-                              src={b.photoUrl} 
+                              src={resolveMediaUrl(b.photoUrl)} 
                               alt="Applicant" 
                               onError={(e) => {
                                 e.target.onerror = null;
@@ -434,7 +447,7 @@ const AdminStallBookings = () => {
                         <div style={{ display: 'flex', flexDirection: 'column', gap: '5px' }}>
                           {b.documentUrl ? (
                             <a 
-                              href={b.documentUrl} 
+                              href={resolveMediaUrl(b.documentUrl)} 
                               target="_blank" 
                               rel="noopener noreferrer"
                               style={{ display: 'inline-flex', alignItems: 'center', gap: '4px', background: 'rgba(59, 130, 246, 0.15)', color: '#60a5fa', padding: '4px 8px', borderRadius: '4px', textDecoration: 'none', fontSize: '0.78rem', fontWeight: 600, border: '1px solid rgba(59, 130, 246, 0.3)' }}
@@ -446,7 +459,7 @@ const AdminStallBookings = () => {
                           )}
                           {b.currentAddressProofUrl && (
                             <a 
-                              href={b.currentAddressProofUrl} 
+                              href={resolveMediaUrl(b.currentAddressProofUrl)} 
                               target="_blank" 
                               rel="noopener noreferrer"
                               style={{ display: 'inline-flex', alignItems: 'center', gap: '4px', background: 'rgba(245, 158, 11, 0.15)', color: '#fbbf24', padding: '4px 8px', borderRadius: '4px', textDecoration: 'none', fontSize: '0.78rem', fontWeight: 600, border: '1px solid rgba(245, 158, 11, 0.3)' }}
@@ -583,7 +596,7 @@ const AdminStallBookings = () => {
                 <div style={{ display: 'flex', gap: '14px', alignItems: 'center', marginBottom: '12px' }}>
                   {selectedBooking.photoUrl ? (
                     <img 
-                      src={selectedBooking.photoUrl} 
+                      src={resolveMediaUrl(selectedBooking.photoUrl)} 
                       alt="Applicant Photo" 
                       onError={(e) => {
                         e.target.onerror = null;
@@ -619,7 +632,7 @@ const AdminStallBookings = () => {
                       </div>
                       {selectedBooking.documentUrl && (
                         <a 
-                          href={selectedBooking.documentUrl} 
+                          href={resolveMediaUrl(selectedBooking.documentUrl)} 
                           target="_blank" 
                           rel="noopener noreferrer"
                           style={{ display: 'inline-flex', alignItems: 'center', gap: '5px', background: '#eff6ff', color: '#2563eb', padding: '4px 10px', borderRadius: '6px', textDecoration: 'none', fontSize: '0.8rem', fontWeight: 600, border: '1px solid #bfdbfe' }}
@@ -636,10 +649,10 @@ const AdminStallBookings = () => {
                     {selectedBooking.documentUrl && (
                       <div style={{ marginTop: '10px', border: '1px dashed #cbd5e1', borderRadius: '6px', padding: '8px', textAlign: 'center', background: '#f8fafc' }}>
                         {selectedBooking.documentUrl.toLowerCase().endsWith('.pdf') ? (
-                          <iframe src={selectedBooking.documentUrl} title="Aadhaar Preview" style={{ width: '100%', height: '220px', border: 'none' }} />
+                          <iframe src={resolveMediaUrl(selectedBooking.documentUrl)} title="Aadhaar Preview" style={{ width: '100%', height: '220px', border: 'none' }} />
                         ) : (
                           <img 
-                            src={selectedBooking.documentUrl} 
+                            src={resolveMediaUrl(selectedBooking.documentUrl)} 
                             alt="Aadhaar Document Preview"
                             onError={(e) => {
                               e.target.style.display = 'none';
@@ -660,7 +673,7 @@ const AdminStallBookings = () => {
                         </div>
                         {selectedBooking.currentAddressProofUrl && (
                           <a 
-                            href={selectedBooking.currentAddressProofUrl} 
+                            href={resolveMediaUrl(selectedBooking.currentAddressProofUrl)} 
                             target="_blank" 
                             rel="noopener noreferrer"
                             style={{ display: 'inline-flex', alignItems: 'center', gap: '5px', background: '#fef3c7', color: '#b45309', padding: '4px 10px', borderRadius: '6px', textDecoration: 'none', fontSize: '0.8rem', fontWeight: 600, border: '1px solid #fde68a' }}
@@ -682,10 +695,10 @@ const AdminStallBookings = () => {
                       {selectedBooking.currentAddressProofUrl && (
                         <div style={{ marginTop: '10px', border: '1px dashed #cbd5e1', borderRadius: '6px', padding: '8px', textAlign: 'center', background: '#f8fafc' }}>
                           {selectedBooking.currentAddressProofUrl.toLowerCase().endsWith('.pdf') ? (
-                            <iframe src={selectedBooking.currentAddressProofUrl} title="Address Proof Preview" style={{ width: '100%', height: '220px', border: 'none' }} />
+                            <iframe src={resolveMediaUrl(selectedBooking.currentAddressProofUrl)} title="Address Proof Preview" style={{ width: '100%', height: '220px', border: 'none' }} />
                           ) : (
                             <img 
-                              src={selectedBooking.currentAddressProofUrl} 
+                              src={resolveMediaUrl(selectedBooking.currentAddressProofUrl)} 
                               alt="Address Proof Preview"
                               onError={(e) => {
                                 e.target.style.display = 'none';
