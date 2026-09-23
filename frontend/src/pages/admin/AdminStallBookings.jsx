@@ -16,7 +16,8 @@ import {
   Trash2,
   RefreshCw,
   Sparkles,
-  ExternalLink
+  ExternalLink,
+  Download
 } from 'lucide-react';
 
 import Swal from 'sweetalert2';
@@ -467,26 +468,50 @@ const AdminStallBookings = () => {
                       <td style={{ padding: '1rem' }}>
                         <div style={{ display: 'flex', flexDirection: 'column', gap: '5px' }}>
                           {(b.documentUrl || b.user?.aadhaarFrontImage) ? (
-                            <a 
-                              href={resolveMediaUrl(b.documentUrl || b.user?.aadhaarFrontImage)} 
-                              target="_blank" 
-                              rel="noopener noreferrer"
-                              style={{ display: 'inline-flex', alignItems: 'center', gap: '4px', background: 'rgba(59, 130, 246, 0.15)', color: '#60a5fa', padding: '4px 8px', borderRadius: '4px', textDecoration: 'none', fontSize: '0.78rem', fontWeight: 600, border: '1px solid rgba(59, 130, 246, 0.3)' }}
-                            >
-                              <FileText size={13} /> Aadhaar Card <ExternalLink size={11} />
-                            </a>
+                            <div style={{ display: 'flex', alignItems: 'center', gap: '4px' }}>
+                              <a 
+                                href={resolveMediaUrl(b.documentUrl || b.user?.aadhaarFrontImage)} 
+                                target="_blank" 
+                                rel="noopener noreferrer"
+                                style={{ display: 'inline-flex', alignItems: 'center', gap: '4px', background: 'rgba(59, 130, 246, 0.15)', color: '#60a5fa', padding: '4px 8px', borderRadius: '4px', textDecoration: 'none', fontSize: '0.78rem', fontWeight: 600, border: '1px solid rgba(59, 130, 246, 0.3)' }}
+                              >
+                                <FileText size={13} /> Aadhaar Card <ExternalLink size={11} />
+                              </a>
+                              <a 
+                                href={resolveMediaUrl(b.documentUrl || b.user?.aadhaarFrontImage)} 
+                                download
+                                target="_blank"
+                                rel="noopener noreferrer"
+                                title="Download Aadhaar Document"
+                                style={{ display: 'inline-flex', alignItems: 'center', justifyContent: 'center', background: 'rgba(59, 130, 246, 0.15)', color: '#60a5fa', padding: '4px 6px', borderRadius: '4px', textDecoration: 'none', fontSize: '0.78rem', border: '1px solid rgba(59, 130, 246, 0.3)' }}
+                              >
+                                <Download size={13} />
+                              </a>
+                            </div>
                           ) : (
                             <span style={{ fontSize: '0.76rem', color: '#94a3b8' }}>No doc attached</span>
                           )}
                           {b.currentAddressProofUrl && (
-                            <a 
-                              href={resolveMediaUrl(b.currentAddressProofUrl)} 
-                              target="_blank" 
-                              rel="noopener noreferrer"
-                              style={{ display: 'inline-flex', alignItems: 'center', gap: '4px', background: 'rgba(245, 158, 11, 0.15)', color: '#fbbf24', padding: '4px 8px', borderRadius: '4px', textDecoration: 'none', fontSize: '0.78rem', fontWeight: 600, border: '1px solid rgba(245, 158, 11, 0.3)' }}
-                            >
-                              <FileText size={13} /> Address Proof <ExternalLink size={11} />
-                            </a>
+                            <div style={{ display: 'flex', alignItems: 'center', gap: '4px' }}>
+                              <a 
+                                href={resolveMediaUrl(b.currentAddressProofUrl)} 
+                                target="_blank" 
+                                rel="noopener noreferrer"
+                                style={{ display: 'inline-flex', alignItems: 'center', gap: '4px', background: 'rgba(245, 158, 11, 0.15)', color: '#fbbf24', padding: '4px 8px', borderRadius: '4px', textDecoration: 'none', fontSize: '0.78rem', fontWeight: 600, border: '1px solid rgba(245, 158, 11, 0.3)' }}
+                              >
+                                <FileText size={13} /> Address Proof <ExternalLink size={11} />
+                              </a>
+                              <a 
+                                href={resolveMediaUrl(b.currentAddressProofUrl)} 
+                                download
+                                target="_blank"
+                                rel="noopener noreferrer"
+                                title="Download Address Proof"
+                                style={{ display: 'inline-flex', alignItems: 'center', justifyContent: 'center', background: 'rgba(245, 158, 11, 0.15)', color: '#fbbf24', padding: '4px 6px', borderRadius: '4px', textDecoration: 'none', fontSize: '0.78rem', border: '1px solid rgba(245, 158, 11, 0.3)' }}
+                              >
+                                <Download size={13} />
+                              </a>
+                            </div>
                           )}
                         </div>
                       </td>
@@ -635,14 +660,25 @@ const AdminStallBookings = () => {
                         Aadhaar / Permanent Address
                       </div>
                       {(selectedBooking.documentUrl || selectedBooking.user?.aadhaarFrontImage) && (
-                        <a 
-                          href={resolveMediaUrl(selectedBooking.documentUrl || selectedBooking.user?.aadhaarFrontImage)} 
-                          target="_blank" 
-                          rel="noopener noreferrer"
-                          style={{ display: 'inline-flex', alignItems: 'center', gap: '5px', background: '#eff6ff', color: '#2563eb', padding: '4px 10px', borderRadius: '6px', textDecoration: 'none', fontSize: '0.8rem', fontWeight: 600, border: '1px solid #bfdbfe' }}
-                        >
-                          <FileText size={14} /> View Aadhaar Card <ExternalLink size={12} />
-                        </a>
+                        <div style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
+                          <a 
+                            href={resolveMediaUrl(selectedBooking.documentUrl || selectedBooking.user?.aadhaarFrontImage)} 
+                            target="_blank" 
+                            rel="noopener noreferrer"
+                            style={{ display: 'inline-flex', alignItems: 'center', gap: '5px', background: '#eff6ff', color: '#2563eb', padding: '4px 10px', borderRadius: '6px', textDecoration: 'none', fontSize: '0.8rem', fontWeight: 600, border: '1px solid #bfdbfe' }}
+                          >
+                            <FileText size={14} /> View Aadhaar Card <ExternalLink size={12} />
+                          </a>
+                          <a 
+                            href={resolveMediaUrl(selectedBooking.documentUrl || selectedBooking.user?.aadhaarFrontImage)} 
+                            download
+                            target="_blank" 
+                            rel="noopener noreferrer"
+                            style={{ display: 'inline-flex', alignItems: 'center', gap: '4px', background: '#f1f5f9', color: '#334155', padding: '4px 10px', borderRadius: '6px', textDecoration: 'none', fontSize: '0.8rem', fontWeight: 600, border: '1px solid #cbd5e1' }}
+                          >
+                            <Download size={14} /> Download
+                          </a>
+                        </div>
                       )}
                     </div>
                     <div style={{ fontSize: '0.92rem', color: '#0f172a', fontWeight: 600, lineHeight: 1.5 }}>

@@ -93,12 +93,19 @@ const StallBookingModal = ({ parkId, parkName, slot, onClose, onBookingSuccess }
   const handlePhotoChange = (e) => {
     const file = e.target.files[0];
     if (!file) return;
-    if (!file.type.startsWith('image/')) {
+    const isImageMime = file.type && file.type.startsWith('image/');
+    const hasImageExt = /\.(jpe?g|png|webp|heic|heif|bmp|gif)$/i.test(file.name || '');
+    if (file.type && !isImageMime && !hasImageExt && file.type !== 'application/octet-stream') {
       setError('Please upload a valid image file for applicant photo.');
       return;
     }
+    setError('');
     setPhotoFile(file);
-    setPhotoPreview(URL.createObjectURL(file));
+    try {
+      setPhotoPreview(URL.createObjectURL(file));
+    } catch (err) {
+      console.warn('Could not create object URL for photo preview:', err);
+    }
   };
 
   const loadRazorpayScript = () => {
