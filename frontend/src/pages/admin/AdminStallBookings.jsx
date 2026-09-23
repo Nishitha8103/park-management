@@ -13,7 +13,9 @@ import {
   Check, 
   Info,
   ShieldCheck,
-  Trash2
+  Trash2,
+  RefreshCw,
+  Sparkles
 } from 'lucide-react';
 
 import Swal from 'sweetalert2';
@@ -112,8 +114,11 @@ const AdminStallBookings = () => {
   };
 
 
-  const fetchBookings = async () => {
+  const [refreshing, setRefreshing] = useState(false);
+
+  const fetchBookings = async (showLoading = false) => {
     try {
+      if (showLoading) setRefreshing(true);
       const token = JSON.parse(localStorage.getItem('adminUser'))?.token;
       const res = await axios.get('/api/stall-bookings', {
         headers: { Authorization: `Bearer ${token}` }
@@ -127,11 +132,32 @@ const AdminStallBookings = () => {
       console.error('Error fetching stall bookings:', error);
     } finally {
       setLoading(false);
+      setRefreshing(false);
     }
   };
 
   useEffect(() => {
     fetchBookings();
+
+    // Auto-poll every 8 seconds for dynamic updates when public citizens apply or update
+    const interval = setInterval(() => {
+      fetchBookings(false);
+    }, 8000);
+
+    const handleFocusOrVisibility = () => {
+      if (document.visibilityState === 'visible') {
+        fetchBookings(false);
+      }
+    };
+
+    window.addEventListener('focus', handleFocusOrVisibility);
+    document.addEventListener('visibilitychange', handleFocusOrVisibility);
+
+    return () => {
+      clearInterval(interval);
+      window.removeEventListener('focus', handleFocusOrVisibility);
+      document.removeEventListener('visibilitychange', handleFocusOrVisibility);
+    };
   }, []);
 
   // Admin Actions: Address Verification
@@ -281,11 +307,54 @@ const AdminStallBookings = () => {
     <div className="admin-stall-bookings-view" style={{ padding: '0.5rem', minHeight: '100vh' }}>
       
       {/* Header */}
-      <div style={{ marginBottom: '1.5rem' }}>
-        <h2 style={{ margin: 0, color: '#F0F4FF', fontSize: '1.6rem', fontWeight: 800 }}>Stall Bookings & Address Review</h2>
-        <p style={{ margin: '6px 0 0', color: '#A8B0C8', fontSize: '0.92rem' }}>
-          Review applicant details, Aadhaar cards, cross-city residential addresses, address proofs, and allocate stalls.
-        </p>
+      <div style={{ marginBottom: '1.5rem', display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', flexWrap: 'wrap', gap: '1rem' }}>
+        <div>
+          <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
+            <h2 style={{ margin: 0, color: '#F0F4FF', fontSize: '1.6rem', fontWeight: 800 }}>Stall Bookings & Address Review</h2>
+            <span style={{ 
+              fontSize: '0.75rem', 
+              fontWeight: 700, 
+              color: '#10b981', 
+              background: 'rgba(16, 185, 129, 0.12)', 
+              border: '1px solid rgba(16, 185, 129, 0.3)', 
+              padding: '2px 8px', 
+              borderRadius: '20px',
+              display: 'inline-flex',
+              alignItems: 'center',
+              gap: '4px'
+            }}>
+              <span style={{ width: '6px', height: '6px', borderRadius: '50%', background: '#10b981', display: 'inline-block', animation: 'pulse 2s infinite' }} />
+              Live Dynamic Polling
+            </span>
+          </div>
+          <p style={{ margin: '6px 0 0', color: '#A8B0C8', fontSize: '0.92rem' }}>
+            Review applicant details, Aadhaar cards, cross-city residential addresses, address proofs, and allocate stalls in real time.
+          </p>
+        </div>
+
+        <div style={{ display: 'flex', gap: '10px', alignItems: 'center' }}>
+          <button
+            onClick={() => fetchBookings(true)}
+            disabled={refreshing}
+            style={{
+              display: 'inline-flex',
+              alignItems: 'center',
+              gap: '8px',
+              background: '#242e4c',
+              color: '#e2e8f0',
+              border: '1px solid rgba(255,255,255,0.12)',
+              padding: '8px 16px',
+              borderRadius: '8px',
+              fontSize: '0.88rem',
+              fontWeight: 600,
+              cursor: refreshing ? 'not-allowed' : 'pointer',
+              transition: 'all 0.2s ease'
+            }}
+          >
+            <RefreshCw size={15} style={{ animation: refreshing ? 'spin 1s linear infinite' : 'none' }} />
+            {refreshing ? 'Syncing...' : 'Refresh'}
+          </button>
+        </div>
       </div>
 
       {/* Bookings Table */}
@@ -408,12 +477,23 @@ const AdminStallBookings = () => {
 
                       {/* Actions */}
                       <td style={{ padding: '1rem' }}>
-                        <button
-                          onClick={() => setSelectedBooking(b)}
-                          style={{ display: 'inline-flex', alignItems: 'center', gap: '6px', background: '#059669', color: 'white', border: 'none', padding: '7px 16px', borderRadius: '6px', fontSize: '0.85rem', fontWeight: 600, cursor: 'pointer', boxShadow: '0 2px 6px rgba(5,150,105,0.3)' }}
-                        >
-                          <Eye size={14} /> Review & Verify
-                        </button>
+                        <div style={{ display: 'flex', alignItems: 'center', gap: '8px', flexWrap: 'wrap' }}>
+                          {b.status === 'Pending Approval' && (
+                            <button
+                              onClick={() => handleApproveStall(b._id)}
+                              style={{ display: 'inline-flex', alignItems: 'center', gap: '5px', background: 'linear-gradient(135deg, #059669 0%, #047857 100%)', color: 'white', border: 'none', padding: '7px 14px', borderRadius: '6px', fontSize: '0.82rem', fontWeight: 700, cursor: 'pointer', boxShadow: '0 2px 6px rgba(5,150,105,0.3)' }}
+                              title="Directly approve this booking and notify applicant"
+                            >
+                              <Check size={14} /> Approve
+                            </button>
+                          )}
+                          <button
+                            onClick={() => setSelectedBooking(b)}
+                            style={{ display: 'inline-flex', alignItems: 'center', gap: '6px', background: '#3b82f6', color: 'white', border: 'none', padding: '7px 14px', borderRadius: '6px', fontSize: '0.82rem', fontWeight: 600, cursor: 'pointer', boxShadow: '0 2px 6px rgba(59,130,246,0.3)' }}
+                          >
+                            <Eye size={14} /> Review & Verify
+                          </button>
+                        </div>
                       </td>
                     </tr>
                   );

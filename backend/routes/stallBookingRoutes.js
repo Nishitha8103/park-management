@@ -23,7 +23,7 @@ const {
 
 // Configuration
 router.get('/config/proof-types', getProofTypesConfig);
-router.put('/config/proof-types', protect, authorize('Admin', 'SuperAdmin'), updateProofTypesConfig);
+router.put('/config/proof-types', protect, authorize('Admin', 'admin', 'SuperAdmin'), updateProofTypesConfig);
 
 // Booking creation & list
 router.post(
@@ -37,17 +37,17 @@ router.post(
   createBooking
 );
 
-router.get('/', protect, authorize('Admin', 'SuperAdmin'), getBookings);
+router.get('/', protect, authorize('Admin', 'admin', 'SuperAdmin'), getBookings);
 router.get('/user/:userId', getUserBookings);
-router.delete('/', protect, authorize('Admin', 'SuperAdmin'), clearAllBookings);
-router.delete('/:id', protect, authorize('Admin', 'SuperAdmin'), deleteBooking);
+router.delete('/', protect, authorize('Admin', 'admin', 'SuperAdmin'), clearAllBookings);
+router.delete('/:id', protect, authorize('Admin', 'admin', 'SuperAdmin'), deleteBooking);
 
 // Admin Multi-tier Verification Actions
-router.put('/:id/verify-identity', protect, authorize('Admin', 'SuperAdmin'), verifyIdentity);
-router.put('/:id/verify-address', protect, authorize('Admin', 'SuperAdmin'), verifyAddress);
-router.put('/:id/request-info', protect, authorize('Admin', 'SuperAdmin'), requestMoreInfo);
-router.put('/:id/approve', protect, authorize('Admin', 'SuperAdmin'), approveBooking);
-router.put('/:id/reject', protect, authorize('Admin', 'SuperAdmin'), rejectBooking);
+router.put('/:id/verify-identity', protect, authorize('Admin', 'admin', 'SuperAdmin'), verifyIdentity);
+router.put('/:id/verify-address', protect, authorize('Admin', 'admin', 'SuperAdmin'), verifyAddress);
+router.put('/:id/request-info', protect, authorize('Admin', 'admin', 'SuperAdmin'), requestMoreInfo);
+router.put('/:id/approve', protect, authorize('Admin', 'admin', 'SuperAdmin'), approveBooking);
+router.put('/:id/reject', protect, authorize('Admin', 'admin', 'SuperAdmin'), rejectBooking);
 
 // Razorpay Payments
 router.post('/:id/create-order', protect, createRazorpayOrder);
