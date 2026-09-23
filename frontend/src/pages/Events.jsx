@@ -267,11 +267,6 @@ const Events = () => {
   const generateAndPrintReceipt = (reg) => {
     if (!reg) return;
     const ev = reg.event || selectedEvent || {};
-    const printWin = window.open('', '_blank', 'width=800,height=900');
-    if (!printWin) {
-      alert('Pop-up blocked! Please allow pop-ups to print/download your receipt.');
-      return;
-    }
 
     const html = `
       <!DOCTYPE html>
@@ -279,19 +274,21 @@ const Events = () => {
         <head>
           <title>Receipt_${reg.receiptNumber || reg.registrationId || 'Event'}</title>
           <meta charset="utf-8" />
+          <meta name="viewport" content="width=device-width, initial-scale=1.0" />
           <style>
-            @page { size: A4; margin: 15mm; }
-            body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; padding: 20px; color: #1e293b; line-height: 1.5; background: #ffffff; }
+            @page { size: A4; margin: 12mm; }
+            * { box-sizing: border-box; }
+            body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; padding: 15px; color: #1e293b; line-height: 1.5; background: #ffffff; margin: 0; }
             .receipt-box { border: 2px solid #059669; border-radius: 12px; padding: 24px; max-width: 650px; margin: 0 auto; background: #ffffff; box-shadow: 0 4px 6px -1px rgba(0,0,0,0.1); }
             .header { text-align: center; border-bottom: 2px dashed #cbd5e1; padding-bottom: 16px; margin-bottom: 20px; }
-            .header h2 { color: #047857; margin: 0 0 6px 0; font-size: 24px; font-weight: 700; }
-            .header p { color: #64748b; margin: 0; font-size: 14px; font-weight: 600; text-transform: uppercase; letter-spacing: 0.5px; }
-            .ids-row { display: flex; justify-content: space-between; background: #ecfdf5; padding: 12px 16px; border-radius: 8px; margin-bottom: 20px; font-weight: bold; color: #047857; border: 1px solid #a7f3d0; font-size: 14px; }
+            .header h2 { color: #047857; margin: 0 0 6px 0; font-size: 22px; font-weight: 700; }
+            .header p { color: #64748b; margin: 0; font-size: 13px; font-weight: 600; text-transform: uppercase; letter-spacing: 0.5px; }
+            .ids-row { display: flex; justify-content: space-between; background: #ecfdf5; padding: 12px 16px; border-radius: 8px; margin-bottom: 20px; font-weight: bold; color: #047857; border: 1px solid #a7f3d0; font-size: 13px; flex-wrap: wrap; gap: 6px; }
             table { width: 100%; border-collapse: collapse; margin-bottom: 20px; }
-            th, td { padding: 10px 12px; text-align: left; border-bottom: 1px solid #f1f5f9; font-size: 14px; }
+            th, td { padding: 9px 10px; text-align: left; border-bottom: 1px solid #f1f5f9; font-size: 13px; }
             td.label { font-weight: 600; color: #475569; width: 42%; }
             td.value { font-weight: 600; color: #0f172a; }
-            .footer-note { text-align: center; background: #f8fafc; border: 1px solid #e2e8f0; padding: 14px; border-radius: 8px; font-size: 13px; color: #047857; margin-top: 24px; }
+            .footer-note { text-align: center; background: #f8fafc; border: 1px solid #e2e8f0; padding: 12px; border-radius: 8px; font-size: 12px; color: #047857; margin-top: 20px; }
           </style>
         </head>
         <body>
@@ -327,19 +324,61 @@ const Events = () => {
               <p style="margin:0;">Keep this receipt for your records.</p>
             </div>
           </div>
-          <script>
-            window.onload = function() {
-              setTimeout(function() {
-                window.print();
-              }, 250);
-            };
-          </script>
         </body>
       </html>
     `;
 
-    printWin.document.write(html);
-    printWin.document.close();
+    // Try iframe print first (works in PWA webviews and mobile without popup blockers)
+    try {
+      let iframe = document.getElementById('pms-receipt-print-frame');
+      if (iframe) {
+        iframe.remove();
+      }
+      iframe = document.createElement('iframe');
+      iframe.id = 'pms-receipt-print-frame';
+      iframe.style.position = 'fixed';
+      iframe.style.right = '0';
+      iframe.style.bottom = '0';
+      iframe.style.width = '0';
+      iframe.style.height = '0';
+      iframe.style.border = 'none';
+      document.body.appendChild(iframe);
+
+      const frameDoc = iframe.contentWindow?.document || iframe.contentDocument;
+      if (frameDoc) {
+        frameDoc.open();
+        frameDoc.write(html);
+        frameDoc.close();
+
+        setTimeout(() => {
+          try {
+            iframe.contentWindow?.focus();
+            iframe.contentWindow?.print();
+          } catch (e) {
+            console.warn('Iframe print error fallback:', e);
+          }
+        }, 500);
+        return;
+      }
+    } catch (err) {
+      console.warn('Iframe printing failed, using popup fallback:', err);
+    }
+
+    // Fallback for desktop browser window
+    const printWin = window.open('', '_blank', 'width=800,height=900');
+    if (printWin) {
+      printWin.document.open();
+      printWin.document.write(html);
+      printWin.document.close();
+      setTimeout(() => {
+        try {
+          printWin.focus();
+          printWin.print();
+        } catch(e) {}
+      }, 500);
+    } else {
+      alert('Pop-up was blocked. You can also view and download receipts anytime from "My Registrations".');
+    }
   };
 
   const handleDownloadReceipt = () => {

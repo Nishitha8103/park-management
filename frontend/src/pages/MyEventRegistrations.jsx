@@ -235,13 +235,60 @@ const MyEventRegistrations = () => {
     }
   };
 
+  const printHtmlViaIframeOrWindow = (html, title) => {
+    try {
+      let iframe = document.getElementById('pms-receipt-print-frame');
+      if (iframe) {
+        iframe.remove();
+      }
+      iframe = document.createElement('iframe');
+      iframe.id = 'pms-receipt-print-frame';
+      iframe.style.position = 'fixed';
+      iframe.style.right = '0';
+      iframe.style.bottom = '0';
+      iframe.style.width = '0';
+      iframe.style.height = '0';
+      iframe.style.border = 'none';
+      document.body.appendChild(iframe);
+
+      const frameDoc = iframe.contentWindow?.document || iframe.contentDocument;
+      if (frameDoc) {
+        frameDoc.open();
+        frameDoc.write(html);
+        frameDoc.close();
+
+        setTimeout(() => {
+          try {
+            iframe.contentWindow?.focus();
+            iframe.contentWindow?.print();
+          } catch (e) {
+            console.warn('Iframe print error fallback:', e);
+          }
+        }, 500);
+        return;
+      }
+    } catch (err) {
+      console.warn('Iframe printing failed, using popup fallback:', err);
+    }
+
+    const printWin = window.open('', '_blank', 'width=800,height=900');
+    if (printWin) {
+      printWin.document.open();
+      printWin.document.write(html);
+      printWin.document.close();
+      setTimeout(() => {
+        try {
+          printWin.focus();
+          printWin.print();
+        } catch(e) {}
+      }, 500);
+    } else {
+      alert('Pop-up was blocked. Please enable popups or save the details from your screen.');
+    }
+  };
+
   const generateAndPrintEventReceipt = (reg) => {
     if (!reg) return;
-    const printWin = window.open('', '_blank', 'width=800,height=900');
-    if (!printWin) {
-      alert('Pop-up blocked! Please allow pop-ups to print/download your receipt.');
-      return;
-    }
 
     const html = `
       <!DOCTYPE html>
@@ -249,17 +296,19 @@ const MyEventRegistrations = () => {
         <head>
           <title>Receipt_${reg.receiptNumber || reg.registrationId || 'Event'}</title>
           <meta charset="utf-8" />
+          <meta name="viewport" content="width=device-width, initial-scale=1.0" />
           <style>
-            @page { size: A4; margin: 15mm; }
-            body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; padding: 20px; color: #1e293b; line-height: 1.5; background: #ffffff; }
+            @page { size: A4; margin: 12mm; }
+            * { box-sizing: border-box; }
+            body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; padding: 15px; color: #1e293b; line-height: 1.5; background: #ffffff; margin: 0; }
             .receipt-box { border: 2px solid #059669; border-radius: 12px; padding: 24px; max-width: 650px; margin: 0 auto; background: #ffffff; box-shadow: 0 4px 6px -1px rgba(0,0,0,0.1); }
             .header { text-align: center; border-bottom: 2px dashed #cbd5e1; padding-bottom: 16px; margin-bottom: 20px; }
-            .header h2 { color: #047857; margin: 0 0 6px 0; font-size: 24px; font-weight: 700; }
-            .ids-row { display: flex; justify-content: space-between; background: #ecfdf5; padding: 12px 16px; border-radius: 8px; margin-bottom: 20px; font-weight: bold; color: #047857; border: 1px solid #a7f3d0; }
+            .header h2 { color: #047857; margin: 0 0 6px 0; font-size: 22px; font-weight: 700; }
+            .ids-row { display: flex; justify-content: space-between; background: #ecfdf5; padding: 12px 16px; border-radius: 8px; margin-bottom: 20px; font-weight: bold; color: #047857; border: 1px solid #a7f3d0; font-size: 13px; flex-wrap: wrap; gap: 6px; }
             table { width: 100%; border-collapse: collapse; margin-bottom: 20px; }
-            td { padding: 10px 12px; border-bottom: 1px solid #f1f5f9; font-size: 14px; }
+            td { padding: 9px 10px; border-bottom: 1px solid #f1f5f9; font-size: 13px; }
             .label { font-weight: 600; color: #475569; width: 40%; }
-            .footer-note { text-align: center; background: #f8fafc; padding: 14px; border-radius: 8px; font-size: 13px; color: #047857; margin-top: 24px; }
+            .footer-note { text-align: center; background: #f8fafc; padding: 12px; border-radius: 8px; font-size: 12px; color: #047857; margin-top: 20px; }
           </style>
         </head>
         <body>
@@ -282,22 +331,14 @@ const MyEventRegistrations = () => {
             </table>
             <div class="footer-note">Thank you for participating in community park events! Please present this receipt or Registration ID at the venue.</div>
           </div>
-          <script>window.onload = function() { window.print(); }</script>
         </body>
       </html>
     `;
-    printWin.document.open();
-    printWin.document.write(html);
-    printWin.document.close();
+    printHtmlViaIframeOrWindow(html, `Receipt_${reg.receiptNumber || reg.registrationId}`);
   };
 
   const generateAndPrintStallReceipt = (booking) => {
     if (!booking) return;
-    const printWin = window.open('', '_blank', 'width=800,height=900');
-    if (!printWin) {
-      alert('Pop-up blocked! Please allow pop-ups to print/download your invoice.');
-      return;
-    }
 
     const html = `
       <!DOCTYPE html>
@@ -305,17 +346,19 @@ const MyEventRegistrations = () => {
         <head>
           <title>Stall_Invoice_${booking._id}</title>
           <meta charset="utf-8" />
+          <meta name="viewport" content="width=device-width, initial-scale=1.0" />
           <style>
-            @page { size: A4; margin: 15mm; }
-            body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; padding: 20px; color: #1e293b; line-height: 1.5; background: #ffffff; }
+            @page { size: A4; margin: 12mm; }
+            * { box-sizing: border-box; }
+            body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; padding: 15px; color: #1e293b; line-height: 1.5; background: #ffffff; margin: 0; }
             .receipt-box { border: 2px solid #059669; border-radius: 12px; padding: 24px; max-width: 650px; margin: 0 auto; background: #ffffff; box-shadow: 0 4px 6px -1px rgba(0,0,0,0.1); }
             .header { text-align: center; border-bottom: 2px dashed #cbd5e1; padding-bottom: 16px; margin-bottom: 20px; }
-            .header h2 { color: #047857; margin: 0 0 6px 0; font-size: 24px; font-weight: 700; }
-            .ids-row { display: flex; justify-content: space-between; background: #ecfdf5; padding: 12px 16px; border-radius: 8px; margin-bottom: 20px; font-weight: bold; color: #047857; border: 1px solid #a7f3d0; }
+            .header h2 { color: #047857; margin: 0 0 6px 0; font-size: 22px; font-weight: 700; }
+            .ids-row { display: flex; justify-content: space-between; background: #ecfdf5; padding: 12px 16px; border-radius: 8px; margin-bottom: 20px; font-weight: bold; color: #047857; border: 1px solid #a7f3d0; font-size: 13px; flex-wrap: wrap; gap: 6px; }
             table { width: 100%; border-collapse: collapse; margin-bottom: 20px; }
-            td { padding: 10px 12px; border-bottom: 1px solid #f1f5f9; font-size: 14px; }
+            td { padding: 9px 10px; border-bottom: 1px solid #f1f5f9; font-size: 13px; }
             .label { font-weight: 600; color: #475569; width: 40%; }
-            .footer-note { text-align: center; background: #f8fafc; padding: 14px; border-radius: 8px; font-size: 13px; color: #047857; margin-top: 24px; }
+            .footer-note { text-align: center; background: #f8fafc; padding: 12px; border-radius: 8px; font-size: 12px; color: #047857; margin-top: 20px; }
           </style>
         </head>
         <body>
@@ -338,13 +381,10 @@ const MyEventRegistrations = () => {
             </table>
             <div class="footer-note">This permit grants vendor access for the approved date and slot at the designated park. Maintain cleanliness in park premises.</div>
           </div>
-          <script>window.onload = function() { window.print(); }</script>
         </body>
       </html>
     `;
-    printWin.document.open();
-    printWin.document.write(html);
-    printWin.document.close();
+    printHtmlViaIframeOrWindow(html, `Stall_Invoice_${booking._id}`);
   };
 
   return (
