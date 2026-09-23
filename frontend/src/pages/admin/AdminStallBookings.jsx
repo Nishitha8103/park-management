@@ -28,11 +28,13 @@ const resolveMediaUrl = (path) => {
     return path;
   }
   const clean = path.startsWith('/') ? path : `/${path}`;
-  // If running on custom client port or production, ensure direct backend port 5000 fallback if proxy is bypassed
-  const backendBase = (typeof window !== 'undefined' && window.location.hostname === 'localhost') 
-    ? 'http://localhost:5000' 
-    : '';
-  return `${backendBase}${clean}`;
+  if (typeof window !== 'undefined') {
+    // If backend is running on 5000 and frontend is on 5173/5174/5175, direct to backend 5000 for static media
+    const host = window.location.hostname;
+    const protocol = window.location.protocol;
+    return `${protocol}//${host}:5000${clean}`;
+  }
+  return clean;
 };
 
 const getAdminToken = () => {
