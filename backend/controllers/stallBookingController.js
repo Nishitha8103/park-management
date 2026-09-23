@@ -99,12 +99,15 @@ const createBooking = async (req, res) => {
     let photoUrl = '';
     let currentAddressProofUrl = '';
 
+    console.log('[StallBooking] createBooking hit! req.files:', req.files ? Object.keys(req.files) : 'none');
     if (req.files) {
       if (req.files.document && req.files.document.length > 0) {
         documentUrl = `/uploads/parks/${req.files.document[0].filename}`;
+        console.log('[StallBooking] Uploaded document saved at:', documentUrl, 'path:', req.files.document[0].path);
       }
       if (req.files.photo && req.files.photo.length > 0) {
         photoUrl = `/uploads/parks/${req.files.photo[0].filename}`;
+        console.log('[StallBooking] Uploaded photo saved at:', photoUrl, 'path:', req.files.photo[0].path);
       }
       if (req.files.currentAddressProof && req.files.currentAddressProof.length > 0) {
         currentAddressProofUrl = `/uploads/parks/${req.files.currentAddressProof[0].filename}`;
