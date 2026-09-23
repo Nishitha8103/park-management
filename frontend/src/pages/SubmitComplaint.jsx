@@ -208,7 +208,8 @@ const SubmitComplaint = () => {
       setIsSubmitted(true);
     } catch (error) {
       console.error('Error submitting complaint:', error);
-      alert('Failed to submit complaint. Please try again.');
+      const serverMsg = error.response?.data?.message || error.response?.data?.error || error.message || 'Failed to submit complaint. Please try again.';
+      alert(serverMsg);
     } finally {
       setLoading(false);
     }

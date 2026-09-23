@@ -95,12 +95,16 @@ const createComplaint = async (req, res) => {
     const slaDuration = slaConfig.SLA_DURATIONS_HOURS[finalPriority] || 72;
     const slaDeadline = slaConfig.calculateSlaDeadline(new Date(), finalPriority);
 
+    const mongoose = require('mongoose');
+    const validUserId = (userId && mongoose.Types.ObjectId.isValid(userId) && userId.length === 24) ? userId : undefined;
+    const validParkId = (targetParkId && mongoose.Types.ObjectId.isValid(targetParkId) && targetParkId.length === 24) ? targetParkId : undefined;
+
     const complaint = new Complaint({
       complaintNumber,
-      user: (req.user ? req.user._id : undefined) || (userId ? userId : undefined),
+      user: (req.user ? req.user._id : undefined) || validUserId,
       userName,
       userPhone,
-      park: targetParkId,
+      park: validParkId,
       parkName,
       locationInPark,
       district,
@@ -121,71 +125,75 @@ const createComplaint = async (req, res) => {
     await complaint.save();
 
     // 1. Create Notification for Citizen if registered user
-    const citizenUserId = (req.user ? req.user._id : undefined) || (userId ? userId : undefined);
-    if (citizenUserId) {
+    try {
+      const citizenUserId = (req.user ? req.user._id : undefined) || (userId ? userId : undefined);
+      if (citizenUserId) {
+        await Notification.create({
+          recipientUserId: citizenUserId.toString(),
+          recipientRole: 'citizen',
+          title: '🔔 Complaint Submitted',
+          message: `Your complaint for ${(category || 'maintenance').toLowerCase()} at ${parkName || 'the park'} has been submitted. Ticket #${complaintNumber}.`,
+          type: 'Complaint Submitted',
+          category: 'Complaint',
+          priority: 'NORMAL',
+          relatedEntityType: 'COMPLAINT',
+          relatedEntityId: complaint._id.toString(),
+          actionRoute: '/track-complaint'
+        }).catch(() => {});
+      }
+
+      // 2. Create Notification for Admin
       await Notification.create({
-        recipientUserId: citizenUserId.toString(),
-        recipientRole: 'citizen',
-        title: '🔔 Complaint Submitted',
-        message: `Your complaint for ${(category || 'maintenance').toLowerCase()} at ${parkName || 'the park'} has been submitted. Ticket #${complaintNumber}.`,
+        recipientUserId: 'ADMIN_ALL',
+        recipientRole: 'admin',
+        title: '🔔 New Complaint Submitted',
+        message: `A new complaint (${complaintNumber}) has been submitted for ${parkName || 'Park'}.`,
         type: 'Complaint Submitted',
         category: 'Complaint',
         priority: 'NORMAL',
         relatedEntityType: 'COMPLAINT',
         relatedEntityId: complaint._id.toString(),
-        actionRoute: '/track-complaint'
-      });
-    }
+        actionRoute: '/admin-dashboard/complaints'
+      }).catch(() => {});
 
-    // 2. Create Notification for Admin
-    await Notification.create({
-      recipientUserId: 'ADMIN_ALL',
-      recipientRole: 'admin',
-      title: '🔔 New Complaint Submitted',
-      message: `A new complaint (${complaintNumber}) has been submitted for ${parkName || 'Park'}.`,
-      type: 'Complaint Submitted',
-      category: 'Complaint',
-      priority: 'NORMAL',
-      relatedEntityType: 'COMPLAINT',
-      relatedEntityId: complaint._id.toString(),
-      actionRoute: '/admin-dashboard/complaints'
-    });
-
-    // 3. Trigger Maintenance Alert for responsible Contractor if park has assigned contractor
-    if (targetParkId) {
-      const parkDoc = await Park.findById(targetParkId).populate('contractor').populate('governmentOfficial');
-      if (parkDoc) {
-        if (parkDoc.contractor) {
-          const contractorId = parkDoc.contractor._id ? parkDoc.contractor._id.toString() : parkDoc.contractor.toString();
-          await Notification.create({
-            recipientUserId: contractorId,
-            recipientRole: 'contractor',
-            title: '🔔 Maintenance Alert',
-            message: `${category || 'Asset'} at ${parkName || parkDoc.name || 'Park'} requires repair. Ticket #${complaintNumber}.`,
-            type: 'Maintenance Alert',
-            category: 'Maintenance',
-            priority: finalPriority === 'Urgent' || finalPriority === 'High' ? 'URGENT' : 'HIGH',
-            relatedEntityType: 'TASK',
-            relatedEntityId: complaint._id.toString(),
-            actionRoute: '/contractor/tasks'
-          });
-        }
-        if (parkDoc.governmentOfficial) {
-          const officialId = parkDoc.governmentOfficial._id ? parkDoc.governmentOfficial._id.toString() : parkDoc.governmentOfficial.toString();
-          await Notification.create({
-            recipientUserId: officialId,
-            recipientRole: 'official',
-            title: '🔔 New Complaint Submitted',
-            message: `New complaint (${complaintNumber}) submitted for ${parkName || parkDoc.name || 'Park'} (${category}).`,
-            type: 'Complaint Submitted',
-            category: 'Complaint',
-            priority: 'NORMAL',
-            relatedEntityType: 'COMPLAINT',
-            relatedEntityId: complaint._id.toString(),
-            actionRoute: '/gov-dashboard/complaints'
-          });
+      // 3. Trigger Maintenance Alert for responsible Contractor / Official if park has assigned staff
+      if (validParkId) {
+        const parkDoc = await Park.findById(validParkId).populate('contractor').populate('governmentOfficial');
+        if (parkDoc) {
+          if (parkDoc.contractor) {
+            const contractorId = parkDoc.contractor._id ? parkDoc.contractor._id.toString() : parkDoc.contractor.toString();
+            await Notification.create({
+              recipientUserId: contractorId,
+              recipientRole: 'contractor',
+              title: '🔔 Maintenance Alert',
+              message: `${category || 'Asset'} at ${parkName || parkDoc.name || 'Park'} requires repair. Ticket #${complaintNumber}.`,
+              type: 'Maintenance Alert',
+              category: 'Maintenance',
+              priority: finalPriority === 'Urgent' || finalPriority === 'High' ? 'URGENT' : 'HIGH',
+              relatedEntityType: 'TASK',
+              relatedEntityId: complaint._id.toString(),
+              actionRoute: '/contractor/tasks'
+            }).catch(() => {});
+          }
+          if (parkDoc.governmentOfficial) {
+            const officialId = parkDoc.governmentOfficial._id ? parkDoc.governmentOfficial._id.toString() : parkDoc.governmentOfficial.toString();
+            await Notification.create({
+              recipientUserId: officialId,
+              recipientRole: 'official',
+              title: '🔔 New Complaint Submitted',
+              message: `New complaint (${complaintNumber}) submitted for ${parkName || parkDoc.name || 'Park'} (${category}).`,
+              type: 'Complaint Submitted',
+              category: 'Complaint',
+              priority: 'NORMAL',
+              relatedEntityType: 'COMPLAINT',
+              relatedEntityId: complaint._id.toString(),
+              actionRoute: '/gov-dashboard/complaints'
+            }).catch(() => {});
+          }
         }
       }
+    } catch (notifErr) {
+      console.warn('Post-complaint notification creation warning:', notifErr);
     }
 
     res.status(201).json(complaint);
