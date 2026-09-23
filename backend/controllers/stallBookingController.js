@@ -193,7 +193,7 @@ const getBookings = async (req, res) => {
     const bookings = await StallBooking.find()
       .populate('park', 'name parkCode')
       .populate('slot')
-      .populate('user', 'name email phone aadhaarNumber aadhaarKycStatus aadhaarFrontImage aadhaarBackImage aadhaarKycReviewedAt')
+      .populate('user', 'name email phone profilePic aadhaarNumber aadhaarKycStatus aadhaarFrontImage aadhaarBackImage aadhaarKycReviewedAt')
       .sort({ createdAt: -1 });
     res.json(bookings);
   } catch (error) {
