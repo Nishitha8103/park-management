@@ -547,3 +547,30 @@
 @keyframes spin {
   to { transform: rotate(360deg); }
 }
+
+@media (max-width: 768px) {
+  .schedule-header {
+    padding: 1.25rem 1rem !important;
+    border-radius: 12px;
+    flex-direction: column;
+    align-items: flex-start;
+  }
+
+  .schedule-view-toggle {
+    width: 100%;
+    justify-content: space-between;
+  }
+
+  .schedule-view-toggle button {
+    flex: 1;
+  }
+
+  .calendar-grid {
+    font-size: 0.75rem;
+  }
+
+  .calendar-day-cell {
+    min-height: 70px;
+    padding: 4px;
+  }
+}

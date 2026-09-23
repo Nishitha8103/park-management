@@ -1147,3 +1147,153 @@
   background: #f1f5f9;
   color: #0f172a;
 }
+
+/* ============================================================
+   MOBILE RESPONSIVENESS SUITE FOR CONTRACTOR MODULE
+   ============================================================ */
+@media (max-width: 900px) {
+  .contractor-header {
+    padding: 0.75rem 0;
+  }
+  
+  .contractor-brand h1 {
+    font-size: 1.05rem;
+  }
+  
+  .contractor-brand span {
+    display: none;
+  }
+  
+  .contractor-user-details {
+    display: none;
+  }
+  
+  .btn-contractor-logout span {
+    display: none;
+  }
+
+  .contractor-hero-banner {
+    padding: 1.5rem 1.25rem;
+    border-radius: 12px;
+  }
+
+  .hero-greeting h2 {
+    font-size: 1.45rem;
+  }
+
+  .hero-greeting p {
+    font-size: 0.86rem;
+  }
+
+  .hero-quick-actions {
+    width: 100%;
+    margin-top: 0.5rem;
+  }
+
+  .hero-action-btn {
+    flex: 1;
+    justify-content: center;
+    padding: 0.6rem 0.9rem;
+    font-size: 0.82rem;
+  }
+
+  .grid-2-col, .grid-3-col {
+    grid-template-columns: 1fr !important;
+  }
+
+  .card-header.flex-between {
+    flex-direction: column;
+    align-items: flex-start !important;
+    gap: 0.75rem;
+  }
+
+  .card-action-link {
+    align-self: flex-start;
+  }
+
+  .map-layout {
+    grid-template-columns: 1fr !important;
+    height: auto !important;
+  }
+
+  .contractor-panel-header {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 0.75rem;
+  }
+
+  .contractor-filters {
+    width: 100%;
+    overflow-x: auto;
+    padding-bottom: 4px;
+    -webkit-overflow-scrolling: touch;
+  }
+
+  .contractor-filter-btn {
+    flex-shrink: 0;
+    padding: 0.4rem 0.85rem;
+    font-size: 0.78rem;
+  }
+}
+
+@media (max-width: 640px) {
+  .contractor-dashboard-container {
+    padding: 1rem 0.75rem 3rem 0.75rem !important;
+  }
+
+  .contractor-stats-grid {
+    grid-template-columns: 1fr 1fr !important;
+    gap: 0.75rem !important;
+  }
+
+  .contractor-stat-card {
+    padding: 1rem 0.85rem !important;
+  }
+
+  .stat-card-value {
+    font-size: 1.5rem !important;
+  }
+
+  .stat-card-label {
+    font-size: 0.75rem !important;
+  }
+
+  .contractor-card {
+    padding: 1.15rem 1rem !important;
+    border-radius: 12px !important;
+  }
+
+  .contractor-main-panel {
+    padding: 1rem !important;
+    border-radius: 12px !important;
+  }
+
+  .contractor-table th, 
+  .contractor-table td,
+  .mini-tasks-table th, 
+  .mini-tasks-table td {
+    padding: 0.65rem 0.6rem !important;
+    font-size: 0.78rem !important;
+  }
+
+  .contractor-modal {
+    margin: 1rem;
+    padding: 1.25rem;
+    max-width: 95vw;
+  }
+
+  .btn-job-action {
+    padding: 0.35rem 0.55rem;
+    font-size: 0.75rem;
+  }
+
+  .map-park-card {
+    padding: 0.65rem 0.75rem;
+  }
+}
+
+@media (max-width: 400px) {
+  .contractor-stats-grid {
+    grid-template-columns: 1fr !important;
+  }
+}

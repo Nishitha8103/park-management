@@ -511,11 +511,29 @@
   to { transform: rotate(360deg); }
 }
 
-@media (max-width: 600px) {
-  .mr-form-grid {
-    grid-template-columns: 1fr;
+@media (max-width: 768px) {
+  .mr-page-header {
+    padding: 1.25rem 1rem !important;
+    border-radius: 12px;
+    flex-direction: column;
+    align-items: flex-start;
   }
+
+  .mr-add-btn {
+    width: 100%;
+    justify-content: center;
+  }
+
+  .mr-form-card {
+    padding: 1.25rem 1rem !important;
+    border-radius: 12px;
+  }
+
+  .mr-form-grid {
+    grid-template-columns: 1fr !important;
+  }
+
   .mr-list {
-    grid-template-columns: 1fr;
+    grid-template-columns: 1fr !important;
   }
 }

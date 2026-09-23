@@ -635,3 +635,44 @@
   from { opacity: 0; transform: scale(0.96); }
   to { opacity: 1; transform: scale(1); }
 }
+
+/* ============================================================
+   MOBILE RESPONSIVENESS SUITE FOR TASK DETAILS
+   ============================================================ */
+@media (max-width: 900px) {
+  .task-page-body {
+    padding: 1rem 0.75rem 3rem 0.75rem !important;
+  }
+
+  .task-main-card {
+    grid-template-columns: 1fr !important;
+    padding: 1.25rem 1rem !important;
+    gap: 1.5rem !important;
+    border-radius: 12px;
+  }
+
+  .task-img-container {
+    height: 240px !important;
+  }
+
+  .task-meta-grid {
+    grid-template-columns: 1fr 1fr !important;
+    gap: 0.75rem !important;
+  }
+
+  .action-buttons-group {
+    flex-direction: column;
+    width: 100%;
+  }
+
+  .btn-task-action {
+    width: 100%;
+    justify-content: center;
+  }
+}
+
+@media (max-width: 500px) {
+  .task-meta-grid {
+    grid-template-columns: 1fr !important;
+  }
+}
