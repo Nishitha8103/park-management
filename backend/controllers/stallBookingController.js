@@ -111,6 +111,19 @@ const createBooking = async (req, res) => {
       }
     }
 
+    // Check user record for fallback document / profile photo if not sent in request
+    let userDoc = null;
+    if (userId) {
+      userDoc = await User.findById(userId);
+    }
+
+    if (!photoUrl && userDoc?.profilePic) {
+      photoUrl = userDoc.profilePic;
+    }
+    if (!documentUrl && userDoc?.aadhaarFrontImage) {
+      documentUrl = userDoc.aadhaarFrontImage;
+    }
+
     // Determine initial verification statuses
     const sameAddressBool = isAddressSameAsAadhaar === 'true' || isAddressSameAsAadhaar === true;
     
@@ -125,11 +138,8 @@ const createBooking = async (req, res) => {
 
     // Check if user already has verified Aadhaar KYC
     let initialIdentityStatus = 'Pending';
-    if (userId) {
-      const user = await User.findById(userId);
-      if (user && user.aadhaarKycStatus === 'verified') {
-        initialIdentityStatus = 'Verified';
-      }
+    if (userDoc && userDoc.aadhaarKycStatus === 'verified') {
+      initialIdentityStatus = 'Verified';
     }
 
     // Create booking

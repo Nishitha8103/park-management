@@ -424,9 +424,9 @@ const AdminStallBookings = () => {
                       {/* Applicant */}
                       <td style={{ padding: '1rem' }}>
                         <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
-                          {b.photoUrl ? (
+                          {(b.photoUrl || b.user?.profilePic) ? (
                             <img 
-                              src={resolveMediaUrl(b.photoUrl)} 
+                              src={resolveMediaUrl(b.photoUrl || b.user?.profilePic)} 
                               alt="Applicant" 
                               onError={(e) => {
                                 e.target.onerror = null;
@@ -466,9 +466,9 @@ const AdminStallBookings = () => {
                       {/* Documents */}
                       <td style={{ padding: '1rem' }}>
                         <div style={{ display: 'flex', flexDirection: 'column', gap: '5px' }}>
-                          {b.documentUrl ? (
+                          {(b.documentUrl || b.user?.aadhaarFrontImage) ? (
                             <a 
-                              href={resolveMediaUrl(b.documentUrl)} 
+                              href={resolveMediaUrl(b.documentUrl || b.user?.aadhaarFrontImage)} 
                               target="_blank" 
                               rel="noopener noreferrer"
                               style={{ display: 'inline-flex', alignItems: 'center', gap: '4px', background: 'rgba(59, 130, 246, 0.15)', color: '#60a5fa', padding: '4px 8px', borderRadius: '4px', textDecoration: 'none', fontSize: '0.78rem', fontWeight: 600, border: '1px solid rgba(59, 130, 246, 0.3)' }}
@@ -598,9 +598,9 @@ const AdminStallBookings = () => {
               <div style={{ background: '#f8fafc', padding: '1.25rem', borderRadius: '10px', border: '1px solid #e2e8f0' }}>
                 <h4 style={{ margin: '0 0 10px 0', fontSize: '0.9rem', color: '#1e293b', fontWeight: 700 }}>Applicant & Stall Information</h4>
                 <div style={{ display: 'flex', gap: '14px', alignItems: 'center', marginBottom: '12px' }}>
-                  {selectedBooking.photoUrl ? (
+                  {(selectedBooking.photoUrl || selectedBooking.user?.profilePic) ? (
                     <img 
-                      src={resolveMediaUrl(selectedBooking.photoUrl)} 
+                      src={resolveMediaUrl(selectedBooking.photoUrl || selectedBooking.user?.profilePic)} 
                       alt="Applicant Photo" 
                       onError={(e) => {
                         e.target.onerror = null;
@@ -634,9 +634,9 @@ const AdminStallBookings = () => {
                       <div style={{ fontSize: '0.8rem', fontWeight: 700, color: '#64748b', textTransform: 'uppercase' }}>
                         Aadhaar / Permanent Address
                       </div>
-                      {selectedBooking.documentUrl && (
+                      {(selectedBooking.documentUrl || selectedBooking.user?.aadhaarFrontImage) && (
                         <a 
-                          href={resolveMediaUrl(selectedBooking.documentUrl)} 
+                          href={resolveMediaUrl(selectedBooking.documentUrl || selectedBooking.user?.aadhaarFrontImage)} 
                           target="_blank" 
                           rel="noopener noreferrer"
                           style={{ display: 'inline-flex', alignItems: 'center', gap: '5px', background: '#eff6ff', color: '#2563eb', padding: '4px 10px', borderRadius: '6px', textDecoration: 'none', fontSize: '0.8rem', fontWeight: 600, border: '1px solid #bfdbfe' }}
@@ -650,13 +650,13 @@ const AdminStallBookings = () => {
                     </div>
 
                     {/* Aadhaar Document Preview */}
-                    {selectedBooking.documentUrl && (
+                    {(selectedBooking.documentUrl || selectedBooking.user?.aadhaarFrontImage) && (
                       <div style={{ marginTop: '10px', border: '1px dashed #cbd5e1', borderRadius: '6px', padding: '8px', textAlign: 'center', background: '#f8fafc' }}>
-                        {selectedBooking.documentUrl.toLowerCase().endsWith('.pdf') ? (
-                          <iframe src={resolveMediaUrl(selectedBooking.documentUrl)} title="Aadhaar Preview" style={{ width: '100%', height: '220px', border: 'none' }} />
+                        {(selectedBooking.documentUrl || selectedBooking.user?.aadhaarFrontImage || '').toLowerCase().endsWith('.pdf') ? (
+                          <iframe src={resolveMediaUrl(selectedBooking.documentUrl || selectedBooking.user?.aadhaarFrontImage)} title="Aadhaar Preview" style={{ width: '100%', height: '220px', border: 'none' }} />
                         ) : (
                           <img 
-                            src={resolveMediaUrl(selectedBooking.documentUrl)} 
+                            src={resolveMediaUrl(selectedBooking.documentUrl || selectedBooking.user?.aadhaarFrontImage)} 
                             alt="Aadhaar Document Preview"
                             onError={(e) => {
                               e.target.style.display = 'none';
