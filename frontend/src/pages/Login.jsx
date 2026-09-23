@@ -20,6 +20,10 @@ const Login = () => {
 
   const handleSuccessfulAuth = (userData) => {
     localStorage.setItem('user', JSON.stringify(userData));
+    localStorage.setItem('public_user', JSON.stringify(userData));
+    if (userData.token) {
+      localStorage.setItem('token', userData.token);
+    }
     if (userData.role === 'Contractor') {
       localStorage.setItem('contractorUser', JSON.stringify(userData));
     }
@@ -29,6 +33,7 @@ const Login = () => {
     if (userData.role === 'Government Official' || userData.role === 'official') {
       localStorage.setItem('govUser', JSON.stringify(userData));
     }
+    window.dispatchEvent(new Event('user-updated'));
     
     if (redirectPath) {
       navigate(redirectPath);

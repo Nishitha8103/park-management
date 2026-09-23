@@ -88,15 +88,21 @@ const MyEventRegistrations = () => {
   };
 
   const fetchData = async () => {
-    const userStr = localStorage.getItem('user');
+    const userStr = localStorage.getItem('user') || localStorage.getItem('public_user') || localStorage.getItem('govUser') || localStorage.getItem('contractorUser');
     if (!userStr) {
       navigate('/login');
       return;
     }
-    const user = JSON.parse(userStr);
+    let user = {};
+    try {
+      const parsed = JSON.parse(userStr);
+      user = parsed.user || parsed;
+    } catch (e) {
+      user = {};
+    }
     const email = user.email || '';
     const userId = user._id || user.id || '';
-    const token = user.token;
+    const token = user.token || localStorage.getItem('token');
 
     setLoading(true);
     setError('');

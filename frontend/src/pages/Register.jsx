@@ -48,8 +48,14 @@ const Register = () => {
       const data = await response.json();
 
       if (response.ok) {
-        setSuccessMsg("Successfully registered! Redirecting to login...");
-        setTimeout(() => navigate('/login'), 1200);
+        if (data.user) {
+          localStorage.setItem('user', JSON.stringify(data.user));
+          localStorage.setItem('public_user', JSON.stringify(data.user));
+          if (data.user.token) localStorage.setItem('token', data.user.token);
+          window.dispatchEvent(new Event('user-updated'));
+        }
+        setSuccessMsg("Successfully registered! Welcome to Parks Monitoring System...");
+        setTimeout(() => navigate('/parks'), 1000);
       } else {
         setErrorMsg(data.message || "Registration failed");
       }

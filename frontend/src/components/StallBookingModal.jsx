@@ -38,6 +38,7 @@ const StallBookingModal = ({ parkId, parkName, slot, onClose, onBookingSuccess }
         }
         return {
           name: userObj.name || userObj.fullName || userObj.firstName || '',
+          email: userObj.email || '',
           phone: (userObj.phone || userObj.mobile || userObj.phoneNumber || '').replace(/\D/g, '').slice(0, 10),
           address: userObj.address || ''
         };
@@ -45,7 +46,7 @@ const StallBookingModal = ({ parkId, parkName, slot, onClose, onBookingSuccess }
     } catch (e) {
       console.error('Error reading stored user data:', e);
     }
-    return { name: '', phone: '', address: '' };
+    return { name: '', email: '', phone: '', address: '' };
   };
 
   const initialUser = getStoredUserData();
@@ -53,6 +54,7 @@ const StallBookingModal = ({ parkId, parkName, slot, onClose, onBookingSuccess }
   const [formData, setFormData] = useState({
     applicantName: initialUser.name,
     applicantPhone: initialUser.phone,
+    applicantEmail: initialUser.email,
     stallName: '',
     productsType: '',
     nativeAddress: initialUser.address
@@ -165,6 +167,7 @@ const StallBookingModal = ({ parkId, parkName, slot, onClose, onBookingSuccess }
       submitData.append('userId', userId);
       submitData.append('applicantName', formData.applicantName);
       submitData.append('applicantPhone', formData.applicantPhone);
+      if (formData.applicantEmail) submitData.append('applicantEmail', formData.applicantEmail);
       submitData.append('stallName', formData.stallName);
       submitData.append('productsType', formData.productsType);
       submitData.append('amountPaid', slot.price || 0);

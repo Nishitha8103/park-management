@@ -197,8 +197,14 @@ const Events = () => {
         numberOfAttendees: formData.numberOfAttendees
       });
 
-      const userStr = localStorage.getItem('user');
-      const userObj = userStr ? JSON.parse(userStr) : null;
+      const userStr = localStorage.getItem('user') || localStorage.getItem('public_user') || localStorage.getItem('govUser') || localStorage.getItem('contractorUser');
+      let userObj = null;
+      if (userStr) {
+        try {
+          const parsed = JSON.parse(userStr);
+          userObj = parsed.user || parsed;
+        } catch (e) {}
+      }
 
       const options = {
         key: order.razorpayKeyId,
@@ -248,8 +254,14 @@ const Events = () => {
     setIsSubmitting(true);
     setSubmitError('');
     try {
-      const userStr = localStorage.getItem('user');
-      const userObj = userStr ? JSON.parse(userStr) : null;
+      const userStr = localStorage.getItem('user') || localStorage.getItem('public_user') || localStorage.getItem('govUser') || localStorage.getItem('contractorUser');
+      let userObj = null;
+      if (userStr) {
+        try {
+          const parsed = JSON.parse(userStr);
+          userObj = parsed.user || parsed;
+        } catch (e) {}
+      }
       const payload = {
         ...formData,
         userId: userObj?._id || userObj?.id || null

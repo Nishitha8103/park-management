@@ -8,6 +8,7 @@ const stallBookingSchema = new mongoose.Schema({
   productsType: { type: String, required: true },
   applicantName: { type: String, required: true },
   applicantPhone: { type: String, required: true },
+  applicantEmail: { type: String, default: '' },
   amountPaid: { type: Number, required: true },
   
   // Photo & Documents

@@ -74,14 +74,22 @@ const MyStallBookings = () => {
 
   const fetchBookings = async () => {
     try {
-      const userStr = localStorage.getItem('user');
+      const userStr = localStorage.getItem('user') || localStorage.getItem('public_user') || localStorage.getItem('govUser') || localStorage.getItem('contractorUser');
       if (!userStr) return;
-      const parsed = JSON.parse(userStr);
-      const userId = parsed._id || parsed.id;
-      const token = parsed.token;
+      let user = {};
+      try {
+        const parsed = JSON.parse(userStr);
+        user = parsed.user || parsed;
+      } catch (e) {
+        user = {};
+      }
+      const userId = user._id || user.id || '';
+      const token = user.token || localStorage.getItem('token');
+      const email = user.email || '';
+      const phone = user.phone || '';
 
-      const res = await axios.get(`/api/stall-bookings/user/${userId}`, {
-        headers: { Authorization: `Bearer ${token}` }
+      const res = await axios.get(`/api/stall-bookings/user/${userId}?email=${encodeURIComponent(email)}&phone=${encodeURIComponent(phone)}`, {
+        headers: token ? { Authorization: `Bearer ${token}` } : {}
       });
       setBookings(res.data);
     } catch (error) {
