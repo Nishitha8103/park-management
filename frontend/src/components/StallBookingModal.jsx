@@ -177,8 +177,7 @@ const StallBookingModal = ({ parkId, parkName, slot, onClose, onBookingSuccess }
 
       const bookingRes = await axios.post('/api/stall-bookings', submitData, {
         headers: {
-          Authorization: `Bearer ${token}`,
-          'Content-Type': 'multipart/form-data'
+          Authorization: `Bearer ${token}`
         }
       });
 
