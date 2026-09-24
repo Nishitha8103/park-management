@@ -30,7 +30,8 @@ const port = process.env.PORT || 5000;
 
 app.use(cors());
 app.use(compression());
-app.use(express.json());
+app.use(express.json({ limit: '50mb' }));
+app.use(express.urlencoded({ extended: true, limit: '50mb' }));
 
 // Serve static files from uploads folder
 app.use('/uploads/parks', express.static(path.join(__dirname, 'uploads/parks')));
@@ -39,7 +40,6 @@ app.use('/uploads/kyc', express.static(path.join(__dirname, 'uploads/kyc')));
 app.use('/uploads/leaves', express.static(path.join(__dirname, 'uploads/leaves')));
 app.use('/uploads/reassignments', express.static(path.join(__dirname, 'uploads/reassignments')));
 app.use('/uploads', express.static(path.join(__dirname, 'uploads')));
-app.use('/uploads', express.static(path.join(__dirname, 'uploads/parks')));
 
 // Routes
 app.use('/api/auth', require('./routes/authRoutes'));
