@@ -19,6 +19,7 @@ const upload = multer({
   limits: { fileSize: 10 * 1024 * 1024 }
 });
 
+const { uploadToCloudinary } = require('../utils/cloudinary');
 const {
   submitReassignmentRequest,
   getReassignmentRequests,
@@ -30,12 +31,12 @@ const {
 } = require('../controllers/reassignmentController');
 
 // Upload supporting attachment
-router.post('/upload', upload.single('attachment'), (req, res) => {
+router.post('/upload', upload.single('attachment'), async (req, res) => {
   if (!req.file) {
     return res.status(400).json({ message: 'No file uploaded' });
   }
-  const relativePath = `/uploads/reassignments/${req.file.filename}`;
-  res.json({ success: true, fileUrl: relativePath, filename: req.file.originalname });
+  const fileUrl = await uploadToCloudinary(req.file, 'reassignments');
+  res.json({ success: true, fileUrl, filename: req.file.originalname });
 });
 
 // Submit reassignment request (Contractor / Govt Official)

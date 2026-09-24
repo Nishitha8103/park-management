@@ -4,6 +4,7 @@ const Corporation = require('../models/Corporation');
 const Zone = require('../models/Zone');
 const Ward = require('../models/Ward');
 const xlsx = require('xlsx');
+const { uploadMultipleToCloudinary } = require('../utils/cloudinary');
 
 // @desc    Get a single park by ID
 // @route   GET /api/parks/:id
@@ -163,8 +164,10 @@ const createPark = async (req, res) => {
       }
     }
 
-    // Handle image paths
-    const imagePaths = req.files ? req.files.map(file => `/uploads/parks/${file.filename}`) : [];
+    // Handle image paths via Cloudinary
+    const imagePaths = req.files && req.files.length > 0 
+      ? await uploadMultipleToCloudinary(req.files, 'parks') 
+      : [];
 
     const parsedTotalStallSlots = Number(totalStallSlots) || 0;
     const park = new Park({
@@ -555,9 +558,9 @@ const updatePark = async (req, res) => {
       updateFields.availableStallSlots = updateFields.totalStallSlots;
     }
 
-    // Handle new images
+    // Handle new images via Cloudinary
     if (req.files && req.files.length > 0) {
-      const newImages = req.files.map(file => `/uploads/parks/${file.filename}`);
+      const newImages = await uploadMultipleToCloudinary(req.files, 'parks');
       updateFields.images = [...(park.images || []), ...newImages];
     }
 

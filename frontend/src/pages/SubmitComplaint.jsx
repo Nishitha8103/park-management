@@ -187,22 +187,7 @@ const SubmitComplaint = () => {
       if (userId) submitData.append('userId', userId);
 
       if (selectedFile) {
-        submitData.append('images', selectedFile, selectedFile.name || `complaint_${Date.now()}.jpg`);
-        if (filePreview && typeof filePreview === 'string' && filePreview.startsWith('data:image')) {
-          submitData.append('imageBase64', filePreview);
-        } else {
-          try {
-            const reader = new FileReader();
-            const b64 = await new Promise(res => {
-              reader.onload = () => res(reader.result);
-              reader.onerror = () => res('');
-              reader.readAsDataURL(selectedFile);
-            });
-            if (b64) submitData.append('imageBase64', b64);
-          } catch (b64Err) {
-            console.warn('Base64 encode fallback error:', b64Err);
-          }
-        }
+        submitData.append('images', selectedFile, selectedFile.name || ('complaint_' + Date.now() + '.jpg'));
       }
 
       const res = await axios.post('/api/complaints', submitData);

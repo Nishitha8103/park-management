@@ -3,6 +3,7 @@ const Contractor = require('../models/Contractor');
 const User = require('../models/User');
 const Complaint = require('../models/Complaint');
 const Notification = require('../models/Notification');
+const { uploadToCloudinary } = require('../utils/cloudinary');
 
 // Generate unique Leave ID
 const generateLeaveId = async () => {
@@ -85,7 +86,7 @@ const applyLeave = async (req, res) => {
     let documentPath = '';
     let documentOriginalName = '';
     if (req.file) {
-      documentPath = `/uploads/leaves/${req.file.filename}`;
+      documentPath = await uploadToCloudinary(req.file, 'leaves');
       documentOriginalName = req.file.originalname;
     } else if (req.body.supportingDocument) {
       documentPath = req.body.supportingDocument;

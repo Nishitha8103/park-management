@@ -1,6 +1,7 @@
 const Contractor = require('../models/Contractor');
 const Park = require('../models/Park');
 const { sendContractorCredentialsEmail, sendContractorUpdateEmail } = require('../config/sendEmail');
+const { uploadToCloudinary } = require('../utils/cloudinary');
 const crypto = require('crypto');
 
 const jwt = require('jsonwebtoken');
@@ -88,10 +89,10 @@ const createContractor = async (req, res) => {
     }
     const contractorId = `CON${nextIdNumber.toString().padStart(3, '0')}`;
 
-    // Handle image upload if provided (from multer)
+    // Handle image upload if provided (upload to Cloudinary)
     let profilePhoto = null;
     if (req.file) {
-      profilePhoto = `/uploads/parks/${req.file.filename}`;
+      profilePhoto = await uploadToCloudinary(req.file, 'contractors');
     }
 
     const contractor = new Contractor({
@@ -171,7 +172,7 @@ const updateContractor = async (req, res) => {
       }
 
       if (req.file) {
-        contractor.profilePhoto = `/uploads/parks/${req.file.filename}`;
+        contractor.profilePhoto = await uploadToCloudinary(req.file, 'contractors');
       }
 
       const updatedContractor = await contractor.save();
@@ -301,7 +302,7 @@ const updateContractorProfile = async (req, res) => {
       }
 
       if (req.file) {
-        contractor.profilePhoto = `/uploads/parks/${req.file.filename}`;
+        contractor.profilePhoto = await uploadToCloudinary(req.file, 'contractors');
       } else if (req.body.profilePhoto) {
         contractor.profilePhoto = req.body.profilePhoto;
       } else if (req.body.profilePic) {

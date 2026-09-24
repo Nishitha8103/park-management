@@ -1,6 +1,7 @@
 const path = require('path');
 const fs   = require('fs');
 const User = require('../models/User');
+const { uploadToCloudinary } = require('../utils/cloudinary');
 
 // ----------------------------------------------------------------
 // POST /api/kyc/submit
@@ -39,9 +40,9 @@ exports.submitKyc = async (req, res) => {
     const clean  = aadhaarNumber.replace(/\s/g, '');
     const masked = `XXXX-XXXX-${clean.slice(-4)}`;
 
-    // Store relative URL paths served by /uploads
-    const frontPath = `/uploads/kyc/${path.basename(frontFile.path)}`;
-    const backPath  = `/uploads/kyc/${path.basename(backFile.path)}`;
+    // Upload Aadhaar images to Cloudinary (folder 'kyc')
+    const frontPath = await uploadToCloudinary(frontFile, 'kyc');
+    const backPath  = await uploadToCloudinary(backFile, 'kyc');
 
     await User.findByIdAndUpdate(userId, {
       aadhaarNumber: masked,

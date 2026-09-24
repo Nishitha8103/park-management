@@ -5,6 +5,7 @@ const Park = require('../models/Park');
 const Notification = require('../models/Notification');
 const User = require('../models/User');
 const Setting = require('../models/Setting');
+const { uploadToCloudinary, uploadMultipleToCloudinary } = require('../utils/cloudinary');
 
 // Helper to ensure upload directories exist
 const ensureComplaintImagesOnDisk = (complaintList) => {
@@ -81,46 +82,51 @@ const createComplaint = async (req, res) => {
       fs.mkdirSync(uploadDir, { recursive: true });
     }
 
-    let images = req.files && req.files.length > 0 
-      ? req.files.map(file => `/uploads/complaints/${file.filename}`) 
-      : [];
+    let images = [];
+    if (req.files && req.files.length > 0) {
+      images = await uploadMultipleToCloudinary(req.files, 'complaints');
+    }
 
-    // Helper to decode and save base64 data to disk
-    const saveBase64Image = (b64Str) => {
+    // Helper to decode base64 data and upload to Cloudinary (with disk fallback)
+    const processBase64Evidence = async (b64Str) => {
       if (!b64Str || typeof b64Str !== 'string') return null;
       try {
+        if (b64Str.startsWith('data:')) {
+          const cloudUrl = await uploadToCloudinary(b64Str, 'complaints');
+          if (cloudUrl) return cloudUrl;
+        }
         const matches = b64Str.match(/^data:([A-Za-z-+\/]+);base64,(.+)$/);
         if (matches && matches.length === 3) {
           const buffer = Buffer.from(matches[2], 'base64');
           const filename = `${Date.now()}-evidence_${Math.round(Math.random() * 1e6)}.jpg`;
           const filePath = path.join(uploadDir, filename);
           fs.writeFileSync(filePath, buffer);
-          console.log('[createComplaint] Saved base64 image to disk:', filePath);
-          return `/uploads/complaints/${filename}`;
+          const cloudUrl = await uploadToCloudinary(filePath, 'complaints');
+          return cloudUrl || `/uploads/complaints/${filename}`;
         }
       } catch (e) {
-        console.error('[createComplaint] Error saving base64 image:', e);
+        console.error('[createComplaint] Error processing base64 image:', e);
       }
       return null;
     };
 
-    // If base64 payload provided, always save it to disk
+    // If base64 payload provided, upload to Cloudinary
     const rawB64 = imageBase64 || imagesBase64;
     if (rawB64) {
       const b64List = Array.isArray(rawB64) ? rawB64 : [rawB64];
       for (const b64 of b64List) {
-        const saved = saveBase64Image(b64);
-        if (saved && !images.includes(saved)) {
-          images.push(saved);
+        const savedUrl = await processBase64Evidence(b64);
+        if (savedUrl && !images.includes(savedUrl)) {
+          images.push(savedUrl);
         }
       }
     }
 
     // If req.body.images contains base64 string
     if (req.body.images && typeof req.body.images === 'string' && req.body.images.startsWith('data:image')) {
-      const saved = saveBase64Image(req.body.images);
-      if (saved && !images.includes(saved)) {
-        images.push(saved);
+      const savedUrl = await processBase64Evidence(req.body.images);
+      if (savedUrl && !images.includes(savedUrl)) {
+        images.push(savedUrl);
       }
     }
 
@@ -352,19 +358,19 @@ const updateComplaint = async (req, res) => {
     const { id } = req.params;
     const updateData = req.body;
 
-    // Handle files if uploaded via multer
+    // Handle files if uploaded via multer (upload to Cloudinary)
     if (req.files) {
-      if (req.files.beforeImages) {
-        updateData.beforeImages = req.files.beforeImages.map(f => `/uploads/complaints/${f.filename}`);
+      if (req.files.beforeImages && req.files.beforeImages.length > 0) {
+        updateData.beforeImages = await uploadMultipleToCloudinary(req.files.beforeImages, 'complaints');
       }
-      if (req.files.afterImages) {
-        updateData.afterImages = req.files.afterImages.map(f => `/uploads/complaints/${f.filename}`);
+      if (req.files.afterImages && req.files.afterImages.length > 0) {
+        updateData.afterImages = await uploadMultipleToCloudinary(req.files.afterImages, 'complaints');
       }
-      if (req.files.completionReport) {
-        updateData.completionReport = `/uploads/complaints/${req.files.completionReport[0].filename}`;
+      if (req.files.completionReport && req.files.completionReport.length > 0) {
+        updateData.completionReport = await uploadToCloudinary(req.files.completionReport[0], 'complaints');
       }
-      if (req.files.inspectionImages) {
-        updateData.inspectionImages = req.files.inspectionImages.map(f => `/uploads/complaints/${f.filename}`);
+      if (req.files.inspectionImages && req.files.inspectionImages.length > 0) {
+        updateData.inspectionImages = await uploadMultipleToCloudinary(req.files.inspectionImages, 'complaints');
       }
     }
 

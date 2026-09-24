@@ -6,6 +6,7 @@ const User = require('../models/User');
 const Setting = require('../models/Setting');
 const Razorpay = require('razorpay');
 const crypto = require('crypto');
+const { uploadToCloudinary } = require('../utils/cloudinary');
 
 const DEFAULT_PROOF_TYPES = [
   'Rental Agreement',
@@ -102,15 +103,16 @@ const createBooking = async (req, res) => {
     console.log('[StallBooking] createBooking hit! req.files:', req.files ? Object.keys(req.files) : 'none');
     if (req.files) {
       if (req.files.document && req.files.document.length > 0) {
-        documentUrl = `/uploads/parks/${req.files.document[0].filename}`;
-        console.log('[StallBooking] Uploaded document saved at:', documentUrl, 'path:', req.files.document[0].path);
+        documentUrl = await uploadToCloudinary(req.files.document[0], 'stall_bookings');
+        console.log('[StallBooking] Uploaded document saved at:', documentUrl);
       }
       if (req.files.photo && req.files.photo.length > 0) {
-        photoUrl = `/uploads/parks/${req.files.photo[0].filename}`;
-        console.log('[StallBooking] Uploaded photo saved at:', photoUrl, 'path:', req.files.photo[0].path);
+        photoUrl = await uploadToCloudinary(req.files.photo[0], 'stall_bookings');
+        console.log('[StallBooking] Uploaded photo saved at:', photoUrl);
       }
       if (req.files.currentAddressProof && req.files.currentAddressProof.length > 0) {
-        currentAddressProofUrl = `/uploads/parks/${req.files.currentAddressProof[0].filename}`;
+        currentAddressProofUrl = await uploadToCloudinary(req.files.currentAddressProof[0], 'stall_bookings');
+        console.log('[StallBooking] Uploaded address proof saved at:', currentAddressProofUrl);
       }
     }
 
