@@ -329,13 +329,14 @@ img {
   }
 
   /* Modal responsiveness */
-  .custom-popup-modal, .modal-content, .modal-container, .popup-card {
+  .custom-popup-modal, .modal-content, .modal-container, .popup-card, .swal2-popup {
     width: 95vw !important;
     max-width: 95vw !important;
-    margin: 1rem auto !important;
+    margin: 0.5rem auto !important;
     padding: 1.25rem !important;
     max-height: 90vh !important;
     overflow-y: auto !important;
+    box-sizing: border-box !important;
   }
 
   /* Mobile button sizing */
@@ -346,6 +347,13 @@ img {
   /* Card padding scaling */
   .card, .glass-panel {
     padding: 1rem !important;
+  }
+
+  /* Map responsiveness on mobile */
+  .leaflet-container {
+    height: 320px !important;
+    min-height: 300px !important;
+    width: 100% !important;
   }
 }
 
@@ -361,5 +369,15 @@ img {
     overflow: hidden;
     text-overflow: ellipsis;
   }
+
+  /* Stack flex headers vertically */
+  .page-header-flex,
+  .admin-panel-header,
+  .table-actions-header {
+    flex-direction: column !important;
+    align-items: flex-start !important;
+    gap: 0.75rem !important;
+  }
 }
+
 

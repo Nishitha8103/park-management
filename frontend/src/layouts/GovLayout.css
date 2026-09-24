@@ -344,7 +344,9 @@
   gap: var(--gov-spacing);
 }
 
-/* Responsive */
+/* ============================================================
+   Government Official Portal Mobile & PWA Responsive Suite
+   ============================================================ */
 @media (max-width: 992px) {
   .gov-layout.sidebar-open .gov-main-content {
     margin-left: 0;
@@ -358,3 +360,118 @@
     display: none;
   }
 }
+
+@media screen and (max-width: 768px) {
+  :root {
+    --gov-spacing: 14px;
+  }
+
+  .gov-portal-layout .gov-topbar {
+    height: 56px;
+    padding: 0 0.85rem !important;
+  }
+
+  .gov-portal-layout .main-content,
+  .gov-portal-layout .gov-main-content-wrapper,
+  .gov-page-container {
+    padding: 0.85rem 0.65rem !important;
+    min-height: calc(100vh - 56px);
+    width: 100% !important;
+    max-width: 100vw !important;
+    box-sizing: border-box !important;
+  }
+
+  .gov-portal-layout .card,
+  .gov-portal-layout .gov-card,
+  .gov-portal-layout .table-card {
+    border-radius: 12px !important;
+  }
+
+  /* Table containers */
+  .gov-portal-layout table,
+  .gov-portal-layout .custom-table,
+  .gov-portal-layout .gov-schedule-table {
+    display: block;
+    width: 100%;
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
+    white-space: nowrap;
+  }
+
+  /* Hero Banner scaling */
+  .gov-hero-banner,
+  .gov-schedule-header,
+  .gov-profile-header,
+  .notifications-header {
+    padding: 1.25rem 1rem !important;
+    border-radius: 14px !important;
+  }
+
+  .gov-hero-greeting h2,
+  .gov-header-title-box h2,
+  .notifications-header h2 {
+    font-size: 1.3rem !important;
+  }
+
+  .gov-hero-greeting p,
+  .gov-header-title-box p,
+  .notifications-subtitle {
+    font-size: 0.82rem !important;
+  }
+
+  /* Form & Actions */
+  .gov-portal-layout .form-fields-grid,
+  .gov-portal-layout .inspection-grid,
+  .gov-portal-layout .gov-upload-grid,
+  .gov-portal-layout .charts-grid,
+  .gov-portal-layout .bottom-grid,
+  .gov-portal-layout .gov-calendar-layout,
+  .gov-portal-layout .gov-profile-grid {
+    grid-template-columns: 1fr !important;
+    gap: 1rem !important;
+  }
+}
+
+@media screen and (max-width: 480px) {
+  .gov-portal-layout .logo-text {
+    font-size: 0.92rem !important;
+    max-width: 180px;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+
+  .gov-hero-banner-main {
+    flex-direction: column;
+    align-items: flex-start !important;
+    gap: 0.85rem !important;
+  }
+
+  .gov-stats-grid {
+    grid-template-columns: 1fr !important;
+    gap: 0.75rem !important;
+  }
+
+  .gov-stat-card {
+    padding: 0.95rem 1rem !important;
+  }
+
+  .gov-stat-icon {
+    width: 34px !important;
+    height: 34px !important;
+  }
+
+  .gov-stat-tag {
+    font-size: 0.62rem !important;
+    padding: 0.15rem 0.45rem !important;
+  }
+
+  .stat-card-bottom h3 {
+    font-size: 1.6rem !important;
+  }
+
+  .stat-card-bottom p {
+    font-size: 0.7rem !important;
+  }
+}
+

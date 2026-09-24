@@ -431,12 +431,10 @@ const Events = () => {
         </div>
         <p className="event-card-desc">{event.description}</p>
         <div className="event-meta-box">
-          {event.parkName && (
-            <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+          <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
               <MapPin size={16} color="#059669" />
-              <span style={{ fontWeight: 600 }}>{event.parkName}</span>
+              <span style={{ fontWeight: 600 }}>{event.parkName || event.location}</span>
             </div>
-          )}
           <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
             <Calendar size={16} color="#10b981" />
             <span style={{ fontWeight: 600 }}>{new Date(event.eventDate).toLocaleDateString('en-US', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' })}</span>
@@ -448,10 +446,12 @@ const Events = () => {
               <span>⏰ {new Date(event.eventDate).toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit' })}</span>
             )}
           </div>
-          <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginTop: '4px' }}>
-            <MapPin size={16} color="#ef4444" />
-            <span>{event.location}</span>
-          </div>
+          {!event.parkName && (
+            <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginTop: '4px' }}>
+              <MapPin size={16} color="#059669" />
+              <span>{event.location}</span>
+            </div>
+          )}
         </div>
         {isUpcoming && (
           event.capacity > 0 && event.registeredCount >= event.capacity ? (

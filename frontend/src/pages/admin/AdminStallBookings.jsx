@@ -49,6 +49,7 @@ const AdminStallBookings = () => {
   
   // Selected booking for Review Modal
   const [selectedBooking, setSelectedBooking] = useState(null);
+  const [previewImage, setPreviewImage] = useState(null);
   
   // Modals
   const [rejectModal, setRejectModal] = useState({ isOpen: false, bookingId: null, reason: '', loading: false });
@@ -390,7 +391,6 @@ const AdminStallBookings = () => {
               <tr style={{ backgroundColor: '#1A2035', borderBottom: '1px solid rgba(255,255,255,0.08)' }}>
                 <th style={{ padding: '1rem', color: '#8F9CAE', fontWeight: '700', fontSize: '0.8rem', textTransform: 'uppercase', letterSpacing: '0.05em' }}>Applicant</th>
                 <th style={{ padding: '1rem', color: '#8F9CAE', fontWeight: '700', fontSize: '0.8rem', textTransform: 'uppercase', letterSpacing: '0.05em' }}>Stall & Park</th>
-                <th style={{ padding: '1rem', color: '#8F9CAE', fontWeight: '700', fontSize: '0.8rem', textTransform: 'uppercase', letterSpacing: '0.05em' }}>Current Residential Address</th>
                 <th style={{ padding: '1rem', color: '#8F9CAE', fontWeight: '700', fontSize: '0.8rem', textTransform: 'uppercase', letterSpacing: '0.05em' }}>Documents</th>
                 <th style={{ padding: '1rem', color: '#8F9CAE', fontWeight: '700', fontSize: '0.8rem', textTransform: 'uppercase', letterSpacing: '0.05em' }}>Status</th>
                 <th style={{ padding: '1rem', color: '#8F9CAE', fontWeight: '700', fontSize: '0.8rem', textTransform: 'uppercase', letterSpacing: '0.05em' }}>Actions</th>
@@ -399,7 +399,7 @@ const AdminStallBookings = () => {
             <tbody>
               {bookings.length === 0 ? (
                 <tr>
-                  <td colSpan="6" style={{ padding: '3.5rem', textAlign: 'center', color: '#666E85', fontSize: '0.95rem' }}>
+                  <td colSpan="5" style={{ padding: '3.5rem', textAlign: 'center', color: '#666E85', fontSize: '0.95rem' }}>
                     No stall booking applications found.
                   </td>
                 </tr>
@@ -412,19 +412,38 @@ const AdminStallBookings = () => {
                       
                       {/* Applicant */}
                       <td style={{ padding: '1rem' }}>
-                        <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
+                        <div style={{ display: 'flex', alignItems: 'center', gap: '14px' }}>
                           {(b.photoUrl || b.user?.profilePic) ? (
-                            <img 
-                              src={resolveMediaUrl(b.photoUrl || b.user?.profilePic)} 
-                              alt="Applicant" 
-                              onError={(e) => {
-                                e.target.onerror = null;
-                                e.target.src = 'https://ui-avatars.com/api/?name=' + encodeURIComponent(b.applicantName || 'Applicant') + '&background=059669&color=fff&size=128';
+                            <div 
+                              onClick={() => setPreviewImage(resolveMediaUrl(b.photoUrl || b.user?.profilePic))}
+                              title="Click to view full photo"
+                              style={{ 
+                                width: '56px', 
+                                height: '56px', 
+                                borderRadius: '12px', 
+                                overflow: 'hidden', 
+                                cursor: 'pointer', 
+                                border: '2px solid rgba(16, 185, 129, 0.5)', 
+                                flexShrink: 0,
+                                background: '#111827',
+                                boxShadow: '0 4px 10px rgba(0,0,0,0.35)',
+                                transition: 'transform 0.15s ease, border-color 0.15s ease'
                               }}
-                              style={{ width: '42px', height: '42px', borderRadius: '8px', objectFit: 'cover', border: '1px solid rgba(255,255,255,0.15)' }} 
-                            />
+                              onMouseEnter={(e) => { e.currentTarget.style.transform = 'scale(1.08)'; e.currentTarget.style.borderColor = '#10b981'; }}
+                              onMouseLeave={(e) => { e.currentTarget.style.transform = 'scale(1)'; e.currentTarget.style.borderColor = 'rgba(16, 185, 129, 0.5)'; }}
+                            >
+                              <img 
+                                src={resolveMediaUrl(b.photoUrl || b.user?.profilePic)} 
+                                alt="Applicant" 
+                                onError={(e) => {
+                                  e.target.onerror = null;
+                                  e.target.src = 'https://ui-avatars.com/api/?name=' + encodeURIComponent(b.applicantName || 'Applicant') + '&background=059669&color=fff&size=128';
+                                }}
+                                style={{ width: '100%', height: '100%', objectFit: 'cover', display: 'block' }} 
+                              />
+                            </div>
                           ) : (
-                            <div style={{ width: '42px', height: '42px', borderRadius: '8px', backgroundColor: '#2A334E', display: 'flex', alignItems: 'center', justifyContent: 'center', color: '#F0F4FF', fontWeight: 'bold' }}>
+                            <div style={{ width: '56px', height: '56px', borderRadius: '12px', backgroundColor: '#2A334E', display: 'flex', alignItems: 'center', justifyContent: 'center', color: '#F0F4FF', fontWeight: 'bold', fontSize: '1.25rem', flexShrink: 0 }}>
                               {(b.applicantName || 'U')[0].toUpperCase()}
                             </div>
                           )}
@@ -442,15 +461,6 @@ const AdminStallBookings = () => {
                         <div style={{ fontSize: '0.78rem', color: '#A8B0C8' }}>{b.productsType}</div>
                       </td>
 
-                      {/* Current Residential Address */}
-                      <td style={{ padding: '1rem', fontSize: '0.88rem', color: '#CBD5E1', maxWidth: '240px' }}>
-                        <div>{b.currentAddress || b.nativeAddress || '—'}</div>
-                        {!isSameAddr && b.differentAddressReason && (
-                          <div style={{ fontSize: '0.76rem', color: '#fbbf24', background: 'rgba(245, 158, 11, 0.15)', padding: '2px 8px', borderRadius: '4px', marginTop: '4px', display: 'inline-block', border: '1px solid rgba(245, 158, 11, 0.3)' }}>
-                            {b.differentAddressReason}
-                          </div>
-                        )}
-                      </td>
 
                       {/* Documents */}
                       <td style={{ padding: '1rem' }}>
@@ -612,17 +622,36 @@ const AdminStallBookings = () => {
                 <h4 style={{ margin: '0 0 10px 0', fontSize: '0.9rem', color: '#1e293b', fontWeight: 700 }}>Applicant & Stall Information</h4>
                 <div style={{ display: 'flex', gap: '14px', alignItems: 'center', marginBottom: '12px' }}>
                   {(selectedBooking.photoUrl || selectedBooking.user?.profilePic) ? (
-                    <img 
-                      src={resolveMediaUrl(selectedBooking.photoUrl || selectedBooking.user?.profilePic)} 
-                      alt="Applicant Photo" 
-                      onError={(e) => {
-                        e.target.onerror = null;
-                        e.target.src = 'https://ui-avatars.com/api/?name=' + encodeURIComponent(selectedBooking.applicantName || 'Applicant') + '&background=059669&color=fff&size=128';
+                    <div 
+                      onClick={() => setPreviewImage(resolveMediaUrl(selectedBooking.photoUrl || selectedBooking.user?.profilePic))}
+                      title="Click to view full photo"
+                      style={{ 
+                        width: '90px', 
+                        height: '90px', 
+                        borderRadius: '12px', 
+                        overflow: 'hidden', 
+                        cursor: 'pointer', 
+                        border: '3px solid #059669', 
+                        flexShrink: 0,
+                        background: '#111827',
+                        boxShadow: '0 6px 16px rgba(0,0,0,0.2)',
+                        transition: 'transform 0.15s ease'
                       }}
-                      style={{ width: '64px', height: '64px', borderRadius: '8px', objectFit: 'cover', border: '2px solid #059669' }} 
-                    />
+                      onMouseEnter={(e) => { e.currentTarget.style.transform = 'scale(1.05)'; }}
+                      onMouseLeave={(e) => { e.currentTarget.style.transform = 'scale(1)'; }}
+                    >
+                      <img 
+                        src={resolveMediaUrl(selectedBooking.photoUrl || selectedBooking.user?.profilePic)} 
+                        alt="Applicant Photo" 
+                        onError={(e) => {
+                          e.target.onerror = null;
+                          e.target.src = 'https://ui-avatars.com/api/?name=' + encodeURIComponent(selectedBooking.applicantName || 'Applicant') + '&background=059669&color=fff&size=128';
+                        }}
+                        style={{ width: '100%', height: '100%', objectFit: 'cover', display: 'block' }} 
+                      />
+                    </div>
                   ) : (
-                    <div style={{ width: '64px', height: '64px', borderRadius: '8px', background: '#e2e8f0', display: 'flex', alignItems: 'center', justifyContent: 'center', color: '#94a3b8' }}>
+                    <div style={{ width: '90px', height: '90px', borderRadius: '12px', background: '#e2e8f0', display: 'flex', alignItems: 'center', justifyContent: 'center', color: '#94a3b8', fontWeight: 600 }}>
                       No Photo
                     </div>
                   )}
@@ -842,6 +871,91 @@ const AdminStallBookings = () => {
         </div>
       )}
 
+    
+      {/* Photo Preview Lightbox Modal */}
+      {previewImage && (
+        <div 
+          onClick={() => setPreviewImage(null)}
+          style={{ 
+            position: 'fixed', 
+            inset: 0, 
+            background: 'rgba(0, 0, 0, 0.85)', 
+            backdropFilter: 'blur(8px)', 
+            display: 'flex', 
+            alignItems: 'center', 
+            justifyContent: 'center', 
+            zIndex: 9999, 
+            padding: '1.5rem',
+            cursor: 'zoom-out'
+          }}
+        >
+          <div 
+            onClick={(e) => e.stopPropagation()} 
+            style={{ 
+              position: 'relative', 
+              maxWidth: '90vw', 
+              maxHeight: '90vh', 
+              display: 'flex', 
+              flexDirection: 'column', 
+              alignItems: 'center' 
+            }}
+          >
+            <button
+              onClick={() => setPreviewImage(null)}
+              style={{
+                position: 'absolute',
+                top: '-42px',
+                right: '0',
+                background: 'rgba(255,255,255,0.2)',
+                border: 'none',
+                color: '#fff',
+                padding: '6px 12px',
+                borderRadius: '8px',
+                cursor: 'pointer',
+                fontWeight: 700,
+                display: 'flex',
+                alignItems: 'center',
+                gap: '6px'
+              }}
+            >
+              <X size={18} /> Close
+            </button>
+            <img 
+              src={previewImage} 
+              alt="Applicant Full Photo" 
+              style={{ 
+                maxWidth: '100%', 
+                maxHeight: '82vh', 
+                borderRadius: '16px', 
+                objectFit: 'contain', 
+                boxShadow: '0 25px 60px rgba(0,0,0,0.5)',
+                border: '3px solid rgba(255,255,255,0.2)'
+              }} 
+            />
+            <div style={{ marginTop: '12px', display: 'flex', gap: '10px' }}>
+              <a
+                href={previewImage}
+                target="_blank"
+                rel="noreferrer"
+                style={{
+                  background: '#059669',
+                  color: '#fff',
+                  padding: '8px 16px',
+                  borderRadius: '8px',
+                  fontSize: '0.88rem',
+                  fontWeight: 600,
+                  textDecoration: 'none',
+                  display: 'inline-flex',
+                  alignItems: 'center',
+                  gap: '6px'
+                }}
+              >
+                <ExternalLink size={16} /> Open Original in New Tab
+              </a>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 };

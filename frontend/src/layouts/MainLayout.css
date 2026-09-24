@@ -337,20 +337,63 @@
   color: #F0F4FF;
 }
 
-/* Hide search on small screens */
+/* ============================================================
+   ADMIN PORTAL — Mobile & PWA Responsive Suite
+   ============================================================ */
 @media screen and (max-width: 768px) {
   .admin-portal-layout .adm-topbar-search {
     display: none;
   }
   .admin-portal-layout .adm-topbar {
     height: 56px;
+    padding: 0 0.75rem !important;
+  }
+  .admin-portal-layout .adm-main-content {
+    padding: 0.85rem 0.65rem !important;
+    min-height: calc(100vh - 56px);
+    width: 100% !important;
+    max-width: 100vw !important;
+    box-sizing: border-box !important;
+  }
+
+  /* Admin Cards & Panels */
+  .admin-portal-layout .admin-panel {
+    border-radius: 12px !important;
+    margin-bottom: 1.25rem !important;
+  }
+  .admin-portal-layout .admin-panel-header {
+    padding: 1rem !important;
+    flex-wrap: wrap !important;
+    gap: 0.75rem !important;
+  }
+
+  /* Admin Tables horizontal scrolling */
+  .admin-portal-layout .admin-table-container,
+  .admin-portal-layout .admin-table {
+    display: block;
+    width: 100%;
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
+    white-space: nowrap;
+  }
+
+  .admin-portal-layout .admin-table th,
+  .admin-portal-layout .admin-table td {
+    padding: 0.75rem 0.85rem !important;
+    font-size: 0.84rem !important;
+  }
+
+  /* Action Buttons in tables */
+  .admin-portal-layout .btn-table-action,
+  .admin-portal-layout .btn-icon {
+    padding: 6px 10px !important;
   }
 }
 
 @media screen and (max-width: 480px) {
   .admin-portal-layout .adm-topbar-brand .logo-text {
     font-size: 0.9rem;
-    max-width: 140px;
+    max-width: 150px;
     overflow: hidden;
     text-overflow: ellipsis;
     white-space: nowrap;
@@ -358,4 +401,12 @@
   .admin-portal-layout .adm-badge-portal {
     display: none;
   }
+  .admin-portal-layout .adm-topbar-actions {
+    gap: 6px !important;
+  }
+  .admin-portal-layout .adm-topbar-avatar {
+    width: 30px !important;
+    height: 30px !important;
+  }
 }
+

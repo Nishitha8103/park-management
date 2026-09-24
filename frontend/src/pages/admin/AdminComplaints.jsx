@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react';
 import { Search, MapPin, UserCheck, ShieldCheck, CheckCircle, AlertCircle, X, Phone, Mail, Building, FileText, Calendar, Image, MessageSquare, Trash2, HardHat, User, ExternalLink } from 'lucide-react';
 import axios from 'axios';
+import Swal from 'sweetalert2';
 import { getSlaStatusAndRemaining, getPriorityColor } from '../../utils/slaUtils';
 import { resolveMediaUrl } from '../../utils/imageUtils';
 
@@ -97,14 +98,34 @@ const AdminComplaints = () => {
   };
 
   const handleDeleteComplaint = async (complaintId) => {
-    if (!window.confirm('Are you sure you want to delete this complaint? This action cannot be undone.')) return;
+    const result = await Swal.fire({
+      title: 'Delete Complaint?',
+      text: 'Are you sure you want to delete this complaint? This action cannot be undone.',
+      icon: 'warning',
+      showCancelButton: true,
+      confirmButtonColor: '#ef4444',
+      cancelButtonColor: '#64748b',
+      confirmButtonText: 'Yes, delete it!'
+    });
+    if (!result.isConfirmed) return;
+
     try {
       await axios.delete(`/api/complaints/${complaintId}`);
-      alert('Complaint deleted successfully!');
+      Swal.fire({
+        title: 'Deleted!',
+        text: 'Complaint has been deleted successfully.',
+        icon: 'success',
+        timer: 1800,
+        showConfirmButton: false
+      });
       fetchData();
     } catch (error) {
       console.error('Error deleting complaint:', error);
-      alert('Failed to delete complaint.');
+      Swal.fire({
+        title: 'Error!',
+        text: error.response?.data?.message || 'Failed to delete complaint.',
+        icon: 'error'
+      });
     }
   };
 
@@ -350,6 +371,25 @@ const AdminComplaints = () => {
                               Close Complaint
                             </button>
                           )}
+                          <button
+                            onClick={() => handleDeleteComplaint(c._id)}
+                            style={{ 
+                              background: '#fee2e2', 
+                              color: '#dc2626', 
+                              border: '1px solid #fca5a5', 
+                              padding: '6px 12px', 
+                              borderRadius: '6px', 
+                              cursor: 'pointer', 
+                              fontSize: '0.8rem', 
+                              fontWeight: 600,
+                              display: 'inline-flex',
+                              alignItems: 'center',
+                              gap: '4px'
+                            }}
+                            title="Delete this complaint"
+                          >
+                            <Trash2 size={13} /> Delete
+                          </button>
                         </div>
                       </td>
                     </tr>

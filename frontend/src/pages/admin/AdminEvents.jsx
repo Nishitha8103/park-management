@@ -30,6 +30,9 @@ const AdminEvents = () => {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
   const [conflictWarning, setConflictWarning] = useState('');
+  const [selectedCorp, setSelectedCorp] = useState('');
+  const [selectedZone, setSelectedZone] = useState('');
+  const [selectedWard, setSelectedWard] = useState('');
   const navigate = useNavigate();
   
   // Modal states
@@ -53,6 +56,65 @@ const AdminEvents = () => {
     price: 0,
     capacity: 0
   });
+
+  // Extract unique Corporations, Zones, and Wards from parks list
+  const corporations = React.useMemo(() => {
+    const map = new Map();
+    parks.forEach(p => {
+      const c = p.corporation;
+      if (c && typeof c === 'object' && c._id && !map.has(c._id)) {
+        map.set(c._id, c);
+      } else if (c && typeof c === 'string' && !map.has(c)) {
+        map.set(c, { _id: c, name: c });
+      }
+    });
+    return Array.from(map.values());
+  }, [parks]);
+
+  const zones = React.useMemo(() => {
+    const map = new Map();
+    parks.forEach(p => {
+      const corpId = (p.corporation?._id || p.corporation || '').toString();
+      const z = p.zone;
+      if (z && (!selectedCorp || corpId === selectedCorp)) {
+        if (typeof z === 'object' && z._id && !map.has(z._id)) {
+          map.set(z._id, z);
+        } else if (typeof z === 'string' && !map.has(z)) {
+          map.set(z, { _id: z, name: z });
+        }
+      }
+    });
+    return Array.from(map.values());
+  }, [parks, selectedCorp]);
+
+  const wards = React.useMemo(() => {
+    const map = new Map();
+    parks.forEach(p => {
+      const corpId = (p.corporation?._id || p.corporation || '').toString();
+      const zoneId = (p.zone?._id || p.zone || '').toString();
+      const w = p.ward;
+      if (w && (!selectedCorp || corpId === selectedCorp) && (!selectedZone || zoneId === selectedZone)) {
+        if (typeof w === 'object' && w._id && !map.has(w._id)) {
+          map.set(w._id, w);
+        } else if (typeof w === 'string' && !map.has(w)) {
+          map.set(w, { _id: w, name: w });
+        }
+      }
+    });
+    return Array.from(map.values());
+  }, [parks, selectedCorp, selectedZone]);
+
+  const filteredParks = React.useMemo(() => {
+    return parks.filter(p => {
+      const corpId = (p.corporation?._id || p.corporation || '').toString();
+      const zoneId = (p.zone?._id || p.zone || '').toString();
+      const wardId = (p.ward?._id || p.ward || '').toString();
+      if (selectedCorp && corpId !== selectedCorp) return false;
+      if (selectedZone && zoneId !== selectedZone) return false;
+      if (selectedWard && wardId !== selectedWard) return false;
+      return true;
+    });
+  }, [parks, selectedCorp, selectedZone, selectedWard]);
 
   const fetchEvents = async () => {
     try {
@@ -177,6 +239,9 @@ const AdminEvents = () => {
     setIsEditing(false);
     setCurrentEventId(null);
     setConflictWarning('');
+    setSelectedCorp('');
+    setSelectedZone('');
+    setSelectedWard('');
     setFormData({
       title: '',
       description: '',
@@ -199,6 +264,17 @@ const AdminEvents = () => {
     setIsEditing(true);
     setCurrentEventId(event._id);
     setConflictWarning('');
+    const eventParkId = event.parkId?._id || event.parkId || '';
+    const targetPark = parks.find(p => p._id === eventParkId || p.name === event.parkName);
+    if (targetPark) {
+      setSelectedCorp((targetPark.corporation?._id || targetPark.corporation || '').toString());
+      setSelectedZone((targetPark.zone?._id || targetPark.zone || '').toString());
+      setSelectedWard((targetPark.ward?._id || targetPark.ward || '').toString());
+    } else {
+      setSelectedCorp('');
+      setSelectedZone('');
+      setSelectedWard('');
+    }
     
     // Format date for datetime-local / date input
     let formattedDate = '';
@@ -474,15 +550,9 @@ const AdminEvents = () => {
                     {new Date(event.eventDate).toLocaleDateString('en-US', { dateStyle: 'medium' })}
                     {event.startTime ? ` (${event.startTime} - ${event.endTime || 'End'})` : ` (${new Date(event.eventDate).toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit' })})`}
                   </div>
-                  {event.parkName && (
-                    <div style={{ display: 'flex', alignItems: 'center', gap: '6px', color: '#059669' }}>
-                      <MapPin size={14} />
-                      {event.parkName}
-                    </div>
-                  )}
-                  <div style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
+                  <div style={{ display: 'flex', alignItems: 'center', gap: '6px', color: '#059669', fontWeight: 600 }}>
                     <MapPin size={14} />
-                    {event.location}
+                    {event.parkName || event.location}
                   </div>
                 </div>
 
@@ -600,6 +670,56 @@ const AdminEvents = () => {
                 </div>
               </div>
               
+              {/* Corporation, Zone, Ward Cascade Selection */}
+              <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(140px, 1fr))', gap: '10px' }}>
+                <div>
+                  <label style={{ display: 'block', marginBottom: '6px', fontWeight: 700, fontSize: '0.84rem', color: '#1e293b' }}>Corporation</label>
+                  <select
+                    value={selectedCorp}
+                    onChange={(e) => {
+                      setSelectedCorp(e.target.value);
+                      setSelectedZone('');
+                      setSelectedWard('');
+                    }}
+                    style={{ width: '100%', padding: '9px 10px', borderRadius: '8px', border: '1px solid #cbd5e1', background: '#f8fafc', color: '#0f172a', fontSize: '0.86rem', boxSizing: 'border-box' }}
+                  >
+                    <option value="">-- All Corporations --</option>
+                    {corporations.map(c => (
+                      <option key={c._id} value={c._id}>{c.name}</option>
+                    ))}
+                  </select>
+                </div>
+                <div>
+                  <label style={{ display: 'block', marginBottom: '6px', fontWeight: 700, fontSize: '0.84rem', color: '#1e293b' }}>Zone</label>
+                  <select
+                    value={selectedZone}
+                    onChange={(e) => {
+                      setSelectedZone(e.target.value);
+                      setSelectedWard('');
+                    }}
+                    style={{ width: '100%', padding: '9px 10px', borderRadius: '8px', border: '1px solid #cbd5e1', background: '#f8fafc', color: '#0f172a', fontSize: '0.86rem', boxSizing: 'border-box' }}
+                  >
+                    <option value="">-- All Zones --</option>
+                    {zones.map(z => (
+                      <option key={z._id} value={z._id}>{z.name}</option>
+                    ))}
+                  </select>
+                </div>
+                <div>
+                  <label style={{ display: 'block', marginBottom: '6px', fontWeight: 700, fontSize: '0.84rem', color: '#1e293b' }}>Ward</label>
+                  <select
+                    value={selectedWard}
+                    onChange={(e) => setSelectedWard(e.target.value)}
+                    style={{ width: '100%', padding: '9px 10px', borderRadius: '8px', border: '1px solid #cbd5e1', background: '#f8fafc', color: '#0f172a', fontSize: '0.86rem', boxSizing: 'border-box' }}
+                  >
+                    <option value="">-- All Wards --</option>
+                    {wards.map(w => (
+                      <option key={w._id} value={w._id}>{w.name}</option>
+                    ))}
+                  </select>
+                </div>
+              </div>
+
               <div>
                 <label style={{ display: 'block', marginBottom: '6px', fontWeight: 700, fontSize: '0.88rem', color: '#1e293b' }}>Select Park / Venue *</label>
                 <select
@@ -615,20 +735,28 @@ const AdminEvents = () => {
                       }));
                     } else {
                       const foundPark = parks.find(p => p._id === selectedVal || p.name === selectedVal);
+                      if (foundPark) {
+                        const corpId = (foundPark.corporation?._id || foundPark.corporation || '').toString();
+                        const zoneId = (foundPark.zone?._id || foundPark.zone || '').toString();
+                        const wardId = (foundPark.ward?._id || foundPark.ward || '').toString();
+                        if (corpId) setSelectedCorp(corpId);
+                        if (zoneId) setSelectedZone(zoneId);
+                        if (wardId) setSelectedWard(wardId);
+                      }
                       setFormData(prev => ({
                         ...prev,
                         parkId: foundPark ? foundPark._id : '',
                         parkName: foundPark ? foundPark.name : '',
-                        location: prev.location || (foundPark?.address || foundPark?.location || foundPark?.name || '')
+                        location: foundPark ? foundPark.name : ''
                       }));
                     }
                   }}
                   style={{ width: '100%', padding: '10px 12px', borderRadius: '8px', border: '1px solid #cbd5e1', background: '#f8fafc', color: '#0f172a', fontSize: '0.92rem', boxSizing: 'border-box' }}
                 >
-                  <option value="">-- Choose Park from System --</option>
-                  {parks.map(p => (
+                  <option value="">-- Choose Park from System ({filteredParks.length} available) --</option>
+                  {filteredParks.map(p => (
                     <option key={p._id} value={p._id}>
-                      {p.name} {p.district ? `(${p.district?.name || p.district})` : ''}
+                      {p.name} {p.ward?.name ? `(Ward: ${p.ward?.name})` : p.zone?.name ? `(Zone: ${p.zone?.name})` : ''}
                     </option>
                   ))}
                   <option value="custom">-- Or enter custom venue name below --</option>
@@ -644,14 +772,6 @@ const AdminEvents = () => {
                 )}
               </div>
               
-              <div>
-                <label style={{ display: 'block', marginBottom: '6px', fontWeight: 700, fontSize: '0.88rem', color: '#1e293b' }}>Specific Location / Zone inside Park</label>
-                <input 
-                  type="text" name="location" placeholder="e.g., Main Lawn / Amphitheatre / Central Gazebo"
-                  value={formData.location} onChange={handleInputChange}
-                  style={{ width: '100%', padding: '10px 12px', borderRadius: '8px', border: '1px solid #cbd5e1', background: '#f8fafc', color: '#0f172a', fontSize: '0.92rem', boxSizing: 'border-box' }}
-                />
-              </div>
               
               <div>
                 <label style={{ display: 'block', marginBottom: '6px', fontWeight: 700, fontSize: '0.88rem', color: '#1e293b' }}>Image URL</label>
