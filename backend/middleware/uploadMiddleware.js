@@ -15,35 +15,45 @@ const storage = multer.diskStorage({
   },
   filename: function (req, file, cb) {
     const uniqueSuffix = Date.now() + '-' + Math.round(Math.random() * 1E9);
-    let ext = path.extname(file.originalname || '');
-    if (!ext) {
-      if (file.mimetype === 'image/jpeg' || file.mimetype === 'image/jpg') ext = '.jpg';
-      else if (file.mimetype === 'image/png') ext = '.png';
-      else if (file.mimetype === 'image/webp') ext = '.webp';
-      else if (file.mimetype === 'application/pdf') ext = '.pdf';
+    let ext = path.extname(file.originalname || '').toLowerCase();
+    if (!ext || ext === '.') {
+      const mime = (file.mimetype || '').toLowerCase();
+      if (mime.includes('jpeg') || mime.includes('jpg')) ext = '.jpg';
+      else if (mime.includes('png')) ext = '.png';
+      else if (mime.includes('webp')) ext = '.webp';
+      else if (mime.includes('pdf')) ext = '.pdf';
+      else if (mime.includes('heic')) ext = '.heic';
+      else if (mime.includes('heif')) ext = '.heif';
       else ext = '.jpg';
     }
     cb(null, 'park-' + uniqueSuffix + ext);
   }
 });
 
-// File filter for images and documents (PDF, JPG, PNG, WEBP, HEIC/HEIF)
+// File filter for images and documents (PDF, JPG, PNG, WEBP, HEIC/HEIF, etc.)
 const fileFilter = (req, file, cb) => {
+  const mime = (file.mimetype || '').toLowerCase();
+  const origName = (file.originalname || '').toLowerCase();
+  const isImageExt = /\.(jpe?g|png|webp|heic|heif|bmp|gif|avif)$/i.test(origName);
+  const isPdfExt = /\.pdf$/i.test(origName);
+
   if (
-    file.mimetype.startsWith('image/') || 
-    file.mimetype === 'application/pdf' ||
-    file.mimetype === 'application/octet-stream'
+    mime.startsWith('image/') || 
+    mime === 'application/pdf' ||
+    mime === 'application/octet-stream' ||
+    isImageExt ||
+    isPdfExt
   ) {
     cb(null, true);
   } else {
-    cb(new Error('Only images and PDF documents are allowed'), false);
+    cb(new Error('Only images (JPG, PNG, WEBP, HEIC) and PDF documents are allowed'), false);
   }
 };
 
 const upload = multer({ 
   storage: storage,
   fileFilter: fileFilter,
-  limits: { fileSize: 15 * 1024 * 1024 } // 15MB limit for mobile high-res photos
+  limits: { fileSize: 25 * 1024 * 1024 } // 25MB limit for high-resolution mobile photos
 });
 
 module.exports = upload;

@@ -1,8 +1,9 @@
-import { useState, useEffect } from 'react';
+import React, { useState, useEffect } from 'react';
 import { ShieldCheck, ShieldX, Clock, Eye, CheckCircle2, XCircle, Search, Filter, AlertCircle, X } from 'lucide-react';
 import './AdminKycReview.css';
+import { resolveMediaUrl } from '../../utils/imageUtils';
 
-const API_BASE = 'http://localhost:5000';
+const API_BASE = '';
 
 const statusConfig = {
   pending:  { label: 'Pending', color: '#e65100', bg: '#fff8e1', border: '#ffe082', icon: <Clock size={14} /> },
@@ -234,16 +235,16 @@ const AdminKycReview = () => {
                 <div className="kyc-doc-card">
                   <p className="kyc-doc-label">Front Side</p>
                   {selected.aadhaarFrontImage ? (
-                    <a href={`${API_BASE}${selected.aadhaarFrontImage}`} target="_blank" rel="noreferrer">
-                      <img src={`${API_BASE}${selected.aadhaarFrontImage}`} alt="Aadhaar Front" className="kyc-doc-img" />
+                    <a href={resolveMediaUrl(selected.aadhaarFrontImage, 'kyc')} target="_blank" rel="noreferrer">
+                      <img src={resolveMediaUrl(selected.aadhaarFrontImage, 'kyc')} alt="Aadhaar Front" className="kyc-doc-img" />
                     </a>
                   ) : <div className="kyc-doc-missing">No image</div>}
                 </div>
                 <div className="kyc-doc-card">
                   <p className="kyc-doc-label">Back Side</p>
                   {selected.aadhaarBackImage ? (
-                    <a href={`${API_BASE}${selected.aadhaarBackImage}`} target="_blank" rel="noreferrer">
-                      <img src={`${API_BASE}${selected.aadhaarBackImage}`} alt="Aadhaar Back" className="kyc-doc-img" />
+                    <a href={resolveMediaUrl(selected.aadhaarBackImage, 'kyc')} target="_blank" rel="noreferrer">
+                      <img src={resolveMediaUrl(selected.aadhaarBackImage, 'kyc')} alt="Aadhaar Back" className="kyc-doc-img" />
                     </a>
                   ) : <div className="kyc-doc-missing">No image</div>}
                 </div>

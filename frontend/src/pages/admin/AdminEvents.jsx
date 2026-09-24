@@ -42,7 +42,10 @@ const AdminEvents = () => {
     title: '',
     description: '',
     eventDate: '',
+    startTime: '09:00',
+    endTime: '11:00',
     location: '',
+    parkId: '',
     parkName: '',
     image: '',
     isActive: true,
@@ -83,41 +86,81 @@ const AdminEvents = () => {
     fetchParks();
   }, []);
 
+  // Helper to compute start and end timestamps in client
+  const computeClientInterval = (eventDateStr, startTimeStr, endTimeStr) => {
+    if (!eventDateStr) return { start: null, end: null };
+    const dateObj = new Date(eventDateStr);
+    if (isNaN(dateObj.getTime())) return { start: null, end: null };
+
+    const start = new Date(dateObj);
+    if (startTimeStr) {
+      const [sh, sm] = startTimeStr.split(':').map(Number);
+      if (!isNaN(sh) && !isNaN(sm)) {
+        start.setHours(sh, sm, 0, 0);
+      }
+    }
+
+    let end = new Date(dateObj);
+    if (endTimeStr) {
+      const [eh, em] = endTimeStr.split(':').map(Number);
+      if (!isNaN(eh) && !isNaN(em)) {
+        end.setHours(eh, em, 0, 0);
+      }
+    } else {
+      end = new Date(start.getTime() + 2 * 60 * 60 * 1000);
+    }
+
+    if (end.getTime() <= start.getTime()) {
+      end = new Date(start.getTime() + 60 * 60 * 1000);
+    }
+
+    return { start, end };
+  };
+
   // Client-side quick conflict detector as the user inputs park and time
   useEffect(() => {
-    if (!formData.eventDate || (!formData.parkName && !formData.location)) {
+    if (!formData.eventDate || (!formData.parkId && !formData.parkName && !formData.location)) {
       setConflictWarning('');
       return;
     }
 
-    const inputTime = new Date(formData.eventDate).getTime();
-    if (isNaN(inputTime)) {
+    const { start: targetStart, end: targetEnd } = computeClientInterval(
+      formData.eventDate,
+      formData.startTime,
+      formData.endTime
+    );
+
+    if (!targetStart || !targetEnd) {
       setConflictWarning('');
       return;
     }
 
     const selectedVenue = (formData.parkName || formData.location || '').toLowerCase().trim();
+    const selectedParkId = formData.parkId || '';
 
     const existingConflict = events.find(ev => {
       if (isEditing && ev._id === currentEventId) return false;
-      const evTime = new Date(ev.eventDate).getTime();
-      const timeDiffHours = Math.abs(evTime - inputTime) / (1000 * 60 * 60);
+
+      // Check Park ID or Park Name / Venue matching
+      const sameParkId = selectedParkId && ev.parkId && String(ev.parkId) === String(selectedParkId);
       const evVenue = (ev.parkName || ev.location || '').toLowerCase().trim();
-      
-      const venueMatches = evVenue && (evVenue.includes(selectedVenue) || selectedVenue.includes(evVenue));
-      return venueMatches && timeDiffHours <= 2.5;
+      const venueMatches = sameParkId || (selectedVenue && evVenue && (evVenue.includes(selectedVenue) || selectedVenue.includes(evVenue)));
+
+      if (!venueMatches) return false;
+
+      const { start: evStart, end: evEnd } = computeClientInterval(ev.eventDate, ev.startTime, ev.endTime);
+      if (!evStart || !evEnd) return false;
+
+      // Overlap check: (targetStart < evEnd) && (targetEnd > evStart)
+      return (targetStart < evEnd) && (targetEnd > evStart);
     });
 
     if (existingConflict) {
-      const conflictFormatted = new Date(existingConflict.eventDate).toLocaleString('en-IN', {
-        dateStyle: 'medium',
-        timeStyle: 'short'
-      });
-      setConflictWarning(`⚠️ Conflict Alert: "${existingConflict.title}" is already scheduled at ${existingConflict.parkName || existingConflict.location || 'this park'} around this time (${conflictFormatted}).`);
+      setConflictWarning("Event scheduling conflict! Another event is already scheduled in this park during the selected date and time. Please choose a different time or park.");
     } else {
       setConflictWarning('');
     }
-  }, [formData.eventDate, formData.parkName, formData.location, events, isEditing, currentEventId]);
+  }, [formData.eventDate, formData.startTime, formData.endTime, formData.parkId, formData.parkName, formData.location, events, isEditing, currentEventId]);
 
   const handleInputChange = (e) => {
     let { name, value, type, checked } = e.target;
@@ -132,29 +175,63 @@ const AdminEvents = () => {
 
   const openAddModal = () => {
     setIsEditing(false);
-    setFormData({ title: '', description: '', eventDate: '', location: '', parkName: '', image: '', isActive: true, isPaid: false, price: 0, capacity: 0 });
+    setCurrentEventId(null);
+    setConflictWarning('');
+    setFormData({
+      title: '',
+      description: '',
+      eventDate: '',
+      startTime: '09:00',
+      endTime: '11:00',
+      location: '',
+      parkId: '',
+      parkName: '',
+      image: '',
+      isActive: true,
+      isPaid: false,
+      price: 0,
+      capacity: 0
+    });
     setIsModalOpen(true);
   };
 
   const openEditModal = (event) => {
     setIsEditing(true);
     setCurrentEventId(event._id);
+    setConflictWarning('');
     
-    // Format date for datetime-local input
+    // Format date for datetime-local / date input
     let formattedDate = '';
+    let startT = event.startTime || '';
+    let endT = event.endTime || '';
+
     if (event.eventDate) {
       const dateObj = new Date(event.eventDate);
-      formattedDate = dateObj.toISOString().slice(0, 16);
+      formattedDate = dateObj.toISOString().slice(0, 10);
+      if (!startT) {
+        const hh = String(dateObj.getHours()).padStart(2, '0');
+        const mm = String(dateObj.getMinutes()).padStart(2, '0');
+        startT = `${hh}:${mm}`;
+      }
+    }
+
+    if (!endT && startT) {
+      const [sh, sm] = startT.split(':').map(Number);
+      const endH = (sh + 2) % 24;
+      endT = `${String(endH).padStart(2, '0')}:${String(sm).padStart(2, '0')}`;
     }
     
     setFormData({
-      title: event.title,
-      description: event.description,
+      title: event.title || '',
+      description: event.description || '',
       eventDate: formattedDate,
-      location: event.location,
+      startTime: startT || '09:00',
+      endTime: endT || '11:00',
+      location: event.location || '',
+      parkId: event.parkId?._id || event.parkId || '',
       parkName: event.parkName || '',
       image: event.image || '',
-      isActive: event.isActive,
+      isActive: event.isActive !== undefined ? event.isActive : true,
       isPaid: event.isPaid || false,
       price: event.price || 0,
       capacity: event.capacity || 0
@@ -166,23 +243,66 @@ const AdminEvents = () => {
     e.preventDefault();
 
     if (!formData.title.trim()) {
-      alert("Event Title is required");
+      Swal.fire({ title: 'Validation Error', text: 'Event Title is required', icon: 'warning' });
       return;
     }
     if (!formData.description.trim()) {
-      alert("Description is required");
+      Swal.fire({ title: 'Validation Error', text: 'Description is required', icon: 'warning' });
       return;
     }
     if (!formData.eventDate) {
-      alert("Date & Time is required");
+      Swal.fire({ title: 'Validation Error', text: 'Event Date is required', icon: 'warning' });
+      return;
+    }
+    if (!formData.startTime) {
+      Swal.fire({ title: 'Validation Error', text: 'Start Time is required', icon: 'warning' });
+      return;
+    }
+    if (!formData.endTime) {
+      Swal.fire({ title: 'Validation Error', text: 'End Time is required', icon: 'warning' });
       return;
     }
     if (formData.isPaid && formData.price < 0) {
-      alert("Price cannot be negative");
+      Swal.fire({ title: 'Validation Error', text: 'Price cannot be negative', icon: 'warning' });
       return;
     }
     if (formData.capacity < 0) {
-      alert("Capacity cannot be negative");
+      Swal.fire({ title: 'Validation Error', text: 'Capacity cannot be negative', icon: 'warning' });
+      return;
+    }
+
+    // Client-side conflict check before sending request
+    const { start: targetStart, end: targetEnd } = computeClientInterval(
+      formData.eventDate,
+      formData.startTime,
+      formData.endTime
+    );
+
+    const selectedVenue = (formData.parkName || formData.location || '').toLowerCase().trim();
+    const selectedParkId = formData.parkId || '';
+
+    const clientConflict = events.find(ev => {
+      if (isEditing && ev._id === currentEventId) return false;
+      const sameParkId = selectedParkId && ev.parkId && String(ev.parkId) === String(selectedParkId);
+      const evVenue = (ev.parkName || ev.location || '').toLowerCase().trim();
+      const venueMatches = sameParkId || (selectedVenue && evVenue && (evVenue.includes(selectedVenue) || selectedVenue.includes(evVenue)));
+      if (!venueMatches) return false;
+
+      const { start: evStart, end: evEnd } = computeClientInterval(ev.eventDate, ev.startTime, ev.endTime);
+      if (!evStart || !evEnd) return false;
+
+      return (targetStart < evEnd) && (targetEnd > evStart);
+    });
+
+    if (clientConflict) {
+      const conflictMsg = "Event scheduling conflict! Another event is already scheduled in this park during the selected date and time. Please choose a different time or park.";
+      setConflictWarning(conflictMsg);
+      Swal.fire({
+        title: 'Event Scheduling Conflict',
+        text: conflictMsg,
+        icon: 'error',
+        confirmButtonColor: '#ef4444'
+      });
       return;
     }
 
@@ -190,10 +310,24 @@ const AdminEvents = () => {
       const token = getAdminToken();
       const config = { headers: { Authorization: `Bearer ${token}` } };
       
+      // Ensure combined eventDate and explicit startTime / endTime are passed
+      const combinedDate = new Date(formData.eventDate);
+      if (formData.startTime) {
+        const [sh, sm] = formData.startTime.split(':').map(Number);
+        if (!isNaN(sh) && !isNaN(sm)) {
+          combinedDate.setHours(sh, sm, 0, 0);
+        }
+      }
+
+      const payload = {
+        ...formData,
+        eventDate: combinedDate.toISOString()
+      };
+      
       if (isEditing) {
-        await axios.put(`/api/events/${currentEventId}`, formData, config);
+        await axios.put(`/api/events/${currentEventId}`, payload, config);
       } else {
-        await axios.post('/api/events', formData, config);
+        await axios.post('/api/events', payload, config);
       }
       
       setIsModalOpen(false);
@@ -207,12 +341,14 @@ const AdminEvents = () => {
       fetchEvents();
     } catch (err) {
       const errorMsg = err.response?.data?.message || 'Error saving event';
+      setConflictWarning(errorMsg);
       Swal.fire({
-        title: 'Scheduling Conflict',
+        title: 'Event Scheduling Conflict',
         text: errorMsg,
         icon: 'error',
-        confirmButtonColor: '#2563eb'
+        confirmButtonColor: '#ef4444'
       });
+      // Do NOT close modal so admin retains entered form data
     }
   };
 
@@ -335,7 +471,8 @@ const AdminEvents = () => {
                 <div style={{ display: 'flex', flexDirection: 'column', gap: '8px', fontSize: '0.85rem', color: '#64748b', marginBottom: '1rem' }}>
                   <div style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
                     <Calendar size={14} />
-                    {new Date(event.eventDate).toLocaleString('en-US', { dateStyle: 'medium', timeStyle: 'short' })}
+                    {new Date(event.eventDate).toLocaleDateString('en-US', { dateStyle: 'medium' })}
+                    {event.startTime ? ` (${event.startTime} - ${event.endTime || 'End'})` : ` (${new Date(event.eventDate).toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit' })})`}
                   </div>
                   {event.parkName && (
                     <div style={{ display: 'flex', alignItems: 'center', gap: '6px', color: '#059669' }}>
@@ -436,42 +573,72 @@ const AdminEvents = () => {
                 />
               </div>
               
-              <div>
-                <label style={{ display: 'block', marginBottom: '6px', fontWeight: 700, fontSize: '0.88rem', color: '#1e293b' }}>Date & Time *</label>
-                <input 
-                  type="datetime-local" name="eventDate" required
-                  value={formData.eventDate} onChange={handleInputChange}
-                  style={{ width: '100%', padding: '10px 12px', borderRadius: '8px', border: '1px solid #cbd5e1', background: '#f8fafc', color: '#0f172a', fontSize: '0.92rem', boxSizing: 'border-box' }}
-                />
+              <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr 1fr', gap: '10px' }}>
+                <div>
+                  <label style={{ display: 'block', marginBottom: '6px', fontWeight: 700, fontSize: '0.88rem', color: '#1e293b' }}>Event Date *</label>
+                  <input 
+                    type="date" name="eventDate" required
+                    value={formData.eventDate} onChange={handleInputChange}
+                    style={{ width: '100%', padding: '10px 12px', borderRadius: '8px', border: '1px solid #cbd5e1', background: '#f8fafc', color: '#0f172a', fontSize: '0.92rem', boxSizing: 'border-box' }}
+                  />
+                </div>
+                <div>
+                  <label style={{ display: 'block', marginBottom: '6px', fontWeight: 700, fontSize: '0.88rem', color: '#1e293b' }}>Start Time *</label>
+                  <input 
+                    type="time" name="startTime" required
+                    value={formData.startTime} onChange={handleInputChange}
+                    style={{ width: '100%', padding: '10px 12px', borderRadius: '8px', border: '1px solid #cbd5e1', background: '#f8fafc', color: '#0f172a', fontSize: '0.92rem', boxSizing: 'border-box' }}
+                  />
+                </div>
+                <div>
+                  <label style={{ display: 'block', marginBottom: '6px', fontWeight: 700, fontSize: '0.88rem', color: '#1e293b' }}>End Time *</label>
+                  <input 
+                    type="time" name="endTime" required
+                    value={formData.endTime} onChange={handleInputChange}
+                    style={{ width: '100%', padding: '10px 12px', borderRadius: '8px', border: '1px solid #cbd5e1', background: '#f8fafc', color: '#0f172a', fontSize: '0.92rem', boxSizing: 'border-box' }}
+                  />
+                </div>
               </div>
               
               <div>
-                <label style={{ display: 'block', marginBottom: '6px', fontWeight: 700, fontSize: '0.88rem', color: '#1e293b' }}>Select Park / Venue</label>
+                <label style={{ display: 'block', marginBottom: '6px', fontWeight: 700, fontSize: '0.88rem', color: '#1e293b' }}>Select Park / Venue *</label>
                 <select
-                  name="parkName"
-                  value={formData.parkName}
+                  name="parkId"
+                  value={formData.parkId || (formData.parkName === 'custom' ? 'custom' : '')}
                   onChange={(e) => {
-                    const selected = e.target.value;
-                    const foundPark = parks.find(p => p.name === selected);
-                    setFormData(prev => ({
-                      ...prev,
-                      parkName: selected,
-                      location: prev.location || (foundPark?.address || foundPark?.location || selected)
-                    }));
+                    const selectedVal = e.target.value;
+                    if (selectedVal === 'custom') {
+                      setFormData(prev => ({
+                        ...prev,
+                        parkId: '',
+                        parkName: 'custom'
+                      }));
+                    } else {
+                      const foundPark = parks.find(p => p._id === selectedVal || p.name === selectedVal);
+                      setFormData(prev => ({
+                        ...prev,
+                        parkId: foundPark ? foundPark._id : '',
+                        parkName: foundPark ? foundPark.name : '',
+                        location: prev.location || (foundPark?.address || foundPark?.location || foundPark?.name || '')
+                      }));
+                    }
                   }}
                   style={{ width: '100%', padding: '10px 12px', borderRadius: '8px', border: '1px solid #cbd5e1', background: '#f8fafc', color: '#0f172a', fontSize: '0.92rem', boxSizing: 'border-box' }}
                 >
                   <option value="">-- Choose Park from System --</option>
                   {parks.map(p => (
-                    <option key={p._id} value={p.name}>{p.name} {p.district ? `(${p.district?.name || p.district})` : ''}</option>
+                    <option key={p._id} value={p._id}>
+                      {p.name} {p.district ? `(${p.district?.name || p.district})` : ''}
+                    </option>
                   ))}
                   <option value="custom">-- Or enter custom venue name below --</option>
                 </select>
                 {formData.parkName === 'custom' && (
                   <input 
                     type="text"
-                    placeholder="Enter Park or Facility Name"
-                    onChange={(e) => setFormData(prev => ({ ...prev, parkName: e.target.value }))}
+                    placeholder="Enter Custom Park or Facility Name"
+                    value={formData.location}
+                    onChange={(e) => setFormData(prev => ({ ...prev, location: e.target.value, parkName: e.target.value }))}
                     style={{ width: '100%', marginTop: '6px', padding: '10px 12px', borderRadius: '8px', border: '1px solid #cbd5e1', background: '#f8fafc', color: '#0f172a', fontSize: '0.92rem', boxSizing: 'border-box' }}
                   />
                 )}

@@ -21,21 +21,7 @@ import {
 } from 'lucide-react';
 
 import Swal from 'sweetalert2';
-
-const resolveMediaUrl = (path) => {
-  if (!path) return '';
-  if (path.startsWith('http://') || path.startsWith('https://') || path.startsWith('blob:') || path.startsWith('data:')) {
-    return path;
-  }
-  const clean = path.startsWith('/') ? path : `/${path}`;
-  if (typeof window !== 'undefined') {
-    // If backend is running on 5000 and frontend is on 5173/5174/5175, direct to backend 5000 for static media
-    const host = window.location.hostname;
-    const protocol = window.location.protocol;
-    return `${protocol}//${host}:5000${clean}`;
-  }
-  return clean;
-};
+import { resolveMediaUrl } from '../../utils/imageUtils';
 
 const getAdminToken = () => {
   try {

@@ -14,8 +14,11 @@ import {
   HelpCircle,
   Store,
   AlertCircle,
-  Upload
+  Upload,
+  FileCheck,
+  Camera
 } from 'lucide-react';
+import { processMobileImage } from '../utils/imageUtils';
 
 const DEFAULT_PROOF_TYPES = [
   'Studying in another city',
@@ -63,6 +66,11 @@ const StallBookingModal = ({ parkId, parkName, slot, onClose, onBookingSuccess }
   const [photoFile, setPhotoFile] = useState(null);
   const [photoPreview, setPhotoPreview] = useState('');
   const [aadhaarDocFile, setAadhaarDocFile] = useState(null);
+  const [aadhaarPreview, setAadhaarPreview] = useState('');
+  const [aadhaarDocName, setAadhaarDocName] = useState('');
+  const [isAadhaarPdf, setIsAadhaarPdf] = useState(false);
+  const [photoProcessing, setPhotoProcessing] = useState(false);
+  const [docProcessing, setDocProcessing] = useState(false);
 
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
@@ -90,21 +98,43 @@ const StallBookingModal = ({ parkId, parkName, slot, onClose, onBookingSuccess }
     setFormData(prev => ({ ...prev, [name]: value }));
   };
 
-  const handlePhotoChange = (e) => {
-    const file = e.target.files[0];
-    if (!file) return;
-    const isImageMime = file.type && file.type.startsWith('image/');
-    const hasImageExt = /\.(jpe?g|png|webp|heic|heif|bmp|gif)$/i.test(file.name || '');
-    if (file.type && !isImageMime && !hasImageExt && file.type !== 'application/octet-stream') {
-      setError('Please upload a valid image file for applicant photo.');
-      return;
-    }
-    setError('');
-    setPhotoFile(file);
+  const handlePhotoChange = async (e) => {
+    const rawFile = e.target.files && e.target.files[0];
+    if (!rawFile) return;
     try {
-      setPhotoPreview(URL.createObjectURL(file));
+      setPhotoProcessing(true);
+      setError('');
+      const { file, previewUrl } = await processMobileImage(rawFile, 1280, 0.85);
+      setPhotoFile(file || rawFile);
+      setPhotoPreview(previewUrl);
     } catch (err) {
-      console.warn('Could not create object URL for photo preview:', err);
+      console.warn('Error processing photo:', err);
+      setPhotoFile(rawFile);
+      try {
+        setPhotoPreview(URL.createObjectURL(rawFile));
+      } catch (e) {}
+    } finally {
+      setPhotoProcessing(false);
+    }
+  };
+
+  const handleAadhaarChange = async (e) => {
+    const rawFile = e.target.files && e.target.files[0];
+    if (!rawFile) return;
+    try {
+      setDocProcessing(true);
+      setError('');
+      setAadhaarDocName(rawFile.name || 'aadhaar_document');
+      const { file, previewUrl, isPdf } = await processMobileImage(rawFile, 1600, 0.85);
+      setAadhaarDocFile(file || rawFile);
+      setAadhaarPreview(previewUrl);
+      setIsAadhaarPdf(Boolean(isPdf));
+    } catch (err) {
+      console.warn('Error processing Aadhaar document:', err);
+      setAadhaarDocFile(rawFile);
+      setIsAadhaarPdf(rawFile.type === 'application/pdf');
+    } finally {
+      setDocProcessing(false);
     }
   };
 
@@ -372,12 +402,16 @@ const StallBookingModal = ({ parkId, parkName, slot, onClose, onBookingSuccess }
             <label style={{ display: 'block', marginBottom: '0.35rem', fontWeight: '600', color: '#374151', fontSize: '0.84rem' }}>
               Applicant Photo * (Passport size)
             </label>
-            <div style={{ display: 'flex', gap: '12px', alignItems: 'center' }}>
+            <div style={{ display: 'flex', gap: '14px', alignItems: 'center' }}>
               {photoPreview ? (
-                <img src={photoPreview} alt="Preview" style={{ width: '56px', height: '56px', borderRadius: '8px', objectFit: 'cover', border: '2px solid #059669' }} />
+                <div style={{ position: 'relative' }}>
+                  <img src={photoPreview} alt="Preview" style={{ width: '64px', height: '64px', borderRadius: '10px', objectFit: 'cover', border: '2px solid #059669', boxShadow: '0 2px 8px rgba(5,150,105,0.2)' }} />
+                  <span style={{ position: 'absolute', bottom: '-4px', right: '-4px', background: '#059669', color: 'white', borderRadius: '50%', width: '18px', height: '18px', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '11px' }}>✓</span>
+                </div>
               ) : (
-                <div style={{ width: '56px', height: '56px', borderRadius: '8px', background: '#e2e8f0', display: 'flex', alignItems: 'center', justifyContent: 'center', color: '#94a3b8' }}>
-                  <ImageIcon size={24} />
+                <div style={{ width: '64px', height: '64px', borderRadius: '10px', background: '#e2e8f0', display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', color: '#94a3b8', border: '1px dashed #cbd5e1' }}>
+                  <Camera size={24} />
+                  <span style={{ fontSize: '9px', marginTop: '2px' }}>Photo</span>
                 </div>
               )}
               <div style={{ flex: 1 }}>
@@ -386,9 +420,13 @@ const StallBookingModal = ({ parkId, parkName, slot, onClose, onBookingSuccess }
                   onChange={handlePhotoChange} 
                   required={!photoFile}
                   accept="image/*"
-                  style={{ width: '100%', padding: '0.45rem', border: '1px solid #cbd5e1', borderRadius: '8px', fontSize: '0.85rem' }} 
+                  style={{ width: '100%', padding: '0.5rem', border: '1px solid #cbd5e1', borderRadius: '8px', fontSize: '0.85rem', backgroundColor: 'white' }} 
                 />
-                <p style={{ margin: '3px 0 0', fontSize: '0.75rem', color: '#64748b' }}>Clear face photo for stall license ID badge.</p>
+                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', margin: '3px 0 0' }}>
+                  <p style={{ margin: 0, fontSize: '0.75rem', color: '#64748b' }}>
+                    {photoProcessing ? 'Processing phone image...' : photoFile ? `Ready (${(photoFile.size / 1024).toFixed(0)} KB)` : 'Take or upload clear face photo'}
+                  </p>
+                </div>
               </div>
             </div>
           </div>
@@ -438,16 +476,36 @@ const StallBookingModal = ({ parkId, parkName, slot, onClose, onBookingSuccess }
             <label style={{ display: 'block', marginBottom: '0.35rem', fontWeight: '600', color: '#374151', fontSize: '0.84rem' }}>
               Aadhaar Card Upload (Front / Back / PDF) *
             </label>
-            <input 
-              type="file" 
-              onChange={(e) => setAadhaarDocFile(e.target.files[0])} 
-              required={!aadhaarDocFile}
-              accept="image/*,application/pdf,.pdf"
-              style={{ width: '100%', padding: '0.55rem', border: '1px solid #cbd5e1', borderRadius: '8px', fontSize: '0.85rem', backgroundColor: 'white', boxSizing: 'border-box' }} 
-            />
-            <p style={{ margin: '3px 0 0', fontSize: '0.75rem', color: '#64748b' }}>
-              Upload your official Aadhaar card copy (PDF or Image).
-            </p>
+            <div style={{ display: 'flex', gap: '14px', alignItems: 'center' }}>
+              {aadhaarPreview && !isAadhaarPdf ? (
+                <div style={{ position: 'relative' }}>
+                  <img src={aadhaarPreview} alt="Aadhaar Preview" style={{ width: '64px', height: '64px', borderRadius: '10px', objectFit: 'cover', border: '2px solid #2563eb', boxShadow: '0 2px 8px rgba(37,99,235,0.2)' }} />
+                  <span style={{ position: 'absolute', bottom: '-4px', right: '-4px', background: '#2563eb', color: 'white', borderRadius: '50%', width: '18px', height: '18px', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '11px' }}>✓</span>
+                </div>
+              ) : isAadhaarPdf ? (
+                <div style={{ width: '64px', height: '64px', borderRadius: '10px', background: '#eff6ff', display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', color: '#2563eb', border: '1px solid #bfdbfe' }}>
+                  <FileText size={24} />
+                  <span style={{ fontSize: '9px', fontWeight: 'bold' }}>PDF</span>
+                </div>
+              ) : (
+                <div style={{ width: '64px', height: '64px', borderRadius: '10px', background: '#e2e8f0', display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', color: '#94a3b8', border: '1px dashed #cbd5e1' }}>
+                  <FileText size={24} />
+                  <span style={{ fontSize: '9px', marginTop: '2px' }}>Aadhaar</span>
+                </div>
+              )}
+              <div style={{ flex: 1 }}>
+                <input 
+                  type="file" 
+                  onChange={handleAadhaarChange} 
+                  required={!aadhaarDocFile}
+                  accept="image/*,application/pdf,.pdf"
+                  style={{ width: '100%', padding: '0.5rem', border: '1px solid #cbd5e1', borderRadius: '8px', fontSize: '0.85rem', backgroundColor: 'white' }} 
+                />
+                <p style={{ margin: '3px 0 0', fontSize: '0.75rem', color: '#64748b' }}>
+                  {docProcessing ? 'Processing document...' : aadhaarDocFile ? `${aadhaarDocName} (${(aadhaarDocFile.size / 1024).toFixed(0)} KB)` : 'Upload official Aadhaar card copy (PDF or Image)'}
+                </p>
+              </div>
+            </div>
           </div>
         </div>
 

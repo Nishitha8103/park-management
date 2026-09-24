@@ -1,9 +1,10 @@
 import React, { useState, useEffect } from 'react';
 import axios from 'axios';
 import { Link } from 'react-router-dom';
-import { Plus, CheckCircle2, XCircle, Clock, CreditCard, ExternalLink } from 'lucide-react';
+import { Plus, CheckCircle2, XCircle, Clock, CreditCard, ExternalLink, FileText, User, Image as ImageIcon } from 'lucide-react';
 import Swal from 'sweetalert2';
 import StallBookingModal from '../components/StallBookingModal';
+import { resolveMediaUrl } from '../utils/imageUtils';
 
 const BookingTimer = ({ expiresAt }) => {
   const [timeLeft, setTimeLeft] = useState('');
@@ -214,25 +215,88 @@ const MyStallBookings = () => {
       {bookings.length > 0 && (
         <div style={{ display: 'grid', gap: '1rem', marginBottom: '3rem' }}>
           {bookings.map(booking => (
-            <div key={booking._id} style={{ border: '1px solid #e2e8f0', borderRadius: '8px', padding: '1.5rem', display: 'flex', justifyContent: 'space-between', alignItems: 'center', backgroundColor: 'white' }}>
-              <div>
-                <h3 style={{ margin: '0 0 0.5rem 0', color: '#1e293b' }}>{booking.stallName}</h3>
-                <p style={{ margin: '0 0 0.25rem 0', color: '#475569' }}><strong>Park:</strong> {booking.park?.name || 'Unknown'}</p>
-                {booking.slot && (
-                  <p style={{ margin: '0 0 0.25rem 0', color: '#475569' }}>
-                    <strong>Slot:</strong> {new Date(booking.slot.date).toLocaleDateString()} ({booking.slot.startTime} - {booking.slot.endTime}) @ {booking.slot.location}
+            <div key={booking._id} style={{ border: '1px solid #e2e8f0', borderRadius: '12px', padding: '1.25rem 1.5rem', display: 'flex', justifyContent: 'space-between', alignItems: 'center', backgroundColor: 'white', flexWrap: 'wrap', gap: '1rem', boxShadow: '0 1px 3px rgba(0,0,0,0.05)' }}>
+              
+              {/* Left Side: Photo + Information */}
+              <div style={{ display: 'flex', gap: '1.25rem', alignItems: 'flex-start', minWidth: '280px', flex: 1 }}>
+                {/* Applicant Photo */}
+                <div style={{ flexShrink: 0 }}>
+                  {booking.photoUrl ? (
+                    <img 
+                      src={resolveMediaUrl(booking.photoUrl)} 
+                      alt={booking.applicantName || 'Applicant'} 
+                      onError={(e) => {
+                        e.target.onerror = null;
+                        e.target.src = 'https://ui-avatars.com/api/?name=' + encodeURIComponent(booking.applicantName || 'Applicant') + '&background=059669&color=fff&size=128';
+                      }}
+                      style={{ width: '68px', height: '68px', borderRadius: '10px', objectFit: 'cover', border: '2px solid #059669', boxShadow: '0 2px 6px rgba(0,0,0,0.08)' }} 
+                    />
+                  ) : (
+                    <div style={{ width: '68px', height: '68px', borderRadius: '10px', backgroundColor: '#f1f5f9', display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', color: '#64748b', border: '1px solid #cbd5e1' }}>
+                      <User size={24} />
+                      <span style={{ fontSize: '10px', marginTop: '2px', fontWeight: 600 }}>No Photo</span>
+                    </div>
+                  )}
+                </div>
+
+                {/* Details */}
+                <div style={{ flex: 1 }}>
+                  <div style={{ display: 'flex', alignItems: 'center', gap: '8px', flexWrap: 'wrap' }}>
+                    <h3 style={{ margin: 0, color: '#0f172a', fontSize: '1.15rem', fontWeight: 700 }}>{booking.stallName}</h3>
+                    <span style={{ fontSize: '0.78rem', background: '#ecfdf5', color: '#047857', padding: '2px 8px', borderRadius: '12px', fontWeight: 600 }}>
+                      {booking.applicantName}
+                    </span>
+                  </div>
+                  
+                  <p style={{ margin: '4px 0 2px 0', color: '#475569', fontSize: '0.9rem' }}>
+                    <strong>Park:</strong> {booking.park?.name || 'Park'}
                   </p>
-                )}
-                <p style={{ margin: '0 0 0.25rem 0', color: '#475569' }}><strong>Products:</strong> {booking.productsType}</p>
-                <p style={{ margin: '0', color: '#475569', fontSize: '0.85rem' }}>Requested on: {new Date(booking.bookingDate).toLocaleDateString()}</p>
+                  
+                  {booking.slot && (
+                    <p style={{ margin: '2px 0', color: '#475569', fontSize: '0.88rem' }}>
+                      <strong>Slot:</strong> {new Date(booking.slot.date).toLocaleDateString()} ({booking.slot.startTime} - {booking.slot.endTime}) @ {booking.slot.location}
+                    </p>
+                  )}
+                  
+                  <p style={{ margin: '2px 0', color: '#475569', fontSize: '0.86rem' }}>
+                    <strong>Products:</strong> {booking.productsType}
+                  </p>
+
+                  {/* Documents Attached */}
+                  <div style={{ display: 'flex', gap: '8px', alignItems: 'center', marginTop: '6px', flexWrap: 'wrap' }}>
+                    {booking.documentUrl && (
+                      <a 
+                        href={resolveMediaUrl(booking.documentUrl)} 
+                        target="_blank" 
+                        rel="noopener noreferrer"
+                        style={{ display: 'inline-flex', alignItems: 'center', gap: '4px', background: '#eff6ff', color: '#2563eb', padding: '3px 8px', borderRadius: '6px', textDecoration: 'none', fontSize: '0.78rem', fontWeight: 600, border: '1px solid #bfdbfe' }}
+                      >
+                        <FileText size={12} /> Aadhaar Card <ExternalLink size={10} />
+                      </a>
+                    )}
+                    {booking.currentAddressProofUrl && (
+                      <a 
+                        href={resolveMediaUrl(booking.currentAddressProofUrl)} 
+                        target="_blank" 
+                        rel="noopener noreferrer"
+                        style={{ display: 'inline-flex', alignItems: 'center', gap: '4px', background: '#fef3c7', color: '#b45309', padding: '3px 8px', borderRadius: '6px', textDecoration: 'none', fontSize: '0.78rem', fontWeight: 600, border: '1px solid #fde68a' }}
+                      >
+                        <FileText size={12} /> Address Proof <ExternalLink size={10} />
+                      </a>
+                    )}
+                    <span style={{ color: '#94a3b8', fontSize: '0.8rem' }}>• Submitted on {new Date(booking.bookingDate).toLocaleDateString()}</span>
+                  </div>
+                </div>
               </div>
-              <div style={{ textAlign: 'right', display: 'flex', flexDirection: 'column', alignItems: 'flex-end', gap: '0.75rem' }}>
-                <div style={{ fontSize: '1.25rem', fontWeight: 'bold', color: '#059669', marginBottom: '0.25rem' }}>
+
+              {/* Right Side: Fee & Status */}
+              <div style={{ textAlign: 'right', display: 'flex', flexDirection: 'column', alignItems: 'flex-end', gap: '0.6rem' }}>
+                <div style={{ fontSize: '1.35rem', fontWeight: 800, color: '#059669' }}>
                   ₹{booking.amountPaid}
                 </div>
                 <span style={{
                   display: 'inline-flex', alignItems: 'center', gap: '0.35rem',
-                  padding: '0.35rem 0.75rem', borderRadius: '9999px', fontSize: '0.85rem', fontWeight: '500',
+                  padding: '0.35rem 0.85rem', borderRadius: '9999px', fontSize: '0.85rem', fontWeight: '600',
                   backgroundColor: (booking.status === 'Approved' || booking.status === 'Confirmed') ? '#dcfce7' : (booking.status === 'Rejected' || booking.status === 'Expired') ? '#fee2e2' : booking.status === 'Pending Payment' ? '#e0e7ff' : '#fef3c7',
                   color: (booking.status === 'Approved' || booking.status === 'Confirmed') ? '#166534' : (booking.status === 'Rejected' || booking.status === 'Expired') ? '#991b1b' : booking.status === 'Pending Payment' ? '#3730a3' : '#92400e'
                 }}>
@@ -249,13 +313,13 @@ const MyStallBookings = () => {
                     {(!booking.paymentExpiresAt || new Date(booking.paymentExpiresAt) > new Date()) ? (
                       <button 
                         onClick={() => handlePay(booking)}
-                        style={{ marginTop: '4px', padding: '0.5rem 1rem', backgroundColor: '#4f46e5', color: 'white', border: 'none', borderRadius: '4px', cursor: 'pointer', fontWeight: 'bold', display: 'flex', alignItems: 'center', gap: '4px' }}>
+                        style={{ marginTop: '4px', padding: '0.5rem 1rem', backgroundColor: '#4f46e5', color: 'white', border: 'none', borderRadius: '6px', cursor: 'pointer', fontWeight: 'bold', display: 'flex', alignItems: 'center', gap: '6px', boxShadow: '0 2px 6px rgba(79, 70, 229, 0.3)' }}>
                         <CreditCard size={16} /> Pay ₹{booking.amountPaid} Now
                       </button>
                     ) : (
                       <button 
                         disabled
-                        style={{ marginTop: '4px', padding: '0.5rem 1rem', backgroundColor: '#9ca3af', color: 'white', border: 'none', borderRadius: '4px', cursor: 'not-allowed', fontWeight: 'bold' }}>
+                        style={{ marginTop: '4px', padding: '0.5rem 1rem', backgroundColor: '#9ca3af', color: 'white', border: 'none', borderRadius: '6px', cursor: 'not-allowed', fontWeight: 'bold' }}>
                         Payment Window Expired
                       </button>
                     )}

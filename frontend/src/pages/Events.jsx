@@ -442,7 +442,11 @@ const Events = () => {
             <span style={{ fontWeight: 600 }}>{new Date(event.eventDate).toLocaleDateString('en-US', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' })}</span>
           </div>
           <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginLeft: '24px', color: '#64748b' }}>
-            {new Date(event.eventDate).toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit' })}
+            {event.startTime ? (
+              <span>⏰ {event.startTime}{event.endTime ? ` – ${event.endTime}` : ''}</span>
+            ) : (
+              <span>⏰ {new Date(event.eventDate).toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit' })}</span>
+            )}
           </div>
           <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginTop: '4px' }}>
             <MapPin size={16} color="#ef4444" />

@@ -1,7 +1,8 @@
 import { useState, useEffect } from 'react';
-import { Search, MapPin, UserCheck, ShieldCheck, CheckCircle, AlertCircle, X, Phone, Mail, Building, FileText, Calendar, Image, MessageSquare, Trash2, HardHat, User } from 'lucide-react';
+import { Search, MapPin, UserCheck, ShieldCheck, CheckCircle, AlertCircle, X, Phone, Mail, Building, FileText, Calendar, Image, MessageSquare, Trash2, HardHat, User, ExternalLink } from 'lucide-react';
 import axios from 'axios';
 import { getSlaStatusAndRemaining, getPriorityColor } from '../../utils/slaUtils';
+import { resolveMediaUrl } from '../../utils/imageUtils';
 
 const AdminComplaints = () => {
   const [complaints, setComplaints] = useState([]);
@@ -600,16 +601,25 @@ const AdminComplaints = () => {
                   <div>
                     <strong style={{ fontSize: '0.85rem', color: '#64748b', textTransform: 'uppercase', letterSpacing: '0.05em', display: 'block', marginBottom: '8px' }}>Original Images:</strong>
                     <div style={{ display: 'flex', gap: '12px', flexWrap: 'wrap' }}>
-                      {reportComplaint.images.map((img, i) => (
-                        <a key={i} href={`${img}`} target="_blank" rel="noreferrer" style={{ display: 'block', borderRadius: '12px', overflow: 'hidden', border: '2px solid #e2e8f0', boxShadow: '0 4px 6px -1px rgba(0,0,0,0.05)' }}>
-                          <img 
-                            src={`${img}`} 
-                            alt={`Public Image ${i + 1}`} 
-                            style={{ width: '130px', height: '130px', objectFit: 'cover', display: 'block' }} 
-                            onError={(e) => { e.target.style.display = 'none'; }}
-                          />
-                        </a>
-                      ))}
+                      {reportComplaint.images.map((img, i) => {
+                        const mediaUrl = resolveMediaUrl(img, 'complaints');
+                        return (
+                          <a key={i} href={mediaUrl} target="_blank" rel="noreferrer" style={{ display: 'block', borderRadius: '12px', overflow: 'hidden', border: '2px solid #cbd5e1', boxShadow: '0 4px 6px -1px rgba(0,0,0,0.05)', background: '#f1f5f9', textDecoration: 'none' }}>
+                            <img 
+                              src={mediaUrl} 
+                              alt={`Public Image ${i + 1}`} 
+                              style={{ width: '140px', height: '140px', objectFit: 'cover', display: 'block' }} 
+                              onError={(e) => {
+                                if (!e.target.dataset.triedRelative) {
+                                  e.target.dataset.triedRelative = 'true';
+                                  const filename = img.replace(/^.*[\\\/]/, '');
+                                  e.target.src = `/uploads/complaints/${filename}`;
+                                }
+                              }}
+                            />
+                          </a>
+                        );
+                      })}
                     </div>
                   </div>
                 )}
@@ -680,15 +690,29 @@ const AdminComplaints = () => {
                         <span style={{ fontSize: '0.75rem', background: '#10b981', color: '#fff', padding: '2px 8px', borderRadius: '12px', fontWeight: 700, marginLeft: '4px' }}>{reportComplaint.afterImages.length}</span>
                       </div>
                       <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(130px, 1fr))', gap: '12px' }}>
-                        {reportComplaint.afterImages.map((img, i) => (
-                          <a key={i} href={`${img}`} target="_blank" rel="noreferrer"
-                            style={{ display: 'block', borderRadius: '12px', overflow: 'hidden', border: '3px solid #fff', boxShadow: '0 10px 15px -3px rgba(0,0,0,0.1)', transition: 'transform 0.2s', position: 'relative' }}
-                            onMouseEnter={e => { e.currentTarget.style.transform = 'scale(1.05)' }}
-                            onMouseLeave={e => { e.currentTarget.style.transform = 'scale(1)' }}
-                          >
-                            <img src={`${img}`} alt={`After ${i + 1}`} style={{ width: '100%', height: '110px', objectFit: 'cover', display: 'block' }} onError={e => { e.target.style.display = 'none'; }} />
-                          </a>
-                        ))}
+                        {reportComplaint.afterImages.map((img, i) => {
+                          const mediaUrl = resolveMediaUrl(img, 'complaints');
+                          return (
+                            <a key={i} href={mediaUrl} target="_blank" rel="noreferrer"
+                              style={{ display: 'block', borderRadius: '12px', overflow: 'hidden', border: '3px solid #fff', boxShadow: '0 10px 15px -3px rgba(0,0,0,0.1)', transition: 'transform 0.2s', position: 'relative' }}
+                              onMouseEnter={e => { e.currentTarget.style.transform = 'scale(1.05)' }}
+                              onMouseLeave={e => { e.currentTarget.style.transform = 'scale(1)' }}
+                            >
+                              <img 
+                                src={mediaUrl} 
+                                alt={`After ${i + 1}`} 
+                                style={{ width: '100%', height: '110px', objectFit: 'cover', display: 'block' }} 
+                                onError={e => {
+                                  if (!e.target.dataset.triedRelative) {
+                                    e.target.dataset.triedRelative = 'true';
+                                    const filename = img.replace(/^.*[\\\/]/, '');
+                                    e.target.src = `/uploads/complaints/${filename}`;
+                                  }
+                                }} 
+                              />
+                            </a>
+                          );
+                        })}
                       </div>
                     </div>
                   )}
@@ -756,15 +780,29 @@ const AdminComplaints = () => {
                             <span style={{ fontSize: '0.75rem', background: '#8b5cf6', color: '#fff', padding: '2px 8px', borderRadius: '12px', fontWeight: 700, marginLeft: '4px' }}>{reportComplaint.inspectionImages.length}</span>
                           </div>
                           <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(130px, 1fr))', gap: '12px' }}>
-                            {reportComplaint.inspectionImages.map((img, i) => (
-                              <a key={i} href={`${img}`} target="_blank" rel="noreferrer"
-                                style={{ display: 'block', borderRadius: '12px', overflow: 'hidden', border: '3px solid #fff', boxShadow: '0 10px 15px -3px rgba(0,0,0,0.1)', transition: 'transform 0.2s', position: 'relative' }}
-                                onMouseEnter={e => { e.currentTarget.style.transform = 'scale(1.05)' }}
-                                onMouseLeave={e => { e.currentTarget.style.transform = 'scale(1)' }}
-                              >
-                                <img src={`${img}`} alt={`Inspection ${i + 1}`} style={{ width: '100%', height: '110px', objectFit: 'cover', display: 'block' }} onError={e => { e.target.style.display = 'none'; }} />
-                              </a>
-                            ))}
+                            {reportComplaint.inspectionImages.map((img, i) => {
+                              const mediaUrl = resolveMediaUrl(img, 'complaints');
+                              return (
+                                <a key={i} href={mediaUrl} target="_blank" rel="noreferrer"
+                                  style={{ display: 'block', borderRadius: '12px', overflow: 'hidden', border: '3px solid #fff', boxShadow: '0 10px 15px -3px rgba(0,0,0,0.1)', transition: 'transform 0.2s', position: 'relative' }}
+                                  onMouseEnter={e => { e.currentTarget.style.transform = 'scale(1.05)' }}
+                                  onMouseLeave={e => { e.currentTarget.style.transform = 'scale(1)' }}
+                                >
+                                  <img 
+                                    src={mediaUrl} 
+                                    alt={`Inspection ${i + 1}`} 
+                                    style={{ width: '100%', height: '110px', objectFit: 'cover', display: 'block' }} 
+                                    onError={e => {
+                                      if (!e.target.dataset.triedRelative) {
+                                        e.target.dataset.triedRelative = 'true';
+                                        const filename = img.replace(/^.*[\\\/]/, '');
+                                        e.target.src = `/uploads/complaints/${filename}`;
+                                      }
+                                    }} 
+                                  />
+                                </a>
+                              );
+                            })}
                           </div>
                         </div>
                       ) : (

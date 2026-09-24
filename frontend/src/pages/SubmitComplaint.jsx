@@ -18,8 +18,8 @@ import {
 } from 'lucide-react';
 import { useNavigate, useLocation } from 'react-router-dom';
 import axios from 'axios';
-import LiveCameraCaptureModal from '../components/LiveCameraCaptureModal';
 import { stampImageWithGeoAndTimestamp } from '../utils/imageStampUtil';
+import { processMobileImage } from '../utils/imageUtils';
 import './SubmitComplaint.css';
 
 const SubmitComplaint = () => {
@@ -98,10 +98,14 @@ const SubmitComplaint = () => {
 
   const handleFileChange = async (e) => {
     if (e.target.files && e.target.files.length > 0) {
-      const file = e.target.files[0];
+      const rawFile = e.target.files[0];
       setIsProcessingFile(true);
       try {
-        const stamped = await stampImageWithGeoAndTimestamp(file, {
+        // Pre-process phone image (HEIC/JPEG/PNG compression)
+        const { file: processedFile } = await processMobileImage(rawFile, 1600, 0.88);
+        const inputToStamp = processedFile || rawFile;
+
+        const stamped = await stampImageWithGeoAndTimestamp(inputToStamp, {
           tag: 'Citizen Grievance',
           fileName: `complaint_${Date.now()}.jpg`
         });
@@ -110,9 +114,11 @@ const SubmitComplaint = () => {
         setFilePreview(stamped.preview);
       } catch (err) {
         console.warn('Stamp fallback to raw file:', err);
-        setSelectedFile(file);
-        setFileName(file.name);
-        setFilePreview(URL.createObjectURL(file));
+        setSelectedFile(rawFile);
+        setFileName(rawFile.name);
+        try {
+          setFilePreview(URL.createObjectURL(rawFile));
+        } catch (e) {}
       } finally {
         setIsProcessingFile(false);
       }

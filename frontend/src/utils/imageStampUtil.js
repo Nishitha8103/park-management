@@ -352,10 +352,23 @@ export const stampImageWithGeoAndTimestamp = async (
         const canvas = document.createElement('canvas');
         const ctx = canvas.getContext('2d');
 
-        canvas.width = img.naturalWidth || img.width || 1280;
-        canvas.height = img.naturalHeight || img.height || 720;
+        let origW = img.naturalWidth || img.width || 1280;
+        let origH = img.naturalHeight || img.height || 720;
+        const maxDim = 1600;
+        if (origW > maxDim || origH > maxDim) {
+          if (origW > origH) {
+            origH = Math.round((origH * maxDim) / origW);
+            origW = maxDim;
+          } else {
+            origW = Math.round((origW * maxDim) / origH);
+            origH = maxDim;
+          }
+        }
 
-        // Draw original photo
+        canvas.width = origW;
+        canvas.height = origH;
+
+        // Draw photo scaled to canvas
         ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
 
         // Date & Time formatting: DD/MM/YY hh:mm AM/PM

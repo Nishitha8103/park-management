@@ -2,6 +2,7 @@ import { useState, useEffect } from 'react';
 import { useLocation } from 'react-router-dom';
 import './TrackComplaint.css';
 import { getSlaStatusAndRemaining } from '../utils/slaUtils';
+import { resolveMediaUrl } from '../utils/imageUtils';
 
 const TrackComplaint = () => {
   const location = useLocation();
@@ -176,11 +177,14 @@ const TrackComplaint = () => {
                   <div>
                     <strong style={{ color: '#15803d', display: 'block', marginBottom: '0.5rem' }}>Resolution Photos:</strong>
                     <div style={{ display: 'flex', gap: '1rem', flexWrap: 'wrap' }}>
-                      {[...status.afterImages, ...status.inspectionImages].map((img, idx) => (
-                        <a href={`http://localhost:5000${img}`} target="_blank" rel="noopener noreferrer" key={idx} style={{ display: 'block', width: '200px', height: '150px', borderRadius: '8px', overflow: 'hidden', border: '2px solid #bbf7d0', cursor: 'pointer', transition: 'transform 0.2s' }} onMouseOver={e => e.currentTarget.style.transform = 'scale(1.03)'} onMouseOut={e => e.currentTarget.style.transform = 'scale(1)'}>
-                          <img src={`http://localhost:5000${img}`} alt="Resolved" style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
-                        </a>
-                      ))}
+                      {[...status.afterImages, ...status.inspectionImages].map((img, idx) => {
+                        const mediaUrl = resolveMediaUrl(img, 'complaints');
+                        return (
+                          <a href={mediaUrl} target="_blank" rel="noopener noreferrer" key={idx} style={{ display: 'block', width: '200px', height: '150px', borderRadius: '8px', overflow: 'hidden', border: '2px solid #bbf7d0', cursor: 'pointer', transition: 'transform 0.2s' }} onMouseOver={e => e.currentTarget.style.transform = 'scale(1.03)'} onMouseOut={e => e.currentTarget.style.transform = 'scale(1)'}>
+                            <img src={mediaUrl} alt="Resolved" style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
+                          </a>
+                        );
+                      })}
                     </div>
                   </div>
                 )}

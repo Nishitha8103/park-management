@@ -53,62 +53,148 @@ exports.getAllEvents = async (req, res) => {
   }
 };
 
-// Helper to check for event conflicts at the same park and overlapping time
-const checkEventConflict = async ({ parkName, location, eventDate, excludeEventId = null }) => {
-  const targetPark = (parkName || '').trim();
-  const targetLocation = (location || '').trim();
-  
-  if (!targetPark && !targetLocation) return null;
+// Helper to compute start and end Date objects for an event
+const getEventInterval = (event) => {
+  let start = null;
+  let end = null;
+
+  if (event.eventDate) {
+    const baseDate = new Date(event.eventDate);
+    if (!isNaN(baseDate.getTime())) {
+      if (event.startTime) {
+        const [sh, sm] = event.startTime.split(':').map(Number);
+        start = new Date(baseDate);
+        if (!isNaN(sh) && !isNaN(sm)) {
+          start.setHours(sh, sm, 0, 0);
+        }
+      } else {
+        start = new Date(baseDate);
+      }
+
+      if (event.endDate) {
+        end = new Date(event.endDate);
+      } else if (event.endTime) {
+        const [eh, em] = event.endTime.split(':').map(Number);
+        end = new Date(baseDate);
+        if (!isNaN(eh) && !isNaN(em)) {
+          end.setHours(eh, em, 0, 0);
+        }
+      } else {
+        // Default to a 2-hour duration if no explicit end time is specified
+        end = new Date(start.getTime() + 2 * 60 * 60 * 1000);
+      }
+    }
+  }
+
+  // Ensure end is strictly after start
+  if (start && end && end.getTime() <= start.getTime()) {
+    // If end time is earlier or same (e.g. invalid user input), bump end by at least 1 minute or 1 hour
+    end = new Date(start.getTime() + 60 * 60 * 1000);
+  }
+
+  return { start, end };
+};
+
+// Helper to check for event conflicts at the same park and overlapping date/time
+const checkEventConflict = async ({ parkId, parkName, location, eventDate, startTime, endTime, endDate, excludeEventId = null }) => {
+  if (!parkId && !parkName && !location) return null;
   if (!eventDate) return null;
 
-  const targetTime = new Date(eventDate).getTime();
-  if (isNaN(targetTime)) return null;
+  const { start: targetStart, end: targetEnd } = getEventInterval({ eventDate, startTime, endTime, endDate });
+  if (!targetStart || !targetEnd) return null;
 
-  // Window check: Within 2 hours before or after the specified time at the same park/venue
-  const windowStart = new Date(targetTime - 2 * 60 * 60 * 1000);
-  const windowEnd = new Date(targetTime + 2 * 60 * 60 * 1000);
+  // Search day window (from start of target day to end of target day, plus buffer)
+  const dayStart = new Date(targetStart);
+  dayStart.setHours(0, 0, 0, 0);
+  dayStart.setDate(dayStart.getDate() - 1); // 1 day buffer for multi-day/overnight events
+
+  const dayEnd = new Date(targetEnd);
+  dayEnd.setHours(23, 59, 59, 999);
+  dayEnd.setDate(dayEnd.getDate() + 1);
 
   const parkConditions = [];
-  if (targetPark) {
-    parkConditions.push({ parkName: { $regex: new RegExp(`^${targetPark.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')}$`, 'i') } });
-    parkConditions.push({ location: { $regex: new RegExp(`^${targetPark.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')}$`, 'i') } });
+  if (parkId && mongoose.Types.ObjectId.isValid(parkId)) {
+    parkConditions.push({ parkId: new mongoose.Types.ObjectId(parkId) });
   }
-  if (targetLocation && targetLocation !== targetPark) {
-    parkConditions.push({ location: { $regex: new RegExp(`^${targetLocation.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')}$`, 'i') } });
+
+  const cleanParkName = (parkName || '').trim();
+  const cleanLocation = (location || '').trim();
+
+  if (cleanParkName) {
+    const escapedPark = cleanParkName.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+    parkConditions.push({ parkName: { $regex: new RegExp(`^${escapedPark}$`, 'i') } });
+    parkConditions.push({ location: { $regex: new RegExp(`^${escapedPark}$`, 'i') } });
   }
+  if (cleanLocation && cleanLocation !== cleanParkName) {
+    const escapedLoc = cleanLocation.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+    parkConditions.push({ location: { $regex: new RegExp(`^${escapedLoc}$`, 'i') } });
+    parkConditions.push({ parkName: { $regex: new RegExp(`^${escapedLoc}$`, 'i') } });
+  }
+
+  if (parkConditions.length === 0) return null;
 
   const query = {
     $or: parkConditions,
-    eventDate: { $gte: windowStart, $lte: windowEnd }
+    eventDate: { $gte: dayStart, $lte: dayEnd }
   };
 
   if (excludeEventId) {
     query._id = { $ne: excludeEventId };
   }
 
-  const conflictingEvent = await Event.findOne(query);
-  return conflictingEvent;
+  const candidateEvents = await Event.find(query).lean();
+
+  // Test exact time interval overlap: (startA < endB) && (endA > startB)
+  for (const candidate of candidateEvents) {
+    const candidateInterval = getEventInterval(candidate);
+    if (!candidateInterval.start || !candidateInterval.end) continue;
+
+    const hasOverlap = (targetStart < candidateInterval.end) && (targetEnd > candidateInterval.start);
+    if (hasOverlap) {
+      return candidate;
+    }
+  }
+
+  return null;
 };
 
 // Create a new event
 exports.createEvent = async (req, res) => {
   try {
-    const { title, description, eventDate, location, image, isActive, isPaid, price, capacity, parkName } = req.body;
+    const { title, description, eventDate, startTime, endTime, endDate, location, image, isActive, isPaid, price, capacity, parkName, parkId } = req.body;
 
-    // Check for conflicting event at the same park and time
-    const conflict = await checkEventConflict({ parkName, location, eventDate });
+    // Check for conflicting event at the same park and date/time
+    const conflict = await checkEventConflict({ parkId, parkName, location, eventDate, startTime, endTime, endDate });
     if (conflict) {
-      const conflictDate = new Date(conflict.eventDate).toLocaleString('en-IN', {
-        dateStyle: 'medium',
-        timeStyle: 'short'
-      });
-      const venue = conflict.parkName || conflict.location || 'this park';
       return res.status(400).json({
-        message: `An event ("${conflict.title}") is already scheduled at ${venue} around that time (${conflictDate}). Please choose a different time or park venue.`
+        message: 'Event scheduling conflict! Another event is already scheduled in this park during the selected date and time. Please choose a different time or park.',
+        conflictEvent: {
+          id: conflict._id,
+          title: conflict.title,
+          parkName: conflict.parkName || conflict.location,
+          eventDate: conflict.eventDate,
+          startTime: conflict.startTime,
+          endTime: conflict.endTime
+        }
       });
     }
 
-    const newEvent = new Event({ title, description, eventDate, location, image, isActive, isPaid, price, capacity, parkName });
+    const newEvent = new Event({
+      title,
+      description,
+      eventDate,
+      startTime,
+      endTime,
+      endDate,
+      location,
+      image,
+      isActive,
+      isPaid,
+      price,
+      capacity,
+      parkName,
+      parkId: parkId && mongoose.Types.ObjectId.isValid(parkId) ? parkId : undefined
+    });
     await newEvent.save();
     res.status(201).json(newEvent);
   } catch (error) {
@@ -120,23 +206,41 @@ exports.createEvent = async (req, res) => {
 exports.updateEvent = async (req, res) => {
   try {
     const { id } = req.params;
-    const { title, description, eventDate, location, image, isActive, isPaid, price, capacity, parkName } = req.body;
+    const { title, description, eventDate, startTime, endTime, endDate, location, image, isActive, isPaid, price, capacity, parkName, parkId } = req.body;
 
-    if (eventDate && (parkName || location)) {
-      const conflict = await checkEventConflict({ parkName, location, eventDate, excludeEventId: id });
+    if (eventDate && (parkId || parkName || location)) {
+      const conflict = await checkEventConflict({
+        parkId,
+        parkName,
+        location,
+        eventDate,
+        startTime,
+        endTime,
+        endDate,
+        excludeEventId: id
+      });
+
       if (conflict) {
-        const conflictDate = new Date(conflict.eventDate).toLocaleString('en-IN', {
-          dateStyle: 'medium',
-          timeStyle: 'short'
-        });
-        const venue = conflict.parkName || conflict.location || 'this park';
         return res.status(400).json({
-          message: `An event ("${conflict.title}") is already scheduled at ${venue} around that time (${conflictDate}). Please choose a different time or park venue.`
+          message: 'Event scheduling conflict! Another event is already scheduled in this park during the selected date and time. Please choose a different time or park.',
+          conflictEvent: {
+            id: conflict._id,
+            title: conflict.title,
+            parkName: conflict.parkName || conflict.location,
+            eventDate: conflict.eventDate,
+            startTime: conflict.startTime,
+            endTime: conflict.endTime
+          }
         });
       }
     }
 
-    const updatedEvent = await Event.findByIdAndUpdate(id, req.body, { new: true });
+    const updatePayload = { ...req.body };
+    if (updatePayload.parkId && !mongoose.Types.ObjectId.isValid(updatePayload.parkId)) {
+      delete updatePayload.parkId;
+    }
+
+    const updatedEvent = await Event.findByIdAndUpdate(id, updatePayload, { new: true });
     if (!updatedEvent) {
       return res.status(404).json({ message: 'Event not found' });
     }

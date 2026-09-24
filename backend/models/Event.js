@@ -39,6 +39,23 @@ const eventSchema = new mongoose.Schema({
   parkName: {
     type: String,
     default: ''
+  },
+  parkId: {
+    type: mongoose.Schema.Types.ObjectId,
+    ref: 'Park',
+    default: null
+  },
+  startTime: {
+    type: String,
+    default: ''
+  },
+  endTime: {
+    type: String,
+    default: ''
+  },
+  endDate: {
+    type: Date,
+    default: null
   }
 }, { timestamps: true });
 
