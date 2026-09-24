@@ -549,14 +549,14 @@ const SubmitComplaint = () => {
                   </div>
                 ) : (
                   <div style={{ display: 'flex', flexDirection: 'column', gap: '0.75rem' }}>
-                    <div style={{ display: 'flex', gap: '0.75rem', flexWrap: 'wrap' }}>
+                    <div style={{ display: 'flex', justifyContent: 'center' }}>
                       {/* Live Camera Button */}
                       <button 
                         type="button" 
                         onClick={() => setIsCameraOpen(true)}
                         style={{
                           flex: 1,
-                          minWidth: '180px',
+                          width: '100%',
                           display: 'flex',
                           alignItems: 'center',
                           justifyContent: 'center',
@@ -575,34 +575,10 @@ const SubmitComplaint = () => {
                         <Camera size={20} />
                         <span>Take Photo (Live Camera)</span>
                       </button>
+                      </div>
 
-                      {/* Upload from Phone / Gallery Button */}
-                      <button 
-                        type="button" 
-                        onClick={() => document.getElementById('image-upload')?.click()}
-                        style={{
-                          flex: 1,
-                          minWidth: '180px',
-                          display: 'flex',
-                          alignItems: 'center',
-                          justifyContent: 'center',
-                          gap: '0.5rem',
-                          padding: '0.9rem',
-                          background: '#f8fafc',
-                          color: '#0f172a',
-                          border: '1.5px dashed #94a3b8',
-                          borderRadius: '12px',
-                          fontWeight: 600,
-                          fontSize: '0.95rem',
-                          cursor: 'pointer'
-                        }}
-                      >
-                        <Upload size={20} color="#059669" />
-                        <span>Upload from Gallery</span>
-                      </button>
-                    </div>
                     <p style={{ margin: 0, fontSize: '0.8rem', color: '#64748b', textAlign: 'center' }}>
-                      📸 Capture using live camera or select an image from your device. Photos are automatically stamped with GPS coordinates, date, and time.
+                      📸 Capture using live camera. Photos are automatically stamped with GPS coordinates, date, and time.
                     </p>
                   </div>
                 )}
