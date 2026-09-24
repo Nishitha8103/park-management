@@ -76,31 +76,51 @@ const createComplaint = async (req, res) => {
     const { parkId, parkName, locationInPark, category, priority, description, userName, userPhone, district, zone, ward, userId, imageBase64, imagesBase64 } = req.body;
 
     const complaintNumber = 'CMP' + Math.floor(100000000 + Math.random() * 900000000);
-    let images = req.files ? req.files.map(file => `/uploads/complaints/${file.filename}`) : [];
+    const uploadDir = path.join(__dirname, '../uploads/complaints');
+    if (!fs.existsSync(uploadDir)) {
+      fs.mkdirSync(uploadDir, { recursive: true });
+    }
 
-    // Base64 image fallback if multipart upload is empty
-    if (images.length === 0 && (imageBase64 || imagesBase64)) {
-      const b64List = imagesBase64 ? (Array.isArray(imagesBase64) ? imagesBase64 : [imagesBase64]) : [imageBase64];
-      const uploadDir = path.join(__dirname, '../uploads/complaints');
-      if (!fs.existsSync(uploadDir)) {
-        fs.mkdirSync(uploadDir, { recursive: true });
-      }
-      for (const b64 of b64List) {
-        if (typeof b64 === 'string' && b64.includes('base64,')) {
-          try {
-            const matches = b64.match(/^data:([A-Za-z-+\/]+);base64,(.+)$/);
-            if (matches && matches.length === 3) {
-              const buffer = Buffer.from(matches[2], 'base64');
-              const filename = `${Date.now()}-evidence_${Math.round(Math.random() * 1e6)}.jpg`;
-              const filePath = path.join(uploadDir, filename);
-              fs.writeFileSync(filePath, buffer);
-              images.push(`/uploads/complaints/${filename}`);
-              console.log('[createComplaint] Saved base64 image fallback to:', filePath);
-            }
-          } catch (e) {
-            console.error('[createComplaint] Error saving base64 image fallback:', e);
-          }
+    let images = req.files && req.files.length > 0 
+      ? req.files.map(file => `/uploads/complaints/${file.filename}`) 
+      : [];
+
+    // Helper to decode and save base64 data to disk
+    const saveBase64Image = (b64Str) => {
+      if (!b64Str || typeof b64Str !== 'string') return null;
+      try {
+        const matches = b64Str.match(/^data:([A-Za-z-+\/]+);base64,(.+)$/);
+        if (matches && matches.length === 3) {
+          const buffer = Buffer.from(matches[2], 'base64');
+          const filename = `${Date.now()}-evidence_${Math.round(Math.random() * 1e6)}.jpg`;
+          const filePath = path.join(uploadDir, filename);
+          fs.writeFileSync(filePath, buffer);
+          console.log('[createComplaint] Saved base64 image to disk:', filePath);
+          return `/uploads/complaints/${filename}`;
         }
+      } catch (e) {
+        console.error('[createComplaint] Error saving base64 image:', e);
+      }
+      return null;
+    };
+
+    // If base64 payload provided, always save it to disk
+    const rawB64 = imageBase64 || imagesBase64;
+    if (rawB64) {
+      const b64List = Array.isArray(rawB64) ? rawB64 : [rawB64];
+      for (const b64 of b64List) {
+        const saved = saveBase64Image(b64);
+        if (saved && !images.includes(saved)) {
+          images.push(saved);
+        }
+      }
+    }
+
+    // If req.body.images contains base64 string
+    if (req.body.images && typeof req.body.images === 'string' && req.body.images.startsWith('data:image')) {
+      const saved = saveBase64Image(req.body.images);
+      if (saved && !images.includes(saved)) {
+        images.push(saved);
       }
     }
 
