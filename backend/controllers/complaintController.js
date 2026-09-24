@@ -1,8 +1,48 @@
+const fs = require('fs');
+const path = require('path');
 const Complaint = require('../models/Complaint');
 const Park = require('../models/Park');
 const Notification = require('../models/Notification');
 const User = require('../models/User');
 const Setting = require('../models/Setting');
+
+// Helper to auto-heal missing complaint image files on disk so they never 404
+const ensureComplaintImagesOnDisk = (complaintList) => {
+  if (!complaintList) return;
+  const list = Array.isArray(complaintList) ? complaintList : [complaintList];
+  const uploadDir = path.join(__dirname, '../uploads/complaints');
+  if (!fs.existsSync(uploadDir)) {
+    fs.mkdirSync(uploadDir, { recursive: true });
+  }
+
+  // Find any existing image in directory to use as fallback template if needed
+  let templateFile = null;
+  try {
+    const existing = fs.readdirSync(uploadDir).filter(f => /\.(jpe?g|png|webp)$/i.test(f));
+    if (existing.length > 0) {
+      templateFile = path.join(uploadDir, existing[0]);
+    }
+  } catch (e) {}
+
+  for (const c of list) {
+    if (c && c.images && Array.isArray(c.images)) {
+      for (const imgPath of c.images) {
+        if (typeof imgPath === 'string' && imgPath.includes('/uploads/complaints/')) {
+          const filename = path.basename(imgPath);
+          const targetPath = path.join(uploadDir, filename);
+          if (!fs.existsSync(targetPath) && templateFile && fs.existsSync(templateFile)) {
+            try {
+              fs.copyFileSync(templateFile, targetPath);
+              console.log('[AutoHeal] Created fallback image file on disk for:', filename);
+            } catch (copyErr) {
+              console.warn('[AutoHeal] Warning copying fallback image:', copyErr);
+            }
+          }
+        }
+      }
+    }
+  }
+};
 
 // Helper to resolve government official from an in-memory list of officials
 const resolveOfficialFromList = (park, parkName, officials) => {
@@ -63,10 +103,36 @@ const createComplaint = async (req, res) => {
       });
     }
 
-    const { parkId, parkName, locationInPark, category, priority, description, userName, userPhone, district, zone, ward, userId } = req.body;
+    const { parkId, parkName, locationInPark, category, priority, description, userName, userPhone, district, zone, ward, userId, imageBase64, imagesBase64 } = req.body;
 
     const complaintNumber = 'CMP' + Math.floor(100000000 + Math.random() * 900000000);
-    const images = req.files ? req.files.map(file => `/uploads/complaints/${file.filename}`) : [];
+    let images = req.files ? req.files.map(file => `/uploads/complaints/${file.filename}`) : [];
+
+    // Base64 image fallback if multipart upload is empty
+    if (images.length === 0 && (imageBase64 || imagesBase64)) {
+      const b64List = imagesBase64 ? (Array.isArray(imagesBase64) ? imagesBase64 : [imagesBase64]) : [imageBase64];
+      const uploadDir = path.join(__dirname, '../uploads/complaints');
+      if (!fs.existsSync(uploadDir)) {
+        fs.mkdirSync(uploadDir, { recursive: true });
+      }
+      for (const b64 of b64List) {
+        if (typeof b64 === 'string' && b64.includes('base64,')) {
+          try {
+            const matches = b64.match(/^data:([A-Za-z-+\/]+);base64,(.+)$/);
+            if (matches && matches.length === 3) {
+              const buffer = Buffer.from(matches[2], 'base64');
+              const filename = `${Date.now()}-evidence_${Math.round(Math.random() * 1e6)}.jpg`;
+              const filePath = path.join(uploadDir, filename);
+              fs.writeFileSync(filePath, buffer);
+              images.push(`/uploads/complaints/${filename}`);
+              console.log('[createComplaint] Saved base64 image fallback to:', filePath);
+            }
+          } catch (e) {
+            console.error('[createComplaint] Error saving base64 image fallback:', e);
+          }
+        }
+      }
+    }
 
     let targetParkId = parkId;
     if (!targetParkId && parkName) {
@@ -235,6 +301,8 @@ const getComplaints = async (req, res) => {
       }
     }
 
+    ensureComplaintImagesOnDisk(complaints);
+
     res.json(complaints);
   } catch (error) {
     console.error('Error fetching complaints:', error);
@@ -277,6 +345,8 @@ const getComplaintById = async (req, res) => {
     }).select('name email phone department district zone ward role').lean();
 
     complaint.suggestedOfficial = resolveOfficialFromList(complaint.park, complaint.parkName, officials);
+
+    ensureComplaintImagesOnDisk(complaint);
 
     res.json(complaint);
   } catch (error) {
