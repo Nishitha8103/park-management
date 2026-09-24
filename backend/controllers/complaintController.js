@@ -6,41 +6,11 @@ const Notification = require('../models/Notification');
 const User = require('../models/User');
 const Setting = require('../models/Setting');
 
-// Helper to auto-heal missing complaint image files on disk so they never 404
+// Helper to ensure upload directories exist
 const ensureComplaintImagesOnDisk = (complaintList) => {
-  if (!complaintList) return;
-  const list = Array.isArray(complaintList) ? complaintList : [complaintList];
   const uploadDir = path.join(__dirname, '../uploads/complaints');
   if (!fs.existsSync(uploadDir)) {
     fs.mkdirSync(uploadDir, { recursive: true });
-  }
-
-  // Find any existing image in directory to use as fallback template if needed
-  let templateFile = null;
-  try {
-    const existing = fs.readdirSync(uploadDir).filter(f => /\.(jpe?g|png|webp)$/i.test(f));
-    if (existing.length > 0) {
-      templateFile = path.join(uploadDir, existing[0]);
-    }
-  } catch (e) {}
-
-  for (const c of list) {
-    if (c && c.images && Array.isArray(c.images)) {
-      for (const imgPath of c.images) {
-        if (typeof imgPath === 'string' && imgPath.includes('/uploads/complaints/')) {
-          const filename = path.basename(imgPath);
-          const targetPath = path.join(uploadDir, filename);
-          if (!fs.existsSync(targetPath) && templateFile && fs.existsSync(templateFile)) {
-            try {
-              fs.copyFileSync(templateFile, targetPath);
-              console.log('[AutoHeal] Created fallback image file on disk for:', filename);
-            } catch (copyErr) {
-              console.warn('[AutoHeal] Warning copying fallback image:', copyErr);
-            }
-          }
-        }
-      }
-    }
   }
 };
 

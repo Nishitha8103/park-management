@@ -20,6 +20,7 @@ import { useNavigate, useLocation } from 'react-router-dom';
 import axios from 'axios';
 import { stampImageWithGeoAndTimestamp } from '../utils/imageStampUtil';
 import { processMobileImage } from '../utils/imageUtils';
+import LiveCameraCaptureModal from '../components/LiveCameraCaptureModal';
 import './SubmitComplaint.css';
 
 const SubmitComplaint = () => {
@@ -570,29 +571,53 @@ const SubmitComplaint = () => {
                         onClick={() => setIsCameraOpen(true)}
                         style={{
                           flex: 1,
-                          width: '100%',
-                          minWidth: '200px',
+                          minWidth: '180px',
                           display: 'flex',
                           alignItems: 'center',
                           justifyContent: 'center',
                           gap: '0.5rem',
-                          padding: '1.1rem',
+                          padding: '0.9rem',
                           background: 'linear-gradient(135deg, #059669 0%, #10b981 100%)',
                           color: '#ffffff',
                           border: 'none',
                           borderRadius: '12px',
                           fontWeight: 600,
-                          fontSize: '1rem',
+                          fontSize: '0.95rem',
                           cursor: 'pointer',
                           boxShadow: '0 4px 6px -1px rgba(16, 185, 129, 0.25)'
                         }}
                       >
-                        <Camera size={22} />
+                        <Camera size={20} />
                         <span>Take Photo (Live Camera)</span>
+                      </button>
+
+                      {/* Upload from Phone / Gallery Button */}
+                      <button 
+                        type="button" 
+                        onClick={() => document.getElementById('image-upload')?.click()}
+                        style={{
+                          flex: 1,
+                          minWidth: '180px',
+                          display: 'flex',
+                          alignItems: 'center',
+                          justifyContent: 'center',
+                          gap: '0.5rem',
+                          padding: '0.9rem',
+                          background: '#f8fafc',
+                          color: '#0f172a',
+                          border: '1.5px dashed #94a3b8',
+                          borderRadius: '12px',
+                          fontWeight: 600,
+                          fontSize: '0.95rem',
+                          cursor: 'pointer'
+                        }}
+                      >
+                        <Upload size={20} color="#059669" />
+                        <span>Upload from Gallery</span>
                       </button>
                     </div>
                     <p style={{ margin: 0, fontSize: '0.8rem', color: '#64748b', textAlign: 'center' }}>
-                      📸 Photos are automatically captured via live camera and stamped with your verified <strong>GPS coordinates, date, and live time</strong>.
+                      📸 Capture using live camera or select an image from your device. Photos are automatically stamped with GPS coordinates, date, and time.
                     </p>
                   </div>
                 )}
