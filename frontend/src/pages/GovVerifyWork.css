@@ -1,36 +1,87 @@
 .inspection-decision-container {
   display: flex;
   flex-direction: column;
+  gap: 1.25rem;
+  width: 100%;
+  max-width: 100%;
+  box-sizing: border-box;
+  padding: 0.5rem 0 2rem 0;
+}
+
+.inspection-decision-container .top-nav-row {
+  margin-bottom: 0.25rem;
+}
+
+.inspection-decision-container .btn-back {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  color: #ffffff !important;
+  font-weight: 700;
+  font-size: 0.95rem;
+  background: rgba(255, 255, 255, 0.18);
+  border: 1px solid rgba(255, 255, 255, 0.35);
+  border-radius: 8px;
+  padding: 0.45rem 1rem;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.inspection-decision-container .btn-back:hover {
+  background: #ffffff;
+  color: #1f2a21 !important;
+}
+
+.inspection-decision-container .page-title {
+  font-size: 1.85rem;
+  font-weight: 900;
+  color: #ffffff !important;
+  text-shadow: 0 1px 3px rgba(0, 0, 0, 0.2);
+  margin: 0;
+}
+
+.inspection-decision-container .text-secondary {
+  font-size: 1.05rem;
+  font-weight: 600;
+  color: #edf2ee !important;
+  margin: 0.25rem 0 1.25rem 0;
 }
 
 .decision-cards-grid {
   display: grid;
-  grid-template-columns: repeat(3, 1fr);
-  gap: var(--spacing-xl);
+  grid-template-columns: repeat(2, 1fr);
+  gap: 1.5rem;
+  width: 100%;
+  box-sizing: border-box;
 }
 
 .decision-card {
-  background-color: var(--surface);
-  border: 1px solid var(--border);
-  border-radius: var(--radius-lg);
-  padding: var(--spacing-xl);
+  background: rgba(255, 255, 255, 0.88) !important;
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
+  border: 1.5px solid rgba(255, 255, 255, 0.6) !important;
+  border-radius: 16px;
+  padding: 2rem 1.5rem;
   display: flex;
   flex-direction: column;
   align-items: center;
   text-align: center;
   cursor: pointer;
-  transition: all 0.2s;
-  box-shadow: var(--shadow-sm);
+  transition: all 0.25s ease;
+  box-shadow: 0 10px 30px rgba(31, 42, 33, 0.12);
 }
 
 .decision-card:hover {
-  transform: translateY(-2px);
-  box-shadow: var(--shadow-md);
+  transform: translateY(-3px);
+  background: rgba(255, 255, 255, 0.96) !important;
+  box-shadow: 0 14px 36px rgba(31, 42, 33, 0.18);
+  border-color: #ffffff !important;
 }
 
 .decision-card.selected {
-  border-color: var(--primary);
-  box-shadow: 0 0 0 2px rgba(15, 81, 50, 0.2);
+  border-color: #2d5a37 !important;
+  background: rgba(255, 255, 255, 0.98) !important;
+  box-shadow: 0 0 0 3px rgba(45, 90, 55, 0.25), 0 12px 32px rgba(31, 42, 33, 0.16);
 }
 
 .decision-icon-wrapper {
@@ -42,17 +93,36 @@
   justify-content: center;
 }
 
+.text-success {
+  color: #15803d !important;
+}
+
+.bg-success-light {
+  background-color: #dcfce7 !important;
+  border: 1px solid #bbf7d0;
+}
+
+.text-warning {
+  color: #c2410c !important;
+}
+
+.bg-warning-light {
+  background-color: #ffedd5 !important;
+  border: 1px solid #fed7aa;
+}
+
 .decision-title {
-  font-size: 1.2rem;
-  font-weight: 700;
-  color: var(--text-primary);
+  font-size: 1.35rem;
+  font-weight: 800;
+  color: #152217 !important;
   margin-bottom: 8px;
 }
 
 .decision-desc {
-  font-size: 0.9rem;
-  color: var(--text-secondary);
-  line-height: 1.4;
+  font-size: 0.95rem;
+  color: #3b4d3f !important;
+  font-weight: 600;
+  line-height: 1.45;
   flex: 1;
 }
 
@@ -72,10 +142,10 @@
 }
 
 .radio-mark {
-  height: 24px;
-  width: 24px;
-  background-color: white;
-  border: 2px solid var(--border);
+  height: 26px;
+  width: 26px;
+  background-color: #ffffff;
+  border: 2px solid #8ba892;
   border-radius: 50%;
   display: flex;
   align-items: center;
@@ -84,27 +154,113 @@
 }
 
 .radio-custom input:checked ~ .radio-mark {
-  border-color: var(--primary);
+  border-color: #2d5a37;
+  background-color: #edf7ef;
 }
 
 .radio-custom input:checked ~ .radio-mark:after {
   content: "";
   display: block;
-  width: 12px;
-  height: 12px;
+  width: 14px;
+  height: 14px;
   border-radius: 50%;
-  background-color: var(--primary);
+  background-color: #2d5a37;
 }
 
 .remarks-section {
-  background-color: var(--surface);
-  border: 1px solid var(--border);
-  border-radius: var(--radius-lg);
-  padding: var(--spacing-xl);
+  background: rgba(255, 255, 255, 0.88) !important;
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
+  border: 1.5px solid rgba(255, 255, 255, 0.6) !important;
+  border-radius: 16px;
+  padding: 1.75rem;
+  box-shadow: 0 10px 30px rgba(31, 42, 33, 0.12);
+  width: 100%;
+  box-sizing: border-box;
+}
+
+.remarks-section .font-semibold {
+  font-size: 1.1rem;
+  font-weight: 800;
+  color: #152217 !important;
+}
+
+.remarks-section .input-field {
+  width: 100%;
+  box-sizing: border-box;
+  background: #ffffff !important;
+  border: 1.5px solid #cbd7cd !important;
+  border-radius: 10px;
+  padding: 1rem;
+  font-size: 1rem;
+  color: #1f2a21 !important;
+  font-weight: 500;
+  outline: none;
+  transition: all 0.2s;
+}
+
+.remarks-section .input-field:focus {
+  border-color: #2d5a37 !important;
+  box-shadow: 0 0 0 3px rgba(45, 90, 55, 0.18);
+}
+
+.action-buttons-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 1.25rem;
+  width: 100%;
+}
+
+.btn-decision-cancel {
+  min-width: 180px;
+  padding: 0.85rem 1.5rem;
+  background: rgba(255, 255, 255, 0.9) !important;
+  color: #1f2a21 !important;
+  font-weight: 700;
+  border: 1.5px solid #cbd7cd;
+  border-radius: 10px;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.btn-decision-cancel:hover {
+  background: #ffffff !important;
+  border-color: #94a3b8;
+}
+
+.btn-decision-submit {
+  min-width: 220px;
+  padding: 0.85rem 1.75rem;
+  background: linear-gradient(135deg, #2d5a37 0%, #1f4228 100%) !important;
+  color: #ffffff !important;
+  font-weight: 800;
+  font-size: 1.05rem;
+  border: none;
+  border-radius: 10px;
+  cursor: pointer;
+  box-shadow: 0 4px 14px rgba(31, 66, 40, 0.35);
+  transition: all 0.2s;
+}
+
+.btn-decision-submit:hover:not(:disabled) {
+  transform: translateY(-2px);
+  box-shadow: 0 6px 20px rgba(31, 66, 40, 0.45);
+}
+
+.btn-decision-submit:disabled {
+  opacity: 0.65;
+  cursor: not-allowed;
 }
 
 @media (max-width: 768px) {
   .decision-cards-grid {
     grid-template-columns: 1fr;
+  }
+  .action-buttons-row {
+    flex-direction: column;
+  }
+  .btn-decision-cancel, .btn-decision-submit {
+    width: 100%;
   }
 }

@@ -282,12 +282,122 @@ const sendPasswordResetOtpEmail = async (toEmail, name, otp) => {
   }
 };
 
+const sendTaskAssignedEmail = async (toEmail, recipientName, role, complaint) => {
+  try {
+    if (!toEmail) return;
+    const { transporter, fromEmail, isTest } = await createTransporter();
+    const isContractor = role?.toLowerCase().includes('contractor');
+    const roleTitle = isContractor ? 'Contractor Maintenance Task' : 'Official Inspection Task';
+    const actionRoute = isContractor ? 'Contractor Portal Tasks' : 'Government Official Inspection Portal';
+
+    const mailOptions = {
+      from: `"Parks Monitoring System" <${fromEmail}>`,
+      to: toEmail,
+      subject: `[Assigned] Task #${complaint.complaintNumber} - ${complaint.parkName || 'Park Issue'}`,
+      text: `Hello ${recipientName || 'Team Member'},\n\nA new task has been assigned to you:\n\nComplaint #: ${complaint.complaintNumber}\nPark: ${complaint.parkName || 'Park'}\nCategory: ${complaint.category || 'Maintenance'}\nPriority: ${complaint.priority || 'Medium'}\nDescription: ${complaint.description || 'N/A'}\n\nPlease log in to your ${actionRoute} to review details and begin required work.\n\nBest regards,\nParks Monitoring Administration`,
+      html: `
+        <div style="font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif; max-width: 580px; margin: 0 auto; background-color: #ffffff; border: 1px solid #e2e8f0; border-radius: 12px; overflow: hidden;">
+          <div style="background: linear-gradient(135deg, #15803d, #16a34a); padding: 22px 24px; color: #ffffff;">
+            <h2 style="margin: 0; font-size: 20px;">🔔 New ${roleTitle} Assigned</h2>
+            <p style="margin: 6px 0 0 0; color: #dcfce7; font-size: 13px;">Ticket Reference: #${complaint.complaintNumber}</p>
+          </div>
+          <div style="padding: 24px;">
+            <p style="margin: 0 0 16px 0; color: #334155; font-size: 15px;">
+              Hello <strong>${recipientName || 'Team Member'}</strong>, a new task has been assigned to you for resolution:
+            </p>
+            <table style="width: 100%; border-collapse: collapse; margin-bottom: 20px; font-size: 14px;">
+              <tr style="border-bottom: 1px solid #f1f5f9;">
+                <td style="padding: 8px 0; color: #64748b; width: 35%;"><strong>Park Name:</strong></td>
+                <td style="padding: 8px 0; color: #0f172a; font-weight: 600;">${complaint.parkName || 'Park Area'}</td>
+              </tr>
+              <tr style="border-bottom: 1px solid #f1f5f9;">
+                <td style="padding: 8px 0; color: #64748b;"><strong>Category:</strong></td>
+                <td style="padding: 8px 0; color: #0f172a;">${complaint.category || 'General'}</td>
+              </tr>
+              <tr style="border-bottom: 1px solid #f1f5f9;">
+                <td style="padding: 8px 0; color: #64748b;"><strong>Priority:</strong></td>
+                <td style="padding: 8px 0; color: #b91c1c; font-weight: 700;">${complaint.priority || 'Medium'}</td>
+              </tr>
+              <tr>
+                <td style="padding: 8px 0; color: #64748b; vertical-align: top;"><strong>Description:</strong></td>
+                <td style="padding: 8px 0; color: #334155;">${complaint.description || 'N/A'}</td>
+              </tr>
+            </table>
+            <p style="color: #64748b; font-size: 13px; line-height: 1.5; margin: 0 0 16px 0;">
+              Please log in to your dashboard to view complete park details, upload geo-tagged photo proofs, and submit your completion status.
+            </p>
+          </div>
+          <div style="background-color: #f8fafc; padding: 14px 24px; border-top: 1px solid #e2e8f0; text-align: center; color: #94a3b8; font-size: 12px;">
+            Parks Monitoring System • Official Task Assignment Notification
+          </div>
+        </div>
+      `
+    };
+
+    const info = await transporter.sendMail(mailOptions);
+    console.log(`[Task Assigned Email Sent] To: ${toEmail} (${role})`);
+    return info;
+  } catch (err) {
+    console.error(`[sendTaskAssignedEmail Error] Failed to send email to ${toEmail}:`, err.message || err);
+  }
+};
+
+const sendComplaintClosedEmail = async (toEmail, citizenName, complaint) => {
+  try {
+    if (!toEmail) return;
+    const { transporter, fromEmail, isTest } = await createTransporter();
+
+    const mailOptions = {
+      from: `"Parks Monitoring System" <${fromEmail}>`,
+      to: toEmail,
+      subject: `✅ Issue Resolved - Complaint #${complaint.complaintNumber} Closed`,
+      text: `Hello ${citizenName || 'Citizen'},\n\nYour complaint #${complaint.complaintNumber} regarding "${complaint.category || 'Park Maintenance'}" at "${complaint.parkName || 'Park'}" has been successfully resolved and officially closed by the administration.\n\nThank you for helping us keep our parks clean and safe!\n\nBest regards,\nParks Monitoring System`,
+      html: `
+        <div style="font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif; max-width: 580px; margin: 0 auto; background-color: #ffffff; border: 1px solid #e2e8f0; border-radius: 12px; overflow: hidden;">
+          <div style="background: linear-gradient(135deg, #059669, #10b981); padding: 24px; color: #ffffff; text-align: center;">
+            <div style="font-size: 36px; margin-bottom: 8px;">✅</div>
+            <h2 style="margin: 0; font-size: 22px; font-weight: 800;">Complaint Resolved & Closed</h2>
+            <p style="margin: 6px 0 0 0; color: #d1fae5; font-size: 14px;">Ticket Reference: #${complaint.complaintNumber}</p>
+          </div>
+          <div style="padding: 24px;">
+            <p style="margin: 0 0 16px 0; color: #334155; font-size: 15px;">
+              Hello <strong>${citizenName || 'Citizen'}</strong>,
+            </p>
+            <p style="color: #475569; font-size: 14px; line-height: 1.6; margin: 0 0 16px 0;">
+              We are pleased to inform you that your reported issue at <strong>${complaint.parkName || 'the park'}</strong> has been inspected, resolved, and verified.
+            </p>
+            <div style="background-color: #f0fdf4; border-left: 4px solid #16a34a; padding: 14px 16px; margin-bottom: 20px; border-radius: 4px;">
+              <p style="margin: 0 0 6px 0; font-size: 13px; color: #166534;"><strong>Issue Category:</strong> ${complaint.category || 'General'}</p>
+              <p style="margin: 0 0 6px 0; font-size: 13px; color: #166534;"><strong>Status:</strong> Closed (Verified & Approved)</p>
+              <p style="margin: 0; font-size: 13px; color: #166534;"><strong>Park Location:</strong> ${complaint.parkName || 'Park'} ${complaint.locationInPark ? `(${complaint.locationInPark})` : ''}</p>
+            </div>
+            <p style="color: #64748b; font-size: 13px; line-height: 1.5; margin: 0 0 8px 0;">
+              Thank you for being an active civic citizen and helping us maintain clean, green, and vibrant parks for the entire community.
+            </p>
+          </div>
+          <div style="background-color: #f8fafc; padding: 14px 24px; border-top: 1px solid #e2e8f0; text-align: center; color: #94a3b8; font-size: 12px;">
+            Parks Monitoring System • Official Citizen Notification
+          </div>
+        </div>
+      `
+    };
+
+    const info = await transporter.sendMail(mailOptions);
+    console.log(`[Complaint Closed Email Sent] To Citizen: ${toEmail}`);
+    return info;
+  } catch (err) {
+    console.error(`[sendComplaintClosedEmail Error] Failed to send email to ${toEmail}:`, err.message || err);
+  }
+};
+
 module.exports = {
   sendContractorCredentialsEmail,
   sendContractorUpdateEmail,
   sendOfficialCredentialsEmail,
   sendWelcomePublicEmail,
-  sendPasswordResetOtpEmail
+  sendPasswordResetOtpEmail,
+  sendTaskAssignedEmail,
+  sendComplaintClosedEmail
 };
 
 

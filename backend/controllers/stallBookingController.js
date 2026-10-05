@@ -37,8 +37,7 @@ const getProofTypesConfig = async (req, res) => {
   }
 };
 
-// @desc    Update accepted address proof types (Admin only)
-// @route   PUT /api/stall-bookings/config/proof-types
+
 const updateProofTypesConfig = async (req, res) => {
   try {
     const { proofTypes } = req.body;
@@ -91,7 +90,7 @@ const createBooking = async (req, res) => {
     if (!slot) {
       return res.status(404).json({ message: 'Stall slot not found' });
     }
-    
+
     if (!slot.isAvailable) {
       return res.status(400).json({ message: 'This slot is already booked or reserved' });
     }
@@ -131,7 +130,7 @@ const createBooking = async (req, res) => {
 
     // Determine initial verification statuses
     const sameAddressBool = isAddressSameAsAadhaar === 'true' || isAddressSameAsAadhaar === true;
-    
+
     let initialAddressStatus = 'Verified';
     if (!sameAddressBool) {
       if (currentAddressProofUrl) {
@@ -461,8 +460,8 @@ const createRazorpayOrder = async (req, res) => {
     const amount = booking.amountPaid * 100; // paise
 
     const razorpay = new Razorpay({
-      key_id: (process.env.RAZORPAY_KEY_ID || "rzp_test_TZpwFUaag8MfCo").trim(), 
-      key_secret: (process.env.RAZORPAY_KEY_SECRET || "tpAyBheedlToaXMjya5xOno7").trim(), 
+      key_id: (process.env.RAZORPAY_KEY_ID || "rzp_test_TZpwFUaag8MfCo").trim(),
+      key_secret: (process.env.RAZORPAY_KEY_SECRET || "tpAyBheedlToaXMjya5xOno7").trim(),
     });
 
     const options = {
@@ -476,8 +475,8 @@ const createRazorpayOrder = async (req, res) => {
       res.json({ ...order, razorpayKeyId: (process.env.RAZORPAY_KEY_ID || "rzp_test_TZpwFUaag8MfCo").trim() });
     } catch (razorpayError) {
       console.warn('Razorpay API failed:', razorpayError);
-      return res.status(400).json({ 
-        message: razorpayError.description || razorpayError.message || 'Payment gateway authentication failed. Please check Razorpay keys.' 
+      return res.status(400).json({
+        message: razorpayError.description || razorpayError.message || 'Payment gateway authentication failed. Please check Razorpay keys.'
       });
     }
   } catch (error) {
@@ -493,7 +492,7 @@ const payBooking = async (req, res) => {
   try {
     const { id } = req.params;
     const { razorpay_order_id, razorpay_payment_id, razorpay_signature } = req.body;
-    
+
     const booking = await StallBooking.findById(id).populate('park');
     if (!booking) {
       return res.status(404).json({ message: 'Booking not found' });

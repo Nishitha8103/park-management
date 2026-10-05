@@ -1,14 +1,21 @@
 import { useState, useEffect } from 'react';
 import { Outlet, useNavigate } from 'react-router-dom';
 import GovSidebar from '../components/GovSidebar';
-import { Menu, TreePine, Bell } from 'lucide-react';
+import { Menu, TreePine, Bell, Sun, Moon } from 'lucide-react';
 import './MainLayout.css';
 import './GovLayout.css';
 
 const GovLayout = () => {
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
+  const [theme, setTheme] = useState(() => localStorage.getItem('govTheme') || 'light');
   const toggleSidebar = () => setIsSidebarOpen(!isSidebarOpen);
   const navigate = useNavigate();
+
+  const toggleTheme = () => {
+    const nextTheme = theme === 'dark' ? 'light' : 'dark';
+    setTheme(nextTheme);
+    localStorage.setItem('govTheme', nextTheme);
+  };
 
   useEffect(() => {
     const storedUser = localStorage.getItem('govUser');
@@ -18,9 +25,9 @@ const GovLayout = () => {
   }, [navigate]);
 
   return (
-    <div className="app-layout gov-portal-layout">
+    <div className={`app-layout gov-portal-layout ${theme === 'dark' ? 'gov-dark-mode' : 'gov-light-mode'}`}>
       <header className="main-topbar gov-topbar">
-        <button className="menu-toggle" onClick={toggleSidebar}>
+        <button className="menu-toggle" onClick={toggleSidebar} title="Toggle Menu">
           <Menu size={28} color="white" />
         </button>
         <div className="topbar-logo" style={{ display: 'flex', flex: 1, justifyContent: 'space-between', alignItems: 'center' }}>
@@ -28,7 +35,34 @@ const GovLayout = () => {
             <TreePine size={28} color="#e5ede7" />
             <span className="logo-text">Parks Monitoring System</span>
           </div>
-          <div style={{ display: 'flex', alignItems: 'center', gap: '16px', marginRight: '16px' }}>
+          <div style={{ display: 'flex', alignItems: 'center', gap: '14px', marginRight: '16px' }}>
+            <button 
+              className="gov-theme-toggle-btn"
+              onClick={toggleTheme}
+              title={`Switch to ${theme === 'dark' ? 'Light' : 'Dark'} Mode`}
+              aria-label="Toggle Theme"
+              style={{
+                color: 'white',
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+                padding: '6px',
+                borderRadius: '50%',
+                background: 'rgba(255,255,255,0.18)',
+                border: '1px solid rgba(255,255,255,0.3)',
+                cursor: 'pointer',
+                width: '36px',
+                height: '36px',
+                transition: 'all 0.2s ease'
+              }}
+            >
+              {theme === 'dark' ? (
+                <Sun size={18} color="#F5B942" />
+              ) : (
+                <Moon size={18} color="#ffffff" />
+              )}
+            </button>
+
             <div 
               style={{ position: 'relative', cursor: 'pointer' }}
               onClick={() => navigate('/gov-dashboard/notifications')}

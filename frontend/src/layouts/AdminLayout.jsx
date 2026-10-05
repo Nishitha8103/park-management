@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react';
 import { Outlet, useNavigate } from 'react-router-dom';
 import AdminSidebar from '../components/AdminSidebar';
-import { Menu, TreePine, Search, Settings, User } from 'lucide-react';
+import { Menu, TreePine, Sun, Moon } from 'lucide-react';
 import NotificationDropdown from '../components/NotificationDropdown';
 import './MainLayout.css';
 
@@ -11,6 +11,13 @@ const AdminLayout = () => {
   const navigate = useNavigate();
 
   const [adminUser, setAdminUser] = useState(null);
+  const [theme, setTheme] = useState(() => localStorage.getItem('adminTheme') || 'dark');
+
+  const toggleTheme = () => {
+    const nextTheme = theme === 'dark' ? 'light' : 'dark';
+    setTheme(nextTheme);
+    localStorage.setItem('adminTheme', nextTheme);
+  };
 
   useEffect(() => {
     let storedAdmin = localStorage.getItem('adminUser');
@@ -34,7 +41,6 @@ const AdminLayout = () => {
     if (parsed) {
       setAdminUser(parsed);
     } else {
-      // If not logged in as admin, provide fallback guest admin or redirect gracefully
       const defaultAdmin = {
         name: 'Administrator',
         role: 'Admin',
@@ -46,24 +52,30 @@ const AdminLayout = () => {
   }, [navigate]);
 
   return (
-    <div className="app-layout admin-portal-layout">
+    <div className={`app-layout admin-portal-layout ${theme === 'light' ? 'light-mode' : 'dark-mode'}`}>
       <header className="main-topbar adm-topbar">
-        <button className="menu-toggle" onClick={toggleSidebar}>
-          <Menu size={24} color="white" />
+        <button className="menu-toggle" onClick={toggleSidebar} title="Toggle Sidebar">
+          <Menu size={24} color={theme === 'light' ? '#0f172a' : 'white'} />
         </button>
         <div className="adm-topbar-inner">
           <div className="adm-topbar-brand">
-            <TreePine size={26} color="#e5ede7" />
+            <TreePine size={26} color={theme === 'light' ? '#16a34a' : '#4ade80'} />
             <span className="logo-text">Parks Monitoring System</span>
           </div>
           <div className="adm-topbar-actions">
             {adminUser && <NotificationDropdown userId={adminUser.id || adminUser._id} role="admin" />}
-            <button className="adm-topbar-icon-btn" onClick={() => navigate('/admin-dashboard/settings')} title="Settings">
-              <Settings size={18} />
+            <button 
+              className="adm-topbar-icon-btn theme-toggle-btn" 
+              onClick={toggleTheme} 
+              title={`Switch to ${theme === 'dark' ? 'Light' : 'Dark'} Theme`}
+              aria-label="Toggle Theme"
+            >
+              {theme === 'dark' ? (
+                <Sun size={20} className="theme-icon sun-icon" />
+              ) : (
+                <Moon size={20} className="theme-icon moon-icon" />
+              )}
             </button>
-            <div className="adm-topbar-avatar" title={adminUser?.name || 'Admin'}>
-              <User size={16} />
-            </div>
           </div>
         </div>
       </header>

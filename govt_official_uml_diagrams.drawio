@@ -1,0 +1,189 @@
+<mxfile host="app.diagrams.net" modified="2026-10-01T09:40:00.000Z" agent="5.0" version="21.0.0" etag="govt_officials_standard_uml" type="device">
+  <diagram id="GovtOfficialsUMLDiagram" name="Fig 4.2.1.3 UML Diagram">
+    <mxGraphModel dx="1200" dy="800" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="1169" pageHeight="827" background="#ffffff" math="0" shadow="0">
+      <root>
+        <mxCell id="0" />
+        <mxCell id="1" parent="0" />
+
+        <!-- ================= CLASS 1: Government Officials ================= -->
+        <!-- Main Box -->
+        <mxCell id="go_box" value="" style="rounded=0;whiteSpace=wrap;html=1;fillColor=#ffffff;strokeColor=#000000;strokeWidth=1.5;" vertex="1" parent="1">
+          <mxGeometry x="360" y="40" width="280" height="310" as="geometry" />
+        </mxCell>
+        <!-- Header -->
+        <mxCell id="go_header" value="Government Officials" style="text;html=1;strokeColor=none;fillColor=none;align=center;verticalAlign=middle;whiteSpace=wrap;rounded=0;fontSize=14;fontFamily=Times New Roman;fontStyle=0;fontColor=#000000;" vertex="1" parent="1">
+          <mxGeometry x="360" y="45" width="280" height="30" as="geometry" />
+        </mxCell>
+        <!-- Line 1 -->
+        <mxCell id="go_line1" value="" style="endArrow=none;html=1;strokeColor=#000000;strokeWidth=1;" edge="1" parent="1">
+          <mxGeometry relative="1" as="geometry">
+            <mxPoint x="360" y="80" as="sourcePoint" />
+            <mxPoint x="640" y="80" as="targetPoint" />
+          </mxGeometry>
+        </mxCell>
+        <!-- Attributes -->
+        <mxCell id="go_attrs" value="id: int&#xa;name: string&#xa;phone: int&#xa;zone: string&#xa;division: string&#xa;ward: string&#xa;email: string&#xa;password: string" style="text;html=1;strokeColor=none;fillColor=none;align=left;verticalAlign=top;whiteSpace=wrap;rounded=0;fontSize=13;fontFamily=Times New Roman;fontColor=#000000;spacingLeft=12;spacingTop=4;" vertex="1" parent="1">
+          <mxGeometry x="360" y="82" width="280" height="138" as="geometry" />
+        </mxCell>
+        <!-- Line 2 -->
+        <mxCell id="go_line2" value="" style="endArrow=none;html=1;strokeColor=#000000;strokeWidth=1;" edge="1" parent="1">
+          <mxGeometry relative="1" as="geometry">
+            <mxPoint x="360" y="220" as="sourcePoint" />
+            <mxPoint x="640" y="220" as="targetPoint" />
+          </mxGeometry>
+        </mxCell>
+        <!-- Methods -->
+        <mxCell id="go_methods" value="login()&#xa;profile()&#xa;viewAssignedComplaints()&#xa;updateComplaints()&#xa;checkComplaints()&#xa;viewHistory()" style="text;html=1;strokeColor=none;fillColor=none;align=left;verticalAlign=top;whiteSpace=wrap;rounded=0;fontSize=13;fontFamily=Times New Roman;fontColor=#000000;spacingLeft=12;spacingTop=4;" vertex="1" parent="1">
+          <mxGeometry x="360" y="222" width="280" height="128" as="geometry" />
+        </mxCell>
+
+
+        <!-- ================= CLASS 2: Complaints ================= -->
+        <!-- Main Box -->
+        <mxCell id="c_box" value="" style="rounded=0;whiteSpace=wrap;html=1;fillColor=#ffffff;strokeColor=#000000;strokeWidth=1.5;" vertex="1" parent="1">
+          <mxGeometry x="40" y="470" width="280" height="290" as="geometry" />
+        </mxCell>
+        <!-- Header -->
+        <mxCell id="c_header" value="Complaints" style="text;html=1;strokeColor=none;fillColor=none;align=center;verticalAlign=middle;whiteSpace=wrap;rounded=0;fontSize=14;fontFamily=Times New Roman;fontStyle=0;fontColor=#000000;" vertex="1" parent="1">
+          <mxGeometry x="40" y="475" width="280" height="30" as="geometry" />
+        </mxCell>
+        <!-- Line 1 -->
+        <mxCell id="c_line1" value="" style="endArrow=none;html=1;strokeColor=#000000;strokeWidth=1;" edge="1" parent="1">
+          <mxGeometry relative="1" as="geometry">
+            <mxPoint x="40" y="510" as="sourcePoint" />
+            <mxPoint x="320" y="510" as="targetPoint" />
+          </mxGeometry>
+        </mxCell>
+        <!-- Attributes -->
+        <mxCell id="c_attrs" value="id: int&#xa;remarks: string&#xa;image: string&#xa;latitude: int&#xa;longitude: int&#xa;status: string&#xa;updated_image: string&#xa;official_remarks: string" style="text;html=1;strokeColor=none;fillColor=none;align=left;verticalAlign=top;whiteSpace=wrap;rounded=0;fontSize=13;fontFamily=Times New Roman;fontColor=#000000;spacingLeft=12;spacingTop=4;" vertex="1" parent="1">
+          <mxGeometry x="40" y="512" width="280" height="158" as="geometry" />
+        </mxCell>
+        <!-- Line 2 -->
+        <mxCell id="c_line2" value="" style="endArrow=none;html=1;strokeColor=#000000;strokeWidth=1;" edge="1" parent="1">
+          <mxGeometry relative="1" as="geometry">
+            <mxPoint x="40" y="670" as="sourcePoint" />
+            <mxPoint x="320" y="670" as="targetPoint" />
+          </mxGeometry>
+        </mxCell>
+        <!-- Methods -->
+        <mxCell id="c_methods" value="uploadResolvedImage()&#xa;changeStatus()" style="text;html=1;strokeColor=none;fillColor=none;align=left;verticalAlign=top;whiteSpace=wrap;rounded=0;fontSize=13;fontFamily=Times New Roman;fontColor=#000000;spacingLeft=12;spacingTop=4;" vertex="1" parent="1">
+          <mxGeometry x="40" y="672" width="280" height="88" as="geometry" />
+        </mxCell>
+
+
+        <!-- ================= CLASS 3: Complaints Details ================= -->
+        <!-- Main Box -->
+        <mxCell id="cd_box" value="" style="rounded=0;whiteSpace=wrap;html=1;fillColor=#ffffff;strokeColor=#000000;strokeWidth=1.5;" vertex="1" parent="1">
+          <mxGeometry x="360" y="470" width="280" height="290" as="geometry" />
+        </mxCell>
+        <!-- Header -->
+        <mxCell id="cd_header" value="Complaints Details" style="text;html=1;strokeColor=none;fillColor=none;align=center;verticalAlign=middle;whiteSpace=wrap;rounded=0;fontSize=14;fontFamily=Times New Roman;fontStyle=0;fontColor=#000000;" vertex="1" parent="1">
+          <mxGeometry x="360" y="475" width="280" height="30" as="geometry" />
+        </mxCell>
+        <!-- Line 1 -->
+        <mxCell id="cd_line1" value="" style="endArrow=none;html=1;strokeColor=#000000;strokeWidth=1;" edge="1" parent="1">
+          <mxGeometry relative="1" as="geometry">
+            <mxPoint x="360" y="510" as="sourcePoint" />
+            <mxPoint x="640" y="510" as="targetPoint" />
+          </mxGeometry>
+        </mxCell>
+        <!-- Attributes -->
+        <mxCell id="cd_attrs" value="id: int&#xa;date: date&#xa;remarks: string&#xa;image: string&#xa;latitude: int&#xa;longitude: int&#xa;status: string" style="text;html=1;strokeColor=none;fillColor=none;align=left;verticalAlign=top;whiteSpace=wrap;rounded=0;fontSize=13;fontFamily=Times New Roman;fontColor=#000000;spacingLeft=12;spacingTop=4;" vertex="1" parent="1">
+          <mxGeometry x="360" y="512" width="280" height="248" as="geometry" />
+        </mxCell>
+
+
+        <!-- ================= CLASS 4: History ================= -->
+        <!-- Main Box -->
+        <mxCell id="h_box" value="" style="rounded=0;whiteSpace=wrap;html=1;fillColor=#ffffff;strokeColor=#000000;strokeWidth=1.5;" vertex="1" parent="1">
+          <mxGeometry x="680" y="470" width="280" height="290" as="geometry" />
+        </mxCell>
+        <!-- Header -->
+        <mxCell id="h_header" value="History" style="text;html=1;strokeColor=none;fillColor=none;align=center;verticalAlign=middle;whiteSpace=wrap;rounded=0;fontSize=14;fontFamily=Times New Roman;fontStyle=0;fontColor=#000000;" vertex="1" parent="1">
+          <mxGeometry x="680" y="475" width="280" height="30" as="geometry" />
+        </mxCell>
+        <!-- Line 1 -->
+        <mxCell id="h_line1" value="" style="endArrow=none;html=1;strokeColor=#000000;strokeWidth=1;" edge="1" parent="1">
+          <mxGeometry relative="1" as="geometry">
+            <mxPoint x="680" y="510" as="sourcePoint" />
+            <mxPoint x="960" y="510" as="targetPoint" />
+          </mxGeometry>
+        </mxCell>
+        <!-- Attributes -->
+        <mxCell id="h_attrs" value="id: int&#xa;date: date&#xa;remarks: string&#xa;image: string&#xa;latitude: int&#xa;longitude: int&#xa;status: string&#xa;updated_image: string&#xa;official_remarks: string" style="text;html=1;strokeColor=none;fillColor=none;align=left;verticalAlign=top;whiteSpace=wrap;rounded=0;fontSize=13;fontFamily=Times New Roman;fontColor=#000000;spacingLeft=12;spacingTop=4;" vertex="1" parent="1">
+          <mxGeometry x="680" y="512" width="280" height="248" as="geometry" />
+        </mxCell>
+
+
+        <!-- ================= RELATIONSHIP 1: Manages (Govt Officials -> Complaints) ================= -->
+        <mxCell id="line_manages" value="" style="endArrow=none;html=1;strokeColor=#000000;strokeWidth=1.5;" edge="1" parent="1">
+          <mxGeometry relative="1" as="geometry">
+            <mxPoint x="430" y="350" as="sourcePoint" />
+            <mxPoint x="230" y="470" as="targetPoint" />
+          </mxGeometry>
+        </mxCell>
+        <!-- Label: Manages -->
+        <mxCell id="lbl_manages" value="Manages" style="text;html=1;strokeColor=none;fillColor=#ffffff;align=center;verticalAlign=middle;fontSize=13;fontFamily=Times New Roman;fontStyle=2;fontColor=#000000;rotation=-31;" vertex="1" parent="1">
+          <mxGeometry x="290" y="400" width="70" height="20" as="geometry" />
+        </mxCell>
+        <!-- Multiplicity: 1 -->
+        <mxCell id="m1_top" value="1" style="text;html=1;strokeColor=none;fillColor=none;align=center;verticalAlign=middle;fontSize=13;fontFamily=Times New Roman;fontColor=#000000;" vertex="1" parent="1">
+          <mxGeometry x="400" y="360" width="20" height="20" as="geometry" />
+        </mxCell>
+        <!-- Multiplicity: * -->
+        <mxCell id="m1_bot" value="*" style="text;html=1;strokeColor=none;fillColor=none;align=center;verticalAlign=middle;fontSize=14;fontFamily=Times New Roman;fontColor=#000000;" vertex="1" parent="1">
+          <mxGeometry x="240" y="445" width="20" height="20" as="geometry" />
+        </mxCell>
+
+
+        <!-- ================= RELATIONSHIP 2: View (Govt Officials -> Complaints Details) ================= -->
+        <mxCell id="line_view1" value="" style="endArrow=none;html=1;strokeColor=#000000;strokeWidth=1.5;" edge="1" parent="1">
+          <mxGeometry relative="1" as="geometry">
+            <mxPoint x="500" y="350" as="sourcePoint" />
+            <mxPoint x="500" y="470" as="targetPoint" />
+          </mxGeometry>
+        </mxCell>
+        <!-- Label: View -->
+        <mxCell id="lbl_view1" value="View" style="text;html=1;strokeColor=none;fillColor=#ffffff;align=center;verticalAlign=middle;fontSize=13;fontFamily=Times New Roman;fontStyle=2;fontColor=#000000;rotation=-90;" vertex="1" parent="1">
+          <mxGeometry x="475" y="400" width="50" height="20" as="geometry" />
+        </mxCell>
+        <!-- Multiplicity: 1 -->
+        <mxCell id="m2_top" value="1" style="text;html=1;strokeColor=none;fillColor=none;align=center;verticalAlign=middle;fontSize=13;fontFamily=Times New Roman;fontColor=#000000;" vertex="1" parent="1">
+          <mxGeometry x="480" y="360" width="20" height="20" as="geometry" />
+        </mxCell>
+        <!-- Multiplicity: * -->
+        <mxCell id="m2_bot" value="*" style="text;html=1;strokeColor=none;fillColor=none;align=center;verticalAlign=middle;fontSize=14;fontFamily=Times New Roman;fontColor=#000000;" vertex="1" parent="1">
+          <mxGeometry x="480" y="445" width="20" height="20" as="geometry" />
+        </mxCell>
+
+
+        <!-- ================= RELATIONSHIP 3: View (Govt Officials -> History) ================= -->
+        <mxCell id="line_view2" value="" style="endArrow=none;html=1;strokeColor=#000000;strokeWidth=1.5;" edge="1" parent="1">
+          <mxGeometry relative="1" as="geometry">
+            <mxPoint x="570" y="350" as="sourcePoint" />
+            <mxPoint x="770" y="470" as="targetPoint" />
+          </mxGeometry>
+        </mxCell>
+        <!-- Label: View -->
+        <mxCell id="lbl_view2" value="View" style="text;html=1;strokeColor=none;fillColor=#ffffff;align=center;verticalAlign=middle;fontSize=13;fontFamily=Times New Roman;fontStyle=2;fontColor=#000000;rotation=31;" vertex="1" parent="1">
+          <mxGeometry x="650" y="400" width="50" height="20" as="geometry" />
+        </mxCell>
+        <!-- Multiplicity: 1 -->
+        <mxCell id="m3_top" value="1" style="text;html=1;strokeColor=none;fillColor=none;align=center;verticalAlign=middle;fontSize=13;fontFamily=Times New Roman;fontColor=#000000;" vertex="1" parent="1">
+          <mxGeometry x="580" y="360" width="20" height="20" as="geometry" />
+        </mxCell>
+        <!-- Multiplicity: * -->
+        <mxCell id="m3_bot" value="*" style="text;html=1;strokeColor=none;fillColor=none;align=center;verticalAlign=middle;fontSize=14;fontFamily=Times New Roman;fontColor=#000000;" vertex="1" parent="1">
+          <mxGeometry x="750" y="445" width="20" height="20" as="geometry" />
+        </mxCell>
+
+
+        <!-- ================= CAPTION ================= -->
+        <mxCell id="caption" value="&lt;b&gt;Fig 4.2.1.3 UML Diagram&lt;/b&gt;" style="text;html=1;strokeColor=none;fillColor=none;align=center;verticalAlign=middle;fontSize=15;fontFamily=Times New Roman;fontColor=#000000;" vertex="1" parent="1">
+          <mxGeometry x="350" y="790" width="300" height="30" as="geometry" />
+        </mxCell>
+
+      </root>
+    </mxGraphModel>
+  </diagram>
+</mxfile>

@@ -332,13 +332,6 @@ const GovNotifications = () => {
             </p>
           </div>
         </div>
-
-        {unreadCount > 0 && (
-          <button className="btn-mark-all" onClick={handleMarkAllAsRead}>
-            <CheckCircle size={15} />
-            Mark All as Read
-          </button>
-        )}
       </div>
 
       {/* Filter Tabs */}

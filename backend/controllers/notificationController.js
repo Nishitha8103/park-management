@@ -408,7 +408,7 @@ const getNotifications = async (req, res) => {
     }
 
     const [notifications, unreadCount] = await Promise.all([
-      Notification.find(query).sort({ createdAt: -1 }).limit(100).lean(),
+      Notification.find(query).sort({ createdAt: -1 }).limit(200).lean(),
       Notification.countDocuments({ ...query, isRead: false })
     ]);
 

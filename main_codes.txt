@@ -1,0 +1,320 @@
+Registration:
+<form className="register-card-form" onSubmit={handleRegister}>
+  {errorMsg && (
+    <div className="alert alert-danger">
+      {errorMsg}
+    </div>
+  )}
+  {successMsg && (
+    <div className="alert alert-success" style={{ backgroundColor: '#e6ffed', color: '#2e7d32', padding: '10px', border: '1px solid #a5d6a7', borderRadius: '5px' }}>
+      <strong>Success!</strong> {successMsg}
+    </div>
+  )}
+  <div className="text-center my-3">
+    <img src="/images/logo.png" width="75" height="75" className="rounded-xl" alt="Logo" />
+  </div>
+  <div className="register-field-group mb-4">
+    <label htmlFor="name" className="register-field-label">Full Name<span className="text-danger">*</span></label>
+    <div className="register-input-container">
+      <User size={18} className="register-input-icon" />
+      <input 
+        type="text" 
+        className="register-text-input" 
+        id="name" 
+        name="name" 
+        value={name} 
+        onChange={(e) => setName(e.target.value.replace(/[^a-zA-Z\s]/g, ''))} 
+        required 
+        pattern="[A-Za-z\s]{3,20}" 
+        title="Please enter your name" 
+        placeholder="Enter your full name" 
+      />
+      <i className="fa fa-times disabled invalid color-red-dark"></i>
+      <i className="fa fa-check disabled valid color-green-dark"></i>
+    </div>
+    <em>(Required)</em>
+    <small id="nameError" className="text-danger"></small>
+  </div>
+</form>
+
+
+Login:
+const loginUser = async (req, res) => {
+  try {
+    const { email, password, username } = req.body;
+    const identifier = (email || username || '').trim();
+
+    if (!identifier || !password) {
+      return res.status(400).json({ message: 'Please provide email/username and password' });
+    }
+
+    const identifierRegex = new RegExp(`^${identifier.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')}$`, 'i');
+    const user = await User.findOne({
+      $or: [{ email: identifierRegex }, { username: identifierRegex }]
+    });
+
+    if (!user || !(await user.matchPassword(password))) {
+      return res.status(401).json({ message: 'Invalid phone number or password.' });
+    }
+
+    return res.json({
+      message: 'Login successful!',
+      token: generateToken(user._id),
+      user: {
+        id: user._id,
+        name: user.name,
+        email: user.email,
+        phone: user.phone,
+        role: user.role
+      }
+    });
+  } catch (error) {
+    res.status(500).json({ message: 'Server error', error: error.message });
+  }
+};
+
+
+Raise Complaints:
+const createComplaint = async (req, res) => {
+  try {
+    const { parkId, parkName, locationInPark, category, priority, description, latitude, longitude, ward, remarks } = req.body;
+    
+    if (!latitude || !longitude || !ward) {
+      return res.status(400).json({ message: 'Latitude, longitude, and ward are required' });
+    }
+
+    let imageName = null;
+    if (req.files && req.files.length > 0) {
+      imageName = req.files[0].filename || req.files[0].path;
+    }
+
+    const complaintNumber = 'CMP' + Math.floor(100000000 + Math.random() * 900000000);
+    const complaint = await Complaint.create({
+      complaintNumber,
+      user: req.user ? req.user._id : req.body.userId,
+      park: parkId,
+      parkName,
+      locationInPark,
+      category: category || 'General Maintenance',
+      priority: priority || 'Medium',
+      description: description || remarks,
+      latitude,
+      longitude,
+      ward,
+      remarks,
+      images: imageName ? [imageName] : [],
+      status: 'New'
+    });
+
+    const complaintId = complaint.complaintNumber || complaint._id;
+    const userEmail = req.user?.email || req.body.email;
+    if (userEmail) {
+      sendEmailNotification(userEmail, 'Complaint Registered - Reference ID', 
+        `Your complaint has been registered successfully.\nComplaint ID: ${complaintId}`
+      );
+    }
+
+    return res.status(201).json({
+      success: true,
+      message: `Complaint submitted successfully. Your Complaint ID is: ${complaintId}`,
+      complaint
+    });
+  } catch (error) {
+    res.status(500).json({ message: 'Server error', error: error.message });
+  }
+};
+
+
+Assign Complaints:
+const assignOfficials = async (req, res) => {
+  try {
+    const { complaintId, officialId } = req.body;
+    if (!complaintId || !officialId) {
+      return res.status(400).json({ message: 'Complaint ID and Official ID are required' });
+    }
+
+    const official = await User.findById(officialId);
+    const complaint = await Complaint.findById(complaintId);
+    if (!official || !complaint) {
+      return res.status(404).json({ message: 'Official or Complaint not found' });
+    }
+
+    complaint.assignedOfficial = official._id;
+    complaint.status = 'In progress';
+    complaint.assignedAt = new Date();
+    await complaint.save();
+
+    if (official.email) {
+      sendEmailNotification(official.email, 'New Complaint Assigned', `A new complaint #${complaint.complaintNumber} has been assigned to you.`);
+    }
+
+    return res.json({ success: true, message: 'Complaint assigned successfully and email sent.', complaint });
+  } catch (error) {
+    res.status(500).json({ message: 'Server error', error: error.message });
+  }
+};
+
+
+Reports:
+<form onSubmit={handleFilterReports} className="mb-4">
+  <div className="row g-3 align-items-end">
+    <div className="col-md-2">
+      <label>From Date</label>
+      <input type="date" name="from_date" className="form-control" value={fromDate} onChange={(e) => setFromDate(e.target.value)} />
+    </div>
+    <div className="col-md-2">
+      <label>To Date</label>
+      <input type="date" name="to_date" className="form-control" value={toDate} onChange={(e) => setToDate(e.target.value)} />
+    </div>
+    <div className="col-md-2">
+      <label>Ward</label>
+      <input type="text" name="ward" className="form-control" value={ward} onChange={(e) => setWard(e.target.value)} />
+    </div>
+    <div className="col-md-2 d-flex justify-content-center align-items-end gap-2">
+      <button type="submit" className="btn btn-primary d-flex align-items-center gap-1">
+        <i className="bi bi-funnel-fill"></i>
+        <span>Filter</span>
+      </button>
+      <button type="button" onClick={handleDownloadPdf} className="btn btn-danger d-flex align-items-center gap-1">
+        <i className="bi bi-file-earmark-pdf-fill"></i>
+        <span>PDF</span>
+      </button>
+    </div>
+  </div>
+</form>
+
+
+Add Zones:
+const zoneNames = [
+  'Yelahanka', 'Dasarahalli', 'Rajarajeshwarinagar', 'Mahadevapura', 'Bommanahalli', 'Bangalore East', 'Bangalore West', 'Bangalore South'
+];
+
+const createZone = async (req, res) => {
+  try {
+    const { zoneName, latitude, longitude, corporationId, districtId } = req.body;
+    if (!zoneName || !latitude || !longitude) {
+      return res.status(400).json({ message: 'Zone name, latitude, and longitude are required' });
+    }
+    const zone = await Zone.create({
+      name: zoneName,
+      latitude,
+      longitude,
+      corporationId,
+      districtId
+    });
+    return res.status(201).json({ success: true, message: 'Zone added successfully.', zone });
+  } catch (error) {
+    return res.status(400).json({ message: error.message });
+  }
+};
+
+
+Edit Division:
+const updateDivision = async (req, res) => {
+  try {
+    const { id } = req.params;
+    const { div_name, zone_name, latitude, longitude } = req.body;
+    if (!div_name || !zone_name || !latitude || !longitude) {
+      return res.status(400).json({ message: 'All division fields are required' });
+    }
+    const division = await Corporation.findById(id);
+    if (!division) {
+      return res.status(404).json({ message: 'Division not found' });
+    }
+    division.name = div_name;
+    division.zone_name = zone_name;
+    division.latitude = latitude;
+    division.longitude = longitude;
+    await division.save();
+    return res.json({ success: true, message: 'Division updated successfully!', division });
+  } catch (error) {
+    return res.status(400).json({ message: error.message });
+  }
+};
+
+
+App User:
+{users.map((user, index) => (
+  <tr key={user._id || user.id}>
+    <td>{index + 1}</td>
+    <td>{user._id || user.id}</td>
+    <td>{user.name}</td>
+    <td>{user.phone}</td>
+    <td>{user.email}</td>
+    <td>{user.address}</td>
+    <td>
+      <button className="btn btn-sm btn-info show-complaints-btn" onClick={() => showComplaints(user)}>
+        {user.complaints ? user.complaints.length : 0}
+      </button>
+    </td>
+    <td>
+      {user.isBlocked || user.is_blocked >= 3 ? (
+        <span className="badge bg-danger">Blocked</span>
+      ) : (
+        <span className="badge bg-success">Active</span>
+      )}
+    </td>
+  </tr>
+))}
+
+
+History:
+<div className="history-container">
+  {complaints.length > 0 ? (
+    complaints.map((complaint) => (
+      <div key={complaint._id || complaint.id} className="card mb-3">
+        <div className="card-body">
+          <strong>Complaint ID:</strong> {complaint.complaintNumber || complaint.id} <br />
+          <strong>Description:</strong> {complaint.description || complaint.remarks} <br />
+          <div className="d-flex align-items-center justify-content-between">
+            <p className="mb-0"><strong>Status:</strong> {complaint.status || complaint.complaint_status}</p>
+            <Link to={`/history_view/${complaint._id || complaint.id}`} className="btn btn-success btn-sm">
+              View
+            </Link>
+          </div>
+        </div>
+      </div>
+    ))
+  ) : (
+    <p className="text-center text-muted">No resolved complaints yet.</p>
+  )}
+</div>
+
+
+Otp:
+const sendOtp = async (req, res) => {
+  try {
+    const { email } = req.body;
+    if (!email) {
+      return res.status(400).json({ message: 'Email is required.' });
+    }
+    const user = await User.findOne({ email: new RegExp(`^${email}$`, 'i') });
+    if (!user) {
+      return res.status(404).json({ message: 'Email does not exist.' });
+    }
+    const otp = Math.floor(100000 + Math.random() * 900000).toString();
+    user.resetPasswordOtp = otp;
+    user.resetPasswordOtpExpires = new Date(Date.now() + 10 * 60 * 1000);
+    await user.save();
+
+    await sendPasswordResetOtpEmail(user.email, user.name, otp);
+    return res.json({ success: true, message: 'OTP sent to email for password reset.', email: user.email });
+  } catch (error) {
+    return res.status(500).json({ message: 'Server error', error: error.message });
+  }
+};
+
+
+Model Code:
+const mongoose = require('mongoose');
+
+const wardSchema = new mongoose.Schema({
+  division_name: { type: String, ref: 'Corporation' },
+  ward_name: { type: String, required: true },
+  ward_no: { type: String, required: true },
+  districtId: { type: mongoose.Schema.Types.ObjectId, ref: 'District' },
+  zoneId: { type: mongoose.Schema.Types.ObjectId, ref: 'Zone' },
+  status: { type: String, default: 'Active', enum: ['Active', 'Inactive'] }
+}, { timestamps: true });
+
+module.exports = mongoose.model('Ward', wardSchema);

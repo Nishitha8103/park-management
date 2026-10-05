@@ -144,17 +144,21 @@
 
 /* Update Form Card */
 .update-progress-card {
-  background: white;
-  border-radius: 12px;
-  box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05), 0 2px 4px -1px rgba(0, 0, 0, 0.03);
+  background: #f5faee;
+  background-image: 
+    radial-gradient(at 10% 10%, rgba(148, 197, 89, 0.12) 0px, transparent 50%),
+    radial-gradient(at 90% 20%, rgba(168, 215, 111, 0.15) 0px, transparent 50%),
+    radial-gradient(at 50% 95%, rgba(124, 174, 64, 0.08) 0px, transparent 50%);
+  border-radius: 16px;
+  box-shadow: 0 4px 20px rgba(74, 119, 27, 0.08);
   padding: 2.5rem;
-  border: 1px solid #e0eed1;
+  border: 1px solid #d4ebba;
 }
 
 .update-progress-card h3 {
   font-size: 1.25rem;
   font-weight: 700;
-  color: #1e293b;
+  color: #1e330a;
   margin: 0 0 1.5rem 0;
 }
 
@@ -174,23 +178,38 @@
   width: 100%;
   max-width: 300px;
   padding: 0.75rem 1rem;
-  border: 1px solid #cbd5e1;
-  border-radius: 6px;
+  border: 1.5px solid #d4ebba;
+  border-radius: 8px;
   font-size: 1rem;
-  color: #1e293b;
-  background-color: white;
+  color: #1e330a;
+  background-color: #ffffff;
+  transition: all 0.2s;
+}
+
+.update-select:focus {
+  outline: none;
+  border-color: #7cae40;
+  box-shadow: 0 0 0 3px rgba(148, 197, 89, 0.2);
 }
 
 .update-textarea {
   width: 100%;
   padding: 1rem;
-  border: 1px solid #cbd5e1;
-  border-radius: 6px;
+  border: 1.5px solid #d4ebba;
+  border-radius: 8px;
   font-size: 0.95rem;
-  color: #334155;
+  color: #1e330a;
+  background-color: #ffffff;
   resize: vertical;
   min-height: 120px;
   line-height: 1.5;
+  transition: all 0.2s;
+}
+
+.update-textarea:focus {
+  outline: none;
+  border-color: #7cae40;
+  box-shadow: 0 0 0 3px rgba(148, 197, 89, 0.2);
 }
 
 .update-photos-grid {
@@ -338,21 +357,22 @@
 /* ── Before / After Photo Upload Section ─────────────────── */
 
 .upload-photos-section {
-  background: #ffffff;
-  border: 1px solid #e0eed1;
+  background: rgba(255, 255, 255, 0.7);
+  border: 1px solid #d4ebba;
   border-radius: 12px;
   padding: 1.5rem;
   margin-top: 0.5rem;
   margin-bottom: 1.5rem;
+  backdrop-filter: blur(8px);
 }
 
 .upload-photos-title {
   font-size: 1.05rem;
   font-weight: 700;
-  color: #1e293b;
+  color: #1e330a;
   margin: 0 0 1.25rem 0;
   padding-bottom: 0.75rem;
-  border-bottom: 1px solid #f1f5f9;
+  border-bottom: 1px solid #e0eed1;
 }
 
 .upload-photos-panels {

@@ -158,7 +158,7 @@
   white-space: nowrap;
 }
 
-.stat-card-bottom h3 {
+.gov-stat-card .stat-card-bottom h3 {
   font-size: 1.95rem;
   font-weight: 900;
   color: #ffffff;
@@ -167,7 +167,7 @@
   text-shadow: 0 1px 3px rgba(0, 0, 0, 0.15);
 }
 
-.stat-card-bottom p {
+.gov-stat-card .stat-card-bottom p {
   font-size: 0.74rem;
   font-weight: 700;
   text-transform: uppercase;

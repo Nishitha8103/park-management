@@ -6,6 +6,7 @@ const Notification = require('../models/Notification');
 const User = require('../models/User');
 const Setting = require('../models/Setting');
 const { uploadToCloudinary, uploadMultipleToCloudinary } = require('../utils/cloudinary');
+const { sendTaskAssignedEmail, sendComplaintClosedEmail } = require('../config/sendEmail');
 
 // Helper to ensure upload directories exist
 const ensureComplaintImagesOnDisk = (complaintList) => {
@@ -279,7 +280,16 @@ const getComplaints = async (req, res) => {
     if (userPhone) query.userPhone = userPhone;
 
     const complaints = await Complaint.find(query)
-      .populate('park', 'name district corporation zone ward latitude longitude')
+      .populate({
+        path: 'park',
+        select: 'name district corporation zone ward latitude longitude',
+        populate: [
+          { path: 'zone', select: 'name' },
+          { path: 'ward', select: 'name' },
+          { path: 'district', select: 'name' },
+          { path: 'corporation', select: 'name' }
+        ]
+      })
       .populate('assignedContractor', 'name email phone companyName')
       .populate('assignedOfficial', 'name email phone department')
       .populate('user', 'name email phone')
@@ -314,9 +324,20 @@ const getComplaintById = async (req, res) => {
     let complaint = null;
 
     const mongoose = require('mongoose');
+    const parkPopulateOptions = {
+      path: 'park',
+      select: 'name district corporation zone ward latitude longitude',
+      populate: [
+        { path: 'zone', select: 'name' },
+        { path: 'ward', select: 'name' },
+        { path: 'district', select: 'name' },
+        { path: 'corporation', select: 'name' }
+      ]
+    };
+
     if (mongoose.Types.ObjectId.isValid(id) && id.length === 24) {
       complaint = await Complaint.findById(id)
-        .populate('park', 'name district corporation zone ward latitude longitude')
+        .populate(parkPopulateOptions)
         .populate('assignedContractor', 'name email phone companyName')
         .populate('assignedOfficial', 'name email phone department')
         .populate('user', 'name email phone')
@@ -325,7 +346,7 @@ const getComplaintById = async (req, res) => {
 
     if (!complaint) {
       complaint = await Complaint.findOne({ complaintNumber: id })
-        .populate('park', 'name district corporation zone ward latitude longitude')
+        .populate(parkPopulateOptions)
         .populate('assignedContractor', 'name email phone companyName')
         .populate('assignedOfficial', 'name email phone department')
         .populate('user', 'name email phone')
@@ -455,6 +476,15 @@ const updateComplaint = async (req, res) => {
       const newContractorId = updateData.assignedContractor.toString();
       const oldContractorId = existingComplaint.assignedContractor ? existingComplaint.assignedContractor.toString() : null;
 
+      // Fetch Contractor details for Email notification
+      const Contractor = require('../models/Contractor');
+      const contractorDoc = await Contractor.findById(newContractorId).lean();
+      if (contractorDoc && contractorDoc.email) {
+        sendTaskAssignedEmail(contractorDoc.email, contractorDoc.name, 'Contractor', complaint).catch(err => {
+          console.error('Failed to send task assigned email to contractor:', err);
+        });
+      }
+
       // If reassigning from an existing contractor
       if (oldContractorId && oldContractorId !== newContractorId) {
         await Notification.create({
@@ -525,6 +555,16 @@ const updateComplaint = async (req, res) => {
           relatedEntityType: 'COMPLAINT',
           relatedEntityId: complaint._id.toString(),
           actionRoute: '/track-complaint'
+        });
+      }
+    }
+
+    // 1b. Handle Government Official Assignment Email
+    if (updateData.assignedOfficial && String(updateData.assignedOfficial) !== String(existingComplaint.assignedOfficial || '')) {
+      const officialDoc = await User.findById(updateData.assignedOfficial).lean();
+      if (officialDoc && officialDoc.email) {
+        sendTaskAssignedEmail(officialDoc.email, officialDoc.name, 'Government Official', complaint).catch(err => {
+          console.error('Failed to send inspection task email to official:', err);
         });
       }
     }
@@ -623,6 +663,17 @@ const updateComplaint = async (req, res) => {
       // Status -> Resolved / Closed / Inspection Approved / Verified
       else if (['Inspection Approved', 'Verified', 'Closed', 'Resolved'].includes(status)) {
         let citizenUserId = complaint.user;
+        let citizenEmail = null;
+        let citizenName = complaint.userName || 'Citizen';
+
+        if (citizenUserId) {
+          const userDoc = await User.findById(citizenUserId).lean();
+          if (userDoc) {
+            citizenEmail = userDoc.email;
+            citizenName = userDoc.name || citizenName;
+          }
+        }
+
         if (!citizenUserId && (complaint.userPhone || complaint.userName)) {
           const lookupQuery = [];
           if (complaint.userPhone) lookupQuery.push({ phone: complaint.userPhone });
@@ -634,9 +685,18 @@ const updateComplaint = async (req, res) => {
             });
             if (citizenUser) {
               citizenUserId = citizenUser._id;
+              citizenEmail = citizenUser.email;
+              citizenName = citizenUser.name || citizenName;
               await Complaint.findByIdAndUpdate(complaint._id, { user: citizenUser._id });
             }
           }
+        }
+
+        // Send resolution & closing email to citizen
+        if (citizenEmail && (status === 'Closed' || status === 'Resolved')) {
+          sendComplaintClosedEmail(citizenEmail, citizenName, complaint).catch(err => {
+            console.error('Failed to send complaint closed email to citizen:', err);
+          });
         }
 
         if (citizenUserId) {

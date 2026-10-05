@@ -2,7 +2,7 @@
 
 .task-page-body {
   padding: 1.25rem 2rem 2.5rem 2rem;
-  background-color: #f7fbf8;
+  background-color: transparent;
   min-height: calc(100vh - 70px);
   width: 100%;
 }

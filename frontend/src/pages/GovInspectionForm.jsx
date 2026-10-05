@@ -143,7 +143,7 @@ const GovInspectionForm = () => {
       </div>
 
       <h1 className="page-title mb-lg">5. Conduct Inspection</h1>
-      <h2 style={{ fontSize: '1.25rem', fontWeight: 'bold', color: '#1e293b', marginBottom: '1.5rem' }}>
+      <h2 className="sub-title">
         Conduct Inspection - {displayId}
       </h2>
 

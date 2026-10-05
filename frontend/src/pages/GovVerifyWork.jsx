@@ -153,11 +153,11 @@ const GovVerifyWork = () => {
         ></textarea>
       </div>
 
-      <div className="action-buttons-row flex justify-between mt-xl">
-        <button className="btn btn-outline" style={{minWidth: '200px'}} onClick={() => navigate(-1)}>
+      <div className="action-buttons-row mt-xl">
+        <button className="btn-decision-cancel" onClick={() => navigate(-1)}>
           Cancel
         </button>
-        <button className="btn btn-primary" style={{minWidth: '200px'}} onClick={handleSubmit} disabled={submitting}>
+        <button className="btn-decision-submit" onClick={handleSubmit} disabled={submitting}>
           {submitting ? 'Submitting...' : 'Submit Decision'}
         </button>
       </div>

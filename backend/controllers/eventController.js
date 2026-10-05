@@ -17,9 +17,7 @@ const generateSequentialId = async (prefix) => {
   return `${prefix}-${year}-${seq}`;
 };
 
-// ── Public Event Routes ─────────────────────────────────────────────────────
 
-// Get all active events (public)
 exports.getEvents = async (req, res) => {
   try {
     const events = await Event.find({ isActive: true }).sort({ eventDate: 1 }).lean();

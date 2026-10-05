@@ -1,5 +1,5 @@
-import { useEffect, useState } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useEffect, useState, useRef } from 'react';
+import { useNavigate, Link } from 'react-router-dom';
 import { 
   ClipboardList, 
   Calendar, 
@@ -7,8 +7,15 @@ import {
   RotateCcw, 
   Bell, 
   Activity, 
-  CalendarDays,
-  Sparkles 
+  MapPin, 
+  AlertCircle, 
+  Wrench, 
+  ChevronRight, 
+  ShieldCheck, 
+  Package, 
+  Plus,
+  TreePine,
+  Search
 } from 'lucide-react';
 import { 
   BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, Legend,
@@ -17,83 +24,115 @@ import {
 import { MapContainer, TileLayer, Marker, Popup } from 'react-leaflet';
 import L from 'leaflet';
 import 'leaflet/dist/leaflet.css';
+import './ContractorDashboard.css';
 import './GovDashboard.css';
+
+// Leaflet default icon fix
+delete L.Icon.Default.prototype._getIconUrl;
+L.Icon.Default.mergeOptions({
+  iconRetinaUrl: 'https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/images/marker-icon-2x.png',
+  iconUrl: 'https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/images/marker-icon.png',
+  shadowUrl: 'https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/images/marker-shadow.png',
+});
+
+// Custom colored marker icons
+const createColorIcon = (color) => L.divIcon({
+  className: '',
+  html: `<div style="
+    width:34px;height:34px;border-radius:50% 50% 50% 0;
+    background:${color};transform:rotate(-45deg);
+    border:3px solid white;box-shadow:0 3px 10px rgba(0,0,0,0.35);
+  "></div>`,
+  iconSize: [34, 34],
+  iconAnchor: [17, 34],
+  popupAnchor: [0, -34],
+});
+
+const statusColors = {
+  Active: '#16a34a',
+  'Under Maintenance': '#f59e0b',
+  Closed: '#ef4444',
+};
 
 const API_BASE = '/api';
 
-// Create custom inline SVG icons to ensure they render reliably everywhere
-const createSvgIcon = (color) => {
-  const svg = `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="30" height="30"><path d="M12 2C8.13 2 5 5.13 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.87-3.13-7-7-7zm0 9.5c-1.38 0-2.5-1.12-2.5-2.5s1.12-2.5 2.5-2.5 2.5 1.12 2.5 2.5-1.12 2.5-2.5 2.5z" fill="${color}" stroke="white" stroke-width="1.5"/></svg>`;
-  return new L.Icon({
-    iconUrl: `data:image/svg+xml;charset=UTF-8,${encodeURIComponent(svg)}`,
-    iconSize: [30, 30],
-    iconAnchor: [15, 30],
-    popupAnchor: [0, -30]
-  });
-};
-
-const greenIcon = createSvgIcon('#10b981');
-const redIcon = createSvgIcon('#ef4444');
-
 const GovDashboard = () => {
   const navigate = useNavigate();
-  const [user, setUser] = useState(null);
+  const [user, setUser] = useState(() => {
+    try {
+      const stored = localStorage.getItem('govUser');
+      return stored ? JSON.parse(stored) : null;
+    } catch {
+      return null;
+    }
+  });
+
   const [complaints, setComplaints] = useState([]);
   const [parks, setParks] = useState([]);
-  const [loading, setLoading] = useState(true);
+  const [selectedMapStatus, setSelectedMapStatus] = useState('All');
+  const [selectedParkId, setSelectedParkId] = useState(null);
 
-  // Derived stats from real data
+  const [loading, setLoading] = useState(true);
+  const [loadingParks, setLoadingParks] = useState(true);
+
+  const mapRef = useRef(null);
+
+  // Derived stats
   const [stats, setStats] = useState({
     pending: 0,
     today: 0,
     completed: 0,
     rework: 0,
   });
+
+  const [slaStats, setSlaStats] = useState({
+    onTime: 0,
+    dueSoon: 0,
+    overdue: 0
+  });
+
   const [pieData, setPieData] = useState([]);
   const [recentActivities, setRecentActivities] = useState([]);
 
-  // Load logged-in user from localStorage
   useEffect(() => {
-    const stored = localStorage.getItem('govUser');
-    if (!stored) {
+    if (!user) {
       navigate('/login');
-      return;
     }
-    setUser(JSON.parse(stored));
-  }, [navigate]);
+  }, [user, navigate]);
 
-  // Fetch complaints assigned to this official once we have the user
   useEffect(() => {
     if (!user) return;
 
-    const fetchData = async () => {
+    const fetchParks = async () => {
+      try {
+        setLoadingParks(true);
+        const res = await fetch(`${API_BASE}/parks`);
+        const data = await res.json();
+        setParks(Array.isArray(data) ? data : []);
+      } catch (err) {
+        console.error('Failed to fetch parks:', err);
+      } finally {
+        setLoadingParks(false);
+      }
+    };
+
+    const fetchComplaints = async () => {
       try {
         setLoading(true);
-        // Fetch complaints assigned to this official
         const res = await fetch(`${API_BASE}/complaints?officialId=${user._id || user.id}`);
         const data = await res.json();
 
-        // Also fetch ALL complaints so we can show total overview if no assigned ones
+        // Also fetch all complaints as fallback/context
         const allRes = await fetch(`${API_BASE}/complaints`);
         const allData = await allRes.json();
 
-        // Fetch all parks for the map
-        const parksRes = await fetch(`${API_BASE}/parks`);
-        const parksData = await parksRes.json();
-
-        // Use assigned complaints if any, else fall back to all
         const source = Array.isArray(data) && data.length > 0 ? data : (Array.isArray(allData) ? allData : []);
         setComplaints(source);
-        
-        if (Array.isArray(parksData)) {
-          setParks(parksData);
-        }
 
-        // Calculate stats
+        // Stats calculations
         const todayStr = new Date().toDateString();
-
         const pending = source.filter(c =>
-          ['New', 'Assigned', 'Started', 'In Progress', 'Waiting for Parts', 'Inspection Pending'].includes(c.status)
+          ['New', 'Assigned', 'Started', 'In Progress', 'Waiting for Parts', 'Inspection Pending', 'Completed - Waiting for Admin Review'].includes(c.status)
         ).length;
 
         const todayCount = source.filter(c => {
@@ -102,56 +141,59 @@ const GovDashboard = () => {
         }).length;
 
         const completed = source.filter(c =>
-          ['Completed', 'Verified', 'Closed'].includes(c.status)
+          ['Completed', 'Verified', 'Closed', 'Inspection Approved'].includes(c.status)
         ).length;
 
-        const rework = source.filter(c => c.status === 'Rejected').length;
+        const rework = source.filter(c => ['Returned by Admin', 'Rework Required', 'Rejected'].includes(c.status)).length;
 
         setStats({ pending, today: todayCount, completed, rework });
 
-        // Pie chart: group by status buckets
-        const approved = source.filter(c => ['Verified', 'Closed'].includes(c.status)).length;
-        const inProgress = source.filter(c =>
-          ['Assigned', 'Started', 'In Progress', 'Waiting for Parts', 'Inspection Pending'].includes(c.status)
-        ).length;
-        const rejected = source.filter(c => c.status === 'Rejected').length;
-        const newCount = source.filter(c => c.status === 'New').length;
-        const total = source.length;
+        // SLA calculation
+        let onTime = 0, dueSoon = 0, overdue = 0;
+        source.forEach(c => {
+          if (!['Completed', 'Verified', 'Closed', 'Inspection Approved'].includes(c.status)) {
+            if (c.slaStatus === 'On Time') onTime++;
+            else if (c.slaStatus === 'Due Soon') dueSoon++;
+            else if (c.slaStatus === 'Overdue') overdue++;
+            else onTime++;
+          }
+        });
+        setSlaStats({ onTime, dueSoon, overdue });
 
+        // Pie chart breakdown
         const pie = [];
-        if (approved > 0) pie.push({ name: 'Approved', value: approved, color: '#10b981' });
-        if (inProgress > 0) pie.push({ name: 'In Progress', value: inProgress, color: '#f59e0b' });
-        if (rejected > 0) pie.push({ name: 'Rejected', value: rejected, color: '#ef4444' });
-        if (newCount > 0) pie.push({ name: 'New', value: newCount, color: '#3b82f6' });
+        if (completed > 0) pie.push({ name: 'Verified/Completed', value: completed, color: '#10b981' });
+        if (pending > 0) pie.push({ name: 'Pending Inspection', value: pending, color: '#f59e0b' });
+        if (rework > 0) pie.push({ name: 'Rework/Returned', value: rework, color: '#ef4444' });
 
-        // If no data at all, show placeholder zeros
         if (pie.length === 0) {
-          pie.push({ name: 'No Data', value: 1, color: '#e2e8f0' });
+          pie.push({ name: 'No Active Tasks', value: 1, color: '#cbd5e1' });
         }
-
         setPieData(pie);
 
-        // Recent activities: last 5 updated complaints
+        // Recent activities
         const sorted = [...source]
-          .sort((a, b) => new Date(b.updatedAt) - new Date(a.updatedAt))
+          .sort((a, b) => new Date(b.updatedAt || b.createdAt) - new Date(a.updatedAt || a.createdAt))
           .slice(0, 5);
 
         setRecentActivities(sorted.map(c => ({
           id: c._id,
-          text: `Complaint #${c.complaintNumber} — ${c.category} at ${c.parkName || 'Unknown Park'} [${c.status}]`,
-          time: new Date(c.updatedAt).toLocaleString('en-IN', { day: '2-digit', month: 'short', year: 'numeric', hour: '2-digit', minute: '2-digit' })
+          text: `Complaint #${c.complaintNumber} — ${c.category} at ${c.parkName || 'Park'} [${c.status}]`,
+          time: new Date(c.updatedAt || c.createdAt).toLocaleString('en-IN', { day: '2-digit', month: 'short', hour: '2-digit', minute: '2-digit' })
         })));
+
       } catch (err) {
-        console.error('Failed to fetch data:', err);
+        console.error('Failed to fetch complaints:', err);
       } finally {
         setLoading(false);
       }
     };
 
-    fetchData();
+    fetchParks();
+    fetchComplaints();
   }, [user]);
 
-  // Build line chart data from last 7 days of complaints
+  // 7-day velocity bar chart
   const lineData = (() => {
     const days = [];
     for (let i = 6; i >= 0; i--) {
@@ -165,71 +207,97 @@ const GovDashboard = () => {
         return cd.toDateString() === dayStr;
       });
 
-      const completed = dayComplaints.filter(c => ['Completed', 'Verified', 'Closed'].includes(c.status)).length;
-      const pending = dayComplaints.filter(c => ['New', 'Assigned', 'In Progress'].includes(c.status)).length;
-      const rejected = dayComplaints.filter(c => c.status === 'Rejected').length;
+      const completed = dayComplaints.filter(c => ['Completed', 'Verified', 'Closed', 'Inspection Approved'].includes(c.status)).length;
+      const pending = dayComplaints.filter(c => ['New', 'Assigned', 'In Progress', 'Inspection Pending', 'Completed - Waiting for Admin Review'].includes(c.status)).length;
+      const rework = dayComplaints.filter(c => ['Returned by Admin', 'Rework Required', 'Rejected'].includes(c.status)).length;
 
-      days.push({ date: label, completed, pending, rejected });
+      days.push({ date: label, completed, pending, rework });
     }
     return days;
   })();
 
-  // Today's date display
-  const now = new Date();
-  const dayNum = now.getDate();
-  const monthYear = now.toLocaleDateString('en-IN', { month: 'long', year: 'numeric' });
-  const weekday = now.toLocaleDateString('en-IN', { weekday: 'long' });
+  // Filter parks for official
+  const assignedParkIds = new Set([
+    ...(user?.assignedParks || []).map(id => typeof id === 'object' ? id._id || id.id : id),
+    ...(user?.park ? [typeof user.park === 'object' ? user.park._id || user.park.id : user.park] : []),
+    ...complaints.map(c => c.park?._id || c.park).filter(Boolean)
+  ].map(id => String(id)));
 
-  const totalPie = pieData.reduce((sum, d) => sum + (d.name === 'No Data' ? 0 : d.value), 0);
+  const assignedParksOnly = parks.filter(p => {
+    if (assignedParkIds.size > 0) {
+      return assignedParkIds.has(String(p._id));
+    }
+    return true;
+  });
 
-  const getParkHealth = (parkId) => {
-    const parkComplaints = complaints.filter(c => c.park && (c.park._id === parkId || c.park === parkId));
-    const activeComplaints = parkComplaints.filter(c => ['New', 'Assigned', 'Started', 'In Progress', 'Waiting for Parts', 'Inspection Pending'].includes(c.status));
-    return activeComplaints.length > 0 ? 'red' : 'green';
+  const getTaskCountForPark = (parkId) => complaints.filter(t => {
+    const pId = t.park?._id || t.park;
+    const parkObj = assignedParksOnly.find(p => p._id === parkId);
+    return pId === parkId || (parkObj && t.parkName && parkObj.name === t.parkName);
+  }).length;
+
+  const getPendingCountForPark = (parkId) => complaints.filter(t => {
+    const pId = t.park?._id || t.park;
+    const parkObj = assignedParksOnly.find(p => p._id === parkId);
+    const matchesPark = pId === parkId || (parkObj && t.parkName && parkObj.name === t.parkName);
+    const isCompleted = ['Completed', 'Verified', 'Closed', 'Inspection Approved'].includes(t.status);
+    return matchesPark && !isCompleted;
+  }).length;
+
+  const validParks = assignedParksOnly.filter(p => p.latitude && p.longitude && !isNaN(parseFloat(p.latitude)) && !isNaN(parseFloat(p.longitude)));
+  const filteredParks = selectedMapStatus === 'All' ? validParks : validParks.filter(p => p.status === selectedMapStatus);
+
+  const mapCenter = validParks.length > 0
+    ? [parseFloat(validParks[0].latitude), parseFloat(validParks[0].longitude)]
+    : [12.9716, 77.5946];
+
+  const mapStatusCounts = {
+    All: validParks.length,
+    Active: validParks.filter(p => p.status === 'Active').length,
+    'Under Maintenance': validParks.filter(p => p.status === 'Under Maintenance').length,
+    Closed: validParks.filter(p => p.status === 'Closed').length,
   };
 
-  const mapCenter = [12.9716, 77.5946]; // Default to Bangalore coordinates
+  const pendingComplaintsList = complaints.filter(c =>
+    !['Completed', 'Verified', 'Closed', 'Inspection Approved'].includes(c.status)
+  ).slice(0, 5);
 
-  if (!user) {
-    return <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', height: '100vh', fontWeight: 'bold' }}>Loading...</div>;
-  }
+  if (!user) return null;
 
   return (
-    <div className="dashboard-container">
-      {/* Welcome Hero Banner matching Contractor format */}
-      <div className="gov-hero-banner">
-        <div className="gov-hero-banner-main">
-          <div className="gov-hero-greeting">
-            <div className="gov-hero-badge">
-              <Sparkles size={14} /> Official Governance Dashboard
-            </div>
+    <div className="gov-dashboard-main-container">
+      
+      {/* Welcome Hero Banner */}
+      <div className="contractor-hero-banner gov-hero-banner">
+        <div className="hero-banner-main">
+          <div className="hero-greeting">
             <h2>Welcome back, <span className="highlight">{user.name}!</span></h2>
             <p>Overview of assigned parks, active inspections, and complaint resolutions.</p>
           </div>
         </div>
       </div>
 
-      {/* 4 Metric KPI Stat Cards matching Contractor format */}
-      <div className="gov-stats-grid">
-        <div className="gov-stat-card" onClick={() => navigate('/gov-dashboard/my-inspections')}>
+      {/* Key Metric Stats Grid (4 Cards) */}
+      <div className="contractor-stats-grid">
+        <div className="contractor-stat-card amber" onClick={() => navigate('/gov-dashboard/my-inspections')}>
           <div className="stat-card-top">
-            <div className="gov-stat-icon">
+            <div className="stat-icon amber">
               <ClipboardList size={24} />
             </div>
-            <span className="gov-stat-tag">Active Work</span>
+            <span className="stat-tag amber">Active Work</span>
           </div>
           <div className="stat-card-bottom">
             <h3>{loading ? '—' : String(stats.pending).padStart(2, '0')}</h3>
-            <p>Pending Complaints</p>
+            <p>Pending Inspections</p>
           </div>
         </div>
         
-        <div className="gov-stat-card" onClick={() => navigate('/gov-dashboard/schedule')}>
+        <div className="contractor-stat-card blue" onClick={() => navigate('/gov-dashboard/schedule')}>
           <div className="stat-card-top">
-            <div className="gov-stat-icon">
+            <div className="stat-icon blue">
               <Calendar size={24} />
             </div>
-            <span className="gov-stat-tag">Scheduled</span>
+            <span className="stat-tag blue">Scheduled</span>
           </div>
           <div className="stat-card-bottom">
             <h3>{loading ? '—' : String(stats.today).padStart(2, '0')}</h3>
@@ -237,12 +305,12 @@ const GovDashboard = () => {
           </div>
         </div>
 
-        <div className="gov-stat-card" onClick={() => navigate('/gov-dashboard/analytics')}>
+        <div className="contractor-stat-card green" onClick={() => navigate('/gov-dashboard/analytics')}>
           <div className="stat-card-top">
-            <div className="gov-stat-icon">
+            <div className="stat-icon green">
               <CheckCircle size={24} />
             </div>
-            <span className="gov-stat-tag">Verified</span>
+            <span className="stat-tag green">Verified</span>
           </div>
           <div className="stat-card-bottom">
             <h3>{loading ? '—' : String(stats.completed).padStart(2, '0')}</h3>
@@ -250,12 +318,12 @@ const GovDashboard = () => {
           </div>
         </div>
 
-        <div className="gov-stat-card" onClick={() => navigate('/gov-dashboard/complaints')}>
+        <div className="contractor-stat-card rose" onClick={() => navigate('/gov-dashboard/complaints')}>
           <div className="stat-card-top">
-            <div className="gov-stat-icon">
+            <div className="stat-icon rose">
               <RotateCcw size={24} />
             </div>
-            <span className="gov-stat-tag">Needs Action</span>
+            <span className="stat-tag rose">Needs Action</span>
           </div>
           <div className="stat-card-bottom">
             <h3>{loading ? '—' : String(stats.rework).padStart(2, '0')}</h3>
@@ -264,36 +332,299 @@ const GovDashboard = () => {
         </div>
       </div>
 
-      {/* Charts Section */}
-      <div className="charts-grid">
-        <div className="card p-md">
-          <h3 className="section-title">Complaint Overview <span className="text-secondary" style={{fontWeight:'normal', fontSize:'0.9rem'}}>(Last 7 Days)</span></h3>
-          <div className="chart-wrapper">
+      {/* Assigned Parks Map Section */}
+      <div className="contractor-card map-card">
+        <div className="card-header flex-between">
+          <div className="card-title-group">
+            <div className="card-icon-box green">
+              <MapPin size={22} />
+            </div>
+            <div>
+              <h3 className="card-title">Assigned Parks Map</h3>
+              <p className="card-subtitle">Visual overview of your assigned park locations and active inspection workloads</p>
+            </div>
+          </div>
+
+          {/* Status Filter Pills */}
+          <div className="map-filter-pills">
+            {Object.entries(mapStatusCounts).map(([status, count]) => (
+              <button
+                key={status}
+                className={`map-filter-pill ${selectedMapStatus === status ? 'active' : ''}`}
+                data-status={status}
+                onClick={() => setSelectedMapStatus(status)}
+              >
+                {status} <span className="pill-count">{count}</span>
+              </button>
+            ))}
+          </div>
+        </div>
+
+        {loadingParks ? (
+          <div className="map-loading" style={{ height: '380px' }}>
+            <div className="map-spinner"></div>
+            <p>Loading assigned park map locations...</p>
+          </div>
+        ) : validParks.length === 0 ? (
+          <div className="map-empty" style={{ padding: '3.5rem 1rem' }}>
+            <AlertCircle size={44} />
+            <h3>No assigned parks found</h3>
+            <p>You have no parks assigned to your official jurisdiction yet.</p>
+          </div>
+        ) : (
+          <div className="map-layout" style={{ height: '460px' }}>
+            <div className="map-wrapper">
+              <MapContainer 
+                center={mapCenter} 
+                zoom={13} 
+                style={{ height: '100%', width: '100%', borderRadius: '12px' }}
+                ref={mapRef}
+              >
+                <TileLayer
+                  attribution='&copy; <a href="https://www.openstreetmap.org/">OpenStreetMap</a> contributors'
+                  url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
+                />
+                {filteredParks.map((park, index) => {
+                  let lat = parseFloat(park.latitude);
+                  let lng = parseFloat(park.longitude);
+                  
+                  const sameCoordIndex = filteredParks.slice(0, index).filter(p => 
+                    parseFloat(p.latitude) === lat && parseFloat(p.longitude) === lng
+                  ).length;
+                  
+                  if (sameCoordIndex > 0) {
+                    const angle = (sameCoordIndex * 137.5) * (Math.PI / 180);
+                    const radius = 0.003 * Math.ceil(sameCoordIndex / 3);
+                    lat += Math.sin(angle) * radius;
+                    lng += Math.cos(angle) * radius;
+                  }
+                  
+                  return (
+                    <Marker
+                      key={park._id}
+                      position={[lat, lng]}
+                      icon={createColorIcon(statusColors[park.status] || '#6b7280')}
+                    >
+                      <Popup>
+                        <div className="map-popup">
+                          <h4>{park.name}</h4>
+                          <span className={`popup-status popup-status--${park.status?.replace(' ', '-').toLowerCase()}`}>
+                            {park.status || 'Active'}
+                          </span>
+                          <p className="popup-address">{park.address || park.parkCode || 'No address'}</p>
+                          <div className="popup-stats">
+                            <div className="popup-stat">
+                              <span className="popup-stat-num">{getTaskCountForPark(park._id)}</span>
+                              <span className="popup-stat-label">Total Complaints</span>
+                            </div>
+                            <div className="popup-stat">
+                              <span className="popup-stat-num pending">{getPendingCountForPark(park._id)}</span>
+                              <span className="popup-stat-label">Pending</span>
+                            </div>
+                          </div>
+                          <Link to="/gov-dashboard/complaints" className="popup-link">
+                            <ClipboardList size={14} /> View Complaints
+                          </Link>
+                        </div>
+                      </Popup>
+                    </Marker>
+                  );
+                })}
+              </MapContainer>
+            </div>
+
+            {/* Assigned Parks Sidebar List */}
+            <div className="map-park-list">
+              <div className="park-list-header">
+                <h4>Assigned Parks ({filteredParks.length})</h4>
+                <span className="park-list-hint">Click park to view</span>
+              </div>
+              <div className="park-list-scroll">
+                {filteredParks.map(park => {
+                  const isSelected = selectedParkId === park._id;
+                  return (
+                    <div 
+                      key={park._id} 
+                      className={`map-park-card ${isSelected ? 'selected' : ''}`}
+                      onClick={() => setSelectedParkId(park._id)}
+                    >
+                      <div className="map-park-dot" style={{ background: statusColors[park.status] || '#6b7280' }}></div>
+                      <div className="map-park-info">
+                        <h4>{park.name}</h4>
+                        <p>{park.address || park.parkCode || 'Assigned Park'}</p>
+                        <div className="map-park-meta">
+                          <span className={`map-park-status map-park-status--${park.status?.replace(' ', '-').toLowerCase()}`}>
+                            {park.status || 'Active'}
+                          </span>
+                          <span className="map-park-tasks">
+                            <ClipboardList size={12} /> {getPendingCountForPark(park._id)} pending
+                          </span>
+                        </div>
+                      </div>
+                    </div>
+                  );
+                })}
+              </div>
+            </div>
+          </div>
+        )}
+      </div>
+
+      {/* Operational Work & Recent Activity Hub (2 Columns) */}
+      <div className="grid-2-col">
+        
+        {/* Urgent Inspections & Complaints Table */}
+        <div className="contractor-card">
+          <div className="card-header flex-between">
+            <div className="card-title-group">
+              <div className="card-icon-box amber">
+                <Wrench size={20} />
+              </div>
+              <div>
+                <h3 className="card-title">Urgent Complaints & Inspection Tasks</h3>
+                <p className="card-subtitle">Pending verification and monitoring actions</p>
+              </div>
+            </div>
+            <Link to="/gov-dashboard/complaints" className="card-action-link">
+              View All <ChevronRight size={16} />
+            </Link>
+          </div>
+
+          <div className="tasks-list-container">
+            {loading ? (
+              <p className="loading-text">Loading active complaints...</p>
+            ) : pendingComplaintsList.length === 0 ? (
+              <div className="empty-state-box">
+                <CheckCircle size={36} className="text-emerald" />
+                <h4>All caught up!</h4>
+                <p>No urgent pending complaints requiring inspection at the moment.</p>
+              </div>
+            ) : (
+              <div className="tasks-table-wrapper">
+                <table className="mini-tasks-table">
+                  <thead>
+                    <tr>
+                      <th>Ref #</th>
+                      <th>Category & Park</th>
+                      <th>SLA Status</th>
+                      <th>Priority</th>
+                      <th>Action</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {pendingComplaintsList.map(task => (
+                      <tr key={task._id}>
+                        <td>
+                          <span className="task-code">#{task.complaintNumber || task._id.substring(0, 6)}</span>
+                        </td>
+                        <td>
+                          <div className="task-cat-name">{task.category || 'Maintenance'}</div>
+                          <div className="task-park-sub">{task.parkName || 'Park'}</div>
+                        </td>
+                        <td>
+                          <span className={`sla-badge ${task.slaStatus?.toLowerCase().replace(' ', '-') || 'on-time'}`}>
+                            {task.slaStatus || 'On Time'}
+                          </span>
+                        </td>
+                        <td>
+                          <span className={`priority-pill ${task.priority?.toLowerCase() || 'medium'}`}>
+                            {task.priority || 'Medium'}
+                          </span>
+                        </td>
+                        <td>
+                          <Link to={`/gov-dashboard/inspection-details/${task._id}`} className="btn-mini-action">
+                            Inspect
+                          </Link>
+                        </td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+              </div>
+            )}
+          </div>
+        </div>
+
+        {/* Recent Official Activity Timeline */}
+        <div className="contractor-card">
+          <div className="card-header flex-between">
+            <div className="card-title-group">
+              <div className="card-icon-box blue">
+                <Activity size={20} />
+              </div>
+              <div>
+                <h3 className="card-title">Recent Inspection Activity</h3>
+                <p className="card-subtitle">Latest status updates & workflow actions</p>
+              </div>
+            </div>
+          </div>
+
+          <div className="materials-list-container">
+            {recentActivities.length === 0 ? (
+              <div className="empty-state-box">
+                <Activity size={36} className="text-slate" />
+                <h4>No Recent Activity</h4>
+                <p>No recent activity logs found for your jurisdiction.</p>
+              </div>
+            ) : (
+              <div className="materials-mini-list">
+                {recentActivities.map(act => (
+                  <div key={act.id} className="material-item-card">
+                    <div className="mat-icon">
+                      <ShieldCheck size={18} />
+                    </div>
+                    <div className="mat-details">
+                      <div className="mat-name">{act.text}</div>
+                      <div className="mat-sub">{act.time}</div>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            )}
+          </div>
+        </div>
+
+      </div>
+
+      {/* Analytics & SLA Performance Hub (3 Columns) */}
+      <div className="grid-3-col" style={{ marginTop: '1.5rem' }}>
+        
+        {/* 7-Day Completion Velocity Bar Chart */}
+        <div className="contractor-card">
+          <div className="card-header">
+            <h3 className="card-title">7-Day Inspection Velocity</h3>
+            <p className="card-subtitle">Daily breakdown of completed vs pending inspections</p>
+          </div>
+          <div style={{ height: '230px', marginTop: '1rem' }}>
             <ResponsiveContainer width="100%" height="100%">
-              <BarChart data={lineData} margin={{ top: 20, right: 30, left: -20, bottom: 5 }}>
-                <CartesianGrid strokeDasharray="3 3" vertical={false} />
-                <XAxis dataKey="date" tick={{fontSize: 12}} axisLine={false} tickLine={false} dy={10} />
-                <YAxis tick={{fontSize: 12}} axisLine={false} tickLine={false} allowDecimals={false} />
+              <BarChart data={lineData} margin={{ top: 10, right: 10, left: -25, bottom: 0 }}>
+                <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="#f1f5f9" />
+                <XAxis dataKey="date" tick={{fontSize: 11}} axisLine={false} tickLine={false} />
+                <YAxis tick={{fontSize: 11}} axisLine={false} tickLine={false} allowDecimals={false} />
                 <Tooltip cursor={{fill: '#f8fafc'}} />
-                <Legend iconType="circle" wrapperStyle={{ fontSize: '12px' }} />
-                <Bar dataKey="completed" name="Completed" fill="#10b981" radius={[4, 4, 0, 0]} maxBarSize={15} />
-                <Bar dataKey="pending" name="Pending" fill="#f59e0b" radius={[4, 4, 0, 0]} maxBarSize={15} />
-                <Bar dataKey="rejected" name="Rejected" fill="#ef4444" radius={[4, 4, 0, 0]} maxBarSize={15} />
+                <Legend iconType="circle" wrapperStyle={{ fontSize: '11px' }} />
+                <Bar dataKey="completed" name="Completed" fill="#10b981" radius={[4, 4, 0, 0]} maxBarSize={12} />
+                <Bar dataKey="pending" name="Pending" fill="#f59e0b" radius={[4, 4, 0, 0]} maxBarSize={12} />
+                <Bar dataKey="rework" name="Rework" fill="#ef4444" radius={[4, 4, 0, 0]} maxBarSize={12} />
               </BarChart>
             </ResponsiveContainer>
           </div>
         </div>
 
-        <div className="card p-md">
-          <h3 className="section-title">Complaint Status</h3>
-          <div className="pie-chart-wrapper">
-            <ResponsiveContainer width="100%" height={220}>
+        {/* Inspection Breakdown Pie Chart */}
+        <div className="contractor-card">
+          <div className="card-header">
+            <h3 className="card-title">Overall Status Breakdown</h3>
+            <p className="card-subtitle">Current status proportion of all complaints</p>
+          </div>
+          <div style={{ height: '170px', display: 'flex', justifyContent: 'center', alignItems: 'center', marginTop: '0.5rem' }}>
+            <ResponsiveContainer width="100%" height="100%">
               <PieChart>
                 <Pie
                   data={pieData}
-                  innerRadius={60}
-                  outerRadius={80}
-                  paddingAngle={5}
+                  innerRadius={50}
+                  outerRadius={70}
+                  paddingAngle={4}
                   dataKey="value"
                   stroke="none"
                 >
@@ -304,167 +635,66 @@ const GovDashboard = () => {
                 <Tooltip />
               </PieChart>
             </ResponsiveContainer>
-            
-            <div className="pie-legend-custom">
-              {pieData.filter(d => d.name !== 'No Data').map(item => (
-                <div key={item.name} className="pie-legend-row flex justify-between items-center">
-                  <div className="flex items-center gap-sm">
-                    <div className="color-dot" style={{ backgroundColor: item.color }}></div>
-                    <span style={{fontSize: '0.9rem', fontWeight: 500}}>{item.name}</span>
-                  </div>
-                  <span className="text-secondary" style={{fontSize: '0.85rem'}}>
-                    {item.value} ({totalPie > 0 ? Math.round((item.value / totalPie) * 100) : 0}%)
-                  </span>
-                </div>
-              ))}
-              <div className="pie-legend-row flex justify-between items-center" style={{borderTop: '1px solid #e2e8f0', marginTop: '8px', paddingTop: '8px'}}>
-                <span className="font-bold">Total</span>
-                <span className="font-bold">{totalPie}</span>
-              </div>
-            </div>
           </div>
-        </div>
-      </div>
 
-      {/* Map Section */}
-      <div className="card p-md" style={{ marginBottom: '1.5rem' }}>
-        <h3 className="section-title mb-md">Interactive Parks Map</h3>
-        <div className="gov-map-container" style={{ height: '450px', width: '100%' }}>
-          <MapContainer center={mapCenter} zoom={11} style={{ height: '100%', width: '100%', borderRadius: '12px', zIndex: 0 }}>
-            <TileLayer
-              attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
-              url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
-            />
-            {(() => {
-              // Get unique park IDs relevant to the current user's complaints
-              const relevantParkIds = new Set(complaints.filter(c => c.park).map(c => typeof c.park === 'object' ? c.park._id : c.park));
-              
-              return parks
-                .filter(p => p.latitude && p.longitude && relevantParkIds.has(p._id))
-                .map((park) => {
-                  let lat = parseFloat(park.latitude);
-                  let lng = parseFloat(park.longitude);
-                  
-                  // Add a small deterministic offset if coordinates are exactly the dummy ones
-                  // so the markers spread out instead of being stacked on a single pixel
-                  if (Math.abs(lat - 12.9716) < 0.0001 && Math.abs(lng - 77.5946) < 0.0001) {
-                    const hash = String(park._id).charCodeAt(String(park._id).length - 1) + String(park._id).charCodeAt(String(park._id).length - 2);
-                    lat += ((hash % 100) - 50) * 0.005;
-                    lng += (((hash * 3) % 100) - 50) * 0.005;
-                  }
-
-                  const health = getParkHealth(park._id);
-                  const activeCount = complaints.filter(c => c.park && (c.park._id === park._id || c.park === park._id) && ['New', 'Assigned', 'Started', 'In Progress', 'Waiting for Parts', 'Inspection Pending'].includes(c.status)).length;
-                  
-                  return (
-                    <Marker 
-                      key={park._id} 
-                      position={[lat, lng]}
-                      icon={health === 'red' ? redIcon : greenIcon}
-                    >
-                      <Popup>
-                        <div style={{ minWidth: '200px' }}>
-                          <h4 style={{ margin: '0 0 5px 0', fontSize: '1rem', color: '#0f172a' }}>{park.name}</h4>
-                          <p style={{ margin: '0 0 5px 0', fontSize: '0.85rem', color: '#64748b' }}>
-                            Ward: {park.ward?.name || park.ward?.wardNumber || 'N/A'}
-                          </p>
-                          <div style={{ display: 'flex', alignItems: 'center', gap: '5px', marginTop: '10px' }}>
-                            <div style={{ width: '10px', height: '10px', borderRadius: '50%', backgroundColor: health === 'red' ? '#ef4444' : '#10b981' }}></div>
-                            <span style={{ fontSize: '0.85rem', fontWeight: 'bold', color: health === 'red' ? '#ef4444' : '#10b981' }}>
-                              {health === 'red' ? 'Needs Attention' : 'Healthy'}
-                            </span>
-                          </div>
-                          {health === 'red' && (
-                            <p style={{ margin: '5px 0 0 0', fontSize: '0.8rem', color: '#dc2626' }}>
-                              {activeCount} active complaint{activeCount !== 1 ? 's' : ''}
-                            </p>
-                          )}
-                        </div>
-                      </Popup>
-                    </Marker>
-                  );
-                });
-            })()}
-          </MapContainer>
-        </div>
-      </div>
-
-      {/* Bottom Section */}
-      <div className="bottom-grid">
-        <div className="card p-md">
-          <h3 className="section-title mb-md">Recent Activities</h3>
-          <div className="activity-list">
-            {loading ? (
-              <p className="text-secondary" style={{fontSize:'0.9rem'}}>Loading...</p>
-            ) : recentActivities.length === 0 ? (
-              <p className="text-secondary" style={{fontSize:'0.9rem'}}>No recent activity found.</p>
-            ) : (
-              recentActivities.map(activity => (
-                <div key={activity.id} className="activity-item">
-                  <div className="activity-icon text-primary bg-primary-light">
-                    <Activity size={16} />
-                  </div>
-                  <div className="activity-content">
-                    <p className="activity-text">{activity.text}</p>
-                    <p className="activity-time">{activity.time}</p>
-                  </div>
+          <div className="pie-legend-list">
+            {pieData.map(item => (
+              <div key={item.name} className="pie-legend-item">
+                <div className="pie-legend-label">
+                  <span className="pie-dot" style={{ backgroundColor: item.color }}></span>
+                  <span>{item.name}</span>
                 </div>
-              ))
-            )}
-          </div>
-        </div>
-        
-        <div className="card p-md">
-          <h3 className="section-title mb-md">My Complaints Summary</h3>
-          <div className="activity-list">
-            {[
-              { label: 'New', color: '#3b82f6' },
-              { label: 'In Progress', color: '#f59e0b' },
-              { label: 'Completed', color: '#10b981' },
-              { label: 'Rejected', color: '#ef4444' },
-            ].map(s => {
-              const cnt = complaints.filter(c => {
-                if (s.label === 'In Progress') return ['Assigned', 'Started', 'In Progress', 'Waiting for Parts', 'Inspection Pending'].includes(c.status);
-                if (s.label === 'Completed') return ['Completed', 'Verified', 'Closed'].includes(c.status);
-                return c.status === s.label;
-              }).length;
-              return (
-                <div key={s.label} className="activity-item">
-                  <div className="activity-icon" style={{ color: s.color, backgroundColor: s.color + '20' }}>
-                    <ClipboardList size={16} />
-                  </div>
-                  <div className="activity-content">
-                    <p className="activity-text" style={{ fontWeight: 600 }}>{s.label}</p>
-                    <p className="activity-time">{loading ? '—' : `${cnt} complaint${cnt !== 1 ? 's' : ''}`}</p>
-                  </div>
-                </div>
-              );
-            })}
-          </div>
-        </div>
-
-        <div className="card p-md">
-          <h3 className="section-title mb-md">Account Info</h3>
-          <div className="activity-list">
-            {[
-              { label: 'Name', value: user.name },
-              { label: 'Email', value: user.email },
-              { label: 'Role', value: user.role },
-              { label: 'Department', value: user.department || 'N/A' },
-            ].map(info => (
-              <div key={info.label} className="activity-item">
-                <div className="activity-icon text-success bg-success-light">
-                  <Bell size={16} />
-                </div>
-                <div className="activity-content">
-                  <p className="activity-text" style={{ fontWeight: 600 }}>{info.label}</p>
-                  <p className="activity-time">{info.value}</p>
-                </div>
+                <span className="pie-val">{item.value}</span>
               </div>
             ))}
           </div>
         </div>
+
+        {/* SLA Compliance & Deadlines */}
+        <div className="contractor-card">
+          <div className="card-header">
+            <h3 className="card-title">SLA Compliance & Deadlines</h3>
+            <p className="card-subtitle">Active deadline status of assigned complaints</p>
+          </div>
+
+          <div className="sla-summary-list" style={{ marginTop: '0.75rem' }}>
+            <div className="sla-item">
+              <div className="sla-item-icon green">
+                <CheckCircle size={16} />
+              </div>
+              <div className="sla-item-info">
+                <div className="sla-title">On Time Tasks</div>
+                <div className="sla-desc">{slaStats.onTime} active complaint(s) within SLA</div>
+              </div>
+              <span className="sla-count-pill green">{slaStats.onTime}</span>
+            </div>
+
+            <div className="sla-item">
+              <div className="sla-item-icon amber">
+                <Bell size={16} />
+              </div>
+              <div className="sla-item-info">
+                <div className="sla-title">Due Soon Tasks</div>
+                <div className="sla-desc">{slaStats.dueSoon} complaint(s) expiring within 24 hours</div>
+              </div>
+              <span className="sla-count-pill amber">{slaStats.dueSoon}</span>
+            </div>
+
+            <div className="sla-item">
+              <div className="sla-item-icon rose">
+                <Activity size={16} />
+              </div>
+              <div className="sla-item-info">
+                <div className="sla-title">Overdue Tasks</div>
+                <div className="sla-desc">{slaStats.overdue} complaint(s) past SLA resolution deadline</div>
+              </div>
+              <span className="sla-count-pill rose">{slaStats.overdue}</span>
+            </div>
+          </div>
+        </div>
+
       </div>
+
     </div>
   );
 };

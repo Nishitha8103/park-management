@@ -1,0 +1,351 @@
+<mxfile host="app.diagrams.net" modified="2026-10-05T12:56:00.000Z" agent="5.0" version="21.0.0" etag="park_monitoring_strict_structure_chart" type="device">
+  <diagram id="ParkStructureChart" name="Park Monitoring System Structure Chart">
+    <mxGraphModel dx="1600" dy="1000" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="1654" pageHeight="1169" background="#ffffff" math="0" shadow="0">
+      <root>
+        <mxCell id="0" />
+        <mxCell id="1" parent="0" />
+
+        <!-- ================= TOP LEVEL: ROOT MODULE ================= -->
+        <mxCell id="root_module" value="&lt;b&gt;&lt;font style=&quot;font-size: 16px;&quot;&gt;Park Monitoring Admin / Official&lt;br&gt;Control Module&lt;/font&gt;&lt;/b&gt;" style="rounded=0;whiteSpace=wrap;html=1;fillColor=#ffffff;strokeColor=#000000;strokeWidth=2;fontFamily=Times New Roman;align=center;verticalAlign=middle;" vertex="1" parent="1">
+          <mxGeometry x="640" y="30" width="360" height="70" as="geometry" />
+        </mxCell>
+
+        <!-- ================= 6 EXACT LEVEL-1 MODULES ================= -->
+        <!-- 1. User Governance Module (AdminDistricts, AdminCorporations, AdminZones, AdminWards, AdminContractors, AdminOfficials) -->
+        <mxCell id="mod_1" value="&lt;b&gt;1. User Governance&lt;br&gt;Module&lt;/b&gt;" style="rounded=0;whiteSpace=wrap;html=1;fillColor=#ffffff;strokeColor=#000000;strokeWidth=1.5;fontFamily=Times New Roman;fontSize=13;align=center;verticalAlign=middle;" vertex="1" parent="1">
+          <mxGeometry x="40" y="170" width="220" height="60" as="geometry" />
+        </mxCell>
+
+        <!-- 2. Park Registry Module (AdminParks, Parks.jsx, ParkDetails.jsx, ScanQR.jsx, Flora) -->
+        <mxCell id="mod_2" value="&lt;b&gt;2. Park Registry&lt;br&gt;Module&lt;/b&gt;" style="rounded=0;whiteSpace=wrap;html=1;fillColor=#ffffff;strokeColor=#000000;strokeWidth=1.5;fontFamily=Times New Roman;fontSize=13;align=center;verticalAlign=middle;" vertex="1" parent="1">
+          <mxGeometry x="300" y="170" width="220" height="60" as="geometry" />
+        </mxCell>
+
+        <!-- 3. Complaint Module (SubmitComplaint, TrackComplaint, AdminComplaints, complaintController) -->
+        <mxCell id="mod_3" value="&lt;b&gt;3. Complaint&lt;br&gt;Module&lt;/b&gt;" style="rounded=0;whiteSpace=wrap;html=1;fillColor=#ffffff;strokeColor=#000000;strokeWidth=1.5;fontFamily=Times New Roman;fontSize=13;align=center;verticalAlign=middle;" vertex="1" parent="1">
+          <mxGeometry x="560" y="170" width="220" height="60" as="geometry" />
+        </mxCell>
+
+        <!-- 4. Stall Allotment Module (AdminStallBookings, MyStallBookings, stallBookingController, stallSlotController) -->
+        <mxCell id="mod_4" value="&lt;b&gt;4. Stall Allotment&lt;br&gt;Module&lt;/b&gt;" style="rounded=0;whiteSpace=wrap;html=1;fillColor=#ffffff;strokeColor=#000000;strokeWidth=1.5;fontFamily=Times New Roman;fontSize=13;align=center;verticalAlign=middle;" vertex="1" parent="1">
+          <mxGeometry x="820" y="170" width="220" height="60" as="geometry" />
+        </mxCell>
+
+        <!-- 5. Staff & Contractor Module (ContractorMyTasks, AdminAssignments, AdminLeaveManagement, AdminMaterialRequests) -->
+        <mxCell id="mod_5" value="&lt;b&gt;5. Staff &amp;amp; Contractor&lt;br&gt;Module&lt;/b&gt;" style="rounded=0;whiteSpace=wrap;html=1;fillColor=#ffffff;strokeColor=#000000;strokeWidth=1.5;fontFamily=Times New Roman;fontSize=13;align=center;verticalAlign=middle;" vertex="1" parent="1">
+          <mxGeometry x="1080" y="170" width="220" height="60" as="geometry" />
+        </mxCell>
+
+        <!-- 6. Official & Public Module (AdminInspections, GovVerifyWork, AdminAnnouncements, AdminFeedback) -->
+        <mxCell id="mod_6" value="&lt;b&gt;6. Official &amp;amp; Public&lt;br&gt;Module&lt;/b&gt;" style="rounded=0;whiteSpace=wrap;html=1;fillColor=#ffffff;strokeColor=#000000;strokeWidth=1.5;fontFamily=Times New Roman;fontSize=13;align=center;verticalAlign=middle;" vertex="1" parent="1">
+          <mxGeometry x="1340" y="170" width="230" height="60" as="geometry" />
+        </mxCell>
+
+        <!-- ================= TOP BUS CONNECTORS ================= -->
+        <mxCell id="bus_down" value="" style="endArrow=none;html=1;strokeColor=#000000;strokeWidth=1.5;" edge="1" parent="1">
+          <mxGeometry relative="1" as="geometry">
+            <mxPoint x="820" y="100" as="sourcePoint" />
+            <mxPoint x="820" y="135" as="targetPoint" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="bus_horiz" value="" style="endArrow=none;html=1;strokeColor=#000000;strokeWidth=1.5;" edge="1" parent="1">
+          <mxGeometry relative="1" as="geometry">
+            <mxPoint x="150" y="135" as="sourcePoint" />
+            <mxPoint x="1455" y="135" as="targetPoint" />
+          </mxGeometry>
+        </mxCell>
+
+        <!-- Vertical drop lines into level 1 boxes -->
+        <mxCell id="drop_1" value="" style="endArrow=block;html=1;strokeColor=#000000;strokeWidth=1.5;endFill=1;" edge="1" parent="1">
+          <mxGeometry relative="1" as="geometry">
+            <mxPoint x="150" y="135" as="sourcePoint" />
+            <mxPoint x="150" y="170" as="targetPoint" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="drop_2" value="" style="endArrow=block;html=1;strokeColor=#000000;strokeWidth=1.5;endFill=1;" edge="1" parent="1">
+          <mxGeometry relative="1" as="geometry">
+            <mxPoint x="410" y="135" as="sourcePoint" />
+            <mxPoint x="410" y="170" as="targetPoint" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="drop_3" value="" style="endArrow=block;html=1;strokeColor=#000000;strokeWidth=1.5;endFill=1;" edge="1" parent="1">
+          <mxGeometry relative="1" as="geometry">
+            <mxPoint x="670" y="135" as="sourcePoint" />
+            <mxPoint x="670" y="170" as="targetPoint" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="drop_4" value="" style="endArrow=block;html=1;strokeColor=#000000;strokeWidth=1.5;endFill=1;" edge="1" parent="1">
+          <mxGeometry relative="1" as="geometry">
+            <mxPoint x="930" y="135" as="sourcePoint" />
+            <mxPoint x="930" y="170" as="targetPoint" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="drop_5" value="" style="endArrow=block;html=1;strokeColor=#000000;strokeWidth=1.5;endFill=1;" edge="1" parent="1">
+          <mxGeometry relative="1" as="geometry">
+            <mxPoint x="1190" y="135" as="sourcePoint" />
+            <mxPoint x="1190" y="170" as="targetPoint" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="drop_6" value="" style="endArrow=block;html=1;strokeColor=#000000;strokeWidth=1.5;endFill=1;" edge="1" parent="1">
+          <mxGeometry relative="1" as="geometry">
+            <mxPoint x="1455" y="135" as="sourcePoint" />
+            <mxPoint x="1455" y="170" as="targetPoint" />
+          </mxGeometry>
+        </mxCell>
+
+        <!-- ================= COLUMN 1: 1. User Governance Module ================= -->
+        <mxCell id="sub_1_1" value="&lt;b&gt;1.1&lt;/b&gt;&lt;br&gt;Approve Contractor / Official" style="rounded=0;whiteSpace=wrap;html=1;fillColor=#ffffff;strokeColor=#000000;strokeWidth=1.2;fontFamily=Times New Roman;fontSize=11;align=center;" vertex="1" parent="1">
+          <mxGeometry x="70" y="260" width="165" height="45" as="geometry" />
+        </mxCell>
+        <mxCell id="sub_1_2" value="&lt;b&gt;1.2&lt;/b&gt;&lt;br&gt;District &amp;amp; Corp Hierarchy" style="rounded=0;whiteSpace=wrap;html=1;fillColor=#ffffff;strokeColor=#000000;strokeWidth=1.2;fontFamily=Times New Roman;fontSize=11;align=center;" vertex="1" parent="1">
+          <mxGeometry x="70" y="325" width="165" height="45" as="geometry" />
+        </mxCell>
+        <mxCell id="sub_1_3" value="&lt;b&gt;1.3&lt;/b&gt;&lt;br&gt;RBAC Configuration &amp;amp; Roles" style="rounded=0;whiteSpace=wrap;html=1;fillColor=#ffffff;strokeColor=#000000;strokeWidth=1.2;fontFamily=Times New Roman;fontSize=11;align=center;" vertex="1" parent="1">
+          <mxGeometry x="70" y="390" width="165" height="45" as="geometry" />
+        </mxCell>
+
+        <mxCell id="spine_1" value="" style="endArrow=none;html=1;strokeColor=#000000;strokeWidth=1.2;" edge="1" parent="1">
+          <mxGeometry relative="1" as="geometry">
+            <mxPoint x="55" y="230" as="sourcePoint" />
+            <mxPoint x="55" y="412" as="targetPoint" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="arr_1_1" value="" style="endArrow=block;html=1;strokeColor=#000000;strokeWidth=1.2;endFill=1;" edge="1" parent="1">
+          <mxGeometry relative="1" as="geometry">
+            <mxPoint x="55" y="282" as="sourcePoint" />
+            <mxPoint x="70" y="282" as="targetPoint" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="arr_1_2" value="" style="endArrow=block;html=1;strokeColor=#000000;strokeWidth=1.2;endFill=1;" edge="1" parent="1">
+          <mxGeometry relative="1" as="geometry">
+            <mxPoint x="55" y="347" as="sourcePoint" />
+            <mxPoint x="70" y="347" as="targetPoint" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="arr_1_3" value="" style="endArrow=block;html=1;strokeColor=#000000;strokeWidth=1.2;endFill=1;" edge="1" parent="1">
+          <mxGeometry relative="1" as="geometry">
+            <mxPoint x="55" y="412" as="sourcePoint" />
+            <mxPoint x="70" y="412" as="targetPoint" />
+          </mxGeometry>
+        </mxCell>
+
+        <!-- ================= COLUMN 2: 2. Park Registry Module ================= -->
+        <mxCell id="sub_2_1" value="&lt;b&gt;2.1&lt;/b&gt;&lt;br&gt;View Park List &amp;amp; Map" style="rounded=0;whiteSpace=wrap;html=1;fillColor=#ffffff;strokeColor=#000000;strokeWidth=1.2;fontFamily=Times New Roman;fontSize=11;align=center;" vertex="1" parent="1">
+          <mxGeometry x="330" y="260" width="165" height="45" as="geometry" />
+        </mxCell>
+        <mxCell id="sub_2_2" value="&lt;b&gt;2.2&lt;/b&gt;&lt;br&gt;Register Park &amp;amp; Boundaries" style="rounded=0;whiteSpace=wrap;html=1;fillColor=#ffffff;strokeColor=#000000;strokeWidth=1.2;fontFamily=Times New Roman;fontSize=11;align=center;" vertex="1" parent="1">
+          <mxGeometry x="330" y="325" width="165" height="45" as="geometry" />
+        </mxCell>
+        <mxCell id="sub_2_3" value="&lt;b&gt;2.3&lt;/b&gt;&lt;br&gt;Manage Park Amenities &amp;amp; Safety" style="rounded=0;whiteSpace=wrap;html=1;fillColor=#ffffff;strokeColor=#000000;strokeWidth=1.2;fontFamily=Times New Roman;fontSize=11;align=center;" vertex="1" parent="1">
+          <mxGeometry x="330" y="390" width="165" height="45" as="geometry" />
+        </mxCell>
+        <mxCell id="sub_2_4" value="&lt;b&gt;2.4&lt;/b&gt;&lt;br&gt;Flora Species &amp;amp; Health Log" style="rounded=0;whiteSpace=wrap;html=1;fillColor=#ffffff;strokeColor=#000000;strokeWidth=1.2;fontFamily=Times New Roman;fontSize=11;align=center;" vertex="1" parent="1">
+          <mxGeometry x="330" y="455" width="165" height="45" as="geometry" />
+        </mxCell>
+
+        <mxCell id="spine_2" value="" style="endArrow=none;html=1;strokeColor=#000000;strokeWidth=1.2;" edge="1" parent="1">
+          <mxGeometry relative="1" as="geometry">
+            <mxPoint x="315" y="230" as="sourcePoint" />
+            <mxPoint x="315" y="477" as="targetPoint" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="arr_2_1" value="" style="endArrow=block;html=1;strokeColor=#000000;strokeWidth=1.2;endFill=1;" edge="1" parent="1">
+          <mxGeometry relative="1" as="geometry">
+            <mxPoint x="315" y="282" as="sourcePoint" />
+            <mxPoint x="330" y="282" as="targetPoint" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="arr_2_2" value="" style="endArrow=block;html=1;strokeColor=#000000;strokeWidth=1.2;endFill=1;" edge="1" parent="1">
+          <mxGeometry relative="1" as="geometry">
+            <mxPoint x="315" y="347" as="sourcePoint" />
+            <mxPoint x="330" y="347" as="targetPoint" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="arr_2_3" value="" style="endArrow=block;html=1;strokeColor=#000000;strokeWidth=1.2;endFill=1;" edge="1" parent="1">
+          <mxGeometry relative="1" as="geometry">
+            <mxPoint x="315" y="412" as="sourcePoint" />
+            <mxPoint x="330" y="412" as="targetPoint" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="arr_2_4" value="" style="endArrow=block;html=1;strokeColor=#000000;strokeWidth=1.2;endFill=1;" edge="1" parent="1">
+          <mxGeometry relative="1" as="geometry">
+            <mxPoint x="315" y="477" as="sourcePoint" />
+            <mxPoint x="330" y="477" as="targetPoint" />
+          </mxGeometry>
+        </mxCell>
+
+        <!-- ================= COLUMN 3: 3. Complaint Module ================= -->
+        <mxCell id="sub_3_1" value="&lt;b&gt;3.1&lt;/b&gt;&lt;br&gt;Citizen Complaint Logging" style="rounded=0;whiteSpace=wrap;html=1;fillColor=#ffffff;strokeColor=#000000;strokeWidth=1.2;fontFamily=Times New Roman;fontSize=11;align=center;" vertex="1" parent="1">
+          <mxGeometry x="590" y="260" width="165" height="45" as="geometry" />
+        </mxCell>
+        <mxCell id="sub_3_2" value="&lt;b&gt;3.2&lt;/b&gt;&lt;br&gt;Assign Work Order &amp;amp; Priority" style="rounded=0;whiteSpace=wrap;html=1;fillColor=#ffffff;strokeColor=#000000;strokeWidth=1.2;fontFamily=Times New Roman;fontSize=11;align=center;" vertex="1" parent="1">
+          <mxGeometry x="590" y="325" width="165" height="45" as="geometry" />
+        </mxCell>
+        <mxCell id="sub_3_3" value="&lt;b&gt;3.3&lt;/b&gt;&lt;br&gt;Audit Before / After Proofs" style="rounded=0;whiteSpace=wrap;html=1;fillColor=#ffffff;strokeColor=#000000;strokeWidth=1.2;fontFamily=Times New Roman;fontSize=11;align=center;" vertex="1" parent="1">
+          <mxGeometry x="590" y="390" width="165" height="45" as="geometry" />
+        </mxCell>
+        <mxCell id="sub_3_4" value="&lt;b&gt;3.4&lt;/b&gt;&lt;br&gt;Close Ticket &amp;amp; Reassign" style="rounded=0;whiteSpace=wrap;html=1;fillColor=#ffffff;strokeColor=#000000;strokeWidth=1.2;fontFamily=Times New Roman;fontSize=11;align=center;" vertex="1" parent="1">
+          <mxGeometry x="590" y="455" width="165" height="45" as="geometry" />
+        </mxCell>
+
+        <mxCell id="spine_3" value="" style="endArrow=none;html=1;strokeColor=#000000;strokeWidth=1.2;" edge="1" parent="1">
+          <mxGeometry relative="1" as="geometry">
+            <mxPoint x="575" y="230" as="sourcePoint" />
+            <mxPoint x="575" y="477" as="targetPoint" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="arr_3_1" value="" style="endArrow=block;html=1;strokeColor=#000000;strokeWidth=1.2;endFill=1;" edge="1" parent="1">
+          <mxGeometry relative="1" as="geometry">
+            <mxPoint x="575" y="282" as="sourcePoint" />
+            <mxPoint x="590" y="282" as="targetPoint" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="arr_3_2" value="" style="endArrow=block;html=1;strokeColor=#000000;strokeWidth=1.2;endFill=1;" edge="1" parent="1">
+          <mxGeometry relative="1" as="geometry">
+            <mxPoint x="575" y="347" as="sourcePoint" />
+            <mxPoint x="590" y="347" as="targetPoint" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="arr_3_3" value="" style="endArrow=block;html=1;strokeColor=#000000;strokeWidth=1.2;endFill=1;" edge="1" parent="1">
+          <mxGeometry relative="1" as="geometry">
+            <mxPoint x="575" y="412" as="sourcePoint" />
+            <mxPoint x="590" y="412" as="targetPoint" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="arr_3_4" value="" style="endArrow=block;html=1;strokeColor=#000000;strokeWidth=1.2;endFill=1;" edge="1" parent="1">
+          <mxGeometry relative="1" as="geometry">
+            <mxPoint x="575" y="477" as="sourcePoint" />
+            <mxPoint x="590" y="477" as="targetPoint" />
+          </mxGeometry>
+        </mxCell>
+
+        <!-- ================= COLUMN 4: 4. Stall Allotment Module ================= -->
+        <mxCell id="sub_4_1" value="&lt;b&gt;4.1&lt;/b&gt;&lt;br&gt;View Stall Slot Catalog" style="rounded=0;whiteSpace=wrap;html=1;fillColor=#ffffff;strokeColor=#000000;strokeWidth=1.2;fontFamily=Times New Roman;fontSize=11;align=center;" vertex="1" parent="1">
+          <mxGeometry x="850" y="260" width="165" height="45" as="geometry" />
+        </mxCell>
+        <mxCell id="sub_4_2" value="&lt;b&gt;4.2&lt;/b&gt;&lt;br&gt;Vendor Booking &amp;amp; Address Proof" style="rounded=0;whiteSpace=wrap;html=1;fillColor=#ffffff;strokeColor=#000000;strokeWidth=1.2;fontFamily=Times New Roman;fontSize=11;align=center;" vertex="1" parent="1">
+          <mxGeometry x="850" y="325" width="165" height="45" as="geometry" />
+        </mxCell>
+        <mxCell id="sub_4_3" value="&lt;b&gt;4.3&lt;/b&gt;&lt;br&gt;Approve / Reject Stall Permit" style="rounded=0;whiteSpace=wrap;html=1;fillColor=#ffffff;strokeColor=#000000;strokeWidth=1.2;fontFamily=Times New Roman;fontSize=11;align=center;" vertex="1" parent="1">
+          <mxGeometry x="850" y="390" width="165" height="45" as="geometry" />
+        </mxCell>
+        <mxCell id="sub_4_4" value="&lt;b&gt;4.4&lt;/b&gt;&lt;br&gt;Manage Stall Payments" style="rounded=0;whiteSpace=wrap;html=1;fillColor=#ffffff;strokeColor=#000000;strokeWidth=1.2;fontFamily=Times New Roman;fontSize=11;align=center;" vertex="1" parent="1">
+          <mxGeometry x="850" y="455" width="165" height="45" as="geometry" />
+        </mxCell>
+
+        <mxCell id="spine_4" value="" style="endArrow=none;html=1;strokeColor=#000000;strokeWidth=1.2;" edge="1" parent="1">
+          <mxGeometry relative="1" as="geometry">
+            <mxPoint x="835" y="230" as="sourcePoint" />
+            <mxPoint x="835" y="477" as="targetPoint" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="arr_4_1" value="" style="endArrow=block;html=1;strokeColor=#000000;strokeWidth=1.2;endFill=1;" edge="1" parent="1">
+          <mxGeometry relative="1" as="geometry">
+            <mxPoint x="835" y="282" as="sourcePoint" />
+            <mxPoint x="850" y="282" as="targetPoint" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="arr_4_2" value="" style="endArrow=block;html=1;strokeColor=#000000;strokeWidth=1.2;endFill=1;" edge="1" parent="1">
+          <mxGeometry relative="1" as="geometry">
+            <mxPoint x="835" y="347" as="sourcePoint" />
+            <mxPoint x="850" y="347" as="targetPoint" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="arr_4_3" value="" style="endArrow=block;html=1;strokeColor=#000000;strokeWidth=1.2;endFill=1;" edge="1" parent="1">
+          <mxGeometry relative="1" as="geometry">
+            <mxPoint x="835" y="412" as="sourcePoint" />
+            <mxPoint x="850" y="412" as="targetPoint" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="arr_4_4" value="" style="endArrow=block;html=1;strokeColor=#000000;strokeWidth=1.2;endFill=1;" edge="1" parent="1">
+          <mxGeometry relative="1" as="geometry">
+            <mxPoint x="835" y="477" as="sourcePoint" />
+            <mxPoint x="850" y="477" as="targetPoint" />
+          </mxGeometry>
+        </mxCell>
+
+        <!-- ================= COLUMN 5: 5. Staff & Contractor Module ================= -->
+        <mxCell id="sub_5_1" value="&lt;b&gt;5.1&lt;/b&gt;&lt;br&gt;View Staff &amp;amp; Contractor List" style="rounded=0;whiteSpace=wrap;html=1;fillColor=#ffffff;strokeColor=#000000;strokeWidth=1.2;fontFamily=Times New Roman;fontSize=11;align=center;" vertex="1" parent="1">
+          <mxGeometry x="1110" y="260" width="165" height="45" as="geometry" />
+        </mxCell>
+        <mxCell id="sub_5_2" value="&lt;b&gt;5.2&lt;/b&gt;&lt;br&gt;Staff Leave &amp;amp; Availability" style="rounded=0;whiteSpace=wrap;html=1;fillColor=#ffffff;strokeColor=#000000;strokeWidth=1.2;fontFamily=Times New Roman;fontSize=11;align=center;" vertex="1" parent="1">
+          <mxGeometry x="1110" y="325" width="165" height="45" as="geometry" />
+        </mxCell>
+        <mxCell id="sub_5_3" value="&lt;b&gt;5.3&lt;/b&gt;&lt;br&gt;Material &amp;amp; Inventory Requests" style="rounded=0;whiteSpace=wrap;html=1;fillColor=#ffffff;strokeColor=#000000;strokeWidth=1.2;fontFamily=Times New Roman;fontSize=11;align=center;" vertex="1" parent="1">
+          <mxGeometry x="1110" y="390" width="165" height="45" as="geometry" />
+        </mxCell>
+
+        <mxCell id="spine_5" value="" style="endArrow=none;html=1;strokeColor=#000000;strokeWidth=1.2;" edge="1" parent="1">
+          <mxGeometry relative="1" as="geometry">
+            <mxPoint x="1095" y="230" as="sourcePoint" />
+            <mxPoint x="1095" y="412" as="targetPoint" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="arr_5_1" value="" style="endArrow=block;html=1;strokeColor=#000000;strokeWidth=1.2;endFill=1;" edge="1" parent="1">
+          <mxGeometry relative="1" as="geometry">
+            <mxPoint x="1095" y="282" as="sourcePoint" />
+            <mxPoint x="1110" y="282" as="targetPoint" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="arr_5_2" value="" style="endArrow=block;html=1;strokeColor=#000000;strokeWidth=1.2;endFill=1;" edge="1" parent="1">
+          <mxGeometry relative="1" as="geometry">
+            <mxPoint x="1095" y="347" as="sourcePoint" />
+            <mxPoint x="1110" y="347" as="targetPoint" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="arr_5_3" value="" style="endArrow=block;html=1;strokeColor=#000000;strokeWidth=1.2;endFill=1;" edge="1" parent="1">
+          <mxGeometry relative="1" as="geometry">
+            <mxPoint x="1095" y="412" as="sourcePoint" />
+            <mxPoint x="1110" y="412" as="targetPoint" />
+          </mxGeometry>
+        </mxCell>
+
+        <!-- ================= COLUMN 6: 6. Official & Public Module ================= -->
+        <mxCell id="sub_6_1" value="&lt;b&gt;6.1&lt;/b&gt;&lt;br&gt;Official Field Inspections" style="rounded=0;whiteSpace=wrap;html=1;fillColor=#ffffff;strokeColor=#000000;strokeWidth=1.2;fontFamily=Times New Roman;fontSize=11;align=center;" vertex="1" parent="1">
+          <mxGeometry x="1375" y="260" width="165" height="45" as="geometry" />
+        </mxCell>
+        <mxCell id="sub_6_2" value="&lt;b&gt;6.2&lt;/b&gt;&lt;br&gt;Verify Work Quality &amp;amp; Proofs" style="rounded=0;whiteSpace=wrap;html=1;fillColor=#ffffff;strokeColor=#000000;strokeWidth=1.2;fontFamily=Times New Roman;fontSize=11;align=center;" vertex="1" parent="1">
+          <mxGeometry x="1375" y="325" width="165" height="45" as="geometry" />
+        </mxCell>
+        <mxCell id="sub_6_3" value="&lt;b&gt;6.3&lt;/b&gt;&lt;br&gt;Broadcast Announcements" style="rounded=0;whiteSpace=wrap;html=1;fillColor=#ffffff;strokeColor=#000000;strokeWidth=1.2;fontFamily=Times New Roman;fontSize=11;align=center;" vertex="1" parent="1">
+          <mxGeometry x="1375" y="390" width="165" height="45" as="geometry" />
+        </mxCell>
+        <mxCell id="sub_6_4" value="&lt;b&gt;6.4&lt;/b&gt;&lt;br&gt;Citizen Feedback &amp;amp; Rating" style="rounded=0;whiteSpace=wrap;html=1;fillColor=#ffffff;strokeColor=#000000;strokeWidth=1.2;fontFamily=Times New Roman;fontSize=11;align=center;" vertex="1" parent="1">
+          <mxGeometry x="1375" y="455" width="165" height="45" as="geometry" />
+        </mxCell>
+
+        <mxCell id="spine_6" value="" style="endArrow=none;html=1;strokeColor=#000000;strokeWidth=1.2;" edge="1" parent="1">
+          <mxGeometry relative="1" as="geometry">
+            <mxPoint x="1360" y="230" as="sourcePoint" />
+            <mxPoint x="1360" y="477" as="targetPoint" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="arr_6_1" value="" style="endArrow=block;html=1;strokeColor=#000000;strokeWidth=1.2;endFill=1;" edge="1" parent="1">
+          <mxGeometry relative="1" as="geometry">
+            <mxPoint x="1360" y="282" as="sourcePoint" />
+            <mxPoint x="1375" y="282" as="targetPoint" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="arr_6_2" value="" style="endArrow=block;html=1;strokeColor=#000000;strokeWidth=1.2;endFill=1;" edge="1" parent="1">
+          <mxGeometry relative="1" as="geometry">
+            <mxPoint x="1360" y="347" as="sourcePoint" />
+            <mxPoint x="1375" y="347" as="targetPoint" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="arr_6_3" value="" style="endArrow=block;html=1;strokeColor=#000000;strokeWidth=1.2;endFill=1;" edge="1" parent="1">
+          <mxGeometry relative="1" as="geometry">
+            <mxPoint x="1360" y="412" as="sourcePoint" />
+            <mxPoint x="1375" y="412" as="targetPoint" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="arr_6_4" value="" style="endArrow=block;html=1;strokeColor=#000000;strokeWidth=1.2;endFill=1;" edge="1" parent="1">
+          <mxGeometry relative="1" as="geometry">
+            <mxPoint x="1360" y="477" as="sourcePoint" />
+            <mxPoint x="1375" y="477" as="targetPoint" />
+          </mxGeometry>
+        </mxCell>
+
+      </root>
+    </mxGraphModel>
+  </diagram>
+</mxfile>

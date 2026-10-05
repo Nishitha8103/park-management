@@ -47,7 +47,8 @@ const ContractorSchedule = () => {
         const now = new Date();
         const mappedTasks = list.map(c => {
           const isCompleted = ['Completed', 'Completed - Waiting for Admin Review', 'Inspection Pending', 'Inspection Approved', 'Closed'].includes(c.status);
-          const isInProgress = ['In Progress', 'Reassigned to Contractor', 'Rework Required'].includes(c.status);
+          const isInProgress = ['In Progress', 'in-progress', 'Reassigned to Contractor', 'Rework Required', 'Returned by Admin'].includes(c.status);
+          const isAssigned = ['Assigned', 'assigned', 'New'].includes(c.status);
           
           const rawDeadline = c.slaDeadline || c.targetResolutionDate;
           const deadlineDate = rawDeadline ? new Date(rawDeadline) : (c.createdAt ? new Date(new Date(c.createdAt).getTime() + 48 * 3600 * 1000) : new Date());
@@ -59,8 +60,10 @@ const ContractorSchedule = () => {
             computedStatus = 'Overdue';
           } else if (isInProgress) {
             computedStatus = 'In Progress';
-          } else {
+          } else if (isAssigned) {
             computedStatus = 'Pending';
+          } else {
+            computedStatus = 'In Progress';
           }
 
           return {
@@ -134,13 +137,6 @@ const ContractorSchedule = () => {
               <h1>Parks Monitoring System</h1>
             </div>
             <div className="contractor-user-info">
-              <div className="contractor-user-details">
-                <h4 className="contractor-user-name">{contractor?.name}</h4>
-                <p className="contractor-user-role">
-                  {contractor?.maintenanceSkills?.length > 0 ? contractor.maintenanceSkills.join(', ') : 'Maintenance Contractor'}
-                </p>
-              </div>
-              <button className="btn-contractor-logout" onClick={handleLogout}><LogOut size={16} /> Logout</button>
             </div>
           </div>
         </header>
@@ -205,8 +201,18 @@ const ContractorSchedule = () => {
                       >
                         <span className="cal-day-num">{day}</span>
                         {dayTasks.slice(0, 2).map(t => (
-                          <div key={t._id} className="cal-task-dot" style={{ background: statusConfig[t.computedStatus]?.color || '#6b7280' }}>
-                            <span className="cal-task-label">{t.title}</span>
+                          <div 
+                            key={t._id} 
+                            className="cal-task-chip" 
+                            style={{ 
+                              background: statusConfig[t.computedStatus]?.bg || '#f1f5f9', 
+                              color: statusConfig[t.computedStatus]?.color || '#475569',
+                              border: `1px solid ${statusConfig[t.computedStatus]?.color}40`
+                            }}
+                            title={`${t.title} (${t.computedStatus})`}
+                          >
+                            <span className="cal-task-dot-indicator" style={{ background: statusConfig[t.computedStatus]?.color }}></span>
+                            <span className="cal-task-title-text">{t.computedStatus === 'Overdue' ? 'Overdue' : t.category || t.computedStatus}</span>
                           </div>
                         ))}
                         {dayTasks.length > 2 && <div className="cal-more">+{dayTasks.length - 2} more</div>}

@@ -16,7 +16,7 @@
   margin-bottom: var(--spacing-sm);
   font-size: 1.55rem;
   font-weight: 800;
-  color: #1f2a21 !important;
+  color: var(--gov-text-main, #1f2a21);
   letter-spacing: -0.015em;
 }
 
@@ -24,7 +24,7 @@
   display: flex;
   align-items: center;
   gap: 8px;
-  color: #2d3e30 !important;
+  color: var(--gov-text-main, #2d3e30);
   font-weight: 700;
   font-size: 0.95rem;
   background: none;
@@ -34,7 +34,7 @@
 }
 
 .btn-back:hover {
-  color: #4f6d54 !important;
+  color: var(--gov-primary, #4f6d54);
   text-decoration: underline;
 }
 

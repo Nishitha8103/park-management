@@ -255,36 +255,45 @@
   color: #28410e;
 }
 
-.cal-task-dot {
-  height: 5px;
-  border-radius: 3px;
-  margin-bottom: 2px;
-  position: relative;
-  cursor: pointer;
-}
-
-.cal-task-label {
-  display: none;
-  position: absolute;
-  left: 0;
-  top: 7px;
-  background: #0f172a;
-  color: #fff;
-  font-size: 0.68rem;
-  padding: 3px 6px;
+.cal-task-chip {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  padding: 2px 5px;
   border-radius: 4px;
+  margin-bottom: 2px;
+  font-size: 0.65rem;
+  font-weight: 700;
   white-space: nowrap;
-  z-index: 10;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  cursor: pointer;
+  transition: all 0.15s ease;
 }
 
-.cal-task-dot:hover .cal-task-label {
-  display: block;
+.cal-task-chip:hover {
+  transform: translateY(-1px);
+  box-shadow: 0 2px 4px rgba(0,0,0,0.08);
+}
+
+.cal-task-dot-indicator {
+  width: 5px;
+  height: 5px;
+  border-radius: 50%;
+  flex-shrink: 0;
+}
+
+.cal-task-title-text {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
 }
 
 .cal-more {
   font-size: 0.62rem;
   color: #66942f;
   font-weight: 700;
+  margin-top: 1px;
 }
 
 /* ---- Calendar Legend ---- */

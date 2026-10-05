@@ -4,13 +4,13 @@ const Park = require('./models/Park');
 dotenv.config();
 
 const zones = [
-  "East", "West", "South", "North", 
-  "Rajarajeshwari Nagar", "Dasarahalli", 
+  "East", "West", "South", "North",
+  "Rajarajeshwari Nagar", "Dasarahalli",
   "Yelahanka", "Bommanahalli", "Mahadevapura"
 ];
 
 const facilitiesList = [
-  "Walking Track", "Playground", "Open Gym", "Gazebo", 
+  "Walking Track", "Playground", "Open Gym", "Gazebo",
   "Benches", "Restrooms", "Drinking Water", "Children Area",
   "Jogging Track", "Lake", "Musical Fountain", "Statues", "Skating Rink",
   "Yoga Area", "Badminton Court", "Lush Trees", "Sand Pit"
@@ -45,17 +45,17 @@ const famousParks = [
 
 const generateParks = () => {
   const parks = [...famousParks];
-  
-  // Generate 150 more parks to heavily populate the dashboard across all zones
-  for(let i = 1; i <= 150; i++) {
+
+
+  for (let i = 1; i <= 150; i++) {
     const zone = zones[Math.floor(Math.random() * zones.length)];
     const ward = Math.floor(Math.random() * 243) + 1;
-    
+
     const numFacilities = Math.floor(Math.random() * 5) + 2;
     const parkFacilities = [];
-    for(let j=0; j<numFacilities; j++) {
+    for (let j = 0; j < numFacilities; j++) {
       const f = facilitiesList[Math.floor(Math.random() * facilitiesList.length)];
-      if(!parkFacilities.includes(f)) parkFacilities.push(f);
+      if (!parkFacilities.includes(f)) parkFacilities.push(f);
     }
 
     parks.push({
@@ -75,14 +75,14 @@ const seedDB = async () => {
   try {
     console.log('Connecting to MongoDB...');
     await mongoose.connect(process.env.MONGO_URI);
-    
+
     console.log('Clearing old parks...');
     await Park.deleteMany();
-    
+
     const parksData = generateParks();
     console.log(`Inserting ${parksData.length} parks seed data across all zones...`);
     await Park.insertMany(parksData);
-    
+
     console.log('Data Successfully Imported!');
     process.exit();
   } catch (error) {

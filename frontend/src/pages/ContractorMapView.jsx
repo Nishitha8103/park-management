@@ -124,13 +124,6 @@ const ContractorMapView = () => {
               <h1>Parks Monitoring System</h1>
             </div>
             <div className="contractor-user-info">
-              <div className="contractor-user-details">
-                <h4 className="contractor-user-name">{contractor?.name}</h4>
-                <p className="contractor-user-role">
-                  {contractor?.maintenanceSkills?.length > 0 ? contractor.maintenanceSkills.join(', ') : 'Maintenance Contractor'}
-                </p>
-              </div>
-              <button className="btn-contractor-logout" onClick={handleLogout}><LogOut size={16} /> Logout</button>
             </div>
           </div>
         </header>

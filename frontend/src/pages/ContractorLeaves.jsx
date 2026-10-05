@@ -54,13 +54,6 @@ const ContractorLeaves = () => {
             </div>
             <div className="contractor-user-info">
               <NotificationDropdown userId={contractor._id || contractor.id} role="contractor" />
-              <div className="contractor-user-details">
-                <h4 className="contractor-user-name">{contractor.name}</h4>
-                <p className="contractor-user-role">{contractor.department || 'Park Maintenance'} Specialist</p>
-              </div>
-              <button className="btn-contractor-logout" onClick={handleLogout}>
-                <LogOut size={16} /> Logout
-              </button>
             </div>
           </div>
         </header>

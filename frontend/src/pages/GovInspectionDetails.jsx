@@ -84,12 +84,14 @@ const GovInspectionDetails = () => {
         <div className="flex gap-md" style={{ display: 'flex', gap: '10px' }}>
           {inspection.status !== 'Closed' && inspection.status !== 'Reassignment Requested' && (
             <>
-              <button
-                className="btn btn-primary"
-                onClick={() => navigate(`/gov-dashboard/conduct-inspection/${inspection._id}`)}
-              >
-                {inspection.inspectionDate ? 'Edit Inspection' : 'Start Inspection'}
-              </button>
+              {!inspection.inspectionDate && (
+                <button
+                  className="btn btn-primary"
+                  onClick={() => navigate(`/gov-dashboard/conduct-inspection/${inspection._id}`)}
+                >
+                  Start Inspection
+                </button>
+              )}
               <button
                 type="button"
                 className="btn"

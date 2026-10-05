@@ -1,26 +1,58 @@
+/* ============================================================
+   LUSH PARK GREEN & ECO CONTRACTOR DESIGN SYSTEM
+   Theme: Vibrant Park Leaf Green (#94c559 / #7cae40 / #a8d76f)
+   ============================================================ */
+
+:root {
+  --eco-forest-900: #233b0c;
+  --eco-forest-800: #355813;
+  --eco-forest-700: #4a771b;
+  --eco-emerald-600: #689f2c;
+  --eco-emerald-500: #7cae40;
+  --eco-emerald-400: #94c559;
+  --eco-emerald-300: #a8d76f;
+  --eco-sage-100: #f2fae6;
+  --eco-sage-50: #f7fcf2;
+  --eco-bg: #f5faee;
+  --eco-card-bg: rgba(255, 255, 255, 0.92);
+  --eco-border: rgba(148, 197, 89, 0.28);
+  --eco-border-hover: rgba(124, 174, 64, 0.5);
+  --eco-text-main: #1e330a;
+  --eco-text-muted: #4e6b2c;
+  --eco-shadow-sm: 0 2px 8px -1px rgba(74, 119, 27, 0.08);
+  --eco-shadow-md: 0 10px 25px -4px rgba(74, 119, 27, 0.12), 0 4px 10px -2px rgba(74, 119, 27, 0.06);
+  --eco-shadow-lg: 0 20px 35px -6px rgba(74, 119, 27, 0.18), 0 8px 16px -3px rgba(74, 119, 27, 0.08);
+}
+
 .contractor-dashboard-page {
-  background: #f7fbf8 !important;
+  background: var(--eco-bg) !important;
+  background-image: 
+    radial-gradient(at 10% 10%, rgba(148, 197, 89, 0.12) 0px, transparent 50%),
+    radial-gradient(at 90% 20%, rgba(168, 215, 111, 0.15) 0px, transparent 50%),
+    radial-gradient(at 50% 95%, rgba(124, 174, 64, 0.08) 0px, transparent 50%) !important;
   min-height: 100vh;
   font-family: 'Inter', system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
-  color: #1a3320;
+  color: var(--eco-text-main);
 }
 
 .contractor-main-wrapper {
   width: 100%;
-  background: #f7fbf8 !important;
+  background: transparent !important;
 }
 
-/* Header Navbar */
+/* ============================================================
+   TOP NAVBAR / HEADER
+   ============================================================ */
 .contractor-header {
-  background: #94c559;
-  background: linear-gradient(90deg, #7cae40 0%, #94c559 50%, #a8d76f 100%);
+  background: linear-gradient(90deg, #689f2c 0%, #7cae40 40%, #94c559 80%, #a8d76f 100%);
   color: white;
-  padding: 1rem 0;
-  box-shadow: 0 4px 18px -2px rgba(148, 197, 89, 0.25);
+  padding: 0.9rem 0;
+  box-shadow: 0 4px 20px -2px rgba(92, 142, 41, 0.35);
   position: sticky;
   top: 0;
   z-index: 100;
-  border-bottom: 2px solid #7cae40;
+  border-bottom: 2px solid #689f2c;
+  backdrop-filter: blur(12px);
 }
 
 .contractor-header-content {
@@ -32,45 +64,55 @@
 .contractor-brand {
   display: flex;
   align-items: center;
-  gap: 0.75rem;
+  gap: 0.85rem;
+}
+
+.contractor-brand svg {
+  filter: drop-shadow(0 2px 6px rgba(35, 59, 12, 0.35));
 }
 
 .contractor-menu-toggle {
-  background: transparent;
-  border: none;
-  color: #f4f9ef;
+  background: rgba(255, 255, 255, 0.18);
+  border: 1px solid rgba(255, 255, 255, 0.3);
+  color: #f7fcf2;
   cursor: pointer;
-  padding: 0.4rem;
-  border-radius: 6px;
+  padding: 0.45rem;
+  border-radius: 8px;
   display: flex;
   align-items: center;
   justify-content: center;
-  transition: all 0.2s;
+  transition: all 0.25s ease;
 }
 
 .contractor-menu-toggle:hover {
-  background: rgba(255, 255, 255, 0.2);
-  color: white;
+  background: rgba(255, 255, 255, 0.3);
+  color: #ffffff;
+  transform: scale(1.05);
 }
 
 .contractor-brand h1 {
   font-size: 1.25rem;
   font-weight: 800;
   margin: 0;
-  letter-spacing: 0.5px;
+  letter-spacing: -0.01em;
   color: #ffffff;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  text-shadow: 0 1px 3px rgba(0, 0, 0, 0.15);
 }
 
 .contractor-brand span {
-  font-size: 0.75rem;
+  font-size: 0.72rem;
   background: #ffffff;
-  color: #28410e;
+  border: 1px solid rgba(255, 255, 255, 0.6);
+  color: #2e4d10;
   padding: 0.2rem 0.65rem;
   border-radius: 20px;
   font-weight: 800;
   text-transform: uppercase;
-  letter-spacing: 0.5px;
-  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.1);
+  letter-spacing: 0.6px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
 }
 
 .contractor-user-info {
@@ -85,54 +127,58 @@
 
 .contractor-user-name {
   font-weight: 700;
-  font-size: 0.95rem;
+  font-size: 0.92rem;
   margin: 0;
   color: #ffffff;
+  letter-spacing: -0.01em;
+  text-shadow: 0 1px 2px rgba(0, 0, 0, 0.15);
 }
 
 .contractor-user-role {
-  font-size: 0.78rem;
-  color: #f4f9ef;
+  font-size: 0.76rem;
+  color: #f2fae6;
   margin: 0;
-  font-weight: 500;
+  font-weight: 600;
 }
 
 .btn-contractor-logout {
-  background-color: rgba(255, 255, 255, 0.2);
+  background-color: rgba(255, 255, 255, 0.22);
   color: #ffffff;
-  border: 1px solid rgba(255, 255, 255, 0.4);
-  padding: 0.45rem 0.85rem;
+  border: 1px solid rgba(255, 255, 255, 0.45);
+  padding: 0.45rem 0.9rem;
   border-radius: 8px;
   font-size: 0.82rem;
   font-weight: 700;
   cursor: pointer;
-  transition: all 0.2s ease;
+  transition: all 0.25s ease;
   display: inline-flex;
   align-items: center;
-  gap: 0.4rem;
+  gap: 0.45rem;
 }
 
 .btn-contractor-logout:hover {
-  color: white;
+  color: #ffffff;
   border-color: #ef4444;
   background-color: #ef4444;
+  transform: translateY(-1px);
+  box-shadow: 0 4px 12px rgba(239, 68, 68, 0.35);
 }
 
-/* Dashboard Container */
+/* ============================================================
+   HERO BANNER
+   ============================================================ */
 .contractor-dashboard-container {
   padding: 2rem 0 3.5rem 0;
 }
 
-/* Hero Banner matching #94c559 color theme */
 .contractor-hero-banner {
-  background: #94c559;
-  background: linear-gradient(135deg, #7cae40 0%, #94c559 65%, #a8d76f 100%);
-  border: 1px solid #d4ebba;
-  border-radius: 16px;
-  padding: 2rem 2.5rem;
+  background: linear-gradient(135deg, #689f2c 0%, #7cae40 50%, #94c559 100%);
+  border: 1px solid rgba(255, 255, 255, 0.4);
+  border-radius: 20px;
+  padding: 2.25rem 2.75rem;
   margin-bottom: 2rem;
   color: white;
-  box-shadow: 0 10px 25px -5px rgba(148, 197, 89, 0.28);
+  box-shadow: var(--eco-shadow-lg), 0 0 30px rgba(148, 197, 89, 0.3);
   position: relative;
   overflow: hidden;
 }
@@ -140,11 +186,23 @@
 .contractor-hero-banner::before {
   content: '';
   position: absolute;
-  top: -50px;
+  top: -70px;
   right: -50px;
-  width: 240px;
-  height: 240px;
-  background: radial-gradient(circle, rgba(255, 255, 255, 0.25) 0%, rgba(255, 255, 255, 0) 70%);
+  width: 280px;
+  height: 280px;
+  background: radial-gradient(circle, rgba(255, 255, 255, 0.28) 0%, rgba(255, 255, 255, 0) 70%);
+  border-radius: 50%;
+  pointer-events: none;
+}
+
+.contractor-hero-banner::after {
+  content: '';
+  position: absolute;
+  bottom: -60px;
+  left: 20%;
+  width: 200px;
+  height: 200px;
+  background: radial-gradient(circle, rgba(168, 215, 111, 0.35) 0%, rgba(124, 174, 64, 0) 70%);
   border-radius: 50%;
   pointer-events: none;
 }
@@ -155,100 +213,40 @@
   align-items: center;
   flex-wrap: wrap;
   gap: 1.5rem;
-  margin-bottom: 0;
-}
-
-.hero-badge {
-  display: inline-flex;
-  align-items: center;
-  gap: 0.45rem;
-  background: rgba(255, 255, 255, 0.25);
-  color: #ffffff;
-  border: 1px solid rgba(255, 255, 255, 0.4);
-  padding: 0.35rem 0.85rem;
-  border-radius: 9999px;
-  font-size: 0.78rem;
-  font-weight: 700;
-  margin-bottom: 0.65rem;
-  letter-spacing: 0.6px;
-  backdrop-filter: blur(4px);
+  position: relative;
+  z-index: 1;
 }
 
 .hero-greeting h2 {
-  font-size: 1.95rem;
+  font-size: 2rem;
   font-weight: 800;
-  margin: 0 0 0.4rem 0;
+  margin: 0 0 0.45rem 0;
   color: #ffffff;
-  letter-spacing: -0.02em;
+  letter-spacing: -0.03em;
   line-height: 1.2;
 }
 
 .hero-greeting h2 .highlight {
-  color: #ffffff;
-  text-decoration: underline;
-  text-decoration-color: #f4f9ef;
-  text-underline-offset: 4px;
+  color: #6ee7b7;
+  text-shadow: 0 0 20px rgba(110, 231, 183, 0.4);
 }
 
 .hero-greeting p {
-  font-size: 0.95rem;
-  color: #f4f9ef;
+  font-size: 0.98rem;
+  color: #d1fae5;
   margin: 0;
-  font-weight: 500;
-  max-width: 600px;
+  font-weight: 400;
+  max-width: 620px;
   line-height: 1.5;
 }
 
-.hero-quick-actions {
-  display: flex;
-  gap: 0.75rem;
-  flex-wrap: wrap;
-}
-
-.hero-action-btn {
-  display: inline-flex;
-  align-items: center;
-  gap: 0.5rem;
-  padding: 0.65rem 1.25rem;
-  border-radius: 25px;
-  font-size: 0.88rem;
-  font-weight: 700;
-  text-decoration: none;
-  transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
-}
-
-.hero-action-btn.primary {
-  background: #ffffff;
-  color: #28410e;
-  border: none;
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.12);
-}
-
-.hero-action-btn.primary:hover {
-  background: #f4f9ef;
-  color: #1a3320;
-  transform: translateY(-2px);
-  box-shadow: 0 6px 16px rgba(0, 0, 0, 0.18);
-}
-
-.hero-action-btn.secondary {
-  background: rgba(255, 255, 255, 0.2);
-  color: #ffffff;
-  border: 1.5px solid rgba(255, 255, 255, 0.4);
-  backdrop-filter: blur(8px);
-}
-
-.hero-action-btn.secondary:hover {
-  background: rgba(255, 255, 255, 0.35);
-  transform: translateY(-2px);
-  color: #ffffff;
-}
-
-/* Stat Cards Grid - matches the #94c559 theme */
+/* ============================================================
+   KEY METRICS STATS CARDS
+   ============================================================ */
 .contractor-stats-grid {
   display: grid;
   grid-template-columns: repeat(4, 1fr);
-  gap: 1.25rem;
+  gap: 1.35rem;
   margin-bottom: 2rem;
 }
 
@@ -265,49 +263,91 @@
 }
 
 .contractor-stat-card {
-  background: #94c559;
-  background: linear-gradient(180deg, #94c559 0%, #7cae40 100%);
-  border-radius: 14px;
-  padding: 1.5rem;
-  border: 1px solid #d4ebba;
-  box-shadow: 0 4px 15px rgba(148, 197, 89, 0.22);
+  background: var(--eco-card-bg);
+  backdrop-filter: blur(14px);
+  -webkit-backdrop-filter: blur(14px);
+  border-radius: 18px;
+  padding: 1.6rem;
+  border: 1px solid var(--eco-border);
+  box-shadow: var(--eco-shadow-md);
   cursor: pointer;
-  transition: all 0.25s ease;
+  transition: all 0.28s cubic-bezier(0.4, 0, 0.2, 1);
   display: flex;
   flex-direction: column;
   justify-content: space-between;
-  color: white;
+  position: relative;
+  overflow: hidden;
 }
+
+.contractor-stat-card::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 4px;
+  opacity: 0.9;
+  transition: height 0.25s ease;
+}
+
+.contractor-stat-card.amber::before { background: linear-gradient(90deg, #f59e0b, #fbbf24); }
+.contractor-stat-card.blue::before { background: linear-gradient(90deg, #0ea5e9, #38bdf8); }
+.contractor-stat-card.green::before { background: linear-gradient(90deg, #10b981, #34d399); }
+.contractor-stat-card.rose::before { background: linear-gradient(90deg, #ef4444, #f87171); }
 
 .contractor-stat-card:hover {
-  transform: translateY(-4px);
-  box-shadow: 0 10px 25px rgba(148, 197, 89, 0.4);
+  transform: translateY(-5px);
+  box-shadow: var(--eco-shadow-lg);
+  border-color: var(--eco-border-hover);
 }
 
-.contractor-stat-card.amber,
-.contractor-stat-card.blue,
-.contractor-stat-card.green,
-.contractor-stat-card.rose { 
-  border-top: none; 
+.contractor-stat-card:hover::before {
+  height: 6px;
 }
 
 .stat-card-top {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  margin-bottom: 1rem;
+  margin-bottom: 1.25rem;
 }
 
 .stat-icon {
-  width: 44px;
-  height: 44px;
-  border-radius: 50%;
-  background: rgba(255, 255, 255, 0.25) !important;
-  color: #ffffff !important;
+  width: 46px;
+  height: 46px;
+  border-radius: 14px;
   display: flex;
   align-items: center;
   justify-content: center;
-  border: 1.5px solid rgba(255, 255, 255, 0.4);
+  transition: transform 0.25s ease;
+}
+
+.contractor-stat-card:hover .stat-icon {
+  transform: scale(1.08);
+}
+
+.stat-icon.amber {
+  background: #fffbeb;
+  color: #d97706;
+  border: 1px solid #fde68a;
+}
+
+.stat-icon.blue {
+  background: #f0f9ff;
+  color: #0284c7;
+  border: 1px solid #bae6fd;
+}
+
+.stat-icon.green {
+  background: #ecfdf5;
+  color: #059669;
+  border: 1px solid #a7f3d0;
+}
+
+.stat-icon.rose {
+  background: #fff1f2;
+  color: #e11d48;
+  border: 1px solid #fecdd3;
 }
 
 .stat-tag {
@@ -316,41 +356,57 @@
   padding: 0.25rem 0.65rem;
   border-radius: 20px;
   text-transform: uppercase;
-  background: rgba(255, 255, 255, 0.25) !important;
-  color: #ffffff !important;
-  border: 1px solid rgba(255, 255, 255, 0.35);
-}
-
-.stat-card-bottom h3 {
-  font-size: 2.2rem;
-  font-weight: 900;
-  color: #ffffff;
-  margin: 0 0 2px 0;
-  line-height: 1;
-  text-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
-}
-
-.stat-card-bottom p {
-  font-size: 0.88rem;
-  color: #f4f9ef;
-  font-weight: 700;
-  margin: 0;
-  text-transform: uppercase;
   letter-spacing: 0.5px;
 }
 
-/* Card Component Base */
+.stat-tag.amber { background: #fef3c7; color: #b45309; }
+.stat-tag.blue { background: #e0f2fe; color: #0369a1; }
+.stat-tag.green { background: #d1fae5; color: #065f46; }
+.stat-tag.rose { background: #ffe4e6; color: #be123c; }
+
+.contractor-stat-card .stat-card-bottom h3 {
+  font-size: 2.35rem !important;
+  font-weight: 800 !important;
+  color: #1e330a !important;
+  margin: 0 0 4px 0 !important;
+  line-height: 1 !important;
+  letter-spacing: -0.03em !important;
+  text-shadow: none !important;
+  opacity: 1 !important;
+}
+
+.contractor-stat-card .stat-card-bottom p {
+  font-size: 0.86rem !important;
+  color: #4e6b2c !important;
+  font-weight: 700 !important;
+  margin: 0 !important;
+  text-transform: capitalize !important;
+  letter-spacing: 0.2px !important;
+  text-shadow: none !important;
+  opacity: 1 !important;
+}
+
+/* ============================================================
+   GLASSMORPHIС CARD BASE
+   ============================================================ */
 .contractor-card {
-  background: white;
-  border-radius: 16px;
-  border: 1px solid #e0eed1;
-  box-shadow: 0 4px 18px rgba(148, 197, 89, 0.08);
-  padding: 1.75rem;
-  margin-bottom: 1.5rem;
+  background: var(--eco-card-bg);
+  backdrop-filter: blur(14px);
+  -webkit-backdrop-filter: blur(14px);
+  border-radius: 20px;
+  border: 1px solid var(--eco-border);
+  box-shadow: var(--eco-shadow-md);
+  padding: 1.85rem;
+  margin-bottom: 1.75rem;
+  transition: border-color 0.25s ease, box-shadow 0.25s ease;
+}
+
+.contractor-card:hover {
+  border-color: var(--eco-border-hover);
 }
 
 .card-header {
-  margin-bottom: 1.25rem;
+  margin-bottom: 1.4rem;
 }
 
 .card-header.flex-between {
@@ -364,94 +420,120 @@
 .card-title-group {
   display: flex;
   align-items: center;
-  gap: 0.75rem;
+  gap: 0.85rem;
 }
 
 .card-icon-box {
-  width: 42px;
-  height: 42px;
-  border-radius: 50%;
+  width: 44px;
+  height: 44px;
+  border-radius: 12px;
   display: flex;
   align-items: center;
   justify-content: center;
   flex-shrink: 0;
-  background: #f4f9ef !important;
-  color: #66942f !important;
+}
+
+.card-icon-box.green {
+  background: #f2fae6;
+  color: #5c8e29;
   border: 1.5px solid #d4ebba;
 }
 
+.card-icon-box.amber {
+  background: #fffbeb;
+  color: #d97706;
+  border: 1px solid #fde68a;
+}
+
+.card-icon-box.blue {
+  background: #f0f9ff;
+  color: #0284c7;
+  border: 1px solid #bae6fd;
+}
+
 .card-title {
-  font-size: 1.2rem;
+  font-size: 1.18rem;
   font-weight: 800;
-  color: #28410e;
+  color: var(--eco-text-main);
   margin: 0;
+  letter-spacing: -0.02em;
 }
 
 .card-subtitle {
   font-size: 0.84rem;
-  color: #4d741e;
-  margin: 2px 0 0 0;
+  color: var(--eco-text-muted);
+  margin: 3px 0 0 0;
   font-weight: 500;
 }
 
 .card-action-link {
   display: inline-flex;
   align-items: center;
-  gap: 0.35rem;
-  font-size: 0.85rem;
+  gap: 0.4rem;
+  font-size: 0.82rem;
   font-weight: 800;
   color: #ffffff;
-  background: #94c559;
-  padding: 0.35rem 0.9rem;
+  background: linear-gradient(135deg, #7cae40 0%, #94c559 100%);
+  border: 1px solid #7cae40;
+  padding: 0.45rem 1rem;
   border-radius: 20px;
   text-decoration: none;
-  transition: all 0.2s;
-  box-shadow: 0 2px 6px rgba(148, 197, 89, 0.35);
+  transition: all 0.2s ease;
+  box-shadow: 0 2px 8px rgba(124, 174, 64, 0.3);
 }
 
 .card-action-link:hover {
-  background: #66942f;
+  background: linear-gradient(135deg, #689f2c 0%, #7cae40 100%);
   color: #ffffff;
+  border-color: #5c8e29;
   transform: translateY(-1px);
+  box-shadow: 0 4px 12px rgba(124, 174, 64, 0.4);
 }
 
-/* Filter Pills */
+/* Filter Pills for Map */
 .map-filter-pills {
   display: flex;
-  gap: 0.4rem;
+  gap: 0.45rem;
   flex-wrap: wrap;
 }
 
 .map-filter-pill {
   display: inline-flex;
   align-items: center;
-  gap: 0.35rem;
-  padding: 0.4rem 0.9rem;
+  gap: 0.4rem;
+  padding: 0.42rem 0.95rem;
   border-radius: 20px;
   border: 1.5px solid #d4ebba;
-  background: #f4f9ef;
+  background: #f7fcf2;
   font-size: 0.8rem;
   font-weight: 700;
-  color: #324f11;
+  color: #355813;
   cursor: pointer;
   transition: all 0.2s ease;
 }
 
 .map-filter-pill:hover {
   border-color: #94c559;
-  background: #edf6e4;
-  color: #1a3320;
+  background: #f2fae6;
+  color: #233b0c;
 }
 
 .map-filter-pill.active {
-  background: #94c559;
-  border-color: #94c559;
+  background: linear-gradient(135deg, #7cae40 0%, #94c559 100%);
+  border-color: #689f2c;
   color: white;
-  box-shadow: 0 2px 8px rgba(148, 197, 89, 0.35);
+  box-shadow: 0 3px 10px rgba(124, 174, 64, 0.35);
 }
 
-.map-filter-pill[data-status="Under Maintenance"].active { background: #f59e0b; border-color: #f59e0b; }
-.map-filter-pill[data-status="Closed"].active { background: #ef4444; border-color: #ef4444; }
+.map-filter-pill[data-status="Under Maintenance"].active {
+  background: linear-gradient(135deg, #d97706 0%, #f59e0b 100%);
+  border-color: #d97706;
+}
+
+.map-filter-pill[data-status="Closed"].active {
+  background: linear-gradient(135deg, #dc2626 0%, #ef4444 100%);
+  border-color: #dc2626;
+}
 
 .pill-count {
   background: rgba(0, 0, 0, 0.08);
@@ -461,14 +543,16 @@
 }
 
 .map-filter-pill.active .pill-count {
-  background: rgba(255, 255, 255, 0.25);
+  background: rgba(255, 255, 255, 0.28);
 }
 
-/* Map Layout */
+/* ============================================================
+   MAP VIEW & SIDEBAR
+   ============================================================ */
 .map-layout {
   display: grid;
   grid-template-columns: 1fr 320px;
-  gap: 1.25rem;
+  gap: 1.35rem;
 }
 
 @media (max-width: 900px) {
@@ -479,90 +563,92 @@
 }
 
 .map-wrapper {
-  border-radius: 12px;
+  border-radius: 16px;
   overflow: hidden;
-  box-shadow: inset 0 0 0 1px #e2e8f0;
+  box-shadow: inset 0 0 0 1.5px rgba(148, 197, 89, 0.3);
   height: 100%;
-  min-height: 380px;
+  min-height: 400px;
 }
 
 .map-park-list {
   display: flex;
   flex-direction: column;
-  background: #f8fafc;
-  border: 1px solid #e2e8f0;
-  border-radius: 12px;
+  background: rgba(247, 252, 242, 0.85);
+  border: 1px solid rgba(148, 197, 89, 0.3);
+  border-radius: 16px;
   overflow: hidden;
 }
 
 .park-list-header {
-  padding: 0.85rem 1rem;
-  background: white;
-  border-bottom: 1px solid #e2e8f0;
+  padding: 0.95rem 1.15rem;
+  background: #ffffff;
+  border-bottom: 1px solid rgba(148, 197, 89, 0.2);
   display: flex;
   justify-content: space-between;
   align-items: center;
 }
 
 .park-list-header h4 {
-  font-size: 0.9rem;
-  font-weight: 700;
-  color: #0f172a;
+  font-size: 0.88rem;
+  font-weight: 800;
+  color: var(--eco-text-main);
   margin: 0;
 }
 
 .park-list-hint {
   font-size: 0.72rem;
-  color: #94a3b8;
+  color: #64748b;
 }
 
 .park-list-scroll {
-  padding: 0.75rem;
+  padding: 0.85rem;
   overflow-y: auto;
   display: flex;
   flex-direction: column;
-  gap: 0.6rem;
+  gap: 0.65rem;
   flex: 1;
 }
 
 .map-park-card {
   display: flex;
-  gap: 0.65rem;
+  gap: 0.75rem;
   align-items: flex-start;
   background: white;
-  border: 1.5px solid #e2e8f0;
-  border-radius: 10px;
-  padding: 0.75rem 0.85rem;
+  border: 1.5px solid #e0eed1;
+  border-radius: 12px;
+  padding: 0.85rem 0.95rem;
   cursor: pointer;
-  transition: all 0.2s ease;
+  transition: all 0.22s ease;
 }
 
 .map-park-card:hover, .map-park-card.selected {
   border-color: #94c559;
-  box-shadow: 0 3px 10px rgba(148, 197, 89, 0.2);
-  background: #f4f9ef;
+  box-shadow: 0 4px 14px rgba(148, 197, 89, 0.25);
+  background: #f7fcf2;
+  transform: translateX(3px);
 }
 
 .map-park-dot {
   width: 10px;
   height: 10px;
   border-radius: 50%;
-  margin-top: 4px;
+  margin-top: 5px;
   flex-shrink: 0;
+  box-shadow: 0 0 6px currentColor;
 }
 
 .map-park-info h4 {
   font-size: 0.88rem;
-  font-weight: 700;
-  color: #0f172a;
-  margin: 0 0 0.2rem 0;
+  font-weight: 800;
+  color: var(--eco-text-main);
+  margin: 0 0 0.25rem 0;
   line-height: 1.3;
 }
 
 .map-park-info p {
   font-size: 0.76rem;
-  color: #64748b;
-  margin: 0 0 0.4rem 0;
+  color: var(--eco-text-muted);
+  margin: 0 0 0.45rem 0;
 }
 
 .map-park-meta {
@@ -575,34 +661,36 @@
 .map-park-status {
   font-size: 0.7rem;
   font-weight: 700;
-  padding: 1px 6px;
+  padding: 2px 7px;
   border-radius: 6px;
 }
 
-.map-park-status--active { background: #dcfce7; color: #16a34a; }
-.map-park-status--under-maintenance { background: #fef3c7; color: #d97706; }
-.map-park-status--closed { background: #fee2e2; color: #dc2626; }
+.map-park-status--active { background: #dcfce7; color: #15803d; }
+.map-park-status--under-maintenance { background: #fef3c7; color: #b45309; }
+.map-park-status--closed { background: #fee2e2; color: #b91c1c; }
 
 .map-park-tasks {
   display: flex;
   align-items: center;
-  gap: 3px;
+  gap: 4px;
   font-size: 0.72rem;
-  color: #64748b;
+  color: var(--eco-text-muted);
   font-weight: 600;
 }
 
-/* Grids */
+/* ============================================================
+   MULTI-COLUMN LAYOUTS
+   ============================================================ */
 .grid-2-col {
   display: grid;
   grid-template-columns: 1.6fr 1fr;
-  gap: 1.5rem;
+  gap: 1.6rem;
 }
 
 .grid-3-col {
   display: grid;
   grid-template-columns: repeat(3, 1fr);
-  gap: 1.5rem;
+  gap: 1.6rem;
 }
 
 @media (max-width: 1024px) {
@@ -611,58 +699,68 @@
   }
 }
 
-/* Mini Tasks Table */
+/* ============================================================
+   TABLES & TASK LISTS
+   ============================================================ */
 .tasks-table-wrapper {
   overflow-x: auto;
+  border-radius: 12px;
+  border: 1px solid rgba(16, 185, 129, 0.12);
 }
 
 .mini-tasks-table {
   width: 100%;
   border-collapse: separate;
   border-spacing: 0;
+  background: white;
 }
 
 .mini-tasks-table th {
   background: #f8fafc;
   color: #475569;
-  font-size: 0.75rem;
+  font-size: 0.74rem;
   font-weight: 700;
   text-transform: uppercase;
   letter-spacing: 0.5px;
-  padding: 0.75rem 0.85rem;
+  padding: 0.85rem 1rem;
   text-align: left;
   border-bottom: 1px solid #e2e8f0;
 }
 
 .mini-tasks-table td {
-  padding: 0.85rem 0.85rem;
+  padding: 0.95rem 1rem;
   border-bottom: 1px solid #f1f5f9;
-  font-size: 0.85rem;
+  font-size: 0.86rem;
   vertical-align: middle;
 }
 
+.mini-tasks-table tr:last-child td {
+  border-bottom: none;
+}
+
 .mini-tasks-table tr:hover td {
-  background: #f8fafc;
+  background: #f0fdf4;
 }
 
 .task-code {
-  font-family: monospace;
+  font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
   font-weight: 700;
-  color: #0f172a;
-  background: #f1f5f9;
-  padding: 2px 6px;
-  border-radius: 4px;
-  font-size: 0.8rem;
+  color: #065f46;
+  background: #ecfdf5;
+  border: 1px solid #a7f3d0;
+  padding: 2px 7px;
+  border-radius: 6px;
+  font-size: 0.78rem;
 }
 
 .task-cat-name {
   font-weight: 700;
-  color: #0f172a;
+  color: var(--eco-text-main);
 }
 
 .task-park-sub {
-  font-size: 0.75rem;
-  color: #64748b;
+  font-size: 0.76rem;
+  color: var(--eco-text-muted);
 }
 
 .sla-badge {
@@ -673,15 +771,16 @@
   display: inline-block;
 }
 
-.sla-badge.on-time { background: #dcfce7; color: #16a34a; }
-.sla-badge.due-soon { background: #fef3c7; color: #d97706; }
-.sla-badge.overdue { background: #fee2e2; color: #dc2626; }
+.sla-badge.on-time { background: #dcfce7; color: #15803d; border: 1px solid #bbf7d0; }
+.sla-badge.due-soon { background: #fef3c7; color: #b45309; border: 1px solid #fde68a; }
+.sla-badge.overdue { background: #fee2e2; color: #b91c1c; border: 1px solid #fecdd3; }
 
 .priority-pill {
   font-size: 0.72rem;
   font-weight: 700;
-  padding: 2px 6px;
-  border-radius: 4px;
+  padding: 2px 7px;
+  border-radius: 6px;
+  display: inline-block;
 }
 
 .priority-pill.high, .priority-pill.urgent { background: #fee2e2; color: #b91c1c; }
@@ -689,47 +788,58 @@
 .priority-pill.low { background: #f1f5f9; color: #475569; }
 
 .btn-mini-action {
-  background: #f1f5f9;
+  background: #f8fafc;
   color: #0f172a;
   border: 1px solid #cbd5e1;
-  padding: 0.35rem 0.7rem;
-  border-radius: 6px;
+  padding: 0.4rem 0.8rem;
+  border-radius: 8px;
   font-size: 0.78rem;
   font-weight: 700;
   text-decoration: none;
-  transition: all 0.2s;
+  transition: all 0.2s ease;
   display: inline-block;
 }
 
 .btn-mini-action:hover {
-  background: #94c559;
+  background: linear-gradient(135deg, #7cae40 0%, #94c559 100%);
   color: white;
-  border-color: #94c559;
+  border-color: #7cae40;
+  transform: translateY(-1px);
+  box-shadow: 0 2px 8px rgba(124, 174, 64, 0.3);
 }
 
-/* Material Requests Mini List */
+/* ============================================================
+   MATERIAL REQUESTS
+   ============================================================ */
 .materials-mini-list {
   display: flex;
   flex-direction: column;
-  gap: 0.65rem;
+  gap: 0.75rem;
 }
 
 .material-item-card {
   display: flex;
   align-items: center;
-  gap: 0.75rem;
-  padding: 0.75rem 0.85rem;
-  background: #f8fafc;
-  border: 1px solid #e2e8f0;
-  border-radius: 10px;
+  gap: 0.85rem;
+  padding: 0.85rem 1rem;
+  background: #ffffff;
+  border: 1px solid rgba(148, 197, 89, 0.25);
+  border-radius: 12px;
+  transition: all 0.2s ease;
+}
+
+.material-item-card:hover {
+  border-color: #94c559;
+  box-shadow: 0 4px 12px rgba(148, 197, 89, 0.15);
 }
 
 .mat-icon {
-  width: 34px;
-  height: 34px;
-  border-radius: 8px;
-  background: #f4f9ef;
-  color: #66942f;
+  width: 36px;
+  height: 36px;
+  border-radius: 10px;
+  background: #f2fae6;
+  color: #5c8e29;
+  border: 1px solid #d4ebba;
   display: flex;
   align-items: center;
   justify-content: center;
@@ -742,13 +852,13 @@
 
 .mat-name {
   font-weight: 700;
-  font-size: 0.85rem;
-  color: #0f172a;
+  font-size: 0.86rem;
+  color: var(--eco-text-main);
 }
 
 .mat-sub {
-  font-size: 0.74rem;
-  color: #64748b;
+  font-size: 0.75rem;
+  color: var(--eco-text-muted);
 }
 
 .mat-status-tag {
@@ -762,45 +872,14 @@
 .mat-status-tag.approved { background: #dcfce7; color: #15803d; }
 .mat-status-tag.rejected { background: #fee2e2; color: #b91c1c; }
 
-/* Empty States */
-.empty-state-box {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  padding: 2.5rem 1rem;
-  text-align: center;
-}
-
-.empty-state-box h4 {
-  margin: 0.5rem 0 0.25rem 0;
-  font-size: 1rem;
-  color: #0f172a;
-}
-
-.empty-state-box p {
-  margin: 0;
-  font-size: 0.85rem;
-  color: #64748b;
-}
-
-.btn-secondary-sm {
-  background: #f1f5f9;
-  color: #334155;
-  border: 1px solid #cbd5e1;
-  padding: 0.35rem 0.8rem;
-  border-radius: 6px;
-  font-size: 0.8rem;
-  font-weight: 700;
-  text-decoration: none;
-}
-
-/* Pie chart legend */
+/* ============================================================
+   ANALYTICS, SLA & PIE CHARTS
+   ============================================================ */
 .pie-legend-list {
   display: flex;
   flex-direction: column;
-  gap: 0.4rem;
-  margin-top: 0.75rem;
+  gap: 0.5rem;
+  margin-top: 0.85rem;
 }
 
 .pie-legend-item {
@@ -808,12 +887,18 @@
   justify-content: space-between;
   align-items: center;
   font-size: 0.82rem;
+  padding: 0.25rem 0.5rem;
+  border-radius: 6px;
+}
+
+.pie-legend-item:hover {
+  background: #f8fafc;
 }
 
 .pie-legend-label {
   display: flex;
   align-items: center;
-  gap: 0.4rem;
+  gap: 0.5rem;
   color: #334155;
   font-weight: 600;
 }
@@ -825,63 +910,112 @@
 }
 
 .pie-val {
-  font-weight: 700;
-  color: #0f172a;
+  font-weight: 800;
+  color: var(--eco-text-main);
 }
 
-/* SLA Summary Items */
 .sla-summary-list {
   display: flex;
   flex-direction: column;
-  gap: 0.75rem;
+  gap: 0.85rem;
 }
 
 .sla-item {
   display: flex;
   align-items: center;
-  gap: 0.75rem;
-  padding: 0.75rem 0.85rem;
-  border-radius: 10px;
-  background: #f8fafc;
-  border: 1px solid #e2e8f0;
+  gap: 0.85rem;
+  padding: 0.85rem 1rem;
+  border-radius: 12px;
+  background: #ffffff;
+  border: 1px solid rgba(148, 197, 89, 0.22);
+  transition: transform 0.2s ease;
+}
+
+.sla-item:hover {
+  transform: translateX(3px);
 }
 
 .sla-item-icon {
-  width: 32px;
-  height: 32px;
-  border-radius: 50%;
+  width: 34px;
+  height: 34px;
+  border-radius: 10px;
   display: flex;
   align-items: center;
   justify-content: center;
   flex-shrink: 0;
 }
 
-.sla-item-icon.green { background: #dcfce7; color: #16a34a; }
-.sla-item-icon.amber { background: #fef3c7; color: #d97706; }
-.sla-item-icon.rose { background: #fee2e2; color: #dc2626; }
+.sla-item-icon.green { background: #dcfce7; color: #15803d; }
+.sla-item-icon.amber { background: #fef3c7; color: #b45309; }
+.sla-item-icon.rose { background: #fee2e2; color: #b91c1c; }
 
 .sla-item-info { flex: 1; }
-.sla-title { font-weight: 700; font-size: 0.85rem; color: #0f172a; }
-.sla-desc { font-size: 0.75rem; color: #64748b; }
+.sla-title { font-weight: 700; font-size: 0.86rem; color: var(--eco-text-main); }
+.sla-desc { font-size: 0.75rem; color: var(--eco-text-muted); }
 
 .sla-count-pill {
   font-weight: 800;
-  font-size: 0.9rem;
-  padding: 2px 8px;
+  font-size: 0.88rem;
+  padding: 2px 9px;
   border-radius: 8px;
 }
 
-.sla-count-pill.green { color: #16a34a; background: #dcfce7; }
-.sla-count-pill.amber { color: #d97706; background: #fef3c7; }
-.sla-count-pill.rose { color: #dc2626; background: #fee2e2; }
+.sla-count-pill.green { color: #15803d; background: #dcfce7; }
+.sla-count-pill.amber { color: #b45309; background: #fef3c7; }
+.sla-count-pill.rose { color: #b91c1c; background: #fee2e2; }
 
-/* Contractor Tasks Table Panel */
+/* Empty States */
+.empty-state-box {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 2.5rem 1rem;
+  text-align: center;
+}
+
+.empty-state-box h4 {
+  margin: 0.6rem 0 0.25rem 0;
+  font-size: 1.05rem;
+  font-weight: 700;
+  color: var(--eco-text-main);
+}
+
+.empty-state-box p {
+  margin: 0;
+  font-size: 0.86rem;
+  color: var(--eco-text-muted);
+}
+
+.btn-secondary-sm {
+  background: #ffffff;
+  color: #355813;
+  border: 1.5px solid #d4ebba;
+  padding: 0.4rem 0.9rem;
+  border-radius: 8px;
+  font-size: 0.82rem;
+  font-weight: 700;
+  text-decoration: none;
+  transition: all 0.2s ease;
+}
+
+.btn-secondary-sm:hover {
+  background: linear-gradient(135deg, #7cae40 0%, #94c559 100%);
+  color: white;
+  border-color: #7cae40;
+}
+
+/* ============================================================
+   MY TASKS PANEL (ContractorMyTasks)
+   ============================================================ */
 .contractor-main-panel {
-  background: white;
-  border-radius: 14px;
-  border: 1px solid #e0eed1;
-  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.05);
-  padding: 1.5rem;
+  background: var(--eco-card-bg);
+  backdrop-filter: blur(14px);
+  -webkit-backdrop-filter: blur(14px);
+  border-radius: 20px;
+  border: 1px solid var(--eco-border);
+  box-shadow: var(--eco-shadow-md);
+  padding: 1.85rem;
   margin-top: 1.5rem;
   min-height: calc(100vh - 250px);
   display: flex;
@@ -893,86 +1027,94 @@
   justify-content: space-between;
   align-items: center;
   margin-bottom: 1.5rem;
-  padding-bottom: 1rem;
-  border-bottom: 1px solid #f1f5f9;
+  padding-bottom: 1.25rem;
+  border-bottom: 1px solid rgba(148, 197, 89, 0.25);
   flex-wrap: wrap;
   gap: 1rem;
 }
 
 .contractor-panel-header h3 {
-  font-size: 1.4rem;
+  font-size: 1.35rem;
   font-weight: 800;
-  color: #0f172a;
+  color: var(--eco-text-main);
   margin: 0;
+  letter-spacing: -0.02em;
 }
 
 .contractor-filters {
   display: flex;
-  gap: 0.5rem;
+  gap: 0.45rem;
+  flex-wrap: wrap;
 }
 
 .contractor-filter-btn {
-  background: #f8fafc;
-  border: 1px solid #e2e8f0;
-  padding: 0.5rem 1rem;
-  border-radius: 8px;
+  background: #ffffff;
+  border: 1.5px solid #d4ebba;
+  padding: 0.45rem 1rem;
+  border-radius: 10px;
   font-size: 0.85rem;
   font-weight: 600;
-  color: #64748b;
+  color: #355813;
   cursor: pointer;
   transition: all 0.2s ease;
 }
 
 .contractor-filter-btn:hover {
-  background: #f1f5f9;
-  color: #0f172a;
+  background: #f2fae6;
+  color: #233b0c;
+  border-color: #94c559;
 }
 
 .contractor-filter-btn.active {
-  background: #94c559;
+  background: linear-gradient(135deg, #7cae40 0%, #94c559 100%);
   color: white;
-  border-color: #94c559;
+  border-color: #689f2c;
+  font-weight: 700;
+  box-shadow: 0 3px 10px rgba(124, 174, 64, 0.35);
 }
 
 .contractor-table-container {
   overflow-x: auto;
   flex: 1;
+  border-radius: 12px;
+  border: 1px solid rgba(148, 197, 89, 0.2);
 }
 
 .contractor-table {
   width: 100%;
   border-collapse: separate;
   border-spacing: 0;
+  background: white;
 }
 
 .contractor-table th {
-  background: #f8fafc;
-  color: #475569;
-  font-size: 0.8rem;
-  font-weight: 700;
+  background: #f7fcf2;
+  color: #355813;
+  font-size: 0.78rem;
+  font-weight: 800;
   text-transform: uppercase;
   letter-spacing: 0.5px;
   padding: 1rem;
   text-align: left;
-  border-bottom: 2px solid #e2e8f0;
+  border-bottom: 2px solid #e0eed1;
 }
 
 .contractor-table td {
-  padding: 1.2rem 1rem;
+  padding: 1.15rem 1rem;
   border-bottom: 1px solid #f1f5f9;
-  font-size: 0.9rem;
+  font-size: 0.88rem;
   vertical-align: middle;
   color: #334155;
 }
 
 .contractor-table tr:hover td {
-  background: #f8fafc;
+  background: #f7fcf2;
 }
 
 .job-priority-badge {
   font-size: 0.75rem;
   font-weight: 700;
-  padding: 0.25rem 0.6rem;
+  padding: 0.25rem 0.65rem;
   border-radius: 12px;
   display: inline-block;
   text-transform: capitalize;
@@ -985,7 +1127,7 @@
 .job-status-badge {
   font-size: 0.75rem;
   font-weight: 700;
-  padding: 0.25rem 0.6rem;
+  padding: 0.25rem 0.65rem;
   border-radius: 12px;
   display: inline-block;
   text-transform: capitalize;
@@ -994,16 +1136,17 @@
 .job-status-badge.assigned, .job-status-badge.reassigned-to-contractor { background: #dbeafe; color: #1d4ed8; }
 .job-status-badge.in-progress { background: #fef3c7; color: #b45309; }
 .job-status-badge.completed, .job-status-badge.closed, .job-status-badge.completed-waiting-for-admin-review, .job-status-badge.inspection-pending, .job-status-badge.inspection-approved { background: #dcfce7; color: #15803d; }
+.job-status-badge.rejected-by-contractor { background: #fee2e2; color: #dc2626; border: 1px solid #fca5a5; }
 
 .btn-job-action {
   display: inline-flex;
   align-items: center;
-  gap: 0.35rem;
+  gap: 0.4rem;
   background: white;
   border: 1px solid #cbd5e1;
-  padding: 0.4rem 0.75rem;
-  border-radius: 6px;
-  font-size: 0.8rem;
+  padding: 0.45rem 0.85rem;
+  border-radius: 8px;
+  font-size: 0.82rem;
   font-weight: 600;
   color: #334155;
   cursor: pointer;
@@ -1016,62 +1159,40 @@
 }
 
 .btn-job-action.complete {
-  background: #94c559;
+  background: linear-gradient(135deg, #7cae40 0%, #94c559 100%);
   color: white;
-  border-color: #94c559;
+  border-color: #689f2c;
+  box-shadow: 0 2px 8px rgba(124, 174, 64, 0.3);
 }
 
 .btn-job-action.complete:hover {
-  background: #7cae40;
+  background: linear-gradient(135deg, #689f2c 0%, #7cae40 100%);
+  transform: translateY(-1px);
 }
 
 .btn-job-action.reject {
-  background: #fef2f2;
-  color: #dc2626;
-  border-color: #fca5a5;
+  background: #fff1f2;
+  color: #e11d48;
+  border-color: #fecdd3;
 }
 
 .btn-job-action.reject:hover {
-  background: #dc2626;
+  background: #e11d48;
   color: white;
-  border-color: #dc2626;
+  border-color: #e11d48;
 }
 
-.job-status-badge.rejected-by-contractor {
-  background: #fee2e2;
-  color: #dc2626;
-  border: 1px solid #fca5a5;
-}
-
-.contractor-empty-state {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  padding: 4rem 2rem;
-  text-align: center;
-}
-
-.contractor-empty-state h4 {
-  font-size: 1.2rem;
-  color: #0f172a;
-  margin: 0.5rem 0;
-}
-
-.contractor-empty-state p {
-  color: #64748b;
-  margin: 0;
-}
-
-/* Modal styles for ContractorMyTasks */
+/* ============================================================
+   MODALS & OVERLAYS
+   ============================================================ */
 .contractor-modal-overlay {
   position: fixed;
   top: 0;
   left: 0;
   right: 0;
   bottom: 0;
-  background: rgba(15, 23, 42, 0.6);
-  backdrop-filter: blur(4px);
+  background: rgba(6, 44, 30, 0.6);
+  backdrop-filter: blur(6px);
   display: flex;
   align-items: center;
   justify-content: center;
@@ -1080,62 +1201,41 @@
 
 .contractor-modal {
   background: white;
-  border-radius: 12px;
+  border-radius: 18px;
   width: 100%;
-  max-width: 500px;
-  padding: 1.5rem;
-  box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
+  max-width: 520px;
+  padding: 1.85rem;
+  box-shadow: var(--eco-shadow-lg);
+  border: 1px solid var(--eco-border);
 }
 
 .contractor-modal h4 {
   font-size: 1.25rem;
-  font-weight: 700;
-  color: #0f172a;
-  margin: 0 0 1rem 0;
-}
-
-.contractor-modal-body {
-  margin-bottom: 1.5rem;
-}
-
-.contractor-form-group {
-  display: flex;
-  flex-direction: column;
-  gap: 0.5rem;
-}
-
-.contractor-input-label {
-  font-size: 0.85rem;
-  font-weight: 600;
-  color: #334155;
+  font-weight: 800;
+  color: var(--eco-text-main);
+  margin: 0 0 1.2rem 0;
 }
 
 .contractor-input-field {
-  border: 1px solid #cbd5e1;
-  border-radius: 8px;
-  padding: 0.75rem;
+  border: 1.5px solid #cbd5e1;
+  border-radius: 10px;
+  padding: 0.8rem;
   font-size: 0.9rem;
   font-family: inherit;
-  transition: border-color 0.2s;
+  transition: all 0.2s;
 }
 
 .contractor-input-field:focus {
   outline: none;
-  border-color: #94c559;
-  box-shadow: 0 0 0 3px rgba(148, 197, 89, 0.25);
-}
-
-.contractor-modal-actions {
-  display: flex;
-  justify-content: flex-end;
-  gap: 0.75rem;
+  border-color: #10b981;
+  box-shadow: 0 0 0 4px rgba(16, 185, 129, 0.2);
 }
 
 .btn-modal-cancel {
   background: white;
   border: 1px solid #cbd5e1;
-  padding: 0.5rem 1rem;
-  border-radius: 6px;
+  padding: 0.55rem 1.15rem;
+  border-radius: 8px;
   font-size: 0.9rem;
   font-weight: 600;
   color: #475569;
@@ -1149,151 +1249,145 @@
 }
 
 /* ============================================================
-   MOBILE RESPONSIVENESS SUITE FOR CONTRACTOR MODULE
+   MOBILE RESPONSIVENESS
    ============================================================ */
 @media (max-width: 900px) {
-  .contractor-header {
-    padding: 0.75rem 0;
-  }
-  
-  .contractor-brand h1 {
-    font-size: 1.05rem;
-  }
-  
-  .contractor-brand span {
-    display: none;
-  }
-  
-  .contractor-user-details {
-    display: none;
-  }
-  
-  .btn-contractor-logout span {
-    display: none;
-  }
-
-  .contractor-hero-banner {
-    padding: 1.5rem 1.25rem;
-    border-radius: 12px;
-  }
-
-  .hero-greeting h2 {
-    font-size: 1.45rem;
-  }
-
-  .hero-greeting p {
-    font-size: 0.86rem;
-  }
-
-  .hero-quick-actions {
-    width: 100%;
-    margin-top: 0.5rem;
-  }
-
-  .hero-action-btn {
-    flex: 1;
-    justify-content: center;
-    padding: 0.6rem 0.9rem;
-    font-size: 0.82rem;
-  }
-
-  .grid-2-col, .grid-3-col {
-    grid-template-columns: 1fr !important;
-  }
-
-  .card-header.flex-between {
-    flex-direction: column;
-    align-items: flex-start !important;
-    gap: 0.75rem;
-  }
-
-  .card-action-link {
-    align-self: flex-start;
-  }
-
-  .map-layout {
-    grid-template-columns: 1fr !important;
-    height: auto !important;
-  }
-
-  .contractor-panel-header {
-    flex-direction: column;
-    align-items: flex-start;
-    gap: 0.75rem;
-  }
-
-  .contractor-filters {
-    width: 100%;
-    overflow-x: auto;
-    padding-bottom: 4px;
-    -webkit-overflow-scrolling: touch;
-  }
-
-  .contractor-filter-btn {
-    flex-shrink: 0;
-    padding: 0.4rem 0.85rem;
-    font-size: 0.78rem;
-  }
+  .contractor-header { padding: 0.75rem 0; }
+  .contractor-brand h1 { font-size: 1.05rem; }
+  .contractor-brand span { display: none; }
+  .contractor-user-details { display: none; }
+  .contractor-hero-banner { padding: 1.5rem 1.25rem; border-radius: 16px; }
+  .hero-greeting h2 { font-size: 1.45rem; }
+  .hero-greeting p { font-size: 0.86rem; }
+  .grid-2-col, .grid-3-col { grid-template-columns: 1fr !important; }
+  .map-layout { grid-template-columns: 1fr !important; height: auto !important; }
 }
 
 @media (max-width: 640px) {
-  .contractor-dashboard-container {
-    padding: 1rem 0.75rem 3rem 0.75rem !important;
-  }
-
-  .contractor-stats-grid {
-    grid-template-columns: 1fr 1fr !important;
-    gap: 0.75rem !important;
-  }
-
-  .contractor-stat-card {
-    padding: 1rem 0.85rem !important;
-  }
-
-  .stat-card-value {
-    font-size: 1.5rem !important;
-  }
-
-  .stat-card-label {
-    font-size: 0.75rem !important;
-  }
-
-  .contractor-card {
-    padding: 1.15rem 1rem !important;
-    border-radius: 12px !important;
-  }
-
-  .contractor-main-panel {
-    padding: 1rem !important;
-    border-radius: 12px !important;
-  }
-
-  .contractor-table th, 
-  .contractor-table td,
-  .mini-tasks-table th, 
-  .mini-tasks-table td {
-    padding: 0.65rem 0.6rem !important;
-    font-size: 0.78rem !important;
-  }
-
-  .contractor-modal {
-    margin: 1rem;
-    padding: 1.25rem;
-    max-width: 95vw;
-  }
-
-  .btn-job-action {
-    padding: 0.35rem 0.55rem;
-    font-size: 0.75rem;
-  }
-
-  .map-park-card {
-    padding: 0.65rem 0.75rem;
-  }
+  .contractor-dashboard-container { padding: 1rem 0.75rem 3rem 0.75rem !important; }
+  .contractor-stats-grid { grid-template-columns: 1fr 1fr !important; gap: 0.75rem !important; }
+  .contractor-stat-card { padding: 1rem 0.85rem !important; }
+  .contractor-card { padding: 1.15rem 1rem !important; border-radius: 14px !important; }
+  .contractor-main-panel { padding: 1rem !important; border-radius: 14px !important; }
 }
 
 @media (max-width: 400px) {
-  .contractor-stats-grid {
-    grid-template-columns: 1fr !important;
-  }
+  .contractor-stats-grid { grid-template-columns: 1fr !important; }
 }
+
+/* ============================================================
+   CONTRACTOR MODULE — Dark Mode Suite
+   ============================================================ */
+.contractor-dashboard-page.contractor-dark-mode {
+  background: #0d1e12 !important;
+  background-image: 
+    radial-gradient(at 10% 10%, rgba(124, 174, 64, 0.12) 0px, transparent 50%),
+    radial-gradient(at 90% 20%, rgba(148, 197, 89, 0.08) 0px, transparent 50%),
+    radial-gradient(at 50% 95%, rgba(6, 44, 30, 0.3) 0px, transparent 50%) !important;
+  color: #f1f8ee !important;
+}
+
+.contractor-dashboard-page.contractor-dark-mode .contractor-header {
+  background: linear-gradient(90deg, #1b3310 0%, #2e4d16 50%, #3e661c 100%) !important;
+  border-bottom: 2px solid #162a0c !important;
+}
+
+.contractor-dashboard-page.contractor-dark-mode .contractor-card,
+.contractor-dashboard-page.contractor-dark-mode .contractor-main-panel {
+  background: #142417 !important;
+  border: 1px solid rgba(148, 197, 89, 0.15) !important;
+  color: #f1f8ee !important;
+  box-shadow: 0 10px 25px rgba(0, 0, 0, 0.4) !important;
+}
+
+.contractor-dashboard-page.contractor-dark-mode .contractor-stat-card {
+  background: #142417 !important;
+  border: 1px solid rgba(148, 197, 89, 0.2) !important;
+}
+
+.contractor-dashboard-page.contractor-dark-mode .contractor-stat-card .stat-card-bottom h3 {
+  color: #ffffff !important;
+}
+
+.contractor-dashboard-page.contractor-dark-mode .contractor-stat-card .stat-card-bottom p {
+  color: #a8d76f !important;
+}
+
+.contractor-dashboard-page.contractor-dark-mode .card-title {
+  color: #ffffff !important;
+}
+
+.contractor-dashboard-page.contractor-dark-mode .card-subtitle {
+  color: #a8d76f !important;
+}
+
+.contractor-dashboard-page.contractor-dark-mode .mini-tasks-table,
+.contractor-dashboard-page.contractor-dark-mode .contractor-table {
+  background: #142417 !important;
+  color: #e5f2df !important;
+}
+
+.contractor-dashboard-page.contractor-dark-mode .mini-tasks-table th,
+.contractor-dashboard-page.contractor-dark-mode .contractor-table th {
+  background: #1a2f1e !important;
+  color: #a8d76f !important;
+  border-bottom: 1px solid rgba(148, 197, 89, 0.2) !important;
+}
+
+.contractor-dashboard-page.contractor-dark-mode .mini-tasks-table td,
+.contractor-dashboard-page.contractor-dark-mode .contractor-table td {
+  color: #d8ebd0 !important;
+  border-bottom: 1px solid rgba(148, 197, 89, 0.1) !important;
+}
+
+.contractor-dashboard-page.contractor-dark-mode .mini-tasks-table tr:hover td,
+.contractor-dashboard-page.contractor-dark-mode .contractor-table tr:hover td {
+  background: #1d3622 !important;
+}
+
+.contractor-dashboard-page.contractor-dark-mode .map-park-card,
+.contractor-dashboard-page.contractor-dark-mode .material-item-card,
+.contractor-dashboard-page.contractor-dark-mode .sla-item {
+  background: #182c1b !important;
+  border: 1px solid rgba(148, 197, 89, 0.15) !important;
+  color: #f1f8ee !important;
+}
+
+.contractor-dashboard-page.contractor-dark-mode .map-park-info h4,
+.contractor-dashboard-page.contractor-dark-mode .mat-name,
+.contractor-dashboard-page.contractor-dark-mode .sla-title {
+  color: #ffffff !important;
+}
+
+.contractor-dashboard-page.contractor-dark-mode .map-park-meta,
+.contractor-dashboard-page.contractor-dark-mode .mat-purpose,
+.contractor-dashboard-page.contractor-dark-mode .sla-date,
+.contractor-dashboard-page.contractor-dark-mode .park-list-hint,
+.contractor-dashboard-page.contractor-dark-mode p,
+.contractor-dashboard-page.contractor-dark-mode span {
+  color: #d1e7c4;
+}
+
+.contractor-dashboard-page.contractor-dark-mode h1,
+.contractor-dashboard-page.contractor-dark-mode h2,
+.contractor-dashboard-page.contractor-dark-mode h3,
+.contractor-dashboard-page.contractor-dark-mode h4,
+.contractor-dashboard-page.contractor-dark-mode h5 {
+  color: #ffffff !important;
+}
+
+.contractor-dashboard-page.contractor-dark-mode .park-list-header {
+  background: #182c1b !important;
+  border-bottom: 1px solid rgba(148, 197, 89, 0.2) !important;
+}
+
+.contractor-dashboard-page.contractor-dark-mode .park-list-header h4 {
+  color: #ffffff !important;
+}
+
+.contractor-dashboard-page.contractor-dark-mode .map-park-list {
+  background: #142417 !important;
+  border: 1px solid rgba(148, 197, 89, 0.2) !important;
+}
+
+

@@ -1,0 +1,133 @@
+<mxfile host="app.diagrams.net" modified="2026-10-01T10:55:00.000Z" agent="5.0" version="21.0.0" etag="park_cfd_top_govt_officials" type="device">
+  <diagram id="ContextFlowDiagram" name="Context Flow Diagram (Level 0 DFD)">
+    <mxGraphModel dx="1200" dy="800" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="1169" pageHeight="827" background="#ffffff" math="0" shadow="0">
+      <root>
+        <mxCell id="0" />
+        <mxCell id="1" parent="0" />
+
+        <!-- ================= CENTER PROCESS: 0.0 Park Monitoring System ================= -->
+        <mxCell id="proc_main" value="&lt;b&gt;0.0&lt;/b&gt;&lt;br&gt;&lt;br&gt;&lt;b&gt;Park&lt;br&gt;Monitoring&lt;br&gt;System&lt;/b&gt;" style="ellipse;whiteSpace=wrap;html=1;fillColor=#ffffff;strokeColor=#000000;strokeWidth=1.5;fontFamily=Times New Roman;fontSize=15;fontColor=#000000;align=center;" vertex="1" parent="1">
+          <mxGeometry x="460" y="270" width="180" height="180" as="geometry" />
+        </mxCell>
+
+        <!-- ================= TOP ENTITY: Government Officials ================= -->
+        <mxCell id="ent_govt" value="&lt;b&gt;Government Officials&lt;/b&gt;" style="rounded=0;whiteSpace=wrap;html=1;fillColor=#ffffff;strokeColor=#000000;strokeWidth=1.5;fontFamily=Times New Roman;fontSize=15;fontColor=#000000;" vertex="1" parent="1">
+          <mxGeometry x="420" y="30" width="260" height="75" as="geometry" />
+        </mxCell>
+
+        <!-- Flow 1: System -> Government Officials (Upward, Left line) -->
+        <mxCell id="flow_gov_up" value="" style="endArrow=block;html=1;strokeColor=#000000;strokeWidth=1.3;endFill=1;" edge="1" parent="1">
+          <mxGeometry relative="1" as="geometry">
+            <mxPoint x="490" y="270" as="sourcePoint" />
+            <mxPoint x="490" y="105" as="targetPoint" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="lbl_gov_up" value="Assigned Audit Tasks" style="text;html=1;strokeColor=none;fillColor=#ffffff;align=center;verticalAlign=middle;fontSize=12;fontFamily=Times New Roman;fontColor=#000000;rotation=-90;" vertex="1" parent="1">
+          <mxGeometry x="420" y="170" width="130" height="20" as="geometry" />
+        </mxCell>
+
+        <!-- Flow 2: Government Officials -> System (Downward, Right line) -->
+        <mxCell id="flow_gov_down" value="" style="endArrow=block;html=1;strokeColor=#000000;strokeWidth=1.3;endFill=1;" edge="1" parent="1">
+          <mxGeometry relative="1" as="geometry">
+            <mxPoint x="610" y="105" as="sourcePoint" />
+            <mxPoint x="610" y="270" as="targetPoint" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="lbl_gov_down" value="Inspection Proofs &amp; Sign-off" style="text;html=1;strokeColor=none;fillColor=#ffffff;align=center;verticalAlign=middle;fontSize=12;fontFamily=Times New Roman;fontColor=#000000;rotation=90;" vertex="1" parent="1">
+          <mxGeometry x="540" y="170" width="160" height="20" as="geometry" />
+        </mxCell>
+
+
+        <!-- ================= LEFT ENTITY: Citizens ================= -->
+        <mxCell id="ent_citizens" value="&lt;b&gt;Citizens&lt;/b&gt;" style="rounded=0;whiteSpace=wrap;html=1;fillColor=#ffffff;strokeColor=#000000;strokeWidth=1.5;fontFamily=Times New Roman;fontSize=15;fontColor=#000000;" vertex="1" parent="1">
+          <mxGeometry x="50" y="315" width="180" height="90" as="geometry" />
+        </mxCell>
+
+        <!-- Flow 3: Citizens -> System (Top line) -->
+        <mxCell id="flow_cit_in" value="" style="endArrow=block;html=1;strokeColor=#000000;strokeWidth=1.3;endFill=1;" edge="1" parent="1">
+          <mxGeometry relative="1" as="geometry">
+            <mxPoint x="230" y="340" as="sourcePoint" />
+            <mxPoint x="460" y="340" as="targetPoint" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="lbl_cit_in" value="Raise Complaints / Feedback" style="text;html=1;strokeColor=none;fillColor=#ffffff;align=center;verticalAlign=middle;fontSize=12;fontFamily=Times New Roman;fontColor=#000000;" vertex="1" parent="1">
+          <mxGeometry x="255" y="320" width="175" height="20" as="geometry" />
+        </mxCell>
+
+        <!-- Flow 4: System -> Citizens (Bottom line) -->
+        <mxCell id="flow_cit_out" value="" style="endArrow=block;html=1;strokeColor=#000000;strokeWidth=1.3;endFill=1;" edge="1" parent="1">
+          <mxGeometry relative="1" as="geometry">
+            <mxPoint x="460" y="380" as="sourcePoint" />
+            <mxPoint x="230" y="380" as="targetPoint" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="lbl_cit_out" value="Status Updates &amp; Announcements" style="text;html=1;strokeColor=none;fillColor=#ffffff;align=center;verticalAlign=middle;fontSize=12;fontFamily=Times New Roman;fontColor=#000000;" vertex="1" parent="1">
+          <mxGeometry x="250" y="385" width="185" height="20" as="geometry" />
+        </mxCell>
+
+
+        <!-- ================= RIGHT ENTITY: Maintenance Contractors ================= -->
+        <mxCell id="ent_contractors" value="&lt;b&gt;Maintenance Contractors&lt;/b&gt;" style="rounded=0;whiteSpace=wrap;html=1;fillColor=#ffffff;strokeColor=#000000;strokeWidth=1.5;fontFamily=Times New Roman;fontSize=15;fontColor=#000000;" vertex="1" parent="1">
+          <mxGeometry x="870" y="315" width="220" height="90" as="geometry" />
+        </mxCell>
+
+        <!-- Flow 5: System -> Maintenance Contractors (Top line) -->
+        <mxCell id="flow_con_out" value="" style="endArrow=block;html=1;strokeColor=#000000;strokeWidth=1.3;endFill=1;" edge="1" parent="1">
+          <mxGeometry relative="1" as="geometry">
+            <mxPoint x="640" y="340" as="sourcePoint" />
+            <mxPoint x="870" y="340" as="targetPoint" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="lbl_con_out" value="Assigned Work Orders" style="text;html=1;strokeColor=none;fillColor=#ffffff;align=center;verticalAlign=middle;fontSize=12;fontFamily=Times New Roman;fontColor=#000000;" vertex="1" parent="1">
+          <mxGeometry x="685" y="320" width="140" height="20" as="geometry" />
+        </mxCell>
+
+        <!-- Flow 6: Maintenance Contractors -> System (Bottom line) -->
+        <mxCell id="flow_con_in" value="" style="endArrow=block;html=1;strokeColor=#000000;strokeWidth=1.3;endFill=1;" edge="1" parent="1">
+          <mxGeometry relative="1" as="geometry">
+            <mxPoint x="870" y="380" as="sourcePoint" />
+            <mxPoint x="640" y="380" as="targetPoint" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="lbl_con_in" value="Repair Proofs &amp; Material Requests" style="text;html=1;strokeColor=none;fillColor=#ffffff;align=center;verticalAlign=middle;fontSize=12;fontFamily=Times New Roman;fontColor=#000000;" vertex="1" parent="1">
+          <mxGeometry x="660" y="385" width="190" height="20" as="geometry" />
+        </mxCell>
+
+
+        <!-- ================= BOTTOM ENTITY: Municipal Administrator ================= -->
+        <mxCell id="ent_admin" value="&lt;b&gt;Municipal Administrator&lt;/b&gt;" style="rounded=0;whiteSpace=wrap;html=1;fillColor=#ffffff;strokeColor=#000000;strokeWidth=1.5;fontFamily=Times New Roman;fontSize=15;fontColor=#000000;" vertex="1" parent="1">
+          <mxGeometry x="410" y="615" width="280" height="80" as="geometry" />
+        </mxCell>
+
+        <!-- Flow 7: Municipal Administrator -> System (Upward, Left line) -->
+        <mxCell id="flow_adm_in" value="" style="endArrow=block;html=1;strokeColor=#000000;strokeWidth=1.3;endFill=1;" edge="1" parent="1">
+          <mxGeometry relative="1" as="geometry">
+            <mxPoint x="490" y="615" as="sourcePoint" />
+            <mxPoint x="490" y="450" as="targetPoint" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="lbl_adm_in" value="Dual-Assignments &amp; Policies" style="text;html=1;strokeColor=none;fillColor=#ffffff;align=center;verticalAlign=middle;fontSize=12;fontFamily=Times New Roman;fontColor=#000000;rotation=-90;" vertex="1" parent="1">
+          <mxGeometry x="400" y="520" width="165" height="20" as="geometry" />
+        </mxCell>
+
+        <!-- Flow 8: System -> Municipal Administrator (Downward, Right line) -->
+        <mxCell id="flow_adm_out" value="" style="endArrow=block;html=1;strokeColor=#000000;strokeWidth=1.3;endFill=1;" edge="1" parent="1">
+          <mxGeometry relative="1" as="geometry">
+            <mxPoint x="610" y="450" as="sourcePoint" />
+            <mxPoint x="610" y="615" as="targetPoint" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="lbl_adm_out" value="Grievance Analytics &amp; Reports" style="text;html=1;strokeColor=none;fillColor=#ffffff;align=center;verticalAlign=middle;fontSize=12;fontFamily=Times New Roman;fontColor=#000000;rotation=90;" vertex="1" parent="1">
+          <mxGeometry x="540" y="520" width="175" height="20" as="geometry" />
+        </mxCell>
+
+
+        <!-- ================= CAPTION ================= -->
+        <mxCell id="caption" value="&lt;b&gt;Context Flow Diagram (CFD / Level-0 DFD)&lt;/b&gt;" style="text;html=1;strokeColor=none;fillColor=none;align=center;verticalAlign=middle;fontSize=15;fontFamily=Times New Roman;fontColor=#000000;" vertex="1" parent="1">
+          <mxGeometry x="400" y="730" width="300" height="30" as="geometry" />
+        </mxCell>
+
+      </root>
+    </mxGraphModel>
+  </diagram>
+</mxfile>

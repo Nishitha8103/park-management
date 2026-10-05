@@ -206,9 +206,6 @@ const GovProfile = () => {
       {/* Header Banner */}
       <div className="gov-profile-header">
         <div className="gov-header-title-box">
-          <span className="gov-badge-pill">
-            <ShieldCheck size={14} /> OFFICIAL PROFILE & SETTINGS
-          </span>
           <h2>Government Official Account Settings</h2>
           <p>Manage your account credentials, contact information, department details, and security preferences.</p>
         </div>
@@ -266,10 +263,6 @@ const GovProfile = () => {
 
             {/* Quick Details List */}
             <div className="profile-summary-box">
-              <div className="summary-row">
-                <span className="summary-label">Account ID:</span>
-                <span className="summary-val">GOV-{(user?._id || user?.id || '8892').slice(-6).toUpperCase()}</span>
-              </div>
               <div className="summary-row">
                 <span className="summary-label">Role:</span>
                 <span className="summary-val">{profileData.designation}</span>

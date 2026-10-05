@@ -34,9 +34,6 @@ const clearParksCache = () => {
   parksCache.clear();
 };
 
-// @desc    Get all parks
-// @route   GET /api/parks
-// @access  Public / Private
 const getParks = async (req, res) => {
   try {
     const cacheKey = JSON.stringify(req.query || {});
@@ -110,7 +107,7 @@ const createPark = async (req, res) => {
       wheelchairAccessible, accessiblePathways, petFriendly, firstAid, cctv, strollerFriendly, emergencyAssistance,
       description, status, facilities, totalStallSlots, stallBookingAmount
     } = req.body;
-    
+
     // --- Validation Checks ---
     if (!name || !name.toString().trim()) {
       return res.status(400).json({ message: 'Park Name is required.' });
@@ -165,8 +162,8 @@ const createPark = async (req, res) => {
     }
 
     // Handle image paths via Cloudinary
-    const imagePaths = req.files && req.files.length > 0 
-      ? await uploadMultipleToCloudinary(req.files, 'parks') 
+    const imagePaths = req.files && req.files.length > 0
+      ? await uploadMultipleToCloudinary(req.files, 'parks')
       : [];
 
     const parsedTotalStallSlots = Number(totalStallSlots) || 0;
@@ -273,7 +270,7 @@ const bulkUploadParks = async (req, res) => {
     for (let i = 0; i < rows.length; i++) {
       const row = rows[i];
       const rowNum = i + 2; // Row number in Excel (1-based index + 1 for header)
-      
+
       if (i % 100 === 0) console.log(`Processing row ${rowNum}`);
 
       try {
@@ -304,8 +301,8 @@ const bulkUploadParks = async (req, res) => {
 
         // 1. Find or create District
         const dKeyClean = districtName.toString().trim().toLowerCase();
-        let district = allDistricts.find(d => 
-          (d.name && d.name.trim().toLowerCase() === dKeyClean) || 
+        let district = allDistricts.find(d =>
+          (d.name && d.name.trim().toLowerCase() === dKeyClean) ||
           (d.code && d.code.trim().toLowerCase() === dKeyClean) ||
           (d.name && d.name.trim().toLowerCase().replace('bengaluru', 'bangalore') === dKeyClean.replace('bengaluru', 'bangalore'))
         );
@@ -322,9 +319,9 @@ const bulkUploadParks = async (req, res) => {
 
         // 2. Find or create Corporation
         const cKeyClean = corpName.toString().trim().toLowerCase();
-        let corp = allCorporations.find(c => 
+        let corp = allCorporations.find(c =>
           c.districtId.toString() === district._id.toString() && (
-            (c.name && c.name.trim().toLowerCase() === cKeyClean) || 
+            (c.name && c.name.trim().toLowerCase() === cKeyClean) ||
             (c.code && c.code.trim().toLowerCase() === cKeyClean)
           )
         );
@@ -342,9 +339,9 @@ const bulkUploadParks = async (req, res) => {
 
         // 3. Find or create Zone
         const zKeyClean = zoneName.toString().trim().toLowerCase();
-        let zone = allZones.find(z => 
+        let zone = allZones.find(z =>
           z.corporationId.toString() === corp._id.toString() && (
-            (z.name && z.name.trim().toLowerCase() === zKeyClean) || 
+            (z.name && z.name.trim().toLowerCase() === zKeyClean) ||
             (z.code && z.code.trim().toLowerCase() === zKeyClean)
           )
         );
@@ -362,9 +359,9 @@ const bulkUploadParks = async (req, res) => {
 
         // 4. Find or create Ward
         const wKeyClean = wardNameOrNum.toString().trim().toLowerCase();
-        let ward = allWards.find(w => 
+        let ward = allWards.find(w =>
           w.zoneId.toString() === zone._id.toString() && (
-            (w.name && w.name.trim().toLowerCase() === wKeyClean) || 
+            (w.name && w.name.trim().toLowerCase() === wKeyClean) ||
             (w.wardNumber && w.wardNumber.toString().trim().toLowerCase() === wKeyClean)
           )
         );
@@ -382,7 +379,7 @@ const bulkUploadParks = async (req, res) => {
         }
 
         // 5. Build bulk operation
-        
+
         // Parse facilities array
         let parsedFacilities = [];
         const facValue = getValue(['Facilities', 'facilities']);
@@ -428,7 +425,7 @@ const bulkUploadParks = async (req, res) => {
         if (parsedImages.length > 0) {
           parkData.images = parsedImages;
         }
-        
+
         let upsertFilter = {};
         if (providedParkCode) {
           upsertFilter = { parkCode: providedParkCode.toString().trim() };

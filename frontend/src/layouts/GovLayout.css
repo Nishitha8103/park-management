@@ -1,10 +1,10 @@
 :root {
-  --gov-primary: #4f6d54; /* Olive Sage Green Reference */
+  --gov-primary: #4f6d54;
   --gov-primary-hover: #3d5542;
   --gov-primary-light: #edf2ee;
-  --gov-secondary: #2d3e30; /* Deep Olive */
+  --gov-secondary: #2d3e30;
   --gov-accent: #628768;
-  --gov-bg-color: #f4f7f4;
+  --gov-bg-color: #6f8e79;
   --gov-surface: #ffffff;
   --gov-text-main: #1f2a21;
   --gov-text-muted: #5e7263;
@@ -25,22 +25,28 @@
   --text-primary: #1f2a21 !important;
   --text-secondary: #5e7263 !important;
   --border: #cbd7cd !important;
-  --background: #f4f7f4 !important;
+  --background: #6f8e79 !important;
   --surface: #ffffff !important;
-  background-color: #f4f7f4 !important;
+  background-color: #6f8e79 !important;
+  background: #6f8e79 !important;
+  background-image: 
+    radial-gradient(at 10% 10%, rgba(135, 172, 146, 0.25) 0px, transparent 50%),
+    radial-gradient(at 90% 20%, rgba(94, 125, 105, 0.3) 0px, transparent 50%),
+    radial-gradient(at 50% 95%, rgba(61, 85, 66, 0.2) 0px, transparent 50%) !important;
   color: #1f2a21 !important;
+  min-height: 100vh;
 }
 
 .gov-portal-layout .gov-topbar {
-  background: #4f6d54 !important;
-  background: linear-gradient(90deg, #3d5542 0%, #4f6d54 50%, #5d7e63 100%) !important;
-  border-bottom: 2px solid #364a3a !important;
-  box-shadow: 0 4px 14px rgba(45, 62, 48, 0.25) !important;
+  background: #3d5542 !important;
+  background: linear-gradient(90deg, #2d3e30 0%, #3d5542 50%, #4f6d54 100%) !important;
+  border-bottom: 2px solid #28372b !important;
+  box-shadow: 0 4px 14px rgba(45, 62, 48, 0.35) !important;
 }
 
 .gov-portal-layout .sidebar {
-  background: #384e3c !important;
-  background: linear-gradient(180deg, #28372b 0%, #384e3c 60%, #445e48 100%) !important;
+  background: #2d3e30 !important;
+  background: linear-gradient(180deg, #1f2a21 0%, #2d3e30 60%, #384e3c 100%) !important;
   border-right: 1px solid rgba(255, 255, 255, 0.08);
 }
 
@@ -70,7 +76,8 @@
 
 .gov-portal-layout .main-content,
 .gov-portal-layout .gov-main-content-wrapper {
-  background-color: #f4f7f4 !important;
+  background-color: transparent !important;
+  background: transparent !important;
   min-height: calc(100vh - 64px);
 }
 
@@ -466,12 +473,67 @@
     padding: 0.15rem 0.45rem !important;
   }
 
-  .stat-card-bottom h3 {
+  .gov-stat-card .stat-card-bottom h3 {
     font-size: 1.6rem !important;
   }
 
-  .stat-card-bottom p {
+  .gov-stat-card .stat-card-bottom p {
     font-size: 0.7rem !important;
   }
 }
+
+/* ============================================================
+   GOVERNMENT OFFICIAL PORTAL — Dark Mode Suite
+   ============================================================ */
+.gov-portal-layout.gov-dark-mode {
+  background-color: #121c15 !important;
+  color: #e5ede7 !important;
+}
+
+.gov-portal-layout.gov-dark-mode .gov-topbar {
+  background: #1b2e21 !important;
+  border-bottom: 2px solid #0f1c13 !important;
+}
+
+.gov-portal-layout.gov-dark-mode .main-content,
+.gov-portal-layout.gov-dark-mode .gov-main-content-wrapper {
+  background-color: #121c15 !important;
+  color: #e5ede7 !important;
+}
+
+.gov-portal-layout.gov-dark-mode .sidebar {
+  background: #16241a !important;
+  border-right: 1px solid rgba(255, 255, 255, 0.08) !important;
+}
+
+.gov-portal-layout.gov-dark-mode .card,
+.gov-portal-layout.gov-dark-mode .gov-card,
+.gov-portal-layout.gov-dark-mode .gov-panel {
+  background: #1c2b20 !important;
+  border: 1px solid rgba(255, 255, 255, 0.08) !important;
+  color: #e5ede7 !important;
+  box-shadow: 0 4px 18px rgba(0, 0, 0, 0.3) !important;
+}
+
+.gov-portal-layout.gov-dark-mode .gov-stat-card {
+  background: #1c2b20 !important;
+  border: 1px solid rgba(255, 255, 255, 0.08) !important;
+}
+
+.gov-portal-layout.gov-dark-mode .gov-stat-card .stat-card-bottom h3 {
+  color: #ffffff !important;
+}
+
+.gov-portal-layout.gov-dark-mode .gov-stat-card .stat-card-bottom p {
+  color: #a3c2a9 !important;
+}
+
+.gov-portal-layout.gov-dark-mode input,
+.gov-portal-layout.gov-dark-mode select,
+.gov-portal-layout.gov-dark-mode textarea {
+  background: #1c2b20 !important;
+  color: #ffffff !important;
+  border: 1px solid rgba(255, 255, 255, 0.15) !important;
+}
+
 

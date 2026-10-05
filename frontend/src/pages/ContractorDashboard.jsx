@@ -3,7 +3,8 @@ import { useNavigate, Link } from 'react-router-dom';
 import { 
   Menu, TreePine, HardHat, LogOut, ClipboardList, Calendar, CheckCircle, RotateCcw,
   Bell, Activity, CalendarDays, Wrench, MapPin, AlertCircle, Package, Plus,
-  ChevronRight, ArrowUpRight, ShieldCheck, Clock, Layers, Sparkles, FileText, Check
+  ChevronRight, ArrowUpRight, ShieldCheck, Clock, Layers, Sparkles, FileText, Check,
+  Sun, Moon
 } from 'lucide-react';
 import { 
   BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, Legend,
@@ -286,12 +287,20 @@ const ContractorDashboard = () => {
     ? Math.round((stats.completed / (stats.completed + stats.pending + stats.rework)) * 100) 
     : 100;
 
+  const [theme, setTheme] = useState(() => localStorage.getItem('contractorTheme') || 'light');
+
+  const toggleTheme = () => {
+    const nextTheme = theme === 'dark' ? 'light' : 'dark';
+    setTheme(nextTheme);
+    localStorage.setItem('contractorTheme', nextTheme);
+  };
+
   if (!contractor) {
     return <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', height: '100vh', fontWeight: 'bold' }}>Verifying authorization...</div>;
   }
 
   return (
-    <div className="contractor-dashboard-page">
+    <div className={`contractor-dashboard-page ${theme === 'dark' ? 'contractor-dark-mode' : 'contractor-light-mode'}`}>
       <ContractorSidebar 
         isOpen={isSidebarOpen} 
         toggleSidebar={toggleSidebar} 
@@ -312,14 +321,34 @@ const ContractorDashboard = () => {
             </div>
             
             <div className="contractor-user-info">
-              <NotificationDropdown userId={contractor._id || contractor.id} role="contractor" />
-              <div className="contractor-user-details">
-                <h4 className="contractor-user-name">{contractor.name}</h4>
-                <p className="contractor-user-role">{contractor.department || contractor.maintenanceSkills?.[0] || 'Park Maintenance'} Specialist</p>
-              </div>
-              <button className="btn-contractor-logout" onClick={handleLogout}>
-                <LogOut size={16} /> Logout
+              <button 
+                className="contractor-theme-toggle-btn"
+                onClick={toggleTheme}
+                title={`Switch to ${theme === 'dark' ? 'Light' : 'Dark'} Mode`}
+                aria-label="Toggle Theme"
+                style={{
+                  color: 'white',
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                  padding: '6px',
+                  borderRadius: '50%',
+                  background: 'rgba(255,255,255,0.22)',
+                  border: '1px solid rgba(255,255,255,0.4)',
+                  cursor: 'pointer',
+                  width: '36px',
+                  height: '36px',
+                  transition: 'all 0.2s ease'
+                }}
+              >
+                {theme === 'dark' ? (
+                  <Sun size={18} color="#F5B942" />
+                ) : (
+                  <Moon size={18} color="#ffffff" />
+                )}
               </button>
+
+              <NotificationDropdown userId={contractor._id || contractor.id} role="contractor" />
             </div>
           </div>
         </header>
@@ -331,9 +360,6 @@ const ContractorDashboard = () => {
           <div className="contractor-hero-banner">
             <div className="hero-banner-main" style={{ marginBottom: 0 }}>
               <div className="hero-greeting">
-                <div className="hero-badge">
-                  <Sparkles size={14} /> Contractor Operational Dashboard
-                </div>
                 <h2>Welcome back, <span className="highlight">{contractor.name}!</span></h2>
                 <p>Overview of assigned parks, active maintenance tasks, and material requests.</p>
               </div>

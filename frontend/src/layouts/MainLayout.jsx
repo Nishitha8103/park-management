@@ -2,15 +2,22 @@ import { useState, useEffect } from 'react';
 import { Outlet, useNavigate, Link } from 'react-router-dom';
 import Sidebar from '../components/Sidebar';
 import NotificationDropdown from '../components/NotificationDropdown';
-import { Menu, TreePine, Bell, User } from 'lucide-react';
+import { Menu, TreePine, Bell, User, Sun, Moon } from 'lucide-react';
 import './MainLayout.css';
 
 const MainLayout = () => {
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
   const [user, setUser] = useState(null);
+  const [theme, setTheme] = useState(() => localStorage.getItem('publicTheme') || 'light');
   const navigate = useNavigate();
 
   const toggleSidebar = () => setIsSidebarOpen(!isSidebarOpen);
+
+  const toggleTheme = () => {
+    const nextTheme = theme === 'dark' ? 'light' : 'dark';
+    setTheme(nextTheme);
+    localStorage.setItem('publicTheme', nextTheme);
+  };
 
   useEffect(() => {
     const checkUser = () => {
@@ -36,7 +43,7 @@ const MainLayout = () => {
   }, []);
 
   return (
-    <div className="app-layout public-portal-layout">
+    <div className={`app-layout public-portal-layout ${theme === 'dark' ? 'public-dark-mode' : 'public-light-mode'}`}>
       <header className="main-topbar">
         <div className="topbar-left">
           <button className="menu-toggle" onClick={toggleSidebar} aria-label="Toggle navigation menu">
@@ -49,6 +56,33 @@ const MainLayout = () => {
         </div>
 
         <div className="topbar-right" style={{ display: 'flex', alignItems: 'center', gap: '0.75rem', marginLeft: 'auto' }}>
+          <button 
+            className="topbar-theme-toggle-btn"
+            onClick={toggleTheme}
+            title={`Switch to ${theme === 'dark' ? 'Light' : 'Dark'} Mode`}
+            aria-label="Toggle Theme"
+            style={{
+              color: 'white',
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center',
+              padding: '6px',
+              borderRadius: '50%',
+              background: 'rgba(255,255,255,0.18)',
+              border: '1px solid rgba(255,255,255,0.3)',
+              cursor: 'pointer',
+              width: '36px',
+              height: '36px',
+              transition: 'all 0.2s ease'
+            }}
+          >
+            {theme === 'dark' ? (
+              <Sun size={18} color="#F5B942" />
+            ) : (
+              <Moon size={18} color="#ffffff" />
+            )}
+          </button>
+
           {user ? (
             <>
               <NotificationDropdown 

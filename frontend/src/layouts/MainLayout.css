@@ -212,40 +212,174 @@
   display: flex;
   align-items: center;
   justify-content: center;
-  background: transparent;
-  border: none;
+  background: rgba(255, 255, 255, 0.08);
+  border: 1px solid rgba(255, 255, 255, 0.12);
   color: #A8B0C8;
   cursor: pointer;
-  padding: 6px;
-  border-radius: 8px;
-  transition: all 0.2s;
+  padding: 7px;
+  border-radius: 50%;
+  transition: all 0.25s ease;
+  width: 36px;
+  height: 36px;
 }
 
 .admin-portal-layout .adm-topbar-icon-btn:hover {
-  background: rgba(79,111,245,0.12);
-  color: #4F6FF5;
+  background: rgba(79,111,245,0.22);
+  color: #F0F4FF;
+  border-color: #4F6FF5;
+  transform: scale(1.06);
 }
 
-.admin-portal-layout .adm-topbar-avatar {
-  width: 34px;
-  height: 34px;
-  border-radius: 50%;
-  background: linear-gradient(135deg, #4F6FF5, #6C7CFF);
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  color: #fff;
-  cursor: pointer;
-  transition: box-shadow 0.2s;
+.admin-portal-layout .theme-toggle-btn .sun-icon {
+  color: #F5B942;
+  filter: drop-shadow(0 0 6px rgba(245, 185, 66, 0.5));
 }
 
-.admin-portal-layout .adm-topbar-avatar:hover {
-  box-shadow: 0 0 0 3px rgba(79,111,245,0.25);
+.admin-portal-layout .theme-toggle-btn .moon-icon {
+  color: #A8B0C8;
 }
 
 .admin-portal-layout {
   background: #151A2B !important;
   color: #F0F4FF !important;
+  transition: background-color 0.3s ease, color 0.3s ease;
+}
+
+/* Light Mode Overrides for Admin Portal */
+.admin-portal-layout.light-mode {
+  background: #f4f6fb !important;
+  color: #0f172a !important;
+}
+
+.admin-portal-layout.light-mode .adm-topbar {
+  background: #ffffff !important;
+  border-bottom: 1px solid #e2e8f0 !important;
+  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.06) !important;
+}
+
+.admin-portal-layout.light-mode .adm-topbar-brand .logo-text {
+  color: #0f172a !important;
+}
+
+.admin-portal-layout.light-mode .adm-topbar-actions {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.admin-portal-layout.light-mode .adm-topbar-icon-btn {
+  background: #f1f5f9 !important;
+  border: 1px solid #e2e8f0 !important;
+  color: #0f172a !important;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
+}
+
+.admin-portal-layout.light-mode .adm-topbar-icon-btn:hover {
+  background: #e2e8f0 !important;
+  color: #2563eb !important;
+  border-color: #cbd5e1 !important;
+}
+
+.admin-portal-layout.light-mode .theme-toggle-btn {
+  background: #f1f5f9 !important;
+  border: 1px solid #cbd5e1 !important;
+  color: #0f172a !important;
+}
+
+.admin-portal-layout.light-mode .theme-toggle-btn .moon-icon {
+  color: #2563eb !important;
+}
+
+.admin-portal-layout.light-mode .notification-trigger-btn,
+.admin-portal-layout.light-mode .notification-btn {
+  color: #0f172a !important;
+  background: #f1f5f9 !important;
+  border: 1px solid #e2e8f0 !important;
+}
+
+.admin-portal-layout.light-mode .adm-main-content {
+  background: #f4f6fb !important;
+  color: #0f172a !important;
+}
+
+.admin-portal-layout.light-mode .admin-sidebar {
+  background: #ffffff !important;
+  color: #334155 !important;
+  border-right: 1px solid #e2e8f0 !important;
+  box-shadow: 4px 0 20px rgba(0,0,0,0.05) !important;
+}
+
+.admin-portal-layout.light-mode .admin-profile {
+  background: #f8fafc !important;
+  border-bottom: 1px solid #e2e8f0 !important;
+}
+
+.admin-portal-layout.light-mode .admin-profile .user-name {
+  color: #0f172a !important;
+}
+
+.admin-portal-layout.light-mode .admin-sidebar .adm-nav-group-label {
+  color: #64748b !important;
+}
+
+.admin-portal-layout.light-mode .admin-sidebar .nav-item {
+  color: #475569 !important;
+}
+
+.admin-portal-layout.light-mode .admin-sidebar .nav-item:hover {
+  background: #f1f5f9 !important;
+  color: #2563eb !important;
+}
+
+.admin-portal-layout.light-mode .admin-sidebar .nav-item.active {
+  background: #eff6ff !important;
+  color: #2563eb !important;
+  box-shadow: inset 3px 0 0 #2563eb !important;
+}
+
+.admin-portal-layout.light-mode .admin-panel {
+  background-color: #ffffff !important;
+  border: 1px solid #e2e8f0 !important;
+  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.04) !important;
+  color: #0f172a !important;
+}
+
+.admin-portal-layout.light-mode .admin-panel-header {
+  border-bottom: 1px solid #f1f5f9 !important;
+  background-color: #f8fafc !important;
+  color: #0f172a !important;
+}
+
+.admin-portal-layout.light-mode .admin-panel-header h2,
+.admin-portal-layout.light-mode .admin-panel-header h3 {
+  color: #0f172a !important;
+}
+
+.admin-portal-layout.light-mode .admin-table thead tr,
+.admin-portal-layout.light-mode .admin-table th {
+  background-color: #f8fafc !important;
+  color: #475569 !important;
+  border-bottom: 1px solid #e2e8f0 !important;
+}
+
+.admin-portal-layout.light-mode .admin-table td {
+  color: #334155 !important;
+  border-bottom: 1px solid #f1f5f9 !important;
+}
+
+.admin-portal-layout.light-mode .admin-table tr:hover td {
+  background-color: #f1f5f9 !important;
+}
+
+.admin-portal-layout.light-mode .btn-icon {
+  background: #f8fafc !important;
+  border: 1px solid #e2e8f0 !important;
+  color: #475569 !important;
+}
+
+.admin-portal-layout.light-mode .btn-icon:hover {
+  background: #e2e8f0 !important;
+  color: #0f172a !important;
 }
 
 .admin-portal-layout .admin-panel {
@@ -409,4 +543,57 @@
     height: 30px !important;
   }
 }
+
+/* ============================================================
+   PUBLIC PORTAL — Dark Mode Suite
+   ============================================================ */
+.public-portal-layout.public-dark-mode {
+  background: #0f172a !important;
+  background-image: none !important;
+  color: #f1f5f9 !important;
+}
+
+.public-portal-layout.public-dark-mode .main-topbar {
+  background: #091322 !important;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.1) !important;
+  box-shadow: 0 4px 14px rgba(0, 0, 0, 0.4) !important;
+}
+
+.public-portal-layout.public-dark-mode .sidebar {
+  background: #091322 !important;
+  color: #94a3b8 !important;
+  border-right: 1px solid rgba(255, 255, 255, 0.08) !important;
+}
+
+.public-portal-layout.public-dark-mode .sidebar .nav-item {
+  color: #cbd5e1 !important;
+}
+
+.public-portal-layout.public-dark-mode .sidebar .nav-item:hover {
+  background: rgba(16, 185, 129, 0.15) !important;
+  color: #10b981 !important;
+}
+
+.public-portal-layout.public-dark-mode .main-content {
+  background: #0f172a !important;
+  color: #f1f5f9 !important;
+}
+
+.public-portal-layout.public-dark-mode .card,
+.public-portal-layout.public-dark-mode .panel,
+.public-portal-layout.public-dark-mode .park-card {
+  background: #1e293b !important;
+  color: #f1f5f9 !important;
+  border: 1px solid rgba(255, 255, 255, 0.08) !important;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.3) !important;
+}
+
+.public-portal-layout.public-dark-mode input,
+.public-portal-layout.public-dark-mode select,
+.public-portal-layout.public-dark-mode textarea {
+  background: #1e293b !important;
+  color: #f1f5f9 !important;
+  border: 1px solid #334155 !important;
+}
+
 

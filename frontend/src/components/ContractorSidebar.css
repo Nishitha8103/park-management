@@ -1,21 +1,25 @@
+/* ============================================================
+   BOTANICAL & ECO-GLASSMORPHIС CONTRACTOR SIDEBAR
+   ============================================================ */
+
 .contractor-sidebar {
   position: fixed;
   left: 0;
   top: 0;
   bottom: 0;
-  width: 280px;
+  width: 290px;
   max-width: 85vw;
   transform: translateX(-100%);
   background: #ffffff;
-  color: #1a3320;
+  color: #0f2e22;
   display: flex;
   flex-direction: column;
   z-index: 1000;
-  transition: transform 0.3s cubic-bezier(0.16, 1, 0.3, 1);
-  box-shadow: 4px 0 24px rgba(148, 197, 89, 0.18);
+  transition: transform 0.35s cubic-bezier(0.16, 1, 0.3, 1);
+  box-shadow: 6px 0 30px rgba(6, 78, 59, 0.15);
   overflow-y: auto;
   -webkit-overflow-scrolling: touch;
-  border-right: 1.5px solid #e0eed1;
+  border-right: 1px solid rgba(16, 185, 129, 0.18);
 }
 
 .contractor-sidebar.open {
@@ -23,13 +27,12 @@
 }
 
 .contractor-sidebar-header {
-  padding: 1.5rem;
+  padding: 1.6rem 1.5rem;
   display: flex;
   align-items: center;
   gap: 1rem;
-  border-bottom: 1.5px solid #d4e8c1;
-  background: #94c559;
-  background: linear-gradient(135deg, #7cae40 0%, #94c559 100%);
+  border-bottom: 2px solid #689f2c;
+  background: linear-gradient(90deg, #689f2c 0%, #7cae40 40%, #94c559 100%);
   color: white;
 }
 
@@ -37,9 +40,14 @@
   font-size: 1.15rem;
   margin: 0;
   font-weight: 800;
-  line-height: 1.2;
+  line-height: 1.25;
   color: #ffffff;
-  letter-spacing: 0.3px;
+  letter-spacing: -0.01em;
+  text-shadow: 0 1px 3px rgba(0, 0, 0, 0.15);
+}
+
+.contractor-sidebar-header svg {
+  filter: drop-shadow(0 2px 6px rgba(35, 59, 12, 0.35));
 }
 
 .contractor-sidebar-user {
@@ -47,86 +55,96 @@
   display: flex;
   align-items: center;
   gap: 1rem;
-  border-bottom: 1.5px solid #e2ebd8;
-  background: #f4f9ef;
+  border-bottom: 1.5px solid #e0eed1;
+  background: #f7fcf2;
 }
 
 .contractor-sidebar-avatar {
-  background: #94c559;
+  background: linear-gradient(135deg, #7cae40 0%, #94c559 100%);
   color: #ffffff;
   width: 44px;
   height: 44px;
-  border-radius: 50%;
+  border-radius: 14px;
   display: flex;
   align-items: center;
   justify-content: center;
-  box-shadow: 0 4px 10px rgba(148, 197, 89, 0.35);
+  box-shadow: 0 4px 12px rgba(124, 174, 64, 0.35);
   border: 2px solid #d4ebba;
   font-weight: 800;
+  font-size: 1.1rem;
 }
 
 .contractor-sidebar-user-info .name {
   margin: 0;
   font-weight: 800;
-  font-size: 1rem;
-  color: #28410e;
+  font-size: 0.96rem;
+  color: #233b0c;
+  letter-spacing: -0.01em;
 }
 
 .contractor-sidebar-user-info .role {
   margin: 0;
-  font-size: 0.8rem;
-  color: #66942f;
-  font-weight: 600;
+  font-size: 0.78rem;
+  color: #5c8e29;
+  font-weight: 700;
 }
 
 .contractor-nav {
-  padding: 1rem 0;
+  padding: 1.15rem 0.85rem;
   flex: 1;
   overflow-y: auto;
+  display: flex;
+  flex-direction: column;
+  gap: 0.35rem;
 }
 
 .contractor-nav-item {
   display: flex;
   align-items: center;
-  padding: 0.85rem 1.5rem;
-  color: #4d741e;
+  padding: 0.85rem 1.15rem;
+  color: #4a771b;
   text-decoration: none;
-  gap: 1rem;
-  transition: all 0.2s ease;
+  gap: 0.95rem;
+  transition: all 0.22s cubic-bezier(0.4, 0, 0.2, 1);
   position: relative;
   font-weight: 700;
-  font-size: 0.95rem;
+  font-size: 0.92rem;
+  border-radius: 12px;
 }
 
 .contractor-nav-item:hover {
-  background-color: #f4f9ef;
-  color: #28410e;
+  background-color: #f2fae6;
+  color: #233b0c;
+  transform: translateX(4px);
 }
 
 .contractor-nav-item.active {
-  background: #94c559;
-  background: linear-gradient(90deg, #94c559 0%, #aee072 100%);
+  background: linear-gradient(90deg, #7cae40 0%, #94c559 60%, #a8d76f 100%);
   color: #ffffff;
   font-weight: 800;
-  border-radius: 0 25px 25px 0;
-  margin-right: 1rem;
-  box-shadow: 0 4px 14px rgba(148, 197, 89, 0.45);
+  box-shadow: 0 4px 16px rgba(124, 174, 64, 0.4);
+  transform: translateX(2px);
+}
+
+.contractor-nav-item.active svg {
+  color: #ffffff;
 }
 
 .nav-badge {
   background-color: #ef4444;
   color: white;
   font-size: 0.7rem;
-  padding: 0.15rem 0.5rem;
+  padding: 0.18rem 0.55rem;
   border-radius: 10px;
   margin-left: auto;
-  font-weight: 700;
+  font-weight: 800;
+  box-shadow: 0 2px 6px rgba(239, 68, 68, 0.3);
 }
 
 .contractor-sidebar-footer {
-  padding: 1rem;
-  border-top: 1px solid rgba(148, 197, 89, 0.2);
-  background: rgba(0, 0, 0, 0.04);
+  padding: 1.15rem 1rem;
+  border-top: 1px solid rgba(16, 185, 129, 0.15);
+  background: #f8fafc;
 }
 
 .contractor-logout-btn {
@@ -135,21 +153,23 @@
   gap: 0.75rem;
   width: 100%;
   padding: 0.75rem 1rem;
-  background: rgba(239, 68, 68, 0.08);
-  border: 1px solid rgba(239, 68, 68, 0.2);
-  color: #ef4444;
+  background: #fff1f2;
+  border: 1px solid #fecdd3;
+  color: #e11d48;
   cursor: pointer;
-  border-radius: 8px;
-  transition: all 0.2s;
-  font-size: 0.95rem;
-  font-weight: 600;
+  border-radius: 10px;
+  transition: all 0.22s ease;
+  font-size: 0.9rem;
+  font-weight: 700;
   justify-content: flex-start;
 }
 
 .contractor-logout-btn:hover {
-  background-color: #ef4444;
+  background-color: #e11d48;
   color: #ffffff;
-  border-color: #ef4444;
+  border-color: #e11d48;
+  box-shadow: 0 4px 12px rgba(225, 29, 72, 0.25);
+  transform: translateY(-1px);
 }
 
 /* Sidebar overlay and mobile states */
@@ -157,11 +177,12 @@
   display: none;
   position: fixed;
   inset: 0;
-  background-color: rgba(40, 65, 14, 0.55);
-  backdrop-filter: blur(2px);
+  background-color: rgba(6, 44, 30, 0.65);
+  backdrop-filter: blur(4px);
   z-index: 999;
 }
 
 .contractor-sidebar-overlay.show {
   display: block;
 }
+

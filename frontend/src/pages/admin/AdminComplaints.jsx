@@ -97,33 +97,53 @@ const AdminComplaints = () => {
     }
   };
 
-  const handleDeleteComplaint = async (complaintId) => {
+  const [selectedComplaints, setSelectedComplaints] = useState([]);
+
+  const handleSelectAll = (e) => {
+    if (e.target.checked) {
+      setSelectedComplaints(filteredComplaints.map(c => c._id));
+    } else {
+      setSelectedComplaints([]);
+    }
+  };
+
+  const handleSelectOne = (id) => {
+    setSelectedComplaints(prev => 
+      prev.includes(id) ? prev.filter(item => item !== id) : [...prev, id]
+    );
+  };
+
+  const handleBulkDelete = async () => {
+    if (selectedComplaints.length === 0) return;
+
     const result = await Swal.fire({
-      title: 'Delete Complaint?',
-      text: 'Are you sure you want to delete this complaint? This action cannot be undone.',
+      title: `Delete ${selectedComplaints.length} Complaint(s)?`,
+      text: `Are you sure you want to delete the selected ${selectedComplaints.length} complaint(s)? This action cannot be undone.`,
       icon: 'warning',
       showCancelButton: true,
       confirmButtonColor: '#ef4444',
       cancelButtonColor: '#64748b',
-      confirmButtonText: 'Yes, delete it!'
+      confirmButtonText: `Yes, delete (${selectedComplaints.length})`
     });
+
     if (!result.isConfirmed) return;
 
     try {
-      await axios.delete(`/api/complaints/${complaintId}`);
+      await Promise.all(selectedComplaints.map(id => axios.delete(`/api/complaints/${id}`)));
       Swal.fire({
         title: 'Deleted!',
-        text: 'Complaint has been deleted successfully.',
+        text: `${selectedComplaints.length} complaint(s) have been deleted successfully.`,
         icon: 'success',
         timer: 1800,
         showConfirmButton: false
       });
+      setSelectedComplaints([]);
       fetchData();
     } catch (error) {
-      console.error('Error deleting complaint:', error);
+      console.error('Error deleting complaints:', error);
       Swal.fire({
         title: 'Error!',
-        text: error.response?.data?.message || 'Failed to delete complaint.',
+        text: 'Failed to delete some complaints.',
         icon: 'error'
       });
     }
@@ -208,6 +228,61 @@ const AdminComplaints = () => {
         </select>
       </div>
 
+      {/* Bulk Selection Action Bar */}
+      {selectedComplaints.length > 0 && (
+        <div style={{
+          background: '#fee2e2',
+          border: '1px solid #fca5a5',
+          borderRadius: '8px',
+          padding: '0.75rem 1.25rem',
+          display: 'flex',
+          justifyContent: 'space-between',
+          alignItems: 'center',
+          marginBottom: '1rem',
+          animation: 'fadeIn 0.2s ease'
+        }}>
+          <div style={{ color: '#991b1b', fontWeight: 600, fontSize: '0.9rem' }}>
+            ✓ {selectedComplaints.length} complaint(s) selected
+          </div>
+          <div style={{ display: 'flex', gap: '8px' }}>
+            <button
+              onClick={() => setSelectedComplaints([])}
+              style={{
+                background: '#ffffff',
+                color: '#475569',
+                border: '1px solid #cbd5e1',
+                padding: '6px 12px',
+                borderRadius: '6px',
+                cursor: 'pointer',
+                fontSize: '0.8rem',
+                fontWeight: 600
+              }}
+            >
+              Deselect All
+            </button>
+            <button
+              onClick={handleBulkDelete}
+              style={{
+                background: '#ef4444',
+                color: '#ffffff',
+                border: 'none',
+                padding: '6px 14px',
+                borderRadius: '6px',
+                cursor: 'pointer',
+                fontSize: '0.8rem',
+                fontWeight: 700,
+                display: 'inline-flex',
+                alignItems: 'center',
+                gap: '6px',
+                boxShadow: '0 2px 6px rgba(239,68,68,0.3)'
+              }}
+            >
+              <Trash2 size={14} /> Delete Selected ({selectedComplaints.length})
+            </button>
+          </div>
+        </div>
+      )}
+
       {/* Complaints Table */}
       <div style={{ background: '#fff', borderRadius: '12px', padding: '1.25rem', boxShadow: '0 2px 4px rgba(0,0,0,0.05)' }}>
         {loading ? (
@@ -219,6 +294,15 @@ const AdminComplaints = () => {
             <table style={{ width: '100%', borderCollapse: 'collapse', textAlign: 'left', fontSize: '0.9rem' }}>
               <thead>
                 <tr style={{ borderBottom: '2px solid #e2e8f0', color: '#475569' }}>
+                  <th style={{ padding: '10px 8px', width: '40px', textAlign: 'center' }}>
+                    <input 
+                      type="checkbox"
+                      checked={filteredComplaints.length > 0 && selectedComplaints.length === filteredComplaints.length}
+                      onChange={handleSelectAll}
+                      title="Select all complaints to delete"
+                      style={{ width: '16px', height: '16px', cursor: 'pointer', accentColor: '#ef4444' }}
+                    />
+                  </th>
                   <th style={{ padding: '10px' }}>Complaint #</th>
                   <th style={{ padding: '10px' }}>Park Name</th>
                   <th style={{ padding: '10px' }}>District</th>
@@ -238,9 +322,19 @@ const AdminComplaints = () => {
                   const districtName = c.park?.district?.name || c.district || 'Bangalore Urban';
                   const zoneName = c.park?.zone?.name || c.zone || 'South Zone';
                   const wardName = c.park?.ward?.name || c.ward || 'Bangalore Urban Ward 4';
+                  const isChecked = selectedComplaints.includes(c._id);
 
                   return (
-                    <tr key={c._id} style={{ borderBottom: '1px solid #f1f5f9' }}>
+                    <tr key={c._id} style={{ borderBottom: '1px solid #f1f5f9', background: isChecked ? '#fef2f2' : 'transparent' }}>
+                      <td style={{ padding: '12px 8px', textAlign: 'center' }}>
+                        <input 
+                          type="checkbox"
+                          checked={isChecked}
+                          onChange={() => handleSelectOne(c._id)}
+                          title="Select complaint to delete"
+                          style={{ width: '16px', height: '16px', cursor: 'pointer', accentColor: '#ef4444' }}
+                        />
+                      </td>
                       <td style={{ padding: '12px 10px', fontWeight: 600, color: '#2563eb' }}>{c.complaintNumber}</td>
                       <td style={{ padding: '12px 10px', fontWeight: 600, color: '#0f172a' }}>{c.parkName || c.park?.name || 'Madhavan Park'}</td>
                       <td style={{ padding: '12px 10px', color: '#475569' }}>{districtName}</td>
@@ -371,25 +465,6 @@ const AdminComplaints = () => {
                               Close Complaint
                             </button>
                           )}
-                          <button
-                            onClick={() => handleDeleteComplaint(c._id)}
-                            style={{ 
-                              background: '#fee2e2', 
-                              color: '#dc2626', 
-                              border: '1px solid #fca5a5', 
-                              padding: '6px 12px', 
-                              borderRadius: '6px', 
-                              cursor: 'pointer', 
-                              fontSize: '0.8rem', 
-                              fontWeight: 600,
-                              display: 'inline-flex',
-                              alignItems: 'center',
-                              gap: '4px'
-                            }}
-                            title="Delete this complaint"
-                          >
-                            <Trash2 size={13} /> Delete
-                          </button>
                         </div>
                       </td>
                     </tr>
@@ -424,17 +499,19 @@ const AdminComplaints = () => {
             {/* Modal Body */}
             <div style={{ padding: '1.5rem', overflowY: 'auto', flex: 1 }}>
               {/* Complaint Overview Card */}
-              <div style={{ background: '#f8fafc', padding: '1rem 1.25rem', borderRadius: '10px', border: '1px solid #e2e8f0', marginBottom: '1.5rem' }}>
-                <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))', gap: '0.75rem', fontSize: '0.875rem' }}>
-                  <div><strong>Category:</strong> {selectedComplaint.category}</div>
-                  <div><strong>Priority:</strong> <span style={{ color: selectedComplaint.priority === 'Urgent' ? '#ef4444' : '#2563eb', fontWeight: 700 }}>{selectedComplaint.priority}</span></div>
-                  <div><strong>Current Status:</strong> <span style={{ background: '#dcfce7', color: '#15803d', padding: '2px 8px', borderRadius: '4px', fontWeight: 600 }}>{selectedComplaint.status}</span></div>
+              <div style={{ background: '#f8fafc', padding: '1.25rem', borderRadius: '12px', border: '1px solid #cbd5e1', marginBottom: '1.5rem' }}>
+                <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))', gap: '0.85rem', fontSize: '0.9rem', color: '#0f172a' }}>
+                  <div><strong style={{ color: '#0f172a' }}>Category:</strong> <span style={{ color: '#1e293b', fontWeight: 600 }}>{selectedComplaint.category}</span></div>
+                  <div><strong style={{ color: '#0f172a' }}>Priority:</strong> <span style={{ color: selectedComplaint.priority === 'Urgent' ? '#ef4444' : '#2563eb', fontWeight: 700 }}>{selectedComplaint.priority}</span></div>
+                  <div><strong style={{ color: '#0f172a' }}>Current Status:</strong> <span style={{ background: '#dcfce7', color: '#15803d', padding: '3px 10px', borderRadius: '6px', fontWeight: 700 }}>{selectedComplaint.status}</span></div>
                 </div>
-                <p style={{ margin: '0.75rem 0 0 0', fontSize: '0.875rem', color: '#475569' }}><strong>Description:</strong> {selectedComplaint.description}</p>
+                <p style={{ margin: '0.85rem 0 0 0', fontSize: '0.9rem', color: '#0f172a', lineHeight: 1.5 }}>
+                  <strong style={{ color: '#0f172a' }}>Description:</strong> <span style={{ color: '#1e293b' }}>{selectedComplaint.description}</span>
+                </p>
                 {selectedComplaint.images && selectedComplaint.images.length > 0 && (
-                  <div style={{ marginTop: '1rem' }}>
-                    <strong style={{ fontSize: '0.875rem', color: '#475569' }}>Public Complaint Images:</strong>
-                    <div style={{ display: 'flex', gap: '10px', marginTop: '0.5rem', flexWrap: 'wrap' }}>
+                  <div style={{ marginTop: '1.1rem' }}>
+                    <strong style={{ fontSize: '0.9rem', color: '#0f172a' }}>Public Complaint Images:</strong>
+                    <div style={{ display: 'flex', gap: '10px', marginTop: '0.6rem', flexWrap: 'wrap' }}>
                       {selectedComplaint.images.map((img, i) => (
                         <a key={i} href={`${img}`} target="_blank" rel="noreferrer" style={{ display: 'block' }}>
                           <img 
@@ -996,12 +1073,12 @@ const AdminComplaints = () => {
               <div style={{ padding: '1.5rem', overflowY: 'auto', flex: 1 }}>
 
                 {/* Complaint summary */}
-                <div style={{ background: '#faf5ff', border: '1px solid #e9d5ff', borderRadius: '10px', padding: '1rem 1.25rem', marginBottom: '1.5rem', display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(150px,1fr))', gap: '0.75rem', fontSize: '0.875rem' }}>
-                  <div><span style={{ color: '#64748b', fontWeight: 600 }}>Park:</span> <strong>{inspectionComplaint.parkName || inspectionComplaint.park?.name || '—'}</strong></div>
-                  <div><span style={{ color: '#64748b', fontWeight: 600 }}>Zone:</span> {inspectionComplaint.park?.zone?.name || inspectionComplaint.zone || '—'}</div>
-                  <div><span style={{ color: '#64748b', fontWeight: 600 }}>Ward:</span> {inspectionComplaint.park?.ward?.name || inspectionComplaint.ward || '—'}</div>
-                  <div><span style={{ color: '#64748b', fontWeight: 600 }}>Category:</span> {inspectionComplaint.category}</div>
-                  <div><span style={{ color: '#64748b', fontWeight: 600 }}>Contractor:</span> {inspectionComplaint.assignedContractor?.name || '—'}</div>
+                <div style={{ background: '#f8fafc', border: '1.5px solid #cbd5e1', borderRadius: '12px', padding: '1.25rem', marginBottom: '1.5rem', display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(180px,1fr))', gap: '1rem', fontSize: '0.9rem', color: '#0f172a' }}>
+                  <div><span style={{ color: '#475569', fontWeight: 600, display: 'block', fontSize: '0.8rem', textTransform: 'uppercase', marginBottom: '2px' }}>Park</span> <strong style={{ color: '#0f172a', fontSize: '0.95rem' }}>{inspectionComplaint.parkName || inspectionComplaint.park?.name || '—'}</strong></div>
+                  <div><span style={{ color: '#475569', fontWeight: 600, display: 'block', fontSize: '0.8rem', textTransform: 'uppercase', marginBottom: '2px' }}>Zone</span> <strong style={{ color: '#0f172a', fontSize: '0.95rem' }}>{inspectionComplaint.park?.zone?.name || inspectionComplaint.zone || '—'}</strong></div>
+                  <div><span style={{ color: '#475569', fontWeight: 600, display: 'block', fontSize: '0.8rem', textTransform: 'uppercase', marginBottom: '2px' }}>Ward</span> <strong style={{ color: '#0f172a', fontSize: '0.95rem' }}>{inspectionComplaint.park?.ward?.name || inspectionComplaint.ward || '—'}</strong></div>
+                  <div><span style={{ color: '#475569', fontWeight: 600, display: 'block', fontSize: '0.8rem', textTransform: 'uppercase', marginBottom: '2px' }}>Category</span> <strong style={{ color: '#0f172a', fontSize: '0.95rem' }}>{inspectionComplaint.category || '—'}</strong></div>
+                  <div><span style={{ color: '#475569', fontWeight: 600, display: 'block', fontSize: '0.8rem', textTransform: 'uppercase', marginBottom: '2px' }}>Contractor</span> <strong style={{ color: '#0f172a', fontSize: '0.95rem' }}>{inspectionComplaint.assignedContractor?.name || '—'}</strong></div>
                 </div>
 
                 {/* Filter notice */}

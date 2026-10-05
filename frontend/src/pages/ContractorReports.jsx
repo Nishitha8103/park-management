@@ -35,15 +35,15 @@ const ContractorReports = () => {
         setLoading(true);
         const res = await fetch(`${API_BASE}/complaints?contractorId=${contractor._id || contractor.id}`);
         const data = await res.json();
-        
+
         const source = Array.isArray(data) ? data : [];
-        
-        // Setup Notifications counter
+
+
         const newTasks = source.filter(c => ['Assigned', 'Reassigned to Contractor'].includes(c.status));
         setNotifications(newTasks);
 
-        // Filter reports
-        const completedJobs = source.filter(c => 
+
+        const completedJobs = source.filter(c =>
           ['Completed', 'Completed - Waiting for Admin Review', 'Inspection Pending', 'Inspection Approved', 'Closed'].includes(c.status)
         );
 
@@ -87,13 +87,13 @@ const ContractorReports = () => {
 
   return (
     <div className="contractor-dashboard-page">
-      <ContractorSidebar 
-        isOpen={isSidebarOpen} 
-        toggleSidebar={toggleSidebar} 
-        handleLogout={handleLogout} 
-        contractor={contractor} 
+      <ContractorSidebar
+        isOpen={isSidebarOpen}
+        toggleSidebar={toggleSidebar}
+        handleLogout={handleLogout}
+        contractor={contractor}
       />
-      
+
       <div className={`contractor-main-wrapper ${isSidebarOpen ? 'sidebar-open' : ''}`}>
         <header className="contractor-header">
           <div className="container contractor-header-content">
@@ -104,23 +104,16 @@ const ContractorReports = () => {
               <TreePine size={28} color="#e5ede7" />
               <h1>Parks Monitoring System</h1>
             </div>
-            
+
             <div className="contractor-user-info" style={{ display: 'flex', alignItems: 'center', gap: '1.5rem' }}>
-              <div 
-                className="header-notification-icon" 
+              <div
+                className="header-notification-icon"
                 onClick={() => navigate('/contractor/notifications')}
                 style={{ cursor: 'pointer', position: 'relative', display: 'flex', alignItems: 'center', justifyContent: 'center' }}
               >
                 <Bell size={22} style={{ color: '#e2e8f0' }} />
                 <span style={{ position: 'absolute', top: '-6px', right: '-6px', background: '#ef4444', color: 'white', fontSize: '0.65rem', fontWeight: 'bold', padding: '2px 5px', borderRadius: '10px', minWidth: '16px', textAlign: 'center' }}>{notifications.length}</span>
               </div>
-              <div className="contractor-user-details" style={{ display: 'flex', flexDirection: 'column', alignItems: 'flex-end', marginLeft: '0.5rem' }}>
-                <h4 className="contractor-user-name" style={{ margin: 0 }}>{contractor.name}</h4>
-                <p className="contractor-user-role" style={{ margin: 0, fontSize: '0.8rem', color: '#94a3b8' }}>{contractor.department || 'General Maintenance'} Specialist</p>
-              </div>
-              <button className="btn-contractor-logout" onClick={handleLogout} style={{ marginLeft: '0.5rem' }}>
-                <LogOut size={16} /> Logout
-              </button>
             </div>
           </div>
         </header>
@@ -142,7 +135,7 @@ const ContractorReports = () => {
               </div>
               <div className="stat-info">
                 <h3>{reports.length}</h3>
-                <p>Total Reports<br/>Submitted</p>
+                <p>Total Reports<br />Submitted</p>
               </div>
             </div>
 
@@ -152,7 +145,7 @@ const ContractorReports = () => {
               </div>
               <div className="stat-info">
                 <h3>{reports.filter(r => r.status === 'Verified').length}</h3>
-                <p>Verified<br/>Reports</p>
+                <p>Verified<br />Reports</p>
               </div>
             </div>
 
@@ -162,7 +155,7 @@ const ContractorReports = () => {
               </div>
               <div className="stat-info">
                 <h3>{reports.filter(r => r.status === 'Rejected').length}</h3>
-                <p>Rejected<br/>Reports</p>
+                <p>Rejected<br />Reports</p>
               </div>
             </div>
 
@@ -172,7 +165,7 @@ const ContractorReports = () => {
               </div>
               <div className="stat-info">
                 <h3>{reports.filter(r => r.status === 'Pending').length}</h3>
-                <p>Pending Verification<br/>Reports</p>
+                <p>Pending Verification<br />Reports</p>
               </div>
             </div>
           </div>
@@ -229,8 +222,8 @@ const ContractorReports = () => {
             </div>
           </div>
         </main>
-        
-        
+
+
       </div>
     </div>
   );

@@ -22,7 +22,8 @@ import {
   Edit, 
   Hourglass, 
   X, 
-  Flag 
+  Flag,
+  Download 
 } from 'lucide-react';
 import './ContractorTaskDetails.css';
 import ContractorSidebar from '../components/ContractorSidebar';
@@ -238,13 +239,6 @@ const ContractorTaskDetails = () => {
                 <Bell size={22} style={{ color: '#475569' }} />
                 <span style={{ position: 'absolute', top: '-6px', right: '-6px', background: '#ef4444', color: 'white', fontSize: '0.65rem', fontWeight: 'bold', padding: '2px 5px', borderRadius: '10px', minWidth: '16px', textAlign: 'center' }}>3</span>
               </div>
-              <div className="contractor-user-details" style={{ display: 'flex', flexDirection: 'column', alignItems: 'flex-end', marginLeft: '0.5rem' }}>
-                <h4 className="contractor-user-name" style={{ margin: 0 }}>{contractor.name}</h4>
-                <p className="contractor-user-role" style={{ margin: 0, fontSize: '0.8rem', color: '#64748b' }}>{contractor.department || 'General Maintenance'} Specialist</p>
-              </div>
-              <button className="btn-contractor-logout" onClick={handleLogout} style={{ marginLeft: '0.5rem' }}>
-                <LogOut size={16} /> Logout
-              </button>
             </div>
           </div>
         </header>
@@ -463,14 +457,24 @@ const ContractorTaskDetails = () => {
                         </div>
                       )}
                     </div>
-                  ) : task.status === 'Closed' ? (
+                  ) : ['Completed', 'Completed - Waiting for Admin Review', 'Inspection Pending', 'Inspection Approved', 'Verified', 'Closed'].includes(task.status) ? (
                     <div className="ref-closed-group">
                       <div className="ref-state-banner success">
                         <CheckCircle size={18} />
-                        <span>Task Closed & Verified</span>
+                        <span>
+                          {task.status === 'Closed' 
+                            ? 'Task Closed & Verified' 
+                            : task.status === 'Inspection Approved' 
+                              ? 'Inspection Approved' 
+                              : 'Completion Submitted'}
+                        </span>
                       </div>
-                      <Link to={`/contractor/reports/${task._id}`} className="ref-btn-secondary">
-                        <FileText size={16} /> Download Report
+                      <Link 
+                        to={`/contractor/reports/${task._id}`} 
+                        className="ref-btn-primary" 
+                        style={{ display: 'inline-flex', alignItems: 'center', justifyContent: 'center', gap: '8px', textDecoration: 'none', background: 'linear-gradient(135deg, #15803d, #16a34a)', color: '#ffffff', boxShadow: '0 4px 12px rgba(22, 163, 74, 0.25)' }}
+                      >
+                        <Download size={16} /> Download Report
                       </Link>
                     </div>
                   ) : (

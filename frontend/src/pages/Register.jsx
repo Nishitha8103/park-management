@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
-import { UserPlus, User, Mail, Phone, Lock, Eye, EyeOff, ArrowRight, Sprout, Check, ShieldCheck } from 'lucide-react';
+import { UserPlus, User, Mail, Phone, Lock, Eye, EyeOff, ArrowRight, Sprout } from 'lucide-react';
 import parkBackground from '../assets/images/park-background.jpg';
 import './Register.css';
 
@@ -17,11 +17,6 @@ const Register = () => {
   const [successMsg, setSuccessMsg] = useState('');
   const [isLoading, setIsLoading] = useState(false);
 
-  // Real-time password requirement flags
-  const hasMinLength = password.length >= 8;
-  const hasUppercase = /[A-Z]/.test(password);
-  const hasNumber = /\d/.test(password);
-
   const handleRegister = async (e) => {
     e.preventDefault();
     setErrorMsg('');
@@ -30,9 +25,9 @@ const Register = () => {
     if (!name.trim()) return setErrorMsg('Full Name is required');
     if (!/^\S+@\S+\.\S+$/.test(email)) return setErrorMsg('Invalid email format');
     if (!/^\d{10}$/.test(phone)) return setErrorMsg('Phone number must be exactly 10 digits');
-    if (!hasMinLength) return setErrorMsg('Password must be at least 8 characters');
-    if (!hasUppercase) return setErrorMsg('Password must contain at least one uppercase letter (A-Z)');
-    if (!hasNumber) return setErrorMsg('Password must contain at least one number (0-9)');
+    if (password.length < 8) return setErrorMsg('Password must be at least 8 characters');
+    if (!/[A-Z]/.test(password)) return setErrorMsg('Password must contain at least one uppercase letter (A-Z)');
+    if (!/\d/.test(password)) return setErrorMsg('Password must contain at least one number (0-9)');
     if (password !== confirmPassword) return setErrorMsg('Passwords do not match');
 
     setIsLoading(true);
@@ -164,7 +159,7 @@ const Register = () => {
                 <input 
                   type={showPassword ? "text" : "password"} 
                   className="register-text-input" 
-                  placeholder="Create a strong password" 
+                  placeholder="Min 8 chars, 1 uppercase (A-Z), 1 number (0-9)" 
                   value={password}
                   onChange={(e) => setPassword(e.target.value)}
                   autoComplete="new-password"
@@ -178,28 +173,6 @@ const Register = () => {
                 >
                   {showPassword ? <EyeOff size={18} /> : <Eye size={18} />}
                 </button>
-              </div>
-
-              {/* 2. Password Requirements Checklist */}
-              <div className="register-password-requirements">
-                <div className="pwd-req-header">
-                  <ShieldCheck size={14} className="pwd-req-icon" />
-                  <span>Password Requirements</span>
-                </div>
-                <div className="pwd-req-list">
-                  <div className={`pwd-req-item ${hasMinLength ? 'valid' : ''}`}>
-                    {hasMinLength ? <Check size={13} className="req-check-icon" /> : <div className="req-dot" />}
-                    <span>Minimum 8 characters</span>
-                  </div>
-                  <div className={`pwd-req-item ${hasUppercase ? 'valid' : ''}`}>
-                    {hasUppercase ? <Check size={13} className="req-check-icon" /> : <div className="req-dot" />}
-                    <span>At least one uppercase letter (A-Z)</span>
-                  </div>
-                  <div className={`pwd-req-item ${hasNumber ? 'valid' : ''}`}>
-                    {hasNumber ? <Check size={13} className="req-check-icon" /> : <div className="req-dot" />}
-                    <span>At least one number (0-9)</span>
-                  </div>
-                </div>
               </div>
             </div>
 

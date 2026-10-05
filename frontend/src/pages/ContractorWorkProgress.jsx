@@ -1,6 +1,7 @@
 import { useEffect, useState } from 'react';
 import { useParams, Link, useNavigate } from 'react-router-dom';
 import { Menu, LogOut, ArrowLeft, TreePine, HardHat, Check, X, Plus, Save, Bell, Camera, Upload } from 'lucide-react';
+import './ContractorDashboard.css';
 import './ContractorWorkProgress.css';
 import ContractorSidebar from '../components/ContractorSidebar';
 import LiveCameraCaptureModal from '../components/LiveCameraCaptureModal';
@@ -236,13 +237,6 @@ const ContractorWorkProgress = () => {
                 <Bell size={22} style={{ color: '#475569' }} />
                 <span style={{ position: 'absolute', top: '-6px', right: '-6px', background: '#ef4444', color: 'white', fontSize: '0.65rem', fontWeight: 'bold', padding: '2px 5px', borderRadius: '10px', minWidth: '16px', textAlign: 'center' }}>3</span>
               </div>
-              <div className="contractor-user-details" style={{ display: 'flex', flexDirection: 'column', alignItems: 'flex-end', marginLeft: '0.5rem' }}>
-                <h4 className="contractor-user-name" style={{ margin: 0 }}>{contractor.name}</h4>
-                <p className="contractor-user-role" style={{ margin: 0, fontSize: '0.8rem', color: '#64748b' }}>{contractor.department || 'General Maintenance'} Specialist</p>
-              </div>
-              <button className="btn-contractor-logout" onClick={handleLogout} style={{ marginLeft: '0.5rem' }}>
-                <LogOut size={16} /> Logout
-              </button>
             </div>
           </div>
         </header>
